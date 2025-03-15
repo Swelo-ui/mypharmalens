@@ -7,72 +7,7 @@ import { DetailedDrugData } from '@/components/DrugDetails';
 import DrugDetails from '@/components/DrugDetails';
 import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
-
-const mockIdentificationResponse = (delay: number = 2000): Promise<DetailedDrugData> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: "para-123",
-        name: "Paracetamol 500mg",
-        genericName: "Acetaminophen",
-        manufacturer: "Generic Pharmaceuticals",
-        category: "Analgesic",
-        description: "Paracetamol is used to treat pain and fever. It's one of the most widely used medications globally for these purposes.",
-        dosageAndAdmin: "Adults and children 12 years and over: 1-2 tablets every 4-6 hours as needed, not exceeding 8 tablets in 24 hours. Children under 12: consult a doctor.",
-        sideEffects: [
-          "Nausea or vomiting",
-          "Stomach pain",
-          "Loss of appetite",
-          "Headache",
-          "Skin rash or itching",
-          "Allergic reactions (rare)"
-        ],
-        warnings: [
-          "Do not exceed the recommended dose",
-          "Do not use with other products containing paracetamol",
-          "May cause liver damage if taken in excess",
-          "Consult doctor if symptoms persist for more than 3 days",
-          "Avoid alcohol consumption while taking this medication"
-        ],
-        interactions: [
-          "Warfarin and other blood thinners",
-          "Certain epilepsy medications",
-          "Metoclopramide and domperidone",
-          "Cholestyramine"
-        ],
-        storage: "Store below 25°C in a dry place, away from direct sunlight and heat. Keep out of reach of children.",
-        mechanism: "Paracetamol works by inhibiting the production of prostaglandins in the central nervous system and peripherally blocks pain impulse generation. It has antipyretic effects by acting on the hypothalamic heat-regulating center.",
-        indications: [
-          "Mild to moderate pain",
-          "Fever",
-          "Headache",
-          "Muscular aches",
-          "Toothache",
-          "Cold and flu symptoms"
-        ],
-        contraindications: [
-          "Hypersensitivity to paracetamol",
-          "Severe liver impairment",
-          "Alcohol dependence"
-        ],
-        prescriptionStatus: "OTC",
-        pregnancy: "Considered safe for use during pregnancy and breastfeeding when used as directed. Consult healthcare provider before use.",
-        verified: true,
-        image: "/placeholder.svg",
-        similarDrugs: [
-          {
-            id: "ibu-456",
-            name: "Ibuprofen 400mg"
-          },
-          {
-            id: "asp-789",
-            name: "Aspirin 325mg"
-          }
-        ]
-      });
-    }, delay);
-  });
-};
+import { supabase } from '@/integrations/supabase/client';
 
 const DrugIdentify = () => {
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
@@ -84,16 +19,71 @@ const DrugIdentify = () => {
       setIsIdentifying(true);
       toast.info("Processing your image...");
       
-      // In a real app, we would upload the image to a server for processing
-      // For now, we'll use a mock response
-      const drugData = await mockIdentificationResponse(3000);
+      // Convert the image file to base64
+      const reader = new FileReader();
       
-      setIdentifiedDrug(drugData);
-      toast.success("Drug successfully identified!");
+      reader.onload = async (event) => {
+        if (event.target?.result) {
+          const base64Image = event.target.result.toString();
+          
+          try {
+            // Call the Supabase Edge Function for AI-powered drug identification
+            const { data, error } = await supabase.functions.invoke('identify-drug', {
+              body: { imageBase64: base64Image },
+            });
+            
+            if (error) {
+              console.error('Error calling identify-drug function:', error);
+              toast.error("Failed to identify medication. Please try again.");
+              setIsIdentifying(false);
+              return;
+            }
+            
+            if (data) {
+              // Save the identification result to Supabase
+              try {
+                const { error: saveError } = await supabase
+                  .from('drug_identifications')
+                  .insert([
+                    {
+                      image_url: base64Image,
+                      drug_name: data.name,
+                      details: data
+                    }
+                  ]);
+                
+                if (saveError) {
+                  console.error('Error saving identification result:', saveError);
+                }
+              } catch (dbError) {
+                console.error('Database error:', dbError);
+                // Continue even if database save fails
+              }
+              
+              setIdentifiedDrug(data);
+              toast.success("Medication successfully identified!");
+            } else {
+              toast.error("Could not get identification results. Please try again.");
+            }
+          } catch (apiError) {
+            console.error('API error:', apiError);
+            toast.error("Failed to process the image. Please try another image.");
+          } finally {
+            setIsIdentifying(false);
+          }
+        }
+      };
+      
+      reader.onerror = () => {
+        toast.error("Failed to read the image file. Please try another image.");
+        setIsIdentifying(false);
+      };
+      
+      reader.readAsDataURL(file);
+      
     } catch (error) {
-      console.error("Error identifying drug:", error);
-      toast.error("Failed to identify the drug. Please try again.");
-    } finally {
+      console.error("Error identifying medication:", error);
+      toast.error("An unexpected error occurred. Please try again.");
       setIsIdentifying(false);
     }
   };
