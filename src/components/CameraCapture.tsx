@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, FlipCamera, Camera as CameraIcon, Check } from 'lucide-react';
+import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
@@ -206,7 +206,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
                 variant="secondary" 
                 className="rounded-full h-10 w-10 absolute right-4 top-4"
               >
-                <FlipCamera className="h-5 w-5" />
+                <RotateCw className="h-5 w-5" />
               </Button>
             )}
           </div>
