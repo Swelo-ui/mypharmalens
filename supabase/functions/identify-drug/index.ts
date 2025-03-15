@@ -33,8 +33,26 @@ serve(async (req) => {
       ? imageBase64.split('base64,')[1] 
       : imageBase64;
 
-    // Call DeepSeek API for drug identification
+    console.log("Image received, preparing to call AI API");
+    
+    // Get the API key from environment variables
     const apiKey = Deno.env.get("DEEPSEEK_API_KEY");
+    
+    if (!apiKey) {
+      console.error("DEEPSEEK_API_KEY is not set in environment variables");
+      return new Response(
+        JSON.stringify({ 
+          error: "API key not configured" 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    // Call DeepSeek API for drug identification
+    console.log("Calling DeepSeek API...");
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -62,7 +80,25 @@ serve(async (req) => {
       })
     });
 
+    // Check if the API request was successful
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("DeepSeek API error:", JSON.stringify(errorData));
+      
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to analyze image with AI", 
+          details: errorData 
+        }),
+        { 
+          status: response.status, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const data = await response.json();
+    console.log("DeepSeek API response received");
 
     // Parse the result from the DeepSeek API
     try {
@@ -121,7 +157,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (parseError) {
-      console.error("Error parsing DeepSeek response:", parseError);
+      console.error("Error parsing DeepSeek response:", parseError.message);
       return new Response(
         JSON.stringify({ 
           error: "Failed to parse drug information", 
@@ -135,7 +171,7 @@ serve(async (req) => {
       );
     }
   } catch (error) {
-    console.error("Error in identify-drug function:", error);
+    console.error("Error in identify-drug function:", error.message);
     return new Response(
       JSON.stringify({ 
         error: "An unexpected error occurred", 
