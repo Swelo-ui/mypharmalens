@@ -39,7 +39,7 @@ const SearchResults = () => {
           genericName: 'Acetaminophen',
           manufacturer: 'Generic',
           category: 'Analgesic',
-          description: 'Used to treat pain and fever. It's often used for headaches, toothaches, and minor aches and pains.',
+          description: 'Used to treat pain and fever. It\'s often used for headaches, toothaches, and minor aches and pains.',
           drugClass: 'Non-opioid analgesic',
           verified: true
         },
