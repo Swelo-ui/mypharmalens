@@ -13,6 +13,7 @@ export interface DrugData {
   description?: string;
   drugClass?: string;
   verified?: boolean;
+  image?: string;
 }
 
 interface DrugCardProps {
@@ -81,11 +82,24 @@ const DrugCard = ({ drug, className }: DrugCardProps) => {
         )}
       </div>
       
+      {drug.image && (
+        <div className="mt-4 h-32 rounded-lg overflow-hidden">
+          <img 
+            src={drug.image} 
+            alt={drug.name} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
-        <button className="text-xs text-pharma-600 font-medium flex items-center hover:underline">
-          <Info className="h-3 w-3 mr-1" />
+        <Link 
+          to={`/drug/${drug.id}`}
+          className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors"
+        >
+          <Info className="h-3.5 w-3.5 mr-1.5" />
           View detailed information
-        </button>
+        </Link>
       </div>
     </Link>
   );

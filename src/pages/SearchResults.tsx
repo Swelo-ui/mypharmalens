@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -6,6 +5,7 @@ import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
+import { mockDrugsData } from '@/data/mockDrugsData';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -18,11 +18,8 @@ const SearchResults = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   
-  // Categories for filtering
-  const categories = [
-    "Analgesic", "Antibiotic", "Antihistamine", "Antidepressant", 
-    "Antihypertensive", "Antidiabetic", "Antiemetic", "Anti-inflammatory"
-  ];
+  // Extract unique categories from mockDrugsData
+  const categories = Array.from(new Set(mockDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
 
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
@@ -31,89 +28,25 @@ const SearchResults = () => {
     
     // Simulate API call to fetch results
     const timer = setTimeout(() => {
-      // Mock data - in a real app, this would be fetched from an API
-      const mockResults: DrugData[] = [
-        {
-          id: '1',
-          name: 'Paracetamol',
-          genericName: 'Acetaminophen',
-          manufacturer: 'Generic',
-          category: 'Analgesic',
-          description: 'Used to treat pain and fever. It\'s often used for headaches, toothaches, and minor aches and pains.',
-          drugClass: 'Non-opioid analgesic',
-          verified: true
-        },
-        {
-          id: '2',
-          name: 'Ibuprofen',
-          genericName: 'Ibuprofen',
-          manufacturer: 'Various',
-          category: 'Anti-inflammatory',
-          description: 'Non-steroidal anti-inflammatory drug used for relieving pain, fever, and inflammation.',
-          drugClass: 'NSAID',
-          verified: true
-        },
-        {
-          id: '3',
-          name: 'Amoxicillin',
-          genericName: 'Amoxicillin',
-          manufacturer: 'Generic',
-          category: 'Antibiotic',
-          description: 'Penicillin antibiotic used to treat bacterial infections of the ear, nose, throat, respiratory tract, urinary tract, and skin.',
-          drugClass: 'Penicillin antibiotic',
-          verified: true
-        },
-        {
-          id: '4',
-          name: 'Lisinopril',
-          genericName: 'Lisinopril',
-          manufacturer: 'Various',
-          category: 'Antihypertensive',
-          description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to improve survival after a heart attack.',
-          drugClass: 'ACE inhibitor',
-          verified: true
-        },
-        {
-          id: '5',
-          name: 'Loratadine',
-          genericName: 'Loratadine',
-          manufacturer: 'Various',
-          category: 'Antihistamine',
-          description: 'Antihistamine used to temporarily relieve symptoms of hay fever and other allergies.',
-          drugClass: 'Second-generation antihistamine',
-          verified: false
-        },
-        {
-          id: '6',
-          name: 'Metformin',
-          genericName: 'Metformin hydrochloride',
-          manufacturer: 'Various',
-          category: 'Antidiabetic',
-          description: 'Oral medication used to treat type 2 diabetes by improving how the body handles insulin.',
-          drugClass: 'Biguanide',
-          verified: true
-        }
-      ];
-      
       // Filter based on search query
       const filtered = searchQuery
-        ? mockResults.filter(drug => 
+        ? mockDrugsData.filter(drug => 
             drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (drug.category && drug.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (drug.drugClass && drug.drugClass.toLowerCase().includes(searchQuery.toLowerCase()))
           )
-        : mockResults;
+        : mockDrugsData;
       
       // Apply category filters if any are active
       const finalResults = activeFilters.length > 0
-        ? filtered.filter(drug => activeFilters.includes(drug.category || ''))
+        ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
         : filtered;
       
       setResults(finalResults);
       setIsLoading(false);
-    }, 1500); // Simulating delay for API call
+    }, 1000); // Reduced delay for better user experience
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
