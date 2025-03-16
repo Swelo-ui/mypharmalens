@@ -1,4 +1,3 @@
-
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -223,7 +222,6 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/003782608.jpg'
   },
-  // Add more essential medications (20-40)
   {
     id: '21',
     name: 'Alprazolam',
@@ -279,8 +277,6 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/mtm/Pantoprazole%20Sodium%2040%20mg-TEV.jpg'
   },
-  // Add more essential medications (25-40)
-  // Adding many brand names for common medications
   {
     id: '26',
     name: 'Lipitor',
@@ -336,7 +332,6 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/000690365.jpg'
   },
-  // Continuing with more brand names (31-40)
   {
     id: '31',
     name: 'Prozac',
@@ -392,7 +387,6 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/000090029.jpg'
   },
-  // Continuing with more brand and generic medications (36-50)
   {
     id: '36',
     name: 'Celebrex',
@@ -448,17 +442,14 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/501070177.jpg'
   }
-  // ...and so on up to at least 200 medications
 ];
 
-// Detailed drug data for specific drug pages
 export const getDetailedDrugData = (id: string): DetailedDrugData | undefined => {
   const basicDrug = mockDrugsData.find(drug => drug.id === id);
   
   if (!basicDrug) return undefined;
   
-  // Additional detailed data based on drug ID
-  const detailedData: Partial<DetailedDrugData> = {
+  const detailedData: Record<string, Partial<DetailedDrugData>> = {
     '1': {
       dosageAndAdmin: 'Adults and adolescents (aged 12 years and over): 500-1000 mg every 4-6 hours as needed, not exceeding 4000 mg in 24 hours.',
       sideEffects: [
@@ -536,40 +527,39 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | undefined =>
       pregnancy: 'Category C (first and second trimesters). Category D (third trimester). Use during the first and second trimesters only if clearly needed. Avoid use during the third trimester as it may cause premature closure of the ductus arteriosus.',
       verified: true
     }
-  }[id];
+  };
   
   return {
     ...basicDrug,
     genericName: basicDrug.genericName || '',
     manufacturer: basicDrug.manufacturer || 'Unknown',
     category: basicDrug.category || 'Unknown',
-    dosageAndAdmin: detailedData?.dosageAndAdmin || 'Please consult a healthcare professional for proper dosage instructions.',
-    sideEffects: detailedData?.sideEffects || [
+    dosageAndAdmin: detailedData[id]?.dosageAndAdmin || 'Please consult a healthcare professional for proper dosage instructions.',
+    sideEffects: detailedData[id]?.sideEffects || [
       'Consult a healthcare professional for information about possible side effects'
     ],
-    warnings: detailedData?.warnings || [
+    warnings: detailedData[id]?.warnings || [
       'Always read the medication guide or package insert',
       'Follow the directions provided by your healthcare provider'
     ],
-    interactions: detailedData?.interactions || [
+    interactions: detailedData[id]?.interactions || [
       'May interact with other medications'
     ],
-    storage: detailedData?.storage || 'Store according to package instructions.',
-    mechanism: detailedData?.mechanism || 'The mechanism of action for this medication may involve specific biochemical pathways.',
-    indications: detailedData?.indications || [
+    storage: detailedData[id]?.storage || 'Store according to package instructions.',
+    mechanism: detailedData[id]?.mechanism || 'The mechanism of action for this medication may involve specific biochemical pathways.',
+    indications: detailedData[id]?.indications || [
       'Consult healthcare provider for approved uses of this medication'
     ],
-    contraindications: detailedData?.contraindications || [
+    contraindications: detailedData[id]?.contraindications || [
       'May not be suitable for all patients'
     ],
-    prescriptionStatus: detailedData?.prescriptionStatus || 'Unknown',
-    pregnancy: detailedData?.pregnancy || 'Consult a healthcare professional before using this medication during pregnancy or breastfeeding.',
+    prescriptionStatus: detailedData[id]?.prescriptionStatus || 'OTC',
+    pregnancy: detailedData[id]?.pregnancy || 'Consult a healthcare professional before using this medication during pregnancy or breastfeeding.',
     verified: basicDrug.verified || false,
     similarDrugs: getSimilarDrugs(id)
   };
 };
 
-// Function to get similar drugs based on category and drug class
 const getSimilarDrugs = (drugId: string): { id: string; name: string }[] => {
   const drug = mockDrugsData.find(d => d.id === drugId);
   if (!drug) return [];

@@ -26,6 +26,7 @@ export interface DetailedDrugData {
   pregnancy: string;
   verified: boolean;
   image?: string;
+  drugClass?: string;
   similarDrugs?: {
     id: string;
     name: string;
