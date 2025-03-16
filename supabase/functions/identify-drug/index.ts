@@ -42,10 +42,15 @@ async function getDrugInfoFromDrugsCom(drugName: string): Promise<any> {
       
       const searchHtml = await searchResponse.text();
       
-      // Extract the first search result URL (simplified parsing)
+      // Enhanced regex to find search results
       const firstResultMatch = searchHtml.match(/<a href="(\/[^"]+)" class="ddc-link-[^"]+">/);
-      if (firstResultMatch && firstResultMatch[1]) {
-        const resultUrl = `https://www.drugs.com${firstResultMatch[1]}`;
+      
+      // Try to find alternative pattern if first one fails
+      const alternativeMatch = firstResultMatch || 
+                             searchHtml.match(/<a href="(\/[^"]+)" class="[^"]*?">/);
+      
+      if (alternativeMatch && alternativeMatch[1]) {
+        const resultUrl = `https://www.drugs.com${alternativeMatch[1]}`;
         console.log(`Found search result, fetching: ${resultUrl}`);
         
         const detailResponse = await fetch(resultUrl, {
@@ -61,6 +66,33 @@ async function getDrugInfoFromDrugsCom(drugName: string): Promise<any> {
         return parseHtmlForDrugInfo(await detailResponse.text(), drugName);
       }
       
+      // Try another approach - look for search results table
+      const tableResultMatch = searchHtml.match(/<table class="data-list data-list--search[^>]*>([\s\S]*?)<\/table>/);
+      if (tableResultMatch) {
+        const tableHtml = tableResultMatch[1];
+        const linkMatch = tableHtml.match(/<a href="([^"]+)"/);
+        
+        if (linkMatch && linkMatch[1]) {
+          const resultUrl = linkMatch[1].startsWith('http') ? 
+                          linkMatch[1] : 
+                          `https://www.drugs.com${linkMatch[1]}`;
+          
+          console.log(`Found table result, fetching: ${resultUrl}`);
+          
+          const detailResponse = await fetch(resultUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+          });
+          
+          if (!detailResponse.ok) {
+            throw new Error('Failed to fetch drug detail page from table result');
+          }
+          
+          return parseHtmlForDrugInfo(await detailResponse.text(), drugName);
+        }
+      }
+      
       return null; // No search results found
     }
     
@@ -69,6 +101,57 @@ async function getDrugInfoFromDrugsCom(drugName: string): Promise<any> {
     return parseHtmlForDrugInfo(html, drugName);
   } catch (error) {
     console.error(`Error fetching drug info from drugs.com: ${error.message}`);
+    return null;
+  }
+}
+
+// Function to find drug information by imprint or markings
+async function findDrugByImprint(imprint: string): Promise<any> {
+  try {
+    if (!imprint || imprint.trim().length < 2) {
+      return null;
+    }
+    
+    console.log(`Searching drugs.com for pill imprint: ${imprint}`);
+    const url = `https://www.drugs.com/imprints.php?imprint=${encodeURIComponent(imprint)}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const html = await response.text();
+    
+    // Look for the first pill match in the results
+    const pillMatch = html.match(/<a href="([^"]+)" class="[^"]*?pill-identifier-[^"]*?">([^<]+)<\/a>/i);
+    
+    if (pillMatch && pillMatch[1]) {
+      const pillUrl = pillMatch[1].startsWith('http') ? 
+                    pillMatch[1] : 
+                    `https://www.drugs.com${pillMatch[1]}`;
+      const pillName = pillMatch[2].trim();
+      
+      console.log(`Found pill match: ${pillName}, fetching details from: ${pillUrl}`);
+      
+      const detailResponse = await fetch(pillUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      if (detailResponse.ok) {
+        return parseHtmlForDrugInfo(await detailResponse.text(), pillName);
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`Error searching by imprint: ${error.message}`);
     return null;
   }
 }
@@ -102,8 +185,30 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
       drugInfo.genericName = genericNameMatch[1].trim();
     }
     
-    // Extract description
-    const descriptionMatch = html.match(/<div class="contentBox">[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    // Extract manufacturer (enhanced)
+    const manufacturerMatch = html.match(/(?:Manufactured|Marketed|Supplied) by:?\s*([^<.]+)(?:<|\.)/i) || 
+                            html.match(/(?:Manufactured|Marketed|Supplied) for:?\s*([^<.]+)(?:<|\.)/i);
+    if (manufacturerMatch && manufacturerMatch[1]) {
+      drugInfo.manufacturer = manufacturerMatch[1].trim();
+    }
+    
+    // Extract drug category
+    const categoryMatch = html.match(/<a href="\/drug-class\/[^"]+"[^>]*>([^<]+)<\/a>/i);
+    if (categoryMatch && categoryMatch[1]) {
+      drugInfo.category = categoryMatch[1].trim();
+    }
+    
+    // Extract description (improved with fallbacks)
+    let descriptionMatch = html.match(/<div class="contentBox">[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    if (!descriptionMatch) {
+      // Try alternative pattern
+      descriptionMatch = html.match(/<div id="drug-description"[^>]*>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    }
+    if (!descriptionMatch) {
+      // Try another pattern
+      descriptionMatch = html.match(/<div class="[^"]*?drug-description[^"]*?"[^>]*>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    }
+    
     if (descriptionMatch && descriptionMatch[1]) {
       drugInfo.description = descriptionMatch[1]
         .replace(/<[^>]*>/g, '') // Remove HTML tags
@@ -111,8 +216,11 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .trim();
     }
     
-    // Extract side effects
-    const sideEffectsMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/);
+    // Extract side effects (more robust pattern)
+    const sideEffectsMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/) ||
+                           html.match(/<h3[^>]*>Side Effects<\/h3>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/) ||
+                           html.match(/<h2[^>]*>Common[^<]*side effects[^<]*<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i);
+    
     if (sideEffectsMatch && sideEffectsMatch[1]) {
       const sideEffectsHtml = sideEffectsMatch[1];
       const sideEffects = sideEffectsHtml.match(/<li[^>]*>([\s\S]*?)<\/li>/g);
@@ -129,8 +237,30 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
       }
     }
     
-    // Extract warnings
-    const warningsMatch = html.match(/<h2[^>]*>Warnings<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    // If no side effects found with lists, try paragraphs
+    if (drugInfo.sideEffects.length === 0) {
+      const sideEffectsParagraphMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<p>([\s\S]*?)<\/p>/) ||
+                                      html.match(/<h3[^>]*>Side Effects<\/h3>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+      
+      if (sideEffectsParagraphMatch && sideEffectsParagraphMatch[1]) {
+        const paragraphText = sideEffectsParagraphMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        drugInfo.sideEffects = paragraphText
+          .split(/\.\s+|;\s+/)
+          .map(effect => effect.trim())
+          .filter(effect => effect.length > 5)
+          .map(effect => effect + (effect.endsWith('.') ? '' : '.'));
+      }
+    }
+    
+    // Extract warnings (improved)
+    const warningsMatch = html.match(/<h2[^>]*>Warnings<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                        html.match(/<h3[^>]*>Warnings<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                        html.match(/<h2[^>]*>Warning[^<]*<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
     if (warningsMatch && warningsMatch[1]) {
       const warningsText = warningsMatch[1]
         .replace(/<[^>]*>/g, '')
@@ -141,8 +271,12 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .map(warning => warning.trim() + (warning.endsWith('.') ? '' : '.'));
     }
     
-    // Extract dosage info
-    const dosageMatch = html.match(/<h2[^>]*>Dosage<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    // Extract dosage info (more patterns)
+    const dosageMatch = html.match(/<h2[^>]*>Dosage<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h3[^>]*>Dosage<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h2[^>]*>Dosage and Administration<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h2[^>]*>How to [Tt]ake<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
     if (dosageMatch && dosageMatch[1]) {
       drugInfo.dosageAndAdmin = dosageMatch[1]
         .replace(/<[^>]*>/g, '')
@@ -150,8 +284,12 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .trim();
     }
     
-    // Extract indications
-    const indicationsMatch = html.match(/<h2[^>]*>Uses<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    // Extract indications (improved)
+    const indicationsMatch = html.match(/<h2[^>]*>Uses<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h3[^>]*>Uses<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h2[^>]*>Indications<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h2[^>]*>What is [^<]*?<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
     if (indicationsMatch && indicationsMatch[1]) {
       const indicationsText = indicationsMatch[1]
         .replace(/<[^>]*>/g, '')
@@ -162,17 +300,32 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .map(item => item.trim() + (item.endsWith('.') ? '' : '.'));
     }
     
-    // Determine if prescription or OTC
-    if (html.includes("prescription drug") || html.includes("Rx only")) {
+    // Determine if prescription or OTC (more patterns)
+    if (html.includes("prescription drug") || html.includes("Rx only") || html.includes("prescription only") || html.includes("Available by prescription")) {
       drugInfo.prescriptionStatus = "Prescription Only";
-    } else if (html.includes("over-the-counter") || html.includes("OTC")) {
+    } else if (html.includes("over-the-counter") || html.includes("OTC") || html.includes("without a prescription")) {
       drugInfo.prescriptionStatus = "OTC";
     }
     
-    // Extract mechanism of action
-    const mechanismMatch = html.match(/<h2[^>]*>Mechanism of Action<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    // Extract mechanism of action (improved)
+    const mechanismMatch = html.match(/<h2[^>]*>Mechanism of Action<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h3[^>]*>Mechanism of Action<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h2[^>]*>How it works<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h2[^>]*>How does [^<]+?<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
     if (mechanismMatch && mechanismMatch[1]) {
       drugInfo.mechanism = mechanismMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Extract pregnancy information
+    const pregnancyMatch = html.match(/<h2[^>]*>Pregnancy[^<]*<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h3[^>]*>Pregnancy[^<]*<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (pregnancyMatch && pregnancyMatch[1]) {
+      drugInfo.pregnancy = pregnancyMatch[1]
         .replace(/<[^>]*>/g, '')
         .replace(/\s+/g, ' ')
         .trim();
@@ -186,12 +339,43 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
   }
 }
 
+// Helper function to extract text from Gemini response
+function extractDrugNameFromText(text: string): string | null {
+  // Look for explicit drug name mention
+  const nameMatch = text.match(/name["\s:]+([^"'\n,;]+)/i) || 
+                  text.match(/drug name["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/identified as["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/appears to be["\s:]+([^"'\n,;]+)/i);
+  
+  if (nameMatch && nameMatch[1] && nameMatch[1].length > 2) {
+    return nameMatch[1].trim();
+  }
+  
+  // Look for first capitalized words that might be a drug name
+  const firstSentence = text.split('.')[0];
+  const capitalizedWordMatch = firstSentence.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\b/);
+  
+  if (capitalizedWordMatch && capitalizedWordMatch[1] && 
+      !["The", "This", "It", "I", "A", "An"].includes(capitalizedWordMatch[1])) {
+    return capitalizedWordMatch[1];
+  }
+  
+  return null;
+}
+
 // Function to enrich AI-identified drug data with drugs.com data
 async function enrichDrugDataWithDrugsCom(aiDrugData: any): Promise<any> {
   const drugName = aiDrugData.name;
   console.log(`Enriching data for drug: ${drugName}`);
   
-  const drugsComData = await getDrugInfoFromDrugsCom(drugName);
+  // First, try by drug name
+  let drugsComData = await getDrugInfoFromDrugsCom(drugName);
+  
+  // If no data found, try by imprint if available
+  if (!drugsComData && aiDrugData.imprint) {
+    console.log(`No data found by name, trying imprint: ${aiDrugData.imprint}`);
+    drugsComData = await findDrugByImprint(aiDrugData.imprint);
+  }
   
   if (!drugsComData) {
     console.log(`No additional data found on drugs.com for: ${drugName}`);
@@ -204,13 +388,19 @@ async function enrichDrugDataWithDrugsCom(aiDrugData: any): Promise<any> {
   return {
     ...aiDrugData,
     genericName: drugsComData.genericName || aiDrugData.genericName,
+    manufacturer: drugsComData.manufacturer || aiDrugData.manufacturer,
+    category: drugsComData.category || aiDrugData.category,
     description: drugsComData.description || aiDrugData.description,
     dosageAndAdmin: drugsComData.dosageAndAdmin || aiDrugData.dosageAndAdmin,
     sideEffects: drugsComData.sideEffects.length > 0 ? drugsComData.sideEffects : aiDrugData.sideEffects,
     warnings: drugsComData.warnings.length > 0 ? drugsComData.warnings : aiDrugData.warnings,
-    indications: drugsComData.indications.length > 0 ? drugsComData.indications : aiDrugData.indications,
+    interactions: drugsComData.interactions.length > 0 ? drugsComData.interactions : aiDrugData.interactions,
+    storage: drugsComData.storage || aiDrugData.storage,
     mechanism: drugsComData.mechanism || aiDrugData.mechanism,
+    indications: drugsComData.indications.length > 0 ? drugsComData.indications : aiDrugData.indications,
+    contraindications: drugsComData.contraindications.length > 0 ? drugsComData.contraindications : aiDrugData.contraindications,
     prescriptionStatus: drugsComData.prescriptionStatus !== "Unknown" ? drugsComData.prescriptionStatus : aiDrugData.prescriptionStatus,
+    pregnancy: drugsComData.pregnancy || aiDrugData.pregnancy,
   };
 }
 
@@ -273,7 +463,7 @@ serve(async (req) => {
             role: "user",
             parts: [
               {
-                text: "Identify this medication pill/tablet and provide complete information about it. Return the data in ONLY JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy. Ensure your response is ONLY valid JSON with no additional text."
+                text: "You are a pharmaceutical expert. Identify this medication pill/tablet from the image and provide complete information about it. Focus on identifying markings, colors, shapes, and any text visible on the pill. Try to determine the exact medication name, active ingredients, dosage strengths, and manufacturer if possible. Return the data in ONLY JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy, imprint (add this field with any codes, numbers or markings visible on the pill). Ensure your response is ONLY valid JSON with no additional text."
               },
               {
                 inline_data: {
@@ -285,7 +475,7 @@ serve(async (req) => {
           }
         ],
         generation_config: {
-          temperature: 0.2,
+          temperature: 0.1, // Lower temperature for more factual responses
           max_output_tokens: 4000
         }
       })
@@ -328,6 +518,7 @@ serve(async (req) => {
     // Parse the result from the Gemini API
     try {
       let drugInfo;
+      let rawResponseText = "";
       
       if (data.candidates && data.candidates.length > 0 && 
           data.candidates[0].content && 
@@ -335,6 +526,7 @@ serve(async (req) => {
           data.candidates[0].content.parts.length > 0) {
         
         const contentText = data.candidates[0].content.parts[0].text;
+        rawResponseText = contentText;
         console.log("Raw response:", contentText);
         
         // Try to extract JSON from the response content
@@ -376,14 +568,36 @@ serve(async (req) => {
               throw new Error("Could not parse valid JSON from response");
             }
           } else {
-            // As a last resort, try to identify some common patterns in the response
-            const pillName = contentText.match(/name["\s:]+([^"]*)/i);
-            const description = contentText.match(/description["\s:]+([^"]*)/i);
+            console.log("No JSON structure found, attempting to extract key information from text");
             
-            drugInfo = {
-              name: pillName && pillName[1] ? pillName[1].trim() : "Unknown Medication",
-              description: description && description[1] ? description[1].trim() : contentText.substring(0, 200) + "..."
-            };
+            // As a last resort, extract drug name and try to use that for lookup
+            const extractedDrugName = extractDrugNameFromText(contentText);
+            
+            if (extractedDrugName) {
+              console.log(`Extracted drug name from text: ${extractedDrugName}`);
+              
+              // Create a minimal drug object with the extracted name
+              drugInfo = {
+                name: extractedDrugName,
+                description: contentText.substring(0, 300) + "..."
+              };
+              
+              // Try to extract imprint/markings
+              const imprintMatch = contentText.match(/imprint["\s:]+([^"'\n,;]+)/i) || 
+                                 contentText.match(/marking["\s:]+([^"'\n,;]+)/i) ||
+                                 contentText.match(/code["\s:]+([^"'\n,;]+)/i);
+              
+              if (imprintMatch && imprintMatch[1]) {
+                drugInfo.imprint = imprintMatch[1].trim();
+              }
+            } else {
+              console.log("Could not extract drug name, using generic fallback");
+              drugInfo = {
+                name: "Unknown Medication",
+                description: "Could not identify the medication from the image. The AI analysis suggests: " + 
+                            contentText.substring(0, 300) + "..."
+              };
+            }
           }
         }
       } else {
@@ -410,8 +624,10 @@ serve(async (req) => {
         contraindications: Array.isArray(drugInfo.contraindications) ? drugInfo.contraindications : [],
         prescriptionStatus: drugInfo.prescriptionStatus || drugInfo.prescription_status || "Unknown",
         pregnancy: drugInfo.pregnancy || "",
+        imprint: drugInfo.imprint || "",
         verified: false,
         image: imageBase64.includes('data:') ? imageBase64 : `data:image/jpeg;base64,${base64Data}`,
+        aiAnalysis: rawResponseText.substring(0, 500) // Store the first part of the AI analysis for reference
       };
 
       // If we got a valid drug name, enrich data from drugs.com
@@ -419,6 +635,17 @@ serve(async (req) => {
       if (baseResponse.name && baseResponse.name !== "Unknown Medication" && baseResponse.name !== "Could not parse drug information") {
         console.log(`Valid drug name found: ${baseResponse.name}, enriching with drugs.com data`);
         completeResponse = await enrichDrugDataWithDrugsCom(baseResponse);
+      } else if (baseResponse.imprint) {
+        // If we have an imprint but no drug name, try searching by imprint
+        console.log(`No valid drug name but imprint found: ${baseResponse.imprint}, searching by imprint`);
+        const imprintResults = await findDrugByImprint(baseResponse.imprint);
+        
+        if (imprintResults) {
+          console.log(`Found drug by imprint: ${imprintResults.name}`);
+          // Update the name from the imprint search and enrich further
+          baseResponse.name = imprintResults.name;
+          completeResponse = await enrichDrugDataWithDrugsCom(baseResponse);
+        }
       }
 
       // Log the response for debugging
