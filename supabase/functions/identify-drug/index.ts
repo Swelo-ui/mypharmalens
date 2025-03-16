@@ -240,13 +240,13 @@ serve(async (req) => {
       ? imageBase64.split('base64,')[1] 
       : imageBase64;
 
-    console.log("Image received, preparing to call AI API");
+    console.log("Image received, preparing to call Gemini API");
     
     // Get the API key from environment variables
-    const apiKey = Deno.env.get("DEEPSEEK_API_KEY");
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
     
     if (!apiKey) {
-      console.error("DEEPSEEK_API_KEY is not set in environment variables");
+      console.error("GEMINI_API_KEY is not set in environment variables");
       return new Response(
         JSON.stringify({ 
           error: "API key not configured" 
@@ -258,79 +258,137 @@ serve(async (req) => {
       );
     }
     
-    // Call DeepSeek API for drug identification
-    console.log("Calling DeepSeek API...");
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    // Call Google Gemini API for drug identification
+    console.log("Calling Gemini API...");
+    
+    // Prepare the request to Gemini Vision Pro model
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek-vision",
-        messages: [
-          {
-            role: "system",
-            content: "You are a pharmaceutical expert specializing in drug identification by visual appearance. Identify medications based on images, providing detailed information about their name, active ingredients, uses, dosing, and potential side effects. Format your response as structured JSON data."
-          },
+        contents: [
           {
             role: "user",
-            content: [
-              { type: "text", text: "Identify this medication pill/tablet and provide complete information about it. Return the data in JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy." },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Data}` } }
+            parts: [
+              {
+                text: "Identify this medication pill/tablet and provide complete information about it. Return the data in ONLY JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy. Ensure your response is ONLY valid JSON with no additional text."
+              },
+              {
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: base64Data
+                }
+              }
             ]
           }
         ],
-        temperature: 0.2,
-        max_tokens: 4000,
-        response_format: { type: "json_object" }
+        generation_config: {
+          temperature: 0.2,
+          max_output_tokens: 4000
+        }
       })
     });
 
     // Check if the API request was successful
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("DeepSeek API error:", JSON.stringify(errorData));
+      const errorText = await response.text();
+      console.error("Gemini API error:", errorText);
       
-      return new Response(
-        JSON.stringify({ 
-          error: "Failed to analyze image with AI", 
-          details: errorData 
-        }),
-        { 
-          status: response.status, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      try {
+        const errorData = JSON.parse(errorText);
+        return new Response(
+          JSON.stringify({ 
+            error: "Failed to analyze image with Gemini AI", 
+            details: errorData 
+          }),
+          { 
+            status: response.status, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      } catch (e) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Failed to analyze image with Gemini AI", 
+            details: errorText 
+          }),
+          { 
+            status: response.status, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     }
 
     const data = await response.json();
-    console.log("DeepSeek API response received");
+    console.log("Gemini API response received");
 
-    // Parse the result from the DeepSeek API
+    // Parse the result from the Gemini API
     try {
       let drugInfo;
-      const assistantMessage = data.choices[0].message;
       
-      if (assistantMessage && assistantMessage.content) {
+      if (data.candidates && data.candidates.length > 0 && 
+          data.candidates[0].content && 
+          data.candidates[0].content.parts && 
+          data.candidates[0].content.parts.length > 0) {
+        
+        const contentText = data.candidates[0].content.parts[0].text;
+        console.log("Raw response:", contentText);
+        
         // Try to extract JSON from the response content
-        let jsonContent;
         try {
-          jsonContent = JSON.parse(assistantMessage.content);
-          drugInfo = jsonContent;
-        } catch (err) {
-          // If it's not valid JSON, use regex to extract JSON blocks
-          const jsonMatch = assistantMessage.content.match(/```json([\s\S]*?)```/);
+          // First try to parse the content directly as JSON
+          drugInfo = JSON.parse(contentText);
+        } catch (jsonError) {
+          console.log("Initial JSON parsing failed, attempting to extract JSON from text");
+          
+          // Try to find a JSON-like structure in the text
+          const jsonMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/) || 
+                          contentText.match(/```\s*([\s\S]*?)\s*```/) ||
+                          contentText.match(/\{[\s\S]*\}/);
+                          
           if (jsonMatch && jsonMatch[1]) {
-            drugInfo = JSON.parse(jsonMatch[1].trim());
+            try {
+              drugInfo = JSON.parse(jsonMatch[1].trim());
+            } catch (nestedJsonError) {
+              console.error("Failed to parse extracted JSON:", nestedJsonError.message);
+              // Try to extract just the object notation, which might be more reliable
+              const objectMatch = contentText.match(/\{[\s\S]*\}/);
+              if (objectMatch) {
+                try {
+                  drugInfo = JSON.parse(objectMatch[0]);
+                } catch (objectJsonError) {
+                  console.error("Failed to parse object notation:", objectJsonError.message);
+                  throw new Error("Could not parse valid JSON from response");
+                }
+              } else {
+                throw new Error("No valid JSON structure found in response");
+              }
+            }
+          } else if (jsonMatch) {
+            // If we matched the full object notation
+            try {
+              drugInfo = JSON.parse(jsonMatch[0]);
+            } catch (fullObjectError) {
+              console.error("Failed to parse full object notation:", fullObjectError.message);
+              throw new Error("Could not parse valid JSON from response");
+            }
           } else {
-            // Provide a manually structured response based on text content
+            // As a last resort, try to identify some common patterns in the response
+            const pillName = contentText.match(/name["\s:]+([^"]*)/i);
+            const description = contentText.match(/description["\s:]+([^"]*)/i);
+            
             drugInfo = {
-              name: "Could not parse drug information",
-              description: assistantMessage.content
+              name: pillName && pillName[1] ? pillName[1].trim() : "Unknown Medication",
+              description: description && description[1] ? description[1].trim() : contentText.substring(0, 200) + "..."
             };
           }
         }
+      } else {
+        console.error("Unexpected response format from Gemini API");
+        throw new Error("Invalid response format from Gemini API");
       }
 
       // Add missing fields with defaults if needed
@@ -371,7 +429,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (parseError) {
-      console.error("Error parsing DeepSeek response:", parseError.message);
+      console.error("Error parsing Gemini response:", parseError.message);
       return new Response(
         JSON.stringify({ 
           error: "Failed to parse drug information", 
