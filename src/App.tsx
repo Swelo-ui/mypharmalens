@@ -11,6 +11,14 @@ import DrugIdentify from "./pages/DrugIdentify";
 
 const queryClient = new QueryClient();
 
+const About = () => (
+  <div className="pt-24 pb-8 container">
+    <h1 className="text-3xl font-bold mb-6">About PharmaLens</h1>
+    <p className="mb-4">PharmaLens is a comprehensive medication identification and information platform designed to help users quickly identify medications and access detailed information about them.</p>
+    <p className="mb-4">Our mission is to improve medication safety and education by providing accurate, reliable information about prescription and over-the-counter drugs.</p>
+  </div>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -21,6 +29,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/identify" element={<DrugIdentify />} />
+          <Route path="/about" element={<About />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
