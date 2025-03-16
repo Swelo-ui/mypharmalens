@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -538,3 +539,68 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | undefined =>
       ],
       warnings: [
         'May increase risk of heart attack or stroke',
+        'Not recommended for use during the third trimester of pregnancy',
+        'People with heart disease or high blood pressure should consult a doctor before use',
+        'May cause stomach bleeding, especially in elderly patients'
+      ],
+      interactions: [
+        'Aspirin (may decrease effectiveness of ibuprofen)',
+        'Blood thinners (increased risk of bleeding)',
+        'Diuretics (may reduce effectiveness)',
+        'ACE inhibitors (may cause kidney damage)'
+      ],
+      storage: 'Store at room temperature away from moisture and heat.',
+      mechanism: 'Ibuprofen works by inhibiting the production of prostaglandins, chemicals in the body that cause inflammation and contribute to pain.',
+      indications: [
+        'Relief of pain from various conditions',
+        'Reduction of fever',
+        'Treatment of inflammatory conditions like arthritis'
+      ],
+      contraindications: [
+        'Allergic reactions to NSAIDs',
+        'Third trimester of pregnancy',
+        'Active stomach/intestinal bleeding',
+        'History of heart bypass surgery'
+      ],
+      prescriptionStatus: 'OTC',
+      pregnancy: 'Category C. Not recommended during the third trimester of pregnancy.',
+      verified: true
+    }
+  };
+  
+  // Create a full detailed drug data object by merging basic and detailed data
+  const basicData = {
+    id: basicDrug.id,
+    name: basicDrug.name,
+    genericName: basicDrug.genericName || "",
+    manufacturer: basicDrug.manufacturer || "",
+    category: basicDrug.category || "",
+    description: basicDrug.description || "",
+    drugClass: basicDrug.drugClass || "",
+    verified: basicDrug.verified || false,
+    image: basicDrug.image,
+    packageImage: basicDrug.packageImage
+  };
+  
+  // Use default values for detailed data if not explicitly provided
+  const defaultDetailedData: Partial<DetailedDrugData> = {
+    dosageAndAdmin: "Follow the dosage instructions provided by your healthcare provider or as indicated on the packaging.",
+    sideEffects: ["Consult a healthcare professional for information about potential side effects."],
+    warnings: ["Read all medication guides and follow directions on product labels."],
+    interactions: ["Consult with your healthcare provider about potential drug interactions."],
+    storage: "Store at room temperature away from moisture and heat.",
+    mechanism: "Consult with a healthcare professional for information on how this medication works.",
+    indications: ["Treatment of conditions as prescribed by your healthcare provider."],
+    contraindications: ["Consult with a healthcare professional before taking this medication."],
+    prescriptionStatus: "OTC",
+    pregnancy: "Consult with a healthcare professional before use during pregnancy or breastfeeding.",
+    verified: basicDrug.verified || false
+  };
+  
+  // Merge the basic data with detailed data (if available) or default values
+  return {
+    ...basicData,
+    ...defaultDetailedData,
+    ...(detailedData[id] || {})
+  };
+};
