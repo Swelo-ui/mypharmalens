@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, Info, ChevronRight, Shield } from 'lucide-react';
+import { Pill, Info, ChevronRight, Shield, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface DrugData {
@@ -14,6 +14,7 @@ export interface DrugData {
   drugClass?: string;
   verified?: boolean;
   image?: string;
+  packageImage?: string;
 }
 
 interface DrugCardProps {
@@ -82,15 +83,30 @@ const DrugCard = ({ drug, className }: DrugCardProps) => {
         )}
       </div>
       
-      {drug.image && (
-        <div className="mt-4 h-32 rounded-lg overflow-hidden">
-          <img 
-            src={drug.image} 
-            alt={drug.name} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      {/* Display both pill and package images if available */}
+      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        {drug.image && (
+          <div className="w-full sm:w-1/2 h-32 rounded-lg overflow-hidden">
+            <img 
+              src={drug.image} 
+              alt={drug.name} 
+              className="w-full h-full object-cover"
+            />
+            <div className="text-xs text-center mt-1 text-gray-500">Pill</div>
+          </div>
+        )}
+        
+        {drug.packageImage && (
+          <div className="w-full sm:w-1/2 h-32 rounded-lg overflow-hidden">
+            <img 
+              src={drug.packageImage} 
+              alt={`${drug.name} package`} 
+              className="w-full h-full object-cover"
+            />
+            <div className="text-xs text-center mt-1 text-gray-500">Package</div>
+          </div>
+        )}
+      </div>
       
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
         <Link 

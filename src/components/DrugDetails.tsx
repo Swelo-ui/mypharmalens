@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
   Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
-  AlertTriangle
+  AlertTriangle, Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +26,7 @@ export interface DetailedDrugData {
   pregnancy: string;
   verified: boolean;
   image?: string;
+  packageImage?: string;
   drugClass?: string;
   similarDrugs?: {
     id: string;
@@ -275,6 +276,23 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           </div>
         )}
       </div>
+      
+      {/* Package image section */}
+      {drug.packageImage && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Package className="h-4 w-4 text-pharma-600" />
+            <h3 className="text-sm font-medium">Package Appearance</h3>
+          </div>
+          <div className="rounded-xl overflow-hidden shadow-lg">
+            <img 
+              src={drug.packageImage} 
+              alt={`${drug.name} package`} 
+              className="w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
       
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
