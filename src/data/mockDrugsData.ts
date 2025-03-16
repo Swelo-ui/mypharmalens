@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -531,6 +532,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | undefined =>
   
   return {
     ...basicDrug,
+    description: basicDrug.description, // Explicitly include description to satisfy the type requirement
     genericName: basicDrug.genericName || '',
     manufacturer: basicDrug.manufacturer || 'Unknown',
     category: basicDrug.category || 'Unknown',
