@@ -583,7 +583,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | undefined =>
   };
   
   // Use default values for detailed data if not explicitly provided
-  const defaultDetailedData: Partial<DetailedDrugData> = {
+  const defaultDetailedData: Omit<DetailedDrugData, keyof typeof basicData> = {
     dosageAndAdmin: "Follow the dosage instructions provided by your healthcare provider or as indicated on the packaging.",
     sideEffects: ["Consult a healthcare professional for information about potential side effects."],
     warnings: ["Read all medication guides and follow directions on product labels."],
@@ -594,13 +594,14 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | undefined =>
     contraindications: ["Consult with a healthcare professional before taking this medication."],
     prescriptionStatus: "OTC",
     pregnancy: "Consult with a healthcare professional before use during pregnancy or breastfeeding.",
-    verified: basicDrug.verified || false
+    similarDrugs: [] // Added this required property
   };
   
   // Merge the basic data with detailed data (if available) or default values
+  // The as DetailedDrugData ensures that we explicitly treat this as the required type
   return {
     ...basicData,
     ...defaultDetailedData,
     ...(detailedData[id] || {})
-  };
+  } as DetailedDrugData;
 };
