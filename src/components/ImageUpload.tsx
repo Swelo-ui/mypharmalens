@@ -1,8 +1,9 @@
 
 import React, { useState, useRef } from 'react';
-import { Camera, Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
   onImageCapture?: (file: File) => void;
@@ -13,6 +14,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageQualityWarning, setImageQualityWarning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
@@ -65,6 +67,18 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       });
       return;
     }
+
+    // Check if file is too small (might be too low quality)
+    if (file.size < 50 * 1024) {
+      setImageQualityWarning(true);
+      toast({
+        title: "Low quality image",
+        description: "This image may be too small for accurate identification. Consider using a higher resolution image.",
+        variant: "warning",
+      });
+    } else {
+      setImageQualityWarning(false);
+    }
     
     // Create preview
     const reader = new FileReader();
@@ -73,18 +87,19 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     };
     reader.readAsDataURL(file);
     
-    // Simulate processing
+    // Process file
     setIsLoading(true);
     setTimeout(() => {
       if (onImageCapture) {
         onImageCapture(file);
       }
       setIsLoading(false);
-    }, 1500);
+    }, 1000);
   };
   
   const clearImage = () => {
     setPreviewImage(null);
+    setImageQualityWarning(false);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -151,6 +166,20 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       ) : (
         <div className="w-full relative rounded-xl overflow-hidden shadow-lg transition-all animate-scale-in">
           <div className="absolute top-2 right-2 z-10 flex gap-2">
+            {imageQualityWarning && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="p-2 rounded-full bg-yellow-500/80 text-white">
+                      <Info className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>This image may be too low quality for accurate identification</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <button 
               onClick={clearImage}
               className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
@@ -173,7 +202,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg flex items-center">
                 <Loader2 className="h-5 w-5 text-pharma-600 animate-spin mr-2" />
-                <span className="text-sm font-medium">Analyzing image...</span>
+                <span className="text-sm font-medium">Preparing image...</span>
               </div>
             </div>
           )}
