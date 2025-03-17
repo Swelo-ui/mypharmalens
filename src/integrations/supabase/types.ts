@@ -36,6 +36,84 @@ export type Database = {
         }
         Relationships: []
       }
+      drugs: {
+        Row: {
+          brand_names: string[]
+          category: string
+          contraindications: string[]
+          created_at: string | null
+          description: string
+          dosage_and_admin: string
+          drug_class: string
+          generic_name: string
+          id: string
+          image_url: string | null
+          indications: string[]
+          interactions: string[]
+          manufacturer: string
+          mechanism: string
+          name: string
+          package_image_url: string | null
+          pregnancy: string
+          prescription_status: string
+          side_effects: string[]
+          storage: string
+          updated_at: string | null
+          verified: boolean
+          warnings: string[]
+        }
+        Insert: {
+          brand_names?: string[]
+          category: string
+          contraindications?: string[]
+          created_at?: string | null
+          description: string
+          dosage_and_admin: string
+          drug_class: string
+          generic_name: string
+          id?: string
+          image_url?: string | null
+          indications?: string[]
+          interactions?: string[]
+          manufacturer: string
+          mechanism: string
+          name: string
+          package_image_url?: string | null
+          pregnancy: string
+          prescription_status: string
+          side_effects?: string[]
+          storage: string
+          updated_at?: string | null
+          verified?: boolean
+          warnings?: string[]
+        }
+        Update: {
+          brand_names?: string[]
+          category?: string
+          contraindications?: string[]
+          created_at?: string | null
+          description?: string
+          dosage_and_admin?: string
+          drug_class?: string
+          generic_name?: string
+          id?: string
+          image_url?: string | null
+          indications?: string[]
+          interactions?: string[]
+          manufacturer?: string
+          mechanism?: string
+          name?: string
+          package_image_url?: string | null
+          pregnancy?: string
+          prescription_status?: string
+          side_effects?: string[]
+          storage?: string
+          updated_at?: string | null
+          verified?: boolean
+          warnings?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

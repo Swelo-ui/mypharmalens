@@ -164,6 +164,7 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
     const drugInfo: any = {
       name: drugName,
       genericName: "",
+      brandNames: [],
       manufacturer: "",
       category: "",
       description: "",
@@ -176,7 +177,8 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
       indications: [],
       contraindications: [],
       prescriptionStatus: "Unknown",
-      pregnancy: ""
+      pregnancy: "",
+      drugClass: ""
     };
     
     // Extract generic name
@@ -196,6 +198,24 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
     const categoryMatch = html.match(/<a href="\/drug-class\/[^"]+"[^>]*>([^<]+)<\/a>/i);
     if (categoryMatch && categoryMatch[1]) {
       drugInfo.category = categoryMatch[1].trim();
+    }
+    
+    // Extract drug class
+    const drugClassMatch = html.match(/<strong>Drug class:<\/strong>\s*([^<]+)(?:<|$)/i);
+    if (drugClassMatch && drugClassMatch[1]) {
+      drugInfo.drugClass = drugClassMatch[1].trim();
+    } else if (categoryMatch && categoryMatch[1]) {
+      // Fallback to category if class not found
+      drugInfo.drugClass = categoryMatch[1].trim();
+    }
+    
+    // Extract brand names
+    const brandNamesMatch = html.match(/<strong>Brand name[s]?:<\/strong>\s*([^<]+)(?:<|$)/i);
+    if (brandNamesMatch && brandNamesMatch[1]) {
+      drugInfo.brandNames = brandNamesMatch[1]
+        .split(',')
+        .map((name: string) => name.trim())
+        .filter((name: string) => name.length > 0);
     }
     
     // Extract description (improved with fallbacks)
@@ -226,7 +246,7 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
       const sideEffects = sideEffectsHtml.match(/<li[^>]*>([\s\S]*?)<\/li>/g);
       
       if (sideEffects) {
-        drugInfo.sideEffects = sideEffects.map(item => {
+        drugInfo.sideEffects = sideEffects.map((item: string) => {
           return item
             .replace(/<li[^>]*>/, '')
             .replace(/<\/li>/, '')
@@ -250,9 +270,9 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         
         drugInfo.sideEffects = paragraphText
           .split(/\.\s+|;\s+/)
-          .map(effect => effect.trim())
-          .filter(effect => effect.length > 5)
-          .map(effect => effect + (effect.endsWith('.') ? '' : '.'));
+          .map((effect: string) => effect.trim())
+          .filter((effect: string) => effect.length > 5)
+          .map((effect: string) => effect + (effect.endsWith('.') ? '' : '.'));
       }
     }
     
@@ -267,8 +287,8 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .replace(/\s+/g, ' ')
         .trim();
       
-      drugInfo.warnings = warningsText.split(/\.\s+/).filter(warning => warning.length > 10)
-        .map(warning => warning.trim() + (warning.endsWith('.') ? '' : '.'));
+      drugInfo.warnings = warningsText.split(/\.\s+/).filter((warning: string) => warning.length > 10)
+        .map((warning: string) => warning.trim() + (warning.endsWith('.') ? '' : '.'));
     }
     
     // Extract dosage info (more patterns)
@@ -296,8 +316,8 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .replace(/\s+/g, ' ')
         .trim();
       
-      drugInfo.indications = indicationsText.split(/\.\s+/).filter(item => item.length > 5)
-        .map(item => item.trim() + (item.endsWith('.') ? '' : '.'));
+      drugInfo.indications = indicationsText.split(/\.\s+/).filter((item: string) => item.length > 5)
+        .map((item: string) => item.trim() + (item.endsWith('.') ? '' : '.'));
     }
     
     // Determine if prescription or OTC (more patterns)
@@ -331,6 +351,25 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
         .trim();
     }
     
+    // Extract storage information
+    const storageMatch = html.match(/<h2[^>]*>Storage<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                       html.match(/<h3[^>]*>Storage<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                       html.match(/Store\s+[^<.]+(?:\.|<)/i);
+    
+    if (storageMatch && storageMatch[1]) {
+      drugInfo.storage = storageMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    } else if (storageMatch && storageMatch[0]) {
+      drugInfo.storage = storageMatch[0]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    } else {
+      drugInfo.storage = "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.";
+    }
+    
     console.log(`Successfully parsed drug info for: ${drugName}`);
     return drugInfo;
   } catch (error) {
@@ -339,71 +378,128 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
   }
 }
 
-// Helper function to extract text from Gemini response
-function extractDrugNameFromText(text: string): string | null {
-  // Look for explicit drug name mention
-  const nameMatch = text.match(/name["\s:]+([^"'\n,;]+)/i) || 
-                  text.match(/drug name["\s:]+([^"'\n,;]+)/i) ||
-                  text.match(/identified as["\s:]+([^"'\n,;]+)/i) ||
-                  text.match(/appears to be["\s:]+([^"'\n,;]+)/i);
+// Function to check for color and shape information in text
+function extractPillAppearance(text: string) {
+  const colors = [
+    'white', 'blue', 'red', 'green', 'yellow', 'orange', 'purple', 
+    'pink', 'brown', 'gray', 'black', 'turquoise', 'beige', 'maroon'
+  ];
   
-  if (nameMatch && nameMatch[1] && nameMatch[1].length > 2) {
-    return nameMatch[1].trim();
+  const shapes = [
+    'round', 'oval', 'oblong', 'capsule', 'rectangle', 'diamond', 
+    'triangle', 'square', 'hexagon', 'pentagonal', 'octagonal'
+  ];
+  
+  let color = null;
+  let shape = null;
+  
+  // Check for color
+  for (const c of colors) {
+    if (text.toLowerCase().includes(c)) {
+      color = c;
+      break;
+    }
   }
   
-  // Look for first capitalized words that might be a drug name
-  const firstSentence = text.split('.')[0];
-  const capitalizedWordMatch = firstSentence.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\b/);
-  
-  if (capitalizedWordMatch && capitalizedWordMatch[1] && 
-      !["The", "This", "It", "I", "A", "An"].includes(capitalizedWordMatch[1])) {
-    return capitalizedWordMatch[1];
+  // Check for shape
+  for (const s of shapes) {
+    if (text.toLowerCase().includes(s)) {
+      shape = s;
+      break;
+    }
   }
   
-  return null;
+  return { color, shape };
 }
 
-// Function to enrich AI-identified drug data with drugs.com data
-async function enrichDrugDataWithDrugsCom(aiDrugData: any): Promise<any> {
-  const drugName = aiDrugData.name;
-  console.log(`Enriching data for drug: ${drugName}`);
-  
-  // First, try by drug name
-  let drugsComData = await getDrugInfoFromDrugsCom(drugName);
-  
-  // If no data found, try by imprint if available
-  if (!drugsComData && aiDrugData.imprint) {
-    console.log(`No data found by name, trying imprint: ${aiDrugData.imprint}`);
-    drugsComData = await findDrugByImprint(aiDrugData.imprint);
+// Enhanced function to better handle blurry images 
+async function analyzeBlurryImage(imageBase64: string): Promise<any> {
+  try {
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not set");
+    }
+    
+    console.log("Using enhanced blur handling mode for drug identification");
+    
+    // Prepare a prompt specifically for blurry pill images
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: "This image may be blurry or low quality. Please do your best to identify this medication pill/tablet. Focus on any visible markings, color, shape, and pattern. If the image is too blurry to make a definitive identification, provide your best guess along with possible alternatives based on what you can see. Return your analysis in JSON format with these fields: name (most likely name or 'Unknown'), possibleNames (array of possible medications it could be), color, shape, markings (any visible text, numbers, or symbols), confidence (low, medium, high), and description (detailed description of what you can see). ONLY return valid JSON."
+              },
+              {
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64
+                }
+              }
+            ]
+          }
+        ],
+        generation_config: {
+          temperature: 0.2,
+          max_output_tokens: 4000
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to analyze blurry image: ${await response.text()}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+      throw new Error("Invalid response format from Gemini API");
+    }
+    
+    const text = data.candidates[0].content.parts[0].text;
+    console.log("Blurry image analysis:", text);
+    
+    // Try to extract JSON
+    try {
+      // Look for JSON in the response
+      const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       text.match(/```\s*([\s\S]*?)\s*```/) ||
+                       text.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        const jsonString = jsonMatch[1] || jsonMatch[0];
+        return JSON.parse(jsonString);
+      } else {
+        throw new Error("No JSON found in response");
+      }
+    } catch (e) {
+      console.error("Error parsing JSON from blurry image analysis:", e);
+      
+      // Fallback to extracting information from text
+      const appearance = extractPillAppearance(text);
+      return {
+        name: "Unknown",
+        possibleNames: [],
+        color: appearance.color,
+        shape: appearance.shape,
+        markings: "",
+        confidence: "low",
+        description: text.substring(0, 500)
+      };
+    }
+  } catch (error) {
+    console.error("Error in blurry image analysis:", error);
+    return null;
   }
-  
-  if (!drugsComData) {
-    console.log(`No additional data found on drugs.com for: ${drugName}`);
-    return aiDrugData;
-  }
-  
-  console.log(`Successfully enriched data for: ${drugName}`);
-  
-  // Merge data, preferring drugs.com data where available
-  return {
-    ...aiDrugData,
-    genericName: drugsComData.genericName || aiDrugData.genericName,
-    manufacturer: drugsComData.manufacturer || aiDrugData.manufacturer,
-    category: drugsComData.category || aiDrugData.category,
-    description: drugsComData.description || aiDrugData.description,
-    dosageAndAdmin: drugsComData.dosageAndAdmin || aiDrugData.dosageAndAdmin,
-    sideEffects: drugsComData.sideEffects.length > 0 ? drugsComData.sideEffects : aiDrugData.sideEffects,
-    warnings: drugsComData.warnings.length > 0 ? drugsComData.warnings : aiDrugData.warnings,
-    interactions: drugsComData.interactions.length > 0 ? drugsComData.interactions : aiDrugData.interactions,
-    storage: drugsComData.storage || aiDrugData.storage,
-    mechanism: drugsComData.mechanism || aiDrugData.mechanism,
-    indications: drugsComData.indications.length > 0 ? drugsComData.indications : aiDrugData.indications,
-    contraindications: drugsComData.contraindications.length > 0 ? drugsComData.contraindications : aiDrugData.contraindications,
-    prescriptionStatus: drugsComData.prescriptionStatus !== "Unknown" ? drugsComData.prescriptionStatus : aiDrugData.prescriptionStatus,
-    pregnancy: drugsComData.pregnancy || aiDrugData.pregnancy,
-  };
 }
 
+// Enhanced drug identification function with better blur handling
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -411,7 +507,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64 } = await req.json();
+    const { imageBase64, blurryMode } = await req.json();
     
     if (!imageBase64) {
       return new Response(
@@ -448,8 +544,16 @@ serve(async (req) => {
       );
     }
     
+    // If blurry mode is explicitly requested or the image is small (likely low quality)
+    // use the enhanced blur handling mode
+    let blurryAnalysis = null;
+    if (blurryMode === true || base64Data.length < 10000) {
+      console.log("Image appears to be low quality, attempting specialized analysis");
+      blurryAnalysis = await analyzeBlurryImage(imageBase64);
+    }
+    
     // Call Google Gemini API for drug identification
-    console.log("Calling Gemini API...");
+    console.log("Calling Gemini API for standard analysis...");
     
     // Prepare the request to Gemini Vision Pro model
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
@@ -463,7 +567,7 @@ serve(async (req) => {
             role: "user",
             parts: [
               {
-                text: "You are a pharmaceutical expert. Identify this medication pill/tablet from the image and provide complete information about it. Focus on identifying markings, colors, shapes, and any text visible on the pill. Try to determine the exact medication name, active ingredients, dosage strengths, and manufacturer if possible. Return the data in ONLY JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy, imprint (add this field with any codes, numbers or markings visible on the pill). Ensure your response is ONLY valid JSON with no additional text."
+                text: "You are a pharmaceutical expert. Identify this medication pill/tablet from the image and provide complete information about it. Focus on identifying markings, colors, shapes, and any text visible on the pill. Try to determine the exact medication name, active ingredients, dosage strengths, and manufacturer if possible. Also include any brand names this medicine might be marketed under. Return the data in ONLY JSON format with these fields: name, genericName, manufacturer, category, description, dosageAndAdmin, sideEffects (array), warnings (array), interactions (array), storage, mechanism, indications (array), contraindications (array), prescriptionStatus, pregnancy, imprint (add this field with any codes, numbers or markings visible on the pill), brandNames (array of other names this medicine is sold as), drugClass. Ensure your response is ONLY valid JSON with no additional text."
               },
               {
                 inline_data: {
@@ -485,6 +589,41 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Gemini API error:", errorText);
+      
+      // If we have blurry analysis results, use those instead
+      if (blurryAnalysis) {
+        console.log("Standard analysis failed, using blurry analysis results");
+        return new Response(
+          JSON.stringify({
+            id: crypto.randomUUID(),
+            name: blurryAnalysis.name,
+            genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+            brandNames: blurryAnalysis.possibleNames || [],
+            manufacturer: "Unknown",
+            category: "",
+            description: blurryAnalysis.description,
+            dosageAndAdmin: "",
+            sideEffects: [],
+            warnings: [],
+            interactions: [],
+            storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
+            mechanism: "",
+            indications: [],
+            contraindications: [],
+            prescriptionStatus: "Unknown",
+            pregnancy: "",
+            imprint: blurryAnalysis.markings || "",
+            verified: false,
+            image: imageBase64.includes('data:') ? imageBase64 : `data:image/jpeg;base64,${base64Data}`,
+            drugClass: "",
+            confidence: blurryAnalysis.confidence || "low",
+            color: blurryAnalysis.color || "",
+            shape: blurryAnalysis.shape || "",
+            blurryModeUsed: true
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
       try {
         const errorData = JSON.parse(errorText);
@@ -553,8 +692,29 @@ serve(async (req) => {
                   drugInfo = JSON.parse(objectMatch[0]);
                 } catch (objectJsonError) {
                   console.error("Failed to parse object notation:", objectJsonError.message);
-                  throw new Error("Could not parse valid JSON from response");
+                  
+                  // If we have blurry analysis, use that instead
+                  if (blurryAnalysis) {
+                    drugInfo = {
+                      name: blurryAnalysis.name,
+                      genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+                      brandNames: blurryAnalysis.possibleNames || [],
+                      description: blurryAnalysis.description,
+                      imprint: blurryAnalysis.markings || ""
+                    };
+                  } else {
+                    throw new Error("Could not parse valid JSON from response");
+                  }
                 }
+              } else if (blurryAnalysis) {
+                // Use blurry analysis as fallback
+                drugInfo = {
+                  name: blurryAnalysis.name,
+                  genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+                  brandNames: blurryAnalysis.possibleNames || [],
+                  description: blurryAnalysis.description,
+                  imprint: blurryAnalysis.markings || ""
+                };
               } else {
                 throw new Error("No valid JSON structure found in response");
               }
@@ -565,8 +725,29 @@ serve(async (req) => {
               drugInfo = JSON.parse(jsonMatch[0]);
             } catch (fullObjectError) {
               console.error("Failed to parse full object notation:", fullObjectError.message);
-              throw new Error("Could not parse valid JSON from response");
+              
+              // If we have blurry analysis, use that instead
+              if (blurryAnalysis) {
+                drugInfo = {
+                  name: blurryAnalysis.name,
+                  genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+                  brandNames: blurryAnalysis.possibleNames || [],
+                  description: blurryAnalysis.description,
+                  imprint: blurryAnalysis.markings || ""
+                };
+              } else {
+                throw new Error("Could not parse valid JSON from response");
+              }
             }
+          } else if (blurryAnalysis) {
+            // Use blurry analysis as fallback
+            drugInfo = {
+              name: blurryAnalysis.name,
+              genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+              brandNames: blurryAnalysis.possibleNames || [],
+              description: blurryAnalysis.description,
+              imprint: blurryAnalysis.markings || ""
+            };
           } else {
             console.log("No JSON structure found, attempting to extract key information from text");
             
@@ -602,7 +783,19 @@ serve(async (req) => {
         }
       } else {
         console.error("Unexpected response format from Gemini API");
-        throw new Error("Invalid response format from Gemini API");
+        
+        // If we have blurry analysis, use that instead
+        if (blurryAnalysis) {
+          drugInfo = {
+            name: blurryAnalysis.name,
+            genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+            brandNames: blurryAnalysis.possibleNames || [],
+            description: blurryAnalysis.description,
+            imprint: blurryAnalysis.markings || ""
+          };
+        } else {
+          throw new Error("Invalid response format from Gemini API");
+        }
       }
 
       // Add missing fields with defaults if needed
@@ -610,15 +803,17 @@ serve(async (req) => {
         id: crypto.randomUUID(),
         name: drugInfo.name || "Unknown Medication",
         genericName: drugInfo.genericName || drugInfo.generic_name || "",
+        brandNames: drugInfo.brandNames || [],
         manufacturer: drugInfo.manufacturer || "Unknown",
         category: drugInfo.category || "",
+        drugClass: drugInfo.drugClass || drugInfo.drug_class || "",
         description: drugInfo.description || "",
         dosageAndAdmin: drugInfo.dosageAndAdmin || drugInfo.dosage_and_admin || "",
         sideEffects: Array.isArray(drugInfo.sideEffects) ? drugInfo.sideEffects : 
-                    Array.isArray(drugInfo.side_effects) ? drugInfo.side_effects : [],
+                   Array.isArray(drugInfo.side_effects) ? drugInfo.side_effects : [],
         warnings: Array.isArray(drugInfo.warnings) ? drugInfo.warnings : [],
         interactions: Array.isArray(drugInfo.interactions) ? drugInfo.interactions : [],
-        storage: drugInfo.storage || "",
+        storage: drugInfo.storage || "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
         mechanism: drugInfo.mechanism || "",
         indications: Array.isArray(drugInfo.indications) ? drugInfo.indications : [],
         contraindications: Array.isArray(drugInfo.contraindications) ? drugInfo.contraindications : [],
@@ -627,7 +822,14 @@ serve(async (req) => {
         imprint: drugInfo.imprint || "",
         verified: false,
         image: imageBase64.includes('data:') ? imageBase64 : `data:image/jpeg;base64,${base64Data}`,
-        aiAnalysis: rawResponseText.substring(0, 500) // Store the first part of the AI analysis for reference
+        aiAnalysis: rawResponseText.substring(0, 500), // Store the first part of the AI analysis for reference
+        // Add information from blurry analysis if available
+        ...(blurryAnalysis ? {
+          confidence: blurryAnalysis.confidence || "medium",
+          color: blurryAnalysis.color || "",
+          shape: blurryAnalysis.shape || "",
+          blurryModeUsed: Boolean(blurryAnalysis)
+        } : {})
       };
 
       // If we got a valid drug name, enrich data from drugs.com
@@ -657,6 +859,42 @@ serve(async (req) => {
       );
     } catch (parseError) {
       console.error("Error parsing Gemini response:", parseError.message);
+      
+      // If we have blurry analysis, return that as a fallback
+      if (blurryAnalysis) {
+        console.log("Using blurry analysis as fallback due to parsing error");
+        return new Response(
+          JSON.stringify({
+            id: crypto.randomUUID(),
+            name: blurryAnalysis.name,
+            genericName: blurryAnalysis.name !== "Unknown" ? blurryAnalysis.name : "",
+            brandNames: blurryAnalysis.possibleNames || [],
+            manufacturer: "Unknown",
+            category: "",
+            description: blurryAnalysis.description,
+            dosageAndAdmin: "",
+            sideEffects: [],
+            warnings: [],
+            interactions: [],
+            storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
+            mechanism: "",
+            indications: [],
+            contraindications: [],
+            prescriptionStatus: "Unknown",
+            pregnancy: "",
+            imprint: blurryAnalysis.markings || "",
+            verified: false,
+            image: imageBase64.includes('data:') ? imageBase64 : `data:image/jpeg;base64,${base64Data}`,
+            drugClass: "",
+            confidence: blurryAnalysis.confidence || "low",
+            color: blurryAnalysis.color || "",
+            shape: blurryAnalysis.shape || "",
+            blurryModeUsed: true
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ 
           error: "Failed to parse drug information", 
@@ -683,3 +921,72 @@ serve(async (req) => {
     );
   }
 });
+
+// Helper function to extract text from Gemini response
+function extractDrugNameFromText(text: string): string | null {
+  // Look for explicit drug name mention
+  const nameMatch = text.match(/name["\s:]+([^"'\n,;]+)/i) || 
+                  text.match(/drug name["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/identified as["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/appears to be["\s:]+([^"'\n,;]+)/i);
+  
+  if (nameMatch && nameMatch[1] && nameMatch[1].length > 2) {
+    return nameMatch[1].trim();
+  }
+  
+  // Look for first capitalized words that might be a drug name
+  const firstSentence = text.split('.')[0];
+  const capitalizedWordMatch = firstSentence.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\b/);
+  
+  if (capitalizedWordMatch && capitalizedWordMatch[1] && 
+      !["The", "This", "It", "I", "A", "An"].includes(capitalizedWordMatch[1])) {
+    return capitalizedWordMatch[1];
+  }
+  
+  return null;
+}
+
+// Function to enrich AI-identified drug data with drugs.com data
+async function enrichDrugDataWithDrugsCom(aiDrugData: any): Promise<any> {
+  const drugName = aiDrugData.name;
+  console.log(`Enriching data for drug: ${drugName}`);
+  
+  // First, try by drug name
+  let drugsComData = await getDrugInfoFromDrugsCom(drugName);
+  
+  // If no data found, try by imprint if available
+  if (!drugsComData && aiDrugData.imprint) {
+    console.log(`No data found by name, trying imprint: ${aiDrugData.imprint}`);
+    drugsComData = await findDrugByImprint(aiDrugData.imprint);
+  }
+  
+  if (!drugsComData) {
+    console.log(`No additional data found on drugs.com for: ${drugName}`);
+    return aiDrugData;
+  }
+  
+  console.log(`Successfully enriched data for: ${drugName}`);
+  
+  // Merge data, preferring drugs.com data where available
+  return {
+    ...aiDrugData,
+    genericName: drugsComData.genericName || aiDrugData.genericName,
+    brandNames: drugsComData.brandNames && drugsComData.brandNames.length > 0 ? 
+               drugsComData.brandNames : 
+               aiDrugData.brandNames || [],
+    manufacturer: drugsComData.manufacturer || aiDrugData.manufacturer,
+    category: drugsComData.category || aiDrugData.category,
+    drugClass: drugsComData.drugClass || aiDrugData.drugClass,
+    description: drugsComData.description || aiDrugData.description,
+    dosageAndAdmin: drugsComData.dosageAndAdmin || aiDrugData.dosageAndAdmin,
+    sideEffects: drugsComData.sideEffects.length > 0 ? drugsComData.sideEffects : aiDrugData.sideEffects,
+    warnings: drugsComData.warnings.length > 0 ? drugsComData.warnings : aiDrugData.warnings,
+    interactions: drugsComData.interactions.length > 0 ? drugsComData.interactions : aiDrugData.interactions,
+    storage: drugsComData.storage || aiDrugData.storage,
+    mechanism: drugsComData.mechanism || aiDrugData.mechanism,
+    indications: drugsComData.indications.length > 0 ? drugsComData.indications : aiDrugData.indications,
+    contraindications: drugsComData.contraindications.length > 0 ? drugsComData.contraindications : aiDrugData.contraindications,
+    prescriptionStatus: drugsComData.prescriptionStatus !== "Unknown" ? drugsComData.prescriptionStatus : aiDrugData.prescriptionStatus,
+    pregnancy: drugsComData.pregnancy || aiDrugData.pregnancy,
+  };
+}

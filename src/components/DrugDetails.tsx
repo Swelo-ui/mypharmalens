@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
   Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
-  AlertTriangle, Package
+  AlertTriangle, Package, Tag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +28,7 @@ export interface DetailedDrugData {
   image?: string;
   packageImage?: string;
   drugClass?: string;
+  brandNames?: string[];
   similarDrugs?: {
     id: string;
     name: string;
@@ -192,6 +193,20 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
       case 'alternatives':
         return (
           <div className="space-y-4">
+            {drug.brandNames && drug.brandNames.length > 0 && (
+              <div className="glass-card p-4">
+                <h3 className="text-sm font-medium mb-3">Brand Names</h3>
+                <div className="flex flex-wrap gap-2">
+                  {drug.brandNames.map((brand, index) => (
+                    <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
+                      <Tag className="h-3 w-3 mr-1" />
+                      {brand}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Similar medications or alternatives to {drug.name}.
             </p>
@@ -330,7 +345,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Alternatives
+            Alternatives & Brands
           </button>
         </div>
       </div>
