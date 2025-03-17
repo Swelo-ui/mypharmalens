@@ -587,5 +587,52 @@ export const mockDrugsData: DrugData[] = [
     drugClass: 'Beta blocker',
     verified: true,
   }
-]
+];
 
+// Function to get detailed drug data by ID
+export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+  const drug = mockDrugsData.find(drug => drug.id === id);
+  
+  if (!drug) return null;
+  
+  // Return detailed drug data with additional information
+  return {
+    ...drug,
+    prescriptionStatus: Math.random() > 0.3 ? "Prescription Only" : "Over-the-Counter",
+    dosageAndAdmin: "Take as directed by your healthcare provider. Typical dosage is once or twice daily with food.",
+    mechanism: "This medication works by targeting specific receptors in the body to produce its therapeutic effect.",
+    indications: [
+      "Treatment of related medical conditions",
+      "Management of symptoms associated with the condition",
+      "Prevention of disease progression"
+    ],
+    contraindications: [
+      "Known hypersensitivity to the active ingredient",
+      "Severe liver or kidney impairment",
+      "Concurrent use with certain medications"
+    ],
+    warnings: [
+      "Do not exceed recommended dosage",
+      "Consult healthcare provider before use if pregnant or nursing",
+      "May cause drowsiness; use caution when driving or operating machinery"
+    ],
+    sideEffects: [
+      "Headache",
+      "Nausea",
+      "Dizziness",
+      "Fatigue",
+      "Gastrointestinal disturbances"
+    ],
+    interactions: [
+      "May interact with other medications including anticoagulants",
+      "Alcohol may increase risk of side effects",
+      "Certain foods may affect absorption"
+    ],
+    pregnancy: "Consult your healthcare provider before using this medication if you are pregnant, planning to become pregnant, or breastfeeding.",
+    storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
+    similarDrugs: mockDrugsData
+      .filter(d => d.category === drug.category && d.id !== drug.id)
+      .slice(0, 3)
+      .map(d => ({ id: d.id, name: d.name }))
+  };
+};
