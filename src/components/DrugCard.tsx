@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, Info, ChevronRight, Shield, Package } from 'lucide-react';
+import { Pill, ChevronRight, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface DrugData {
@@ -24,14 +24,11 @@ interface DrugCardProps {
 
 const DrugCard = ({ drug, className }: DrugCardProps) => {
   return (
-    <Link 
-      to={`/drug/${drug.id}`}
-      className={cn(
-        "block p-6 rounded-2xl glass-card group transition-all duration-300",
-        "hover:shadow-lg hover:scale-[1.01]",
-        className
-      )}
-    >
+    <div className={cn(
+      "block p-6 rounded-2xl glass-card group transition-all duration-300",
+      "hover:shadow-lg hover:scale-[1.01]",
+      className
+    )}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-2">
           <div className="w-10 h-10 rounded-xl bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center">
@@ -83,41 +80,16 @@ const DrugCard = ({ drug, className }: DrugCardProps) => {
         )}
       </div>
       
-      {/* Display both pill and package images if available */}
-      <div className="mt-4 flex flex-col sm:flex-row gap-3">
-        {drug.image && (
-          <div className="w-full sm:w-1/2 h-32 rounded-lg overflow-hidden">
-            <img 
-              src={drug.image} 
-              alt={drug.name} 
-              className="w-full h-full object-cover"
-            />
-            <div className="text-xs text-center mt-1 text-gray-500">Pill</div>
-          </div>
-        )}
-        
-        {drug.packageImage && (
-          <div className="w-full sm:w-1/2 h-32 rounded-lg overflow-hidden">
-            <img 
-              src={drug.packageImage} 
-              alt={`${drug.name} package`} 
-              className="w-full h-full object-cover"
-            />
-            <div className="text-xs text-center mt-1 text-gray-500">Package</div>
-          </div>
-        )}
-      </div>
-      
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
         <Link 
           to={`/drug/${drug.id}`}
-          className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors"
+          className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors w-full py-2"
         >
-          <Info className="h-3.5 w-3.5 mr-1.5" />
           View detailed information
+          <ChevronRight className="h-4 w-4 ml-1" />
         </Link>
       </div>
-    </Link>
+    </div>
   );
 };
 
