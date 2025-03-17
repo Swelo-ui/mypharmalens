@@ -74,7 +74,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       toast({
         title: "Low quality image",
         description: "This image may be too small for accurate identification. Consider using a higher resolution image.",
-        variant: "warning",
+        variant: "destructive",
       });
     } else {
       setImageQualityWarning(false);

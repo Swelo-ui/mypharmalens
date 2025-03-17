@@ -7,7 +7,7 @@ import { DetailedDrugData } from '@/components/DrugDetails';
 import DrugDetails from '@/components/DrugDetails';
 import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
-import { supabase } from '@/integrations/supabase/client';
+import { mockDrugsData, getDetailedDrugData } from '@/data/mockDrugsData';
 import Header from '@/components/Header';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -17,6 +17,57 @@ const DrugIdentify = () => {
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+
+  // Simple function to identify drug based on text in image
+  const identifyDrugFromText = (text: string): DetailedDrugData | null => {
+    // Convert text to lowercase for case-insensitive matching
+    const lowercaseText = text.toLowerCase();
+    
+    // Find drug by name or generic name in our database
+    let matchedDrug = null;
+    
+    // First try exact matches
+    for (const drug of mockDrugsData) {
+      if (
+        lowercaseText.includes(drug.name.toLowerCase()) || 
+        (drug.genericName && lowercaseText.includes(drug.genericName.toLowerCase()))
+      ) {
+        matchedDrug = drug;
+        console.log("Found exact match:", drug.name);
+        break;
+      }
+    }
+    
+    // If no exact match, try partial matches
+    if (!matchedDrug) {
+      for (const drug of mockDrugsData) {
+        // Split the drug name into parts (for multi-word names)
+        const drugNameParts = drug.name.toLowerCase().split(/\s+/);
+        const genericNameParts = drug.genericName ? drug.genericName.toLowerCase().split(/\s+/) : [];
+        
+        // Check if any part of the drug name is in the text
+        const nameMatch = drugNameParts.some(part => 
+          part.length > 3 && lowercaseText.includes(part)
+        );
+        
+        const genericMatch = genericNameParts.some(part => 
+          part.length > 3 && lowercaseText.includes(part)
+        );
+        
+        if (nameMatch || genericMatch) {
+          matchedDrug = drug;
+          console.log("Found partial match:", drug.name);
+          break;
+        }
+      }
+    }
+    
+    if (matchedDrug) {
+      return getDetailedDrugData(matchedDrug.id);
+    }
+    
+    return null;
+  };
 
   const handleImageCapture = async (file: File) => {
     try {
@@ -32,54 +83,32 @@ const DrugIdentify = () => {
           setCapturedImage(base64Image);
           
           try {
-            console.log("Sending image to identify-drug function...");
-            const { data, error } = await supabase.functions.invoke('identify-drug', {
-              body: { imageBase64: base64Image },
-            });
-            
-            if (error) {
-              console.error('Error calling identify-drug function:', error);
-              setErrorDetails(`API Error: ${error.message}`);
-              toast.error("Failed to identify medication. Please try again.");
-              setIsIdentifying(false);
-              return;
-            }
-            
-            console.log("Received response:", data);
-            
-            if (data && data.name && data.name !== "Unknown Medication") {
-              try {
-                const { error: saveError } = await supabase
-                  .from('drug_identifications')
-                  .insert([
-                    {
-                      image_url: base64Image,
-                      drug_name: data.name,
-                      details: data
-                    }
-                  ]);
-                
-                if (saveError) {
-                  console.error('Error saving identification result:', saveError);
-                }
-              } catch (dbError) {
-                console.error('Database error:', dbError);
+            // Simulate image text recognition with a timeout
+            setTimeout(() => {
+              // Extract text from the file name as a simple simulation
+              // In a real app, you would use a text recognition library here
+              const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+              const extractedText = fileName.replace(/[-_]/g, " ");
+              
+              console.log("Extracted text:", extractedText);
+              
+              // Use our mock drug data to identify the drug
+              const identifiedDrugData = identifyDrugFromText(extractedText);
+              
+              if (identifiedDrugData) {
+                setIdentifiedDrug(identifiedDrugData);
+                toast.success("Medication successfully identified!");
+              } else {
+                setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
+                toast.error("Could not identify the medication. Please try again with a clearer image.");
               }
               
-              setIdentifiedDrug(data);
-              toast.success("Medication successfully identified!");
-            } else if (data && data.error) {
-              setErrorDetails(`Analysis Error: ${data.error}`);
-              toast.error("Failed to analyze the image. Please try again.");
-            } else {
-              setErrorDetails("The AI could not identify this medication with confidence. Try a clearer image or different angle.");
-              toast.error("Could not identify the medication. Please try again.");
-            }
-          } catch (apiError: any) {
-            console.error('API error:', apiError);
-            setErrorDetails(`API Error: ${apiError.message || "Unknown error"}`);
+              setIsIdentifying(false);
+            }, 2000); // Simulate processing time
+          } catch (error: any) {
+            console.error('Error processing image:', error);
+            setErrorDetails(`Error: ${error.message || "Unknown error"}`);
             toast.error("Failed to process the image. Please try another image.");
-          } finally {
             setIsIdentifying(false);
           }
         }
@@ -106,7 +135,7 @@ const DrugIdentify = () => {
     setCapturedImage(null);
   };
 
-  // Add a function for manual entry as fallback
+  // Add a function for manual search as fallback
   const handleManualSearch = () => {
     // For now, we'll just reset the state and let the user try again
     handleRetry();
