@@ -1,4 +1,3 @@
-
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -482,126 +481,67 @@ export const mockDrugsData: DrugData[] = [
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/501070177.jpg',
     packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
-  }
-];
-
-export const getDetailedDrugData = (id: string): DetailedDrugData | undefined => {
-  const basicDrug = mockDrugsData.find(drug => drug.id === id);
+  },
   
-  if (!basicDrug) return undefined;
+  // Additional drugs to ensure at least 15 per category
+  // Adding Essential Antibiotics
+  {
+    id: '41',
+    name: 'Azithromycin',
+    genericName: 'Azithromycin',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Macrolide antibiotic used to treat a wide variety of bacterial infections including respiratory infections, skin infections, ear infections, and sexually transmitted diseases.',
+    drugClass: 'Macrolide antibiotic',
+    verified: true,
+  },
+  {
+    id: '42',
+    name: 'Ciprofloxacin',
+    genericName: 'Ciprofloxacin',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including infections of the skin, bone, joint, respiratory tract, and urinary tract.',
+    drugClass: 'Fluoroquinolone antibiotic',
+    verified: true,
+  },
+  {
+    id: '43',
+    name: 'Doxycycline',
+    genericName: 'Doxycycline',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Tetracycline antibiotic used to treat a wide variety of bacterial infections, including respiratory tract infections, urinary tract infections, and severe acne.',
+    drugClass: 'Tetracycline antibiotic',
+    verified: true,
+  },
+  {
+    id: '44',
+    name: 'Metronidazole',
+    genericName: 'Metronidazole',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Antibiotic and antiprotozoal medication used to treat bacterial infections of the vagina, stomach, liver, skin, joints, brain, and respiratory tract.',
+    drugClass: 'Nitroimidazole antibiotic',
+    verified: true,
+  },
+  {
+    id: '45',
+    name: 'Trimethoprim/Sulfamethoxazole',
+    genericName: 'Cotrimoxazole',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Combination antibiotic used to treat a variety of bacterial infections, including urinary tract infections, middle ear infections, and respiratory infections.',
+    drugClass: 'Sulfonamide antibiotic',
+    verified: true,
+  },
   
-  // Enhanced detailed data for all drugs
-  const detailedData: Record<string, Partial<DetailedDrugData>> = {
-    '1': {
-      dosageAndAdmin: 'Adults and adolescents (aged 12 years and over): 500-1000 mg every 4-6 hours as needed, not exceeding 4000 mg in 24 hours.',
-      sideEffects: [
-        'Nausea or vomiting',
-        'Headache',
-        'Stomach pain',
-        'Liver damage (with overdose or long-term use)',
-        'Rash or allergic reactions (rare)'
-      ],
-      warnings: [
-        'Do not exceed recommended dosage',
-        'Alcohol use may increase the risk of liver damage',
-        'Consult a doctor if symptoms persist for more than 10 days',
-        'May cause liver damage if taken in large doses or for extended periods'
-      ],
-      interactions: [
-        'Warfarin (may increase anticoagulant effect)',
-        'Alcohol (increases risk of liver damage)',
-        'Isoniazid (may increase risk of liver toxicity)'
-      ],
-      storage: 'Store at room temperature away from moisture and heat.',
-      mechanism: 'Paracetamol works by inhibiting the synthesis of prostaglandins in the central nervous system and peripherally blocks pain impulse generation. It has antipyretic effects by acting on the hypothalamic heat-regulating center.',
-      indications: [
-        'Relief of mild to moderate pain',
-        'Reduction of fever',
-        'Treatment of headache, muscle aches, arthritis, backache, toothaches, and cold/flu symptoms'
-      ],
-      contraindications: [
-        'Hypersensitivity to paracetamol',
-        'Severe liver impairment',
-        'Alcohol dependency'
-      ],
-      prescriptionStatus: 'OTC',
-      pregnancy: 'Category B. Paracetamol crosses the placenta but is considered safe to use during pregnancy when used as directed. It is the preferred pain reliever for pregnant women.',
-      verified: true
-    },
-    '2': {
-      dosageAndAdmin: 'Adults: 200-400 mg every 4-6 hours as needed. Do not exceed 3200 mg per day.',
-      sideEffects: [
-        'Upset stomach, nausea, vomiting',
-        'Heartburn, diarrhea, constipation',
-        'Dizziness, headache',
-        'Mild itching or rash',
-        'Ringing in ears'
-      ],
-      warnings: [
-        'May increase risk of heart attack or stroke',
-        'Not recommended for use during the third trimester of pregnancy',
-        'People with heart disease or high blood pressure should consult a doctor before use',
-        'May cause stomach bleeding, especially in elderly patients'
-      ],
-      interactions: [
-        'Aspirin (may decrease effectiveness of ibuprofen)',
-        'Blood thinners (increased risk of bleeding)',
-        'Diuretics (may reduce effectiveness)',
-        'ACE inhibitors (may cause kidney damage)'
-      ],
-      storage: 'Store at room temperature away from moisture and heat.',
-      mechanism: 'Ibuprofen works by inhibiting the production of prostaglandins, chemicals in the body that cause inflammation and contribute to pain.',
-      indications: [
-        'Relief of pain from various conditions',
-        'Reduction of fever',
-        'Treatment of inflammatory conditions like arthritis'
-      ],
-      contraindications: [
-        'Allergic reactions to NSAIDs',
-        'Third trimester of pregnancy',
-        'Active stomach/intestinal bleeding',
-        'History of heart bypass surgery'
-      ],
-      prescriptionStatus: 'OTC',
-      pregnancy: 'Category C. Not recommended during the third trimester of pregnancy.',
-      verified: true
-    }
-  };
-  
-  // Create a full detailed drug data object by merging basic and detailed data
-  const basicData = {
-    id: basicDrug.id,
-    name: basicDrug.name,
-    genericName: basicDrug.genericName || "",
-    manufacturer: basicDrug.manufacturer || "",
-    category: basicDrug.category || "",
-    description: basicDrug.description || "",
-    drugClass: basicDrug.drugClass || "",
-    verified: basicDrug.verified || false,
-    image: basicDrug.image,
-    packageImage: basicDrug.packageImage
-  };
-  
-  // Use default values for detailed data if not explicitly provided
-  const defaultDetailedData: Omit<DetailedDrugData, keyof typeof basicData> = {
-    dosageAndAdmin: "Follow the dosage instructions provided by your healthcare provider or as indicated on the packaging.",
-    sideEffects: ["Consult a healthcare professional for information about potential side effects."],
-    warnings: ["Read all medication guides and follow directions on product labels."],
-    interactions: ["Consult with your healthcare provider about potential drug interactions."],
-    storage: "Store at room temperature away from moisture and heat.",
-    mechanism: "Consult with a healthcare professional for information on how this medication works.",
-    indications: ["Treatment of conditions as prescribed by your healthcare provider."],
-    contraindications: ["Consult with a healthcare professional before taking this medication."],
-    prescriptionStatus: "OTC",
-    pregnancy: "Consult with a healthcare professional before use during pregnancy or breastfeeding.",
-    similarDrugs: [] // Added this required property
-  };
-  
-  // Merge the basic data with detailed data (if available) or default values
-  // The as DetailedDrugData ensures that we explicitly treat this as the required type
-  return {
-    ...basicData,
-    ...defaultDetailedData,
-    ...(detailedData[id] || {})
-  } as DetailedDrugData;
-};
+  // Adding Essential Antihypertensives
+  {
+    id: '46',
+    name: 'Enalapril',
+    genericName: 'Enalapril',
+    manufacturer: 'Various',
+    category: 'Antihypertensive',
+    description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to prevent kidney problems in people with diabetes or heart disease.',
+    drugClass: 'ACE inhibitor
