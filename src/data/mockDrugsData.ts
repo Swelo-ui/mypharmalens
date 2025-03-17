@@ -599,6 +599,15 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   // Return detailed drug data with additional information
   return {
     ...drug,
+    // Ensure all required properties are present with default values if needed
+    id: drug.id,
+    name: drug.name,
+    genericName: drug.genericName || drug.name, // Fallback to name if genericName is missing
+    manufacturer: drug.manufacturer,
+    category: drug.category,
+    description: drug.description,
+    verified: drug.verified,
+    drugClass: drug.drugClass || 'Not specified',
     prescriptionStatus: Math.random() > 0.3 ? "Prescription Only" : "OTC",
     dosageAndAdmin: "Take as directed by your healthcare provider. Typical dosage is once or twice daily with food.",
     mechanism: "This medication works by targeting specific receptors in the body to produce its therapeutic effect.",
@@ -631,6 +640,8 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
     ],
     pregnancy: "Consult your healthcare provider before using this medication if you are pregnant, planning to become pregnant, or breastfeeding.",
     storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
+    image: drug.image,
+    packageImage: drug.packageImage,
     similarDrugs: mockDrugsData
       .filter(d => d.category === drug.category && d.id !== drug.id)
       .slice(0, 3)
