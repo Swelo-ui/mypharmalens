@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -598,7 +599,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   // Return detailed drug data with additional information
   return {
     ...drug,
-    prescriptionStatus: Math.random() > 0.3 ? "Prescription Only" : "Over-the-Counter",
+    prescriptionStatus: Math.random() > 0.3 ? "Prescription Only" : "OTC",
     dosageAndAdmin: "Take as directed by your healthcare provider. Typical dosage is once or twice daily with food.",
     mechanism: "This medication works by targeting specific receptors in the body to produce its therapeutic effect.",
     indications: [
