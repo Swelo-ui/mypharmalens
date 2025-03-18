@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, MessageCircle, Bookmark, CheckCircle2 } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, MessageCircle, Bookmark, CheckCircle2, Mail, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const About = () => {
