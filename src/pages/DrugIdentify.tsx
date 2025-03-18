@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -9,10 +9,11 @@ import { DetailedDrugData } from '@/components/DrugDetails';
 import DrugDetails from '@/components/DrugDetails';
 import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
-import { mockDrugsData, getDetailedDrugData } from '@/data/mockDrugsData';
 import Header from '@/components/Header';
 import { supabase, saveDrugIdentification } from '@/integrations/supabase/client';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 
 const DrugIdentify = () => {
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
@@ -22,22 +23,38 @@ const DrugIdentify = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [blurryMode, setBlurryMode] = useState(false);
   const [isImageLowRes, setIsImageLowRes] = useState(false);
+  const [enhancedMode, setEnhancedMode] = useState(true);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [processingPhase, setProcessingPhase] = useState("");
 
   // Function to identify drug using the Supabase edge function
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
     try {
+      // Track progress for better UX
+      setProcessingPhase("Initializing image analysis");
+      setProcessingProgress(10);
+      
       // Call the identify-drug function
+      setProcessingPhase("Sending image for analysis");
+      setProcessingProgress(30);
+      
       const { data, error } = await supabase.functions.invoke('identify-drug', {
         body: { 
           imageBase64: base64Image,
-          blurryMode: blurryMode || isImageLowRes
+          blurryMode: blurryMode || isImageLowRes || enhancedMode
         }
       });
+
+      setProcessingPhase("Processing AI response");
+      setProcessingProgress(60);
 
       if (error) {
         console.error('Error calling identify-drug function:', error);
         throw new Error(error.message || 'Failed to identify medication');
       }
+      
+      setProcessingPhase("Finalizing results");
+      setProcessingProgress(80);
 
       return data;
     } catch (error: any) {
@@ -81,6 +98,8 @@ const DrugIdentify = () => {
     try {
       setIsIdentifying(true);
       setErrorDetails(null);
+      setProcessingProgress(0);
+      setProcessingPhase("Preparing image");
       toast.info("Processing your image...");
       
       // Check image quality
@@ -94,14 +113,16 @@ const DrugIdentify = () => {
           setCapturedImage(base64Image);
           
           try {
-            // Identify the drug
+            // Identify the drug with advanced processing
             const drugData = await identifyDrugFromImage(base64Image);
+            setProcessingProgress(90);
             
             if (drugData.error) {
               throw new Error(drugData.error);
             }
             
             if (drugData) {
+              setProcessingProgress(95);
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
                 id: drugData.id,
@@ -123,6 +144,7 @@ const DrugIdentify = () => {
                 verified: false,
                 image: drugData.image,
                 drugClass: drugData.drugClass || 'Not specified',
+                brandNames: drugData.brandNames || []
               };
               
               // Save the identification to Supabase
@@ -139,11 +161,33 @@ const DrugIdentify = () => {
               }
               
               setIdentifiedDrug(formattedDrugData);
-              toast.success(`Medication ${drugData.blurryModeUsed ? 'possibly' : 'successfully'} identified as ${drugData.name}!`);
+              setProcessingProgress(100);
               
-              // Show different message based on confidence
-              if (drugData.blurryModeUsed || drugData.confidence === 'low') {
-                toast.info("Note: Image quality was low. Identification may not be fully accurate.", { duration: 5000 });
+              // Show different message based on confidence and analysis method
+              if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
+                if (drugData.confidence === 'high') {
+                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                    description: "Enhanced analysis provided high confidence results."
+                  });
+                } else if (drugData.confidence === 'medium') {
+                  toast.success(`Medication identified as ${drugData.name}`, { 
+                    description: "The identification has medium confidence. Consider the alternatives listed."
+                  });
+                } else {
+                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                    description: "Low confidence identification. Consider consulting a healthcare professional.",
+                    duration: 5000
+                  });
+                }
+              } else {
+                toast.success(`Medication successfully identified as ${drugData.name}!`);
+              }
+              
+              // Additional information about image quality if relevant
+              if (isImageLowRes || drugData.blurryModeUsed) {
+                toast.info("For better accuracy, consider uploading a higher quality image.", { 
+                  duration: 5000 
+                });
               }
             } else {
               setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
@@ -179,6 +223,8 @@ const DrugIdentify = () => {
     setErrorDetails(null);
     setCapturedImage(null);
     setIsImageLowRes(false);
+    setProcessingProgress(0);
+    setProcessingPhase("");
   };
 
   // Function for manual search as fallback
@@ -238,21 +284,55 @@ const DrugIdentify = () => {
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <div className="mb-4 flex items-center justify-center space-x-2">
-                <Switch 
-                  id="blur-mode" 
-                  checked={blurryMode}
-                  onCheckedChange={setBlurryMode}
-                />
-                <Label htmlFor="blur-mode" className="cursor-pointer">
-                  Enhanced mode for blurry images
-                </Label>
-                {isImageLowRes && (
-                  <span className="text-xs text-amber-500 ml-2">
-                    (Recommended for this image)
-                  </span>
-                )}
-              </div>
+              <Tabs defaultValue="standard" className="mb-4">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
+                  <TabsTrigger value="standard">Standard Mode</TabsTrigger>
+                  <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="standard" className="space-y-4">
+                  <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <span className="text-sm font-medium">Basic Analysis</span>
+                      </div>
+                      <Switch 
+                        id="blur-mode" 
+                        checked={blurryMode}
+                        onCheckedChange={setBlurryMode}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Standard mode works best with clear, well-lit images. Enable blur mode for lower-quality images.
+                    </p>
+                    {isImageLowRes && (
+                      <p className="text-xs text-amber-500 mt-2">
+                        Your image appears to be low resolution. Blur mode is recommended.
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="enhanced" className="space-y-4">
+                  <div className="rounded-lg border p-4 bg-pharma-50 dark:bg-pharma-900/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-4 w-4 text-pharma-600" />
+                        <span className="text-sm font-medium">Advanced Analysis</span>
+                      </div>
+                      <Switch 
+                        id="enhanced-mode" 
+                        checked={enhancedMode}
+                        onCheckedChange={setEnhancedMode}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      Enhanced mode uses multiple AI models to analyze the image from different angles, 
+                      improving accuracy for blurry or difficult-to-identify medications.
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
               
               {identificationMode === 'upload' ? (
                 <ImageUpload onImageCapture={handleImageCapture} />
@@ -261,9 +341,17 @@ const DrugIdentify = () => {
               )}
               
               {isIdentifying && (
-                <div className="mt-4 flex items-center justify-center">
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  <span>Analyzing medication image...</span>
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{processingPhase || "Analyzing medication..."}</span>
+                    <span>{processingProgress}%</span>
+                  </div>
+                  <Progress value={processingProgress} className="h-2" />
+                  <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                    {enhancedMode 
+                      ? "Using enhanced multi-model analysis for optimal results" 
+                      : "Using standard analysis"}
+                  </p>
                 </div>
               )}
             </div>
@@ -290,6 +378,10 @@ const DrugIdentify = () => {
                 <li className="flex items-start">
                   <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-pharma-100 rounded-sm" />
                   <span>Include the packaging if available for better accuracy</span>
+                </li>
+                <li className="flex items-start">
+                  <Zap className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span>Use Enhanced Mode for blurry images or hard-to-identify medications</span>
                 </li>
               </ul>
             </div>

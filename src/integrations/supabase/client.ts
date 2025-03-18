@@ -69,3 +69,79 @@ export async function saveDrugIdentification(identificationData: any) {
   
   return data;
 }
+
+// Enhanced drug search with fuzzy matching support
+export async function searchDrugsByFeatures(params: {
+  name?: string;
+  imprint?: string;
+  color?: string;
+  shape?: string;
+  markings?: string;
+  limit?: number;
+}) {
+  const { name, imprint, color, shape, markings, limit = 10 } = params;
+  
+  let query = supabase.from('drugs').select('*');
+  
+  // Build query based on available parameters
+  if (name) {
+    query = query.or(`name.ilike.%${name}%,generic_name.ilike.%${name}%,brand_names.cs.{${name}}`);
+  }
+  
+  // Add other search criteria if provided
+  if (color) {
+    query = query.ilike('description', `%${color}%`);
+  }
+  
+  if (shape) {
+    query = query.ilike('description', `%${shape}%`);
+  }
+  
+  if (imprint || markings) {
+    const searchTerm = imprint || markings;
+    query = query.or(`description.ilike.%${searchTerm}%,name.ilike.%${searchTerm}%`);
+  }
+  
+  const { data, error } = await query.limit(limit);
+  
+  if (error) {
+    console.error('Error searching drugs by features:', error);
+    return null;
+  }
+  
+  return data;
+}
+
+// Function to fetch possible drug matches by description
+export async function findSimilarDrugs(description: string, limit = 5) {
+  if (!description || description.length < 3) {
+    return null;
+  }
+  
+  // Extract key terms from the description
+  const keyTerms = description
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .split(/\s+/)
+    .filter(term => term.length > 3 && !['drug', 'tablet', 'capsule', 'pill', 'medication', 'medicine', 'the', 'and', 'with'].includes(term));
+  
+  if (keyTerms.length === 0) {
+    return null;
+  }
+  
+  // Build a query with the key terms
+  let query = supabase.from('drugs').select('*');
+  
+  // Add each key term to search in the name, generic name, or description
+  const searchConditions = keyTerms.map(term => `name.ilike.%${term}%,generic_name.ilike.%${term}%,description.ilike.%${term}%`);
+  query = query.or(searchConditions.join(','));
+  
+  const { data, error } = await query.limit(limit);
+  
+  if (error) {
+    console.error('Error finding similar drugs:', error);
+    return null;
+  }
+  
+  return data;
+}
