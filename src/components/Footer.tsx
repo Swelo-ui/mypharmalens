@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, Heart, ExternalLink, Mail, Linkedin, Github, MessageCircle } from 'lucide-react';
+import { Pill, Heart, ExternalLink, Mail, Linkedin, Github } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -25,7 +25,7 @@ const Footer = () => {
             
             <div className="flex items-center space-x-4">
               <a 
-                href="https://www.linkedin.com/in/himanshu-sharma" 
+                href="https://www.linkedin.com/in/himanshu-sharma-374421326" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-pharma-600 transition-colors"
@@ -128,7 +128,7 @@ const Footer = () => {
           <div className="mt-4 md:mt-0 flex items-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <span className="mr-2">Made with</span>
-              <Heart className="h-3 w-3 text-red-500 animate-pulse" />
+              <Heart className="h-3 w-3 text-red-500" />
               <span className="mx-2">for healthcare</span>
             </p>
             
