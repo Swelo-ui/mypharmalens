@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -421,6 +422,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     
     console.log("Using enhanced multi-model analysis for drug identification");
     
+    // UPDATED: Using gemini-1.5-flash model instead of the deprecated gemini-pro-vision
     // First attempt: High-detail mode with image enhancement prompt
     const detailedPrompt = `
     This image may show a medication pill, tablet, or capsule. 
@@ -449,10 +451,10 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     confidence, and description. For low confidence, list all possible matches.
     `;
     
-    // Make the primary analysis request with detailed prompt
+    // Make the primary analysis request with detailed prompt using the new model
     let primaryResponse;
     try {
-      primaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
+      primaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -476,7 +478,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     // Make the secondary analysis request with alternative prompt
     let secondaryResponse;
     try {
-      secondaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
+      secondaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -502,17 +504,24 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     if (primaryResponse && primaryResponse.ok) {
       try {
         const responseData = await primaryResponse.json();
-        const text = responseData.candidates[0].content.parts[0].text;
-        console.log("Primary analysis result:", text);
-        
-        // Extract JSON
-        const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
+        // Check if content exists and has parts
+        if (responseData.candidates && 
+            responseData.candidates[0] && 
+            responseData.candidates[0].content && 
+            responseData.candidates[0].content.parts) {
+          
+          const text = responseData.candidates[0].content.parts[0].text;
+          console.log("Primary analysis result:", text);
+          
+          // Extract JSON
+          const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
                          text.match(/```\s*([\s\S]*?)\s*```/) ||
                          text.match(/\{[\s\S]*\}/);
-        
-        if (jsonMatch) {
-          const jsonString = jsonMatch[1] || jsonMatch[0];
-          primaryData = JSON.parse(jsonString);
+          
+          if (jsonMatch) {
+            const jsonString = jsonMatch[1] || jsonMatch[0];
+            primaryData = JSON.parse(jsonString);
+          }
         }
       } catch (e) {
         console.error("Error parsing primary analysis:", e);
@@ -524,17 +533,24 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     if (secondaryResponse && secondaryResponse.ok) {
       try {
         const responseData = await secondaryResponse.json();
-        const text = responseData.candidates[0].content.parts[0].text;
-        console.log("Secondary analysis result:", text);
-        
-        // Extract JSON
-        const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
+        // Check if content exists and has parts
+        if (responseData.candidates && 
+            responseData.candidates[0] && 
+            responseData.candidates[0].content && 
+            responseData.candidates[0].content.parts) {
+          
+          const text = responseData.candidates[0].content.parts[0].text;
+          console.log("Secondary analysis result:", text);
+          
+          // Extract JSON
+          const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
                          text.match(/```\s*([\s\S]*?)\s*```/) ||
                          text.match(/\{[\s\S]*\}/);
-        
-        if (jsonMatch) {
-          const jsonString = jsonMatch[1] || jsonMatch[0];
-          secondaryData = JSON.parse(jsonString);
+          
+          if (jsonMatch) {
+            const jsonString = jsonMatch[1] || jsonMatch[0];
+            secondaryData = JSON.parse(jsonString);
+          }
         }
       } catch (e) {
         console.error("Error parsing secondary analysis:", e);
@@ -674,7 +690,7 @@ serve(async (req) => {
     // STAGE 1: Use multi-model analysis for better handling of blurry/difficult images
     const multiModelAnalysis = await analyzeImageWithMultipleModels(imageBase64);
     
-    // STAGE 2: Standard analysis with Gemini Pro Vision
+    // STAGE 2: Standard analysis with updated Gemini 1.5 Flash
     console.log("Proceeding with standard analysis...");
     const standardAnalysisPrompt = `
     You are a pharmaceutical expert. Identify this medication pill/tablet from the image with extreme precision.
@@ -698,8 +714,8 @@ serve(async (req) => {
     Ensure your response is ONLY valid JSON with no additional text.
     `;
     
-    // Standard analysis request
-    const standardResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`, {
+    // Standard analysis request with the new model
+    const standardResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
