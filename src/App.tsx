@@ -9,16 +9,15 @@ import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import DrugIdentify from "./pages/DrugIdentify";
 import DrugPage from "./pages/DrugPage";
+import About from "./pages/About";
+import FAQ from "./pages/FAQ";
+import HelpCenter from "./pages/HelpCenter";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Disclaimer from "./pages/Disclaimer";
 
 const queryClient = new QueryClient();
-
-const About = () => (
-  <div className="pt-24 pb-8 container">
-    <h1 className="text-3xl font-bold mb-6">About PharmaLens</h1>
-    <p className="mb-4">PharmaLens is a comprehensive medication identification and information platform designed to help users quickly identify medications and access detailed information about them.</p>
-    <p className="mb-4">Our mission is to improve medication safety and education by providing accurate, reliable information about prescription and over-the-counter drugs.</p>
-  </div>
-);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,6 +30,12 @@ const App = () => (
           <Route path="/search" element={<SearchResults />} />
           <Route path="/identify" element={<DrugIdentify />} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/drug/:id" element={<DrugPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
