@@ -120,43 +120,7 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-sm font-semibold mb-3">About the Creator</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 max-w-xl">
-                PharmaLens is developed by Himanshu Sharma, a B.Pharm student at Shriram College of Pharmacy, Morena, 
-                with a passion for AI and healthcare innovation. With expertise in pharmacovigilance and pharmaceutical research,
-                I aim to bridge the gap between technology and medicine.
-              </p>
-              
-              <div className="flex space-x-4 mt-4">
-                <a 
-                  href="mailto:himanshusharma.shriram@gmail.com" 
-                  className="inline-flex items-center text-sm text-pharma-600 hover:text-pharma-700"
-                >
-                  <Mail className="h-4 w-4 mr-1" /> Email
-                </a>
-                <a 
-                  href="https://www.linkedin.com/in/himanshu-sharma" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-sm text-pharma-600 hover:text-pharma-700"
-                >
-                  <Linkedin className="h-4 w-4 mr-1" /> LinkedIn
-                </a>
-                <a 
-                  href="/contact" 
-                  className="inline-flex items-center text-sm text-pharma-600 hover:text-pharma-700"
-                >
-                  <MessageCircle className="h-4 w-4 mr-1" /> Contact
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             © {new Date().getFullYear()} PharmaLens. All rights reserved.
           </p>
