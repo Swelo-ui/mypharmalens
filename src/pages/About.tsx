@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
