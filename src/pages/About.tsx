@@ -2,38 +2,47 @@
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, MessageCircle, Bookmark, CheckCircle2, Mail, Linkedin } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const About = () => {
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
-    // Add animation to elements on scroll
-    const animateOnScroll = () => {
-      const elements = document.querySelectorAll('.animate-on-scroll');
-      elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-        if (elementPosition < windowHeight - 100) {
-          element.classList.add('animate-fade-up');
+    // Fix animation issue by adding proper animation classes
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-up');
+          entry.target.style.opacity = '1';
         }
       });
     };
 
-    window.addEventListener('scroll', animateOnScroll);
-    // Trigger once on load
-    setTimeout(animateOnScroll, 100);
+    const observer = new IntersectionObserver(observerCallback, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    });
+
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach(element => {
+      element.style.opacity = '0';
+      observer.observe(element);
+    });
     
-    return () => window.removeEventListener('scroll', animateOnScroll);
+    return () => {
+      elements.forEach(element => observer.unobserve(element));
+    };
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 pt-16">
+      <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-pharma-50 to-white dark:from-gray-900 dark:to-gray-950 py-16 overflow-hidden">
           <div className="container mx-auto px-4 max-w-6xl">
@@ -206,11 +215,11 @@ const About = () => {
               </div>
               
               <div className="order-1 md:order-2 flex justify-center animate-on-scroll">
-                <div className="relative shadow-lg transition-all duration-500">
+                <div className="relative">
                   <img 
                     src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
                     alt="Himanshu Sharma" 
-                    className="max-w-full h-auto rounded-lg"
+                    className="max-w-full h-auto rounded-lg shadow-lg object-cover"
                     style={{ maxHeight: "400px", width: "auto" }}
                   />
                 </div>
