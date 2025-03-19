@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -16,7 +16,7 @@ const About = () => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-up');
-          entry.target.style.opacity = '1';
+          (entry.target as HTMLElement).style.opacity = '1';
         }
       });
     };
@@ -29,7 +29,7 @@ const About = () => {
 
     const elements = document.querySelectorAll('.animate-on-scroll');
     elements.forEach(element => {
-      element.style.opacity = '0';
+      (element as HTMLElement).style.opacity = '0';
       observer.observe(element);
     });
     
