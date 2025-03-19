@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '@/components/ui/card';
 
 const About = () => {
   useEffect(() => {
@@ -118,61 +119,35 @@ const About = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
               {[
                 {
                   icon: <Camera className="h-8 w-8 text-pharma-600" />,
                   title: "AI-Powered Visual Identification",
-                  desc: "Upload a photo of any medication and our advanced AI will identify it with high accuracy, even with blurry or low-quality images."
+                  desc: "Upload a photo of any medication and our advanced AI will identify it with high accuracy."
                 },
                 {
                   icon: <Database className="h-8 w-8 text-pharma-600" />,
                   title: "Comprehensive Drug Database",
-                  desc: "Access detailed information about thousands of medications, including usage instructions, side effects, interactions, and more."
+                  desc: "Access detailed information about medications, including usage instructions, side effects, and interactions."
                 },
                 {
                   icon: <Pill className="h-8 w-8 text-pharma-600" />,
                   title: "Smart Search Functionality",
-                  desc: "Find medications quickly by name, active ingredient, manufacturer, or even by describing their physical characteristics."
+                  desc: "Find medications quickly by name, active ingredient, or manufacturer."
+                },
+                {
+                  icon: <FileText className="h-8 w-8 text-pharma-600" />,
+                  title: "Educational Resources",
+                  desc: "Access medication guides and usage instructions to better understand your prescriptions."
                 }
               ].map((feature, i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 animate-on-scroll">
-                  <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700 animate-on-scroll">
+                  <div className="w-12 h-12 rounded-lg bg-pharma-50 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">{feature.desc}</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-              {[
-                {
-                  title: "Educational Resources",
-                  desc: "Access medication guides, usage instructions, and educational content to better understand your prescriptions."
-                },
-                {
-                  title: "High-Accuracy Results",
-                  desc: "Our AI models are trained on vast datasets of medication images to ensure precise identification in various conditions."
-                },
-                {
-                  title: "User-Friendly Interface",
-                  desc: "Intuitive design makes it easy for anyone to access medication information quickly and efficiently."
-                },
-                {
-                  title: "Continuous Improvements",
-                  desc: "We regularly update our AI models and databases to improve accuracy and expand our medication coverage."
-                }
-              ].map((item, i) => (
-                <div key={i} className="flex items-start animate-on-scroll">
-                  <div className="shrink-0 mr-3 text-pharma-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-1">{item.title}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{item.desc}</p>
-                  </div>
+                  <p className="text-gray-600 dark:text-gray-300">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -197,7 +172,7 @@ const About = () => {
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <a 
                     href="mailto:himanshusharma.shriram@gmail.com" 
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-pharma-600 text-white hover:bg-pharma-700 transition-all hover:translate-y-[-2px] shadow-md hover:shadow-lg"
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-pharma-600 text-white hover:bg-pharma-700 transition-all shadow-md"
                   >
                     <Mail className="h-5 w-5 mr-2" />
                     Contact via Email
@@ -206,7 +181,7 @@ const About = () => {
                     href="https://www.linkedin.com/in/himanshu-sharma-374421326" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-pharma-600 text-pharma-600 hover:bg-pharma-50 dark:hover:bg-pharma-900/10 transition-all hover:translate-y-[-2px] shadow-md hover:shadow-lg"
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-pharma-600 text-pharma-600 hover:bg-pharma-50 dark:hover:bg-pharma-900/10 transition-all shadow-md"
                   >
                     <Linkedin className="h-5 w-5 mr-2" />
                     Connect on LinkedIn
@@ -215,14 +190,19 @@ const About = () => {
               </div>
               
               <div className="order-1 md:order-2 flex justify-center animate-on-scroll">
-                <div className="relative">
-                  <img 
-                    src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
-                    alt="Himanshu Sharma" 
-                    className="max-w-full h-auto rounded-lg shadow-lg object-cover"
-                    style={{ maxHeight: "400px", width: "auto" }}
-                  />
-                </div>
+                <Card className="overflow-hidden border-0 shadow-lg max-w-sm">
+                  <CardContent className="p-0">
+                    <img 
+                      src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
+                      alt="Himanshu Sharma" 
+                      className="w-full h-auto object-cover"
+                      style={{ 
+                        maxWidth: "100%",
+                        filter: "contrast(1.05) brightness(1.02)"
+                      }}
+                    />
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
@@ -237,10 +217,10 @@ const About = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 animate-on-scroll">
-              <Link to="/identify" className="px-8 py-3 rounded-lg bg-white text-pharma-800 font-medium hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+              <Link to="/identify" className="px-8 py-3 rounded-lg bg-white text-pharma-800 font-medium hover:bg-gray-100 transition-all shadow-md">
                 Try Visual Identification
               </Link>
-              <Link to="/search" className="px-8 py-3 rounded-lg bg-pharma-700 text-white font-medium border border-pharma-500 hover:bg-pharma-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+              <Link to="/search" className="px-8 py-3 rounded-lg bg-pharma-700 text-white font-medium border border-pharma-500 hover:bg-pharma-800 transition-all shadow-md">
                 Search Medications
               </Link>
             </div>
