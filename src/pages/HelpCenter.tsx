@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -9,7 +8,6 @@ import { helpArticles } from '@/components/HelpArticle';
 const HelpCenter = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Filter popular articles for search functionality
   const filteredArticles = helpArticles.filter(article => 
     article.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -27,7 +25,6 @@ const HelpCenter = () => {
             </p>
           </div>
           
-          {/* Search Box */}
           <div className="max-w-2xl mx-auto mb-16">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -42,7 +39,6 @@ const HelpCenter = () => {
               />
             </div>
             
-            {/* Search Results */}
             {searchQuery && (
               <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
                 {filteredArticles.length > 0 ? (
@@ -70,7 +66,6 @@ const HelpCenter = () => {
             )}
           </div>
           
-          {/* Help Categories */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
@@ -80,7 +75,10 @@ const HelpCenter = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                 Learn how to take good photos of medications and get the most accurate identification results.
               </p>
-              <Link to="/help/visual-identification" className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium">
+              <Link 
+                to="/help/visual-identification" 
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+              >
                 Read guides <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
@@ -93,7 +91,10 @@ const HelpCenter = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                 Tips for finding medications quickly using names, ingredients, or physical characteristics.
               </p>
-              <Link to="/help/searching" className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium">
+              <Link 
+                to="/help/searching" 
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+              >
                 Read guides <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
@@ -106,13 +107,15 @@ const HelpCenter = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                 How to interpret medication information, including usage, side effects, and interactions.
               </p>
-              <Link to="/help/results" className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium">
+              <Link 
+                to="/help/results" 
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+              >
                 Read guides <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
           </div>
           
-          {/* Contact Support */}
           <div className="bg-gray-50 dark:bg-gray-900/30 rounded-xl p-8 mb-16">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-3">Need More Help?</h2>
@@ -157,7 +160,6 @@ const HelpCenter = () => {
             </div>
           </div>
           
-          {/* Popular Articles */}
           <div>
             <h2 className="text-2xl font-bold mb-6">Popular Help Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
