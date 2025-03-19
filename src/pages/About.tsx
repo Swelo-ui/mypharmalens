@@ -157,8 +157,8 @@ const About = () => {
         {/* Creator Section */}
         <section className="py-16 bg-white dark:bg-gray-900">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="order-2 md:order-1 animate-on-scroll">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+              <div className="md:col-span-8 order-2 md:order-1 animate-on-scroll">
                 <div className="inline-block mb-3">
                   <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800 dark:bg-pharma-900/30 dark:text-pharma-300">
                     About the Creator
@@ -189,8 +189,8 @@ const About = () => {
                 </div>
               </div>
               
-              <div className="order-1 md:order-2 flex justify-center animate-on-scroll">
-                <Card className="overflow-hidden border-0 shadow-lg max-w-sm">
+              <div className="md:col-span-4 order-1 md:order-2 flex justify-center animate-on-scroll">
+                <Card className="overflow-hidden border-0 shadow-lg max-w-[240px]">
                   <CardContent className="p-0">
                     <img 
                       src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
@@ -198,6 +198,7 @@ const About = () => {
                       className="w-full h-auto object-cover"
                       style={{ 
                         maxWidth: "100%",
+                        borderRadius: "0.5rem",
                         filter: "contrast(1.05) brightness(1.02)"
                       }}
                     />

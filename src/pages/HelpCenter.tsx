@@ -1,11 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Search, Camera, FileText, MessageCircle, Mail, PenTool, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { helpArticles } from '@/components/HelpArticle';
 
 const HelpCenter = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Filter popular articles for search functionality
+  const filteredArticles = helpArticles.filter(article => 
+    article.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -29,8 +37,37 @@ const HelpCenter = () => {
                 type="text"
                 placeholder="Search for help articles..."
                 className="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-pharma-500 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+            
+            {/* Search Results */}
+            {searchQuery && (
+              <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+                {filteredArticles.length > 0 ? (
+                  <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+                    {filteredArticles.map(article => (
+                      <li key={article.id}>
+                        <Link
+                          to={`/help/article/${article.id}`}
+                          className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        >
+                          <h3 className="font-medium text-pharma-600">{article.title}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {article.content.substring(0, 100).replace(/<[^>]*>/g, '')}...
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-6 text-center">
+                    <p className="text-gray-500 dark:text-gray-400">No articles found matching "{searchQuery}"</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Help Categories */}
@@ -124,21 +161,14 @@ const HelpCenter = () => {
           <div>
             <h2 className="text-2xl font-bold mb-6">Popular Help Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              {[
-                "How to identify a pill using PharmaLens",
-                "Understanding medication interactions",
-                "How to search for medications by name",
-                "Reading and understanding drug information",
-                "Tips for getting accurate identification results",
-                "Reporting incorrect information"
-              ].map((title, i) => (
+              {helpArticles.map((article) => (
                 <Link 
-                  key={i} 
-                  to={`/help/article/${i+1}`}
+                  key={article.id} 
+                  to={`/help/article/${article.id}`}
                   className="flex items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 >
                   <PenTool className="h-5 w-5 text-pharma-600 mr-3 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-200">{title}</span>
+                  <span className="text-gray-700 dark:text-gray-200">{article.title}</span>
                 </Link>
               ))}
             </div>
