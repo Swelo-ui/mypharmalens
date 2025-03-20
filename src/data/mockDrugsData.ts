@@ -558,10 +558,19 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   
   if (!drug) return null;
   
-  // Extended drug details for the detailed view
-  return {
-    ...drug,
-    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'OTC', // Changed 'Over-the-Counter' to 'OTC'
+  // Make sure all required properties have default values if they don't exist in the drug object
+  const detailedDrug: DetailedDrugData = {
+    id: drug.id,
+    name: drug.name,
+    genericName: drug.genericName || drug.name, // Use name as fallback if genericName is missing
+    manufacturer: drug.manufacturer || 'Unknown',
+    category: drug.category || 'Uncategorized',
+    description: drug.description || 'No description available',
+    drugClass: drug.drugClass || 'Unknown',
+    verified: drug.verified || false,
+    image: drug.image,
+    packageImage: drug.packageImage,
+    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'OTC',
     dosageAndAdmin: 'Dosage should be individualized based on the condition being treated and patient response. Initial dose may be adjusted to achieve desired therapeutic effect.',
     mechanism: 'The primary mechanism of action involves blocking specific pathways in the body that contribute to the disease process, resulting in therapeutic effects.',
     sideEffects: [
@@ -604,4 +613,6 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
         })) 
       : []
   };
+  
+  return detailedDrug;
 };
