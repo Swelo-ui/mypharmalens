@@ -121,15 +121,25 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full mb-8">
-          <TabsList className={cn("mb-6", 
-            isMobile ? "grid grid-cols-1 gap-2" : "grid grid-cols-3")}>
-            <TabsTrigger value="general" className="px-3 py-2 text-sm">
+          {/* Improved mobile-friendly tabs layout */}
+          <TabsList className={cn("w-full mb-6", 
+            isMobile ? "flex flex-col space-y-2" : "grid grid-cols-3")}>
+            <TabsTrigger 
+              value="general"
+              className="w-full px-3 py-3 text-sm font-medium"
+            >
               General Information
             </TabsTrigger>
-            <TabsTrigger value="usage" className="px-3 py-2 text-sm">
+            <TabsTrigger 
+              value="usage" 
+              className="w-full px-3 py-3 text-sm font-medium"
+            >
               Usage & Precautions
             </TabsTrigger>
-            <TabsTrigger value="alternatives" className="px-3 py-2 text-sm">
+            <TabsTrigger 
+              value="alternatives" 
+              className="w-full px-3 py-3 text-sm font-medium"
+            >
               Alternatives
             </TabsTrigger>
           </TabsList>
