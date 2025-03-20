@@ -12,12 +12,14 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (id) {
@@ -119,10 +121,10 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full mb-8">
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="general">General Information</TabsTrigger>
-            <TabsTrigger value="usage">Usage & Precautions</TabsTrigger>
-            <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
+          <TabsList className={cn("mb-6", isMobile ? "grid grid-cols-1 gap-2" : "grid grid-cols-3")}>
+            <TabsTrigger value="general" className="px-3 py-2 text-sm">General Information</TabsTrigger>
+            <TabsTrigger value="usage" className="px-3 py-2 text-sm">Usage & Precautions</TabsTrigger>
+            <TabsTrigger value="alternatives" className="px-3 py-2 text-sm">Alternatives</TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">

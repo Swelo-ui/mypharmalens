@@ -28,11 +28,13 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
     <div 
       className={cn(
         "block p-6 rounded-2xl glass-card group transition-all duration-300",
-        "hover:shadow-lg hover:scale-[1.01]",
+        "hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]",
         onClick ? "cursor-pointer" : "",
         className
       )}
       onClick={onClick}
+      role={onClick ? "button" : undefined}
+      aria-label={onClick ? `View details for ${drug.name}` : undefined}
     >
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-2">
