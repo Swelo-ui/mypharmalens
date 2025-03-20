@@ -77,10 +77,10 @@ const DrugPage = () => {
           Back to search
         </Button>
 
-        <div className="glass-card rounded-2xl p-6 mb-8">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 {drug.verified && (
                   <div className="flex items-center bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
                     <Shield className="h-3 w-3 text-green-600 mr-1" />
@@ -94,7 +94,7 @@ const DrugPage = () => {
                 </div>
               </div>
               
-              <h1 className="text-3xl font-bold mb-1">{drug.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">{drug.name}</h1>
               
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
                 <span className="font-medium">Generic Name:</span> {drug.genericName}
@@ -121,28 +121,35 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full mb-8">
-          <TabsList className={cn("mb-6", isMobile ? "grid grid-cols-1 gap-2" : "grid grid-cols-3")}>
-            <TabsTrigger value="general" className="px-3 py-2 text-sm">General Information</TabsTrigger>
-            <TabsTrigger value="usage" className="px-3 py-2 text-sm">Usage & Precautions</TabsTrigger>
-            <TabsTrigger value="alternatives" className="px-3 py-2 text-sm">Alternatives</TabsTrigger>
+          <TabsList className={cn("mb-6", 
+            isMobile ? "grid grid-cols-1 gap-2" : "grid grid-cols-3")}>
+            <TabsTrigger value="general" className="px-3 py-2 text-sm">
+              General Information
+            </TabsTrigger>
+            <TabsTrigger value="usage" className="px-3 py-2 text-sm">
+              Usage & Precautions
+            </TabsTrigger>
+            <TabsTrigger value="alternatives" className="px-3 py-2 text-sm">
+              Alternatives
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Dosage & Administration</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {drug.dosageAndAdmin}
               </p>
             </div>
 
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Mechanism of Action</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {drug.mechanism}
               </p>
             </div>
 
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Side Effects</h3>
               <ul className="space-y-2">
                 {drug.sideEffects.map((effect, i) => (
@@ -154,7 +161,7 @@ const DrugPage = () => {
               </ul>
             </div>
 
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Drug Interactions</h3>
               <ul className="space-y-2">
                 {drug.interactions.map((interaction, i) => (
@@ -168,7 +175,7 @@ const DrugPage = () => {
           </TabsContent>
           
           <TabsContent value="usage" className="space-y-4">
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Indications</h3>
               <ul className="space-y-2">
                 {drug.indications.map((indication, i) => (
@@ -180,7 +187,7 @@ const DrugPage = () => {
               </ul>
             </div>
             
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Contraindications</h3>
               <ul className="space-y-2">
                 {drug.contraindications.map((contraindication, i) => (
@@ -192,14 +199,14 @@ const DrugPage = () => {
               </ul>
             </div>
             
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Pregnancy & Lactation</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.pregnancy}
               </p>
             </div>
             
-            <div className="glass-card p-6 rounded-xl">
+            <div className="glass-card p-4 sm:p-6 rounded-xl">
               <h3 className="font-medium text-lg mb-4">Storage Information</h3>
               <div className="flex items-start">
                 <History className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
@@ -242,7 +249,7 @@ const DrugPage = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="glass-card p-6 rounded-xl">
+        <div className="glass-card p-4 sm:p-6 rounded-xl">
           <h3 className="font-medium text-lg mb-4">Warnings & Precautions</h3>
           <ul className="space-y-3">
             {drug.warnings.map((warning, i) => (

@@ -250,10 +250,10 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
   };
 
   return (
-    <div className={cn("rounded-2xl glass-card p-6", className)}>
+    <div className={cn("rounded-2xl glass-card p-4 sm:p-6", className)}>
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             {drug.verified && (
               <div className="flex items-center bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
                 <Shield className="h-3 w-3 text-green-600 mr-1" />
@@ -267,7 +267,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             </div>
           </div>
           
-          <h2 className="text-2xl font-bold mb-1">{drug.name}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-1">{drug.name}</h2>
           
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
             <span className="font-medium">Generic Name:</span> {drug.genericName}
@@ -322,10 +322,14 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             onClick={() => setActiveTab('general')}
             className={cn(
               "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              isMobile ? "border-b border-gray-200 dark:border-gray-700 rounded-md px-3" : "-mb-px",
               activeTab === 'general'
-                ? "border-pharma-600 text-pharma-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? isMobile 
+                  ? "bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 border-pharma-600" 
+                  : "border-pharma-600 text-pharma-600"
+                : isMobile
+                  ? "border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
             General Information
@@ -335,10 +339,14 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             onClick={() => setActiveTab('usage')}
             className={cn(
               "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              isMobile ? "border-b border-gray-200 dark:border-gray-700 rounded-md px-3" : "-mb-px",
               activeTab === 'usage'
-                ? "border-pharma-600 text-pharma-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? isMobile 
+                  ? "bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 border-pharma-600" 
+                  : "border-pharma-600 text-pharma-600"
+                : isMobile
+                  ? "border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
             Usage & Precautions
@@ -348,10 +356,14 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             onClick={() => setActiveTab('alternatives')}
             className={cn(
               "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              isMobile ? "border-b border-gray-200 dark:border-gray-700 rounded-md px-3" : "-mb-px",
               activeTab === 'alternatives'
-                ? "border-pharma-600 text-pharma-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? isMobile 
+                  ? "bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 border-pharma-600" 
+                  : "border-pharma-600 text-pharma-600"
+                : isMobile
+                  ? "border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
             Alternatives & Brands
@@ -360,7 +372,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
       </div>
       
       {/* Tab Content */}
-      <div className="animate-fade-in">
+      <div className="animate-fade-in mt-4">
         {renderTabContent()}
       </div>
     </div>

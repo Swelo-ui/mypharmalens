@@ -27,7 +27,8 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
   return (
     <div 
       className={cn(
-        "block p-6 rounded-2xl glass-card group transition-all duration-300",
+        "block p-4 sm:p-6 rounded-2xl glass-card group transition-all duration-300",
+        "touch-manipulation active:bg-pharma-50/30 dark:active:bg-pharma-900/30",
         "hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]",
         onClick ? "cursor-pointer" : "",
         className
