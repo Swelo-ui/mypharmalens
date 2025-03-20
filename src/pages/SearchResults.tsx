@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
 import { mockDrugsData } from '@/data/mockDrugsData';
+import { fetchDrugs } from '@/integrations/supabase/client';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -26,27 +27,78 @@ const SearchResults = () => {
     setIsLoading(true);
     window.scrollTo(0, 0);
     
-    // Simulate API call to fetch results
+    const loadDrugs = async () => {
+      try {
+        if (searchQuery) {
+          // Try to fetch from Supabase first
+          const supabaseDrugs = await fetchDrugs({ 
+            searchTerm: searchQuery,
+            category: activeFilters.length > 0 ? activeFilters[0] : undefined
+          });
+          
+          if (supabaseDrugs && supabaseDrugs.length > 0) {
+            // Map Supabase drugs to DrugData format
+            const formattedDrugs = supabaseDrugs.map(drug => ({
+              id: drug.id,
+              name: drug.name,
+              genericName: drug.generic_name,
+              manufacturer: drug.manufacturer,
+              category: drug.category,
+              description: drug.description,
+              drugClass: drug.drug_class,
+              verified: drug.verified,
+              image: drug.image_url,
+              packageImage: drug.package_image_url
+            }));
+            
+            setResults(formattedDrugs);
+            setIsLoading(false);
+            return;
+          }
+        }
+        
+        // Fall back to mock data if no Supabase results
+        // Filter based on search query
+        const filtered = searchQuery
+          ? mockDrugsData.filter(drug => 
+              drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (drug.category && drug.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (drug.drugClass && drug.drugClass.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
+          : mockDrugsData;
+        
+        // Apply category filters if any are active
+        const finalResults = activeFilters.length > 0
+          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
+          : filtered;
+        
+        setResults(finalResults);
+      } catch (error) {
+        console.error("Error fetching drugs:", error);
+        // Fall back to mock data on error
+        const filtered = searchQuery
+          ? mockDrugsData.filter(drug => 
+              drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
+          : mockDrugsData;
+          
+        const finalResults = activeFilters.length > 0
+          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
+          : filtered;
+          
+        setResults(finalResults);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    // Simulate API call delay for better UX
     const timer = setTimeout(() => {
-      // Filter based on search query
-      const filtered = searchQuery
-        ? mockDrugsData.filter(drug => 
-            drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (drug.category && drug.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (drug.drugClass && drug.drugClass.toLowerCase().includes(searchQuery.toLowerCase()))
-          )
-        : mockDrugsData;
-      
-      // Apply category filters if any are active
-      const finalResults = activeFilters.length > 0
-        ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
-        : filtered;
-      
-      setResults(finalResults);
-      setIsLoading(false);
-    }, 1000); // Reduced delay for better user experience
+      loadDrugs();
+    }, 800);
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
@@ -65,6 +117,10 @@ const SearchResults = () => {
   
   const clearFilters = () => {
     setActiveFilters([]);
+  };
+  
+  const handleDrugClick = (drugId: string) => {
+    navigate(`/drug/${drugId}`);
   };
 
   return (
@@ -242,7 +298,9 @@ const SearchResults = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {results.map((drug) => (
-                      <DrugCard key={drug.id} drug={drug} />
+                      <div key={drug.id} onClick={() => handleDrugClick(drug.id)} className="cursor-pointer">
+                        <DrugCard drug={drug} />
+                      </div>
                     ))}
                   </div>
                 </>

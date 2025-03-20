@@ -1,13 +1,96 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Mail, MessageCircle, Linkedin, Send } from 'lucide-react';
+import { Mail, MessageCircle, Linkedin, Send, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 const Contact = () => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: "Incomplete form",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Save message to Supabase
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            status: 'unread'
+          }
+        ]);
+      
+      if (error) throw error;
+      
+      // Show success message
+      setIsSuccess(true);
+      toast({
+        title: "Message sent",
+        description: "We've received your message and will get back to you soon.",
+        variant: "default"
+      });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+      
+      // Reset success state after a delay
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send your message. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -26,27 +109,43 @@ const Contact = () => {
               <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
                 <h2 className="text-xl font-bold mb-6">Get in Touch</h2>
                 
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="space-y-5">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium mb-1">
                         Your Name
                       </label>
-                      <Input id="name" placeholder="Enter your name" />
+                      <Input 
+                        id="name" 
+                        placeholder="Enter your name" 
+                        value={formData.name}
+                        onChange={handleInputChange}
+                      />
                     </div>
                     
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium mb-1">
                         Email Address
                       </label>
-                      <Input id="email" type="email" placeholder="Enter your email" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="Enter your email" 
+                        value={formData.email}
+                        onChange={handleInputChange}
+                      />
                     </div>
                     
                     <div>
                       <label htmlFor="subject" className="block text-sm font-medium mb-1">
                         Subject
                       </label>
-                      <Input id="subject" placeholder="What is this regarding?" />
+                      <Input 
+                        id="subject" 
+                        placeholder="What is this regarding?" 
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                      />
                     </div>
                     
                     <div>
@@ -57,12 +156,32 @@ const Contact = () => {
                         id="message" 
                         placeholder="How can we help you?" 
                         rows={6}
+                        value={formData.message}
+                        onChange={handleInputChange}
                       />
                     </div>
                     
-                    <Button type="submit" className="w-full">
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Message
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isSubmitting || isSuccess}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : isSuccess ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Message Sent
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Send Message
+                        </>
+                      )}
                     </Button>
                   </div>
                 </form>

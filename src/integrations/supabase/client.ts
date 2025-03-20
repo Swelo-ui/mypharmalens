@@ -145,3 +145,56 @@ export async function findSimilarDrugs(description: string, limit = 5) {
   
   return data;
 }
+
+// Contact message functions
+export interface ContactMessageData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status?: string;
+}
+
+export async function saveContactMessage(messageData: ContactMessageData) {
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .insert([messageData])
+    .select();
+  
+  if (error) {
+    console.error('Error saving contact message:', error);
+    throw error;
+  }
+  
+  return data;
+}
+
+export async function fetchContactMessages(limit = 100) {
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  if (error) {
+    console.error('Error fetching contact messages:', error);
+    return null;
+  }
+  
+  return data;
+}
+
+export async function updateContactMessageStatus(id: string, status: string) {
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .update({ status })
+    .eq('id', id)
+    .select();
+  
+  if (error) {
+    console.error('Error updating contact message status:', error);
+    return null;
+  }
+  
+  return data;
+}

@@ -20,15 +20,20 @@ export interface DrugData {
 interface DrugCardProps {
   drug: DrugData;
   className?: string;
+  onClick?: () => void;
 }
 
-const DrugCard = ({ drug, className }: DrugCardProps) => {
+const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
   return (
-    <div className={cn(
-      "block p-6 rounded-2xl glass-card group transition-all duration-300",
-      "hover:shadow-lg hover:scale-[1.01]",
-      className
-    )}>
+    <div 
+      className={cn(
+        "block p-6 rounded-2xl glass-card group transition-all duration-300",
+        "hover:shadow-lg hover:scale-[1.01]",
+        onClick ? "cursor-pointer" : "",
+        className
+      )}
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-2">
           <div className="w-10 h-10 rounded-xl bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center">
@@ -81,13 +86,23 @@ const DrugCard = ({ drug, className }: DrugCardProps) => {
       </div>
       
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
-        <Link 
-          to={`/drug/${drug.id}`}
-          className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors w-full py-2"
-        >
-          View detailed information
-          <ChevronRight className="h-4 w-4 ml-1" />
-        </Link>
+        {!onClick && (
+          <Link 
+            to={`/drug/${drug.id}`}
+            className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors w-full py-2"
+          >
+            View detailed information
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Link>
+        )}
+        {onClick && (
+          <div 
+            className="text-sm text-pharma-600 font-medium flex items-center hover:underline hover:text-pharma-800 transition-colors w-full py-2"
+          >
+            View detailed information
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </div>
+        )}
       </div>
     </div>
   );
