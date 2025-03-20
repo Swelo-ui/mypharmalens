@@ -44,14 +44,14 @@ const About = () => {
       <Header />
       
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-pharma-50 to-white dark:from-gray-900 dark:to-gray-950 py-16 overflow-hidden">
+        {/* Hero Section - Adjusted top padding */}
+        <section className="bg-gradient-to-b from-pharma-50 to-white dark:from-gray-900 dark:to-gray-950 py-24 overflow-hidden">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="text-center mb-8 animate-fade-up">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-8 animate-fade-up mt-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 About PharmaLens
               </h1>
-              <div className="w-24 h-1 bg-pharma-500 mx-auto mb-6"></div>
+              <div className="w-24 h-1 bg-pharma-500 mx-auto mb-8"></div>
               <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                 Bridging the gap between technology and medicine through AI-powered medication identification and information.
               </p>
@@ -190,7 +190,7 @@ const About = () => {
               </div>
               
               <div className="md:col-span-4 order-1 md:order-2 flex justify-center animate-on-scroll">
-                <Card className="overflow-hidden border-0 shadow-lg max-w-[240px]">
+                <Card className="overflow-hidden border-0 shadow-lg max-w-[200px]">
                   <CardContent className="p-0">
                     <img 
                       src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 

@@ -66,9 +66,6 @@ const Hero = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Main Hero Content */}
         <div className="text-center mb-12 md:mb-16 animate-fade-up">
-          <div className="mb-6 flex justify-center">
-            <img src="/lovable-uploads/7f661aae-5eba-4e72-bd24-0e791d37ab5d.png" alt="PharmaLens Logo" className="h-16 md:h-20" />
-          </div>
           <div className="inline-block mb-3">
             <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800">
               AI-Powered Drug Identification
