@@ -561,7 +561,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   // Extended drug details for the detailed view
   return {
     ...drug,
-    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'Over-the-Counter',
+    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'OTC', // Changed 'Over-the-Counter' to 'OTC'
     dosageAndAdmin: 'Dosage should be individualized based on the condition being treated and patient response. Initial dose may be adjusted to achieve desired therapeutic effect.',
     mechanism: 'The primary mechanism of action involves blocking specific pathways in the body that contribute to the disease process, resulting in therapeutic effects.',
     sideEffects: [
