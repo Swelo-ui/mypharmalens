@@ -6,7 +6,6 @@ import {
   AlertTriangle, Package, Tag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface DetailedDrugData {
   id: string;
@@ -51,8 +50,6 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
     interactions: false,
     mechanism: false,
   });
-  
-  const isMobile = useIsMobile();
   
   const toggleSection = (section: string) => {
     setExpandedSections({
@@ -314,15 +311,11 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
       
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-        <div className={cn(
-          "flex", 
-          isMobile ? "flex-col space-y-2" : "space-x-8"
-        )}>
+        <div className="flex space-x-8">
           <button
             onClick={() => setActiveTab('general')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
               activeTab === 'general'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -334,8 +327,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           <button
             onClick={() => setActiveTab('usage')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
               activeTab === 'usage'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -347,8 +339,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           <button
             onClick={() => setActiveTab('alternatives')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2",
-              isMobile ? "" : "-mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
               activeTab === 'alternatives'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
