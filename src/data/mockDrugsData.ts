@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -544,4 +545,63 @@ export const mockDrugsData: DrugData[] = [
     manufacturer: 'Various',
     category: 'Antihypertensive',
     description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to prevent kidney problems in people with diabetes or heart disease.',
-    drugClass: 'ACE inhibitor
+    drugClass: 'ACE inhibitor',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/000060131.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+  }
+]
+
+// Function to get detailed drug data by ID
+export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+  const drug = mockDrugsData.find(drug => drug.id === id);
+  
+  if (!drug) return null;
+  
+  // Extended drug details for the detailed view
+  return {
+    ...drug,
+    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'Over-the-Counter',
+    dosageAndAdmin: 'Dosage should be individualized based on the condition being treated and patient response. Initial dose may be adjusted to achieve desired therapeutic effect.',
+    mechanism: 'The primary mechanism of action involves blocking specific pathways in the body that contribute to the disease process, resulting in therapeutic effects.',
+    sideEffects: [
+      'Headache',
+      'Nausea',
+      'Dizziness',
+      'Fatigue',
+      'Gastrointestinal discomfort'
+    ],
+    interactions: [
+      'May interact with other medications that affect the same physiological systems.',
+      'Alcohol may increase the risk of certain side effects.',
+      'Certain foods may alter the absorption or metabolism of this medication.'
+    ],
+    indications: [
+      'Treatment of conditions related to the primary therapeutic class',
+      'Management of symptoms associated with the target disease',
+      'Prevention of complications related to the underlying condition'
+    ],
+    contraindications: [
+      'Known hypersensitivity to the active ingredient or any component of the formulation',
+      'Severe liver or kidney impairment (may require dose adjustment)',
+      'Pregnancy or breastfeeding (consult healthcare provider)'
+    ],
+    pregnancy: 'Use during pregnancy only if the potential benefit justifies the potential risk to the fetus. Consult healthcare provider before use.',
+    storage: 'Store at room temperature (20-25°C/68-77°F). Keep container tightly closed. Protect from light and moisture.',
+    warnings: [
+      'Do not exceed recommended dosage',
+      'Discontinue use and consult healthcare provider if severe side effects occur',
+      'May cause drowsiness or dizziness; use caution when driving or operating machinery'
+    ],
+    similarDrugs: drug.category ? 
+      mockDrugsData
+        .filter(d => d.category === drug.category && d.id !== drug.id)
+        .slice(0, 4)
+        .map(d => ({
+          id: d.id,
+          name: d.name,
+          drugClass: d.drugClass
+        })) 
+      : []
+  };
+};
