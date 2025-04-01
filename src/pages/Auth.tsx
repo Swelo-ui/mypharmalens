@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
 import AuthForm from '@/components/AuthForm';
+import { ShieldCheck, Scan, Database, History } from 'lucide-react';
 
 const Auth = () => {
   const { isAuthenticated, isLoading } = useAuthStatus();
@@ -16,32 +17,65 @@ const Auth = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-5xl mx-auto px-4 pt-24 pb-12">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Account Access</h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Sign in or create an account to save your medication identification history
-          </p>
-        </div>
-        
-        <AuthForm />
-        
-        <div className="mt-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 max-w-2xl mx-auto">
-          <h3 className="text-lg font-medium mb-3">Benefits of creating an account:</h3>
-          <ul className="space-y-2">
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5">✓</span>
-              <span>Save your medication identification history</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5">✓</span>
-              <span>Access your history from any device</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5">✓</span>
-              <span>Track medications you've identified previously</span>
-            </li>
-          </ul>
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-16">
+        <div className="flex flex-col md:flex-row md:gap-12 items-center">
+          <div className="w-full md:w-1/2 mb-10 md:mb-0">
+            <div className="text-center md:text-left mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-pharma-600 to-blue-600 bg-clip-text text-transparent">Secure Account Access</h1>
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
+                Sign in or create an account to access all features of PharmaLens
+              </p>
+            </div>
+            
+            <div className="space-y-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6">
+              <h3 className="text-xl font-medium mb-5 flex items-center">
+                <ShieldCheck className="w-5 h-5 mr-2 text-pharma-600" />
+                Benefits of your PharmaLens account
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 p-1.5 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
+                    <Scan className="h-5 w-5 text-pharma-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Advanced Medication Identification</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Identify medications from images with high accuracy using our advanced AI system.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 p-1.5 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
+                    <Database className="h-5 w-5 text-pharma-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Comprehensive Medication Database</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Access a vast database of medications powered by drugs.com for detailed information.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 p-1.5 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
+                    <History className="h-5 w-5 text-pharma-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Personal Identification History</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Save and access your medication identification history from any device.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  PharmaLens uses secure authentication and encryption to protect your data.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="w-full md:w-1/2">
+            <AuthForm />
+          </div>
         </div>
       </div>
     </>

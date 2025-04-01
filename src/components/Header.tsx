@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Circle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -23,6 +24,16 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
+
+  // Force theme system to recognize current setting
+  useEffect(() => {
+    // This ensures the theme is correctly applied on component mount
+    const currentTheme = theme === 'system' ? 
+      window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' 
+      : theme;
+    
+    document.documentElement.classList.toggle('dark', currentTheme === 'dark');
+  }, [theme]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -53,6 +64,14 @@ const Header = () => {
     }
   };
 
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    
+    // Force the toggle to apply immediately
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
+
   // Links for navigation
   const mainLinks = [
     { name: 'Home', path: '/' },
@@ -68,8 +87,11 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">MediScan</span>
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-pharma-600 dark:bg-pharma-500 rounded-full flex items-center justify-center text-white">
+              <span className="font-bold text-lg">PL</span>
+            </div>
+            <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -108,7 +130,7 @@ const Header = () => {
             </Link>
 
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={handleThemeToggle}
               className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors"
               aria-label="Toggle theme"
             >
@@ -222,7 +244,7 @@ const Header = () => {
             <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6">
               <div className="flex flex-col space-y-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  © {new Date().getFullYear()} MediScan. All rights reserved.
+                  © {new Date().getFullYear()} PharmaLens. All rights reserved.
                 </p>
                 <div className="flex space-x-4">
                   <Link to="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-600">
