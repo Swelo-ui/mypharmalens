@@ -1,140 +1,246 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Camera, Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const { setTheme, theme } = useTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const navigate = useNavigate();
+  const { isAuthenticated, user, isLoading } = useAuthStatus();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  
-  // Close menu when location changes
+  // Close mobile menu when route changes
   useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location]);
+    setIsOpen(false);
+  }, [location.pathname]);
+  
+  // Handle scroll lock when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [isOpen]);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Signed out successfully");
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error("Failed to sign out");
+    }
+  };
+
+  // Links for navigation
+  const mainLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Identify', path: '/identify' },
+    { name: 'About', path: '/about' },
+    { name: 'FAQ', path: '/faq' },
+    { name: 'Help', path: '/help' },
+    { name: 'Contact', path: '/contact' },
+  ];
 
   return (
-    <header className={cn(
-      "fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300",
-      isScrolled 
-        ? "glass border-b border-gray-200 dark:border-gray-800 shadow-sm" 
-        : "bg-transparent"
-    )}>
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="h-10 w-10 rounded-full bg-pharma-600 flex items-center justify-center transition-all group-hover:scale-105">
-              <span className="text-white font-semibold text-lg">PL</span>
-            </div>
-            <span className="text-xl font-semibold transition-colors">
-              PharmaLens
-              <span className="text-pharma-600">.</span>
-            </span>
+    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">MediScan</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className={cn(
-              "text-sm font-medium transition-colors hover:text-pharma-600",
-              location.pathname === "/" ? "text-pharma-600" : "text-gray-600 dark:text-gray-300"
-            )}>
-              Home
-            </Link>
-            <Link to="/search" className={cn(
-              "text-sm font-medium transition-colors hover:text-pharma-600",
-              location.pathname === "/search" ? "text-pharma-600" : "text-gray-600 dark:text-gray-300"
-            )}>
-              Search
-            </Link>
-            <Link to="/identify" className={cn(
-              "text-sm font-medium transition-colors hover:text-pharma-600",
-              location.pathname === "/identify" ? "text-pharma-600" : "text-gray-600 dark:text-gray-300"
-            )}>
-              Identify
-            </Link>
-            <Link to="/about" className={cn(
-              "text-sm font-medium transition-colors hover:text-pharma-600",
-              location.pathname === "/about" ? "text-pharma-600" : "text-gray-600 dark:text-gray-300"
-            )}>
-              About
-            </Link>
-          </nav>
-          
-          {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/search" className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
-              <Search className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            </Link>
-            <Link to="/identify" className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
-              <Camera className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            </Link>
-            <Link to="/search" className="px-4 py-2 rounded-full bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm">
-              Find a Drug
-            </Link>
-          </div>
-          
-          {/* Mobile Menu Toggle */}
-          <button 
-            onClick={toggleMenu}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-          >
-            {isMenuOpen ? (
-              <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            ) : (
-              <Menu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          <nav className="hidden md:flex space-x-6">
+            {mainLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
+                  location.pathname === link.path
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-600 dark:text-gray-300'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            {isAuthenticated && (
+              <Link
+                to="/history"
+                className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
+                  location.pathname === '/history'
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-600 dark:text-gray-300'
+                }`}
+              >
+                History
+              </Link>
             )}
-          </button>
-        </div>
-        
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 p-4 glass rounded-xl border border-gray-200 dark:border-gray-800 animate-fade-in">
-            <nav className="flex flex-col space-y-4">
-              <Link to="/" className={cn(
-                "text-sm font-medium transition-colors hover:text-pharma-600 p-2 rounded-lg",
-                location.pathname === "/" ? "bg-gray-100 dark:bg-gray-800 text-pharma-600" : "text-gray-600 dark:text-gray-300"
-              )}>
-                Home
-              </Link>
-              <Link to="/search" className={cn(
-                "text-sm font-medium transition-colors hover:text-pharma-600 p-2 rounded-lg",
-                location.pathname === "/search" ? "bg-gray-100 dark:bg-gray-800 text-pharma-600" : "text-gray-600 dark:text-gray-300"
-              )}>
-                Search
-              </Link>
-              <Link to="/identify" className={cn(
-                "text-sm font-medium transition-colors hover:text-pharma-600 p-2 rounded-lg",
-                location.pathname === "/identify" ? "bg-gray-100 dark:bg-gray-800 text-pharma-600" : "text-gray-600 dark:text-gray-300"
-              )}>
-                Identify
-              </Link>
-              <Link to="/about" className={cn(
-                "text-sm font-medium transition-colors hover:text-pharma-600 p-2 rounded-lg",
-                location.pathname === "/about" ? "bg-gray-100 dark:bg-gray-800 text-pharma-600" : "text-gray-600 dark:text-gray-300"
-              )}>
-                About
-              </Link>
-              <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
-                <Link to="/search" className="w-full py-2.5 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm flex items-center justify-center">
-                  Find a Drug
-                </Link>
-              </div>
-            </nav>
+          </nav>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-2">
+            <Link to="/search" className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors">
+              <Search className="h-5 w-5" />
+            </Link>
+
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full">
+                        <UserCircle className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>
+                        {user?.email}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/history" className="flex items-center w-full cursor-pointer">
+                          <History className="mr-2 h-4 w-4" />
+                          <span>History</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="hidden md:flex">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                )}
+              </>
+            )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 pt-16">
+          <nav className="container mx-auto px-4 py-8 flex flex-col space-y-6">
+            {mainLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`text-lg font-medium transition-colors ${
+                  location.pathname === link.path
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-800 dark:text-gray-200'
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+            
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/history"
+                  className={`text-lg font-medium transition-colors ${
+                    location.pathname === '/history'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-800 dark:text-gray-200'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  History
+                </Link>
+                
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setIsOpen(false);
+                  }}
+                  className="text-lg font-medium text-red-500 transition-colors flex items-center"
+                >
+                  <LogOut className="mr-2 h-5 w-5" />
+                  Sign Out
+                </button>
+              </>
+            )}
+            
+            {!isAuthenticated && !isLoading && (
+              <Link
+                to="/auth"
+                className="text-lg font-medium text-pharma-600 dark:text-pharma-400 transition-colors flex items-center"
+                onClick={() => setIsOpen(false)}
+              >
+                <LogIn className="mr-2 h-5 w-5" />
+                Sign In
+              </Link>
+            )}
+            
+            <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6">
+              <div className="flex flex-col space-y-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  © {new Date().getFullYear()} MediScan. All rights reserved.
+                </p>
+                <div className="flex space-x-4">
+                  <Link to="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
+                    Terms
+                  </Link>
+                  <Link to="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
+                    Privacy
+                  </Link>
+                  <Link to="/disclaimer" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
+                    Disclaimer
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -10,11 +12,13 @@ import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
 import Header from '@/components/Header';
 import { supabase, saveDrugIdentification } from '@/integrations/supabase/client';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
 const DrugIdentify = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuthStatus();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
@@ -25,6 +29,7 @@ const DrugIdentify = () => {
   const [enhancedMode, setEnhancedMode] = useState(true);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
+  const navigate = useNavigate();
 
   // Function to identify drug using the Supabase edge function
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
@@ -146,17 +151,19 @@ const DrugIdentify = () => {
                 brandNames: drugData.brandNames || []
               };
               
-              // Save the identification to Supabase
-              try {
-                await saveDrugIdentification({
-                  drug_name: drugData.name,
-                  image_url: drugData.image,
-                  details: drugData
-                });
-                console.log('Saved drug identification to Supabase');
-              } catch (saveError) {
-                console.error('Failed to save drug identification:', saveError);
-                // Don't block the UI for database errors
+              // Save the identification to Supabase if authenticated
+              if (isAuthenticated) {
+                try {
+                  await saveDrugIdentification({
+                    drug_name: drugData.name,
+                    image_url: drugData.image,
+                    details: drugData
+                  });
+                  console.log('Saved drug identification to Supabase');
+                } catch (saveError) {
+                  console.error('Failed to save drug identification:', saveError);
+                  // Don't block the UI for database errors
+                }
               }
               
               setIdentifiedDrug(formattedDrugData);
@@ -186,6 +193,17 @@ const DrugIdentify = () => {
               if (isImageLowRes || drugData.blurryModeUsed) {
                 toast.info("For better accuracy, consider uploading a higher quality image.", { 
                   duration: 5000 
+                });
+              }
+              
+              // Remind users to login to save history if they're not authenticated
+              if (!isAuthenticated) {
+                toast.info("Sign in to save this identification to your history", {
+                  duration: 8000,
+                  action: {
+                    label: "Sign In",
+                    onClick: () => navigate('/auth')
+                  }
                 });
               }
             } else {
@@ -237,7 +255,29 @@ const DrugIdentify = () => {
     <>
       <Header />
       <div className="container max-w-6xl mx-auto px-4 pt-24 pb-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Identify Medication</h1>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <h1 className="text-3xl font-bold">Identify Medication</h1>
+          
+          {!isAuthenticated && !authLoading && (
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => navigate('/auth')}
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Sign in to save history</span>
+            </Button>
+          )}
+          
+          {isAuthenticated && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/history')}
+            >
+              View Identification History
+            </Button>
+          )}
+        </div>
         
         {!identifiedDrug ? (
           <>

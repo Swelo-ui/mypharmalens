@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -58,16 +57,6 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       return;
     }
     
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Check if file is too small (might be too low quality)
     if (file.size < 50 * 1024) {
       setImageQualityWarning(true);
