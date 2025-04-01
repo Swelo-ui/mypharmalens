@@ -18,7 +18,7 @@ const SearchBar = ({
   placeholder = "Search for medications by name, category, or manufacturer...",
   onSearch,
   className,
-  enableExternalSearch = false
+  enableExternalSearch = true
 }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -57,9 +57,9 @@ const SearchBar = ({
     setShowExternal(false);
   };
   
-  // Show external search option when query is 3+ characters
+  // Show external search option when query is 2+ characters
   React.useEffect(() => {
-    if (enableExternalSearch && query.length >= 3) {
+    if (enableExternalSearch && query.length >= 2) {
       setShowExternal(true);
     } else {
       setShowExternal(false);
@@ -82,7 +82,7 @@ const SearchBar = ({
         <div className={cn(
           "flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 rounded-full border",
           isFocused 
-            ? "border-pharma-400 ring-2 ring-pharma-100" 
+            ? "border-pharma-400 ring-2 ring-pharma-100 dark:border-pharma-500 dark:ring-pharma-900/30" 
             : "border-gray-200 dark:border-gray-700"
         )}>
           <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
@@ -94,14 +94,14 @@ const SearchBar = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
-            className="flex-1 bg-transparent border-none outline-none placeholder:text-gray-400 text-sm"
+            className="flex-1 bg-transparent border-none outline-none placeholder:text-gray-400 text-sm dark:text-gray-200"
           />
           
           {query && (
             <button
               type="button"
               onClick={clearSearch}
-              className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800"
             >
               <X className="h-4 w-4" />
             </button>
@@ -114,8 +114,8 @@ const SearchBar = ({
               "px-4 py-1.5 rounded-full text-sm font-medium transition-all",
               "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500",
               query.trim() 
-                ? "bg-pharma-600 text-white hover:bg-pharma-700" 
-                : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800"
+                ? "bg-pharma-600 text-white hover:bg-pharma-700 dark:bg-pharma-500 dark:hover:bg-pharma-600" 
+                : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-500"
             )}
           >
             {isLoading ? (

@@ -19,6 +19,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Disclaimer from "./pages/Disclaimer";
 import Auth from "./pages/Auth";
+import SmartSearch from "./pages/SmartSearch";
 import IdentificationHistory from "./pages/IdentificationHistory";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/identify" element={<DrugIdentify />} />
+          <Route path="/smart-search" element={<SmartSearch />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/help" element={<HelpCenter />} />

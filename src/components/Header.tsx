@@ -19,20 +19,30 @@ import { toast } from 'sonner';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, theme } = useTheme();
+  const { setTheme, theme, resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
 
-  // Force theme system to recognize current setting
+  // Store theme preference in localStorage to persist across page navigations
   useEffect(() => {
-    // This ensures the theme is correctly applied on component mount
-    const currentTheme = theme === 'system' ? 
-      window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' 
-      : theme;
+    // On initial mount, apply the theme from localStorage or system preference
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    setTheme(savedTheme);
     
-    document.documentElement.classList.toggle('dark', currentTheme === 'dark');
+    // This ensures the theme is correctly applied on component mount
+    document.documentElement.classList.toggle('dark', 
+      savedTheme === 'dark' || 
+      (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
+  }, []);
+
+  // Update localStorage when theme changes
+  useEffect(() => {
+    if (theme) {
+      localStorage.setItem('theme', theme);
+    }
   }, [theme]);
 
   // Close mobile menu when route changes
@@ -65,25 +75,23 @@ const Header = () => {
   };
 
   const handleThemeToggle = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
     
     // Force the toggle to apply immediately
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  // Links for navigation
+  // Links for navigation - simplified for cleaner header
   const mainLinks = [
     { name: 'Home', path: '/' },
     { name: 'Identify', path: '/identify' },
-    { name: 'About', path: '/about' },
-    { name: 'FAQ', path: '/faq' },
-    { name: 'Help', path: '/help' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Smart Search', path: '/smart-search' },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800">
+    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -109,18 +117,6 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
-            {isAuthenticated && (
-              <Link
-                to="/history"
-                className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                  location.pathname === '/history'
-                    ? 'text-pharma-600 dark:text-pharma-400'
-                    : 'text-gray-600 dark:text-gray-300'
-                }`}
-              >
-                History
-              </Link>
-            )}
           </nav>
 
           {/* Right Side Actions */}
@@ -134,7 +130,7 @@ const Header = () => {
               className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {!isLoading && (
@@ -146,18 +142,18 @@ const Header = () => {
                         <UserCircle className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>
+                    <DropdownMenuContent align="end" className="dark:bg-gray-800 border dark:border-gray-700">
+                      <DropdownMenuLabel className="dark:text-gray-200">
                         {user?.email}
                       </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
+                      <DropdownMenuSeparator className="dark:border-gray-700" />
                       <DropdownMenuItem asChild>
-                        <Link to="/history" className="flex items-center w-full cursor-pointer">
+                        <Link to="/history" className="flex items-center w-full cursor-pointer dark:text-gray-200 dark:hover:bg-gray-700">
                           <History className="mr-2 h-4 w-4" />
                           <span>History</span>
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
+                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 dark:hover:bg-gray-700">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sign out</span>
                       </DropdownMenuItem>
