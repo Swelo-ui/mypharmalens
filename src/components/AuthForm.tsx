@@ -199,7 +199,10 @@ const AuthForm = () => {
                 Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => document.querySelector('[data-value="signup"]')?.click()}
+                  onClick={() => {
+                    const signupTab = document.querySelector('[data-value="signup"]') as HTMLElement;
+                    if (signupTab) signupTab.click();
+                  }}
                   className="font-medium text-pharma-600 hover:text-pharma-700"
                 >
                   Sign up now
@@ -302,7 +305,10 @@ const AuthForm = () => {
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => document.querySelector('[data-value="signin"]')?.click()}
+                  onClick={() => {
+                    const signinTab = document.querySelector('[data-value="signin"]') as HTMLElement;
+                    if (signinTab) signinTab.click();
+                  }}
                   className="font-medium text-pharma-600 hover:text-pharma-700"
                 >
                   Sign in
