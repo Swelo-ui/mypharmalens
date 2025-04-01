@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Circle } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Database } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -25,23 +25,23 @@ const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
 
-  // Store theme preference in localStorage to persist across page navigations
+  // On mount and on theme change, ensure the theme is correctly applied
   useEffect(() => {
-    // On initial mount, apply the theme from localStorage or system preference
+    // Get the theme from local storage or use the system preference
     const savedTheme = localStorage.getItem('theme') || 'system';
-    setTheme(savedTheme);
     
-    // This ensures the theme is correctly applied on component mount
-    document.documentElement.classList.toggle('dark', 
-      savedTheme === 'dark' || 
-      (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
-  }, []);
-
-  // Update localStorage when theme changes
-  useEffect(() => {
-    if (theme) {
-      localStorage.setItem('theme', theme);
+    // Force correct theme application
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      // System preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, [theme]);
 
@@ -80,14 +80,19 @@ const Header = () => {
     localStorage.setItem('theme', newTheme);
     
     // Force the toggle to apply immediately
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
-  // Links for navigation - simplified for cleaner header
+  // Updated main navigation links
   const mainLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Identify', path: '/identify' },
+    { name: 'Identify Medicine', path: '/identify' },
     { name: 'Smart Search', path: '/smart-search' },
+    { name: 'Drug Database', path: '/search' },
   ];
 
   return (
@@ -96,10 +101,10 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-pharma-600 dark:bg-pharma-500 rounded-full flex items-center justify-center text-white">
+            <div className="w-8 h-8 bg-blue-500 dark:bg-blue-500 rounded-full flex items-center justify-center text-white">
               <span className="font-bold text-lg">PL</span>
             </div>
-            <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
+            <span className="font-bold text-xl text-gray-800 dark:text-white">PharmaLens</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -117,14 +122,23 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {isAuthenticated && !isLoading && (
+              <Link
+                to="/history"
+                className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
+                  location.pathname === '/history'
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-600 dark:text-gray-300'
+                }`}
+              >
+                History
+              </Link>
+            )}
           </nav>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
-            <Link to="/search" className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors">
-              <Search className="h-5 w-5" />
-            </Link>
-
             <button
               onClick={handleThemeToggle}
               className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors"

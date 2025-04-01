@@ -2,18 +2,21 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Search, Brain, Loader2, ExternalLink } from 'lucide-react';
+import { Pill, Search, Brain, Loader2, ExternalLink, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Card } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
 
 const SmartSearch = () => {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+  const [searchProgress, setSearchProgress] = useState(0);
   const { isAuthenticated } = useAuthStatus();
   const navigate = useNavigate();
 
@@ -39,35 +42,47 @@ const SmartSearch = () => {
     }
     
     setIsSearching(true);
+    setResults(null);
+    setSearchProgress(10);
     
     try {
-      // Simulate AI search processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Progress animation
+      const progressInterval = setInterval(() => {
+        setSearchProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 600);
       
-      // This is where you would integrate with a real API
-      // For now, we'll just simulate results
-      setResults({
-        mainResult: {
-          name: query.length > 3 ? `${query.charAt(0).toUpperCase() + query.slice(1)}` : "Paracetamol",
-          description: "This is an AI-powered search result. In a real implementation, this would fetch detailed drug information from a comprehensive database.",
-          category: "Pain Reliever",
-          usages: ["Pain relief", "Fever reduction"],
-          sideEffects: ["Nausea", "Headache", "Liver damage (with overuse)"],
-          dosage: "Adults: 1-2 tablets every 4-6 hours as needed. Do not exceed 8 tablets in 24 hours.",
-        },
-        relatedDrugs: [
-          "Ibuprofen", 
-          "Aspirin", 
-          "Naproxen"
-        ]
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('smart-drug-search', {
+        body: { query: query }
       });
       
-      toast.success("Smart search completed!");
+      clearInterval(progressInterval);
+      setSearchProgress(100);
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (data) {
+        setResults(data);
+        toast.success("Smart search completed!");
+      } else {
+        toast.error("No results found. Try a different search term.");
+      }
     } catch (error) {
       console.error("Search error:", error);
       toast.error("Failed to complete smart search. Please try again.");
     } finally {
-      setIsSearching(false);
+      setTimeout(() => {
+        setIsSearching(false);
+        setSearchProgress(0);
+      }, 500);
     }
   };
   
@@ -164,20 +179,39 @@ const SmartSearch = () => {
           </form>
         </div>
         
+        {isSearching && (
+          <div className="my-8 animate-fade-in">
+            <h3 className="text-lg font-medium mb-3 text-gray-700 dark:text-gray-300 text-center">
+              Searching medication databases...
+            </h3>
+            <Progress value={searchProgress} className="h-2 w-full bg-gray-200 dark:bg-gray-700" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+              Analyzing your query and retrieving comprehensive medication information
+            </p>
+          </div>
+        )}
+        
         {results && (
           <div className="space-y-6 animate-fade-in">
             <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-pharma-800 dark:text-pharma-300">
-                  {results.mainResult.name}
+                  {results.name}
                 </h2>
                 <span className="px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-800 dark:text-pharma-300">
-                  {results.mainResult.category}
+                  {results.category}
                 </span>
               </div>
               
+              {results.genericName && (
+                <div className="mb-4">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Generic Name: </span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{results.genericName}</span>
+                </div>
+              )}
+              
               <p className="text-gray-700 dark:text-gray-300 mb-6">
-                {results.mainResult.description}
+                {results.description}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -187,7 +221,7 @@ const SmartSearch = () => {
                     Common Uses
                   </h3>
                   <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-                    {results.mainResult.usages.map((use: string, index: number) => (
+                    {results.usages && results.usages.map((use: string, index: number) => (
                       <li key={index}>{use}</li>
                     ))}
                   </ul>
@@ -199,23 +233,32 @@ const SmartSearch = () => {
                     Side Effects
                   </h3>
                   <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-                    {results.mainResult.sideEffects.map((effect: string, index: number) => (
+                    {results.sideEffects && results.sideEffects.map((effect: string, index: number) => (
                       <li key={index}>{effect}</li>
                     ))}
                   </ul>
                 </div>
               </div>
               
+              {results.warnings && (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-4">
+                  <h3 className="font-medium mb-2 text-gray-900 dark:text-gray-100">Warnings</h3>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {results.warnings}
+                  </p>
+                </div>
+              )}
+              
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h3 className="font-medium mb-2 text-gray-900 dark:text-gray-100">Recommended Dosage</h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {results.mainResult.dosage}
+                  {results.dosage}
                 </p>
               </div>
               
               <div className="mt-6 flex justify-end">
                 <Button 
-                  onClick={handleExternalSearch}
+                  onClick={() => window.open(results.url, '_blank')}
                   variant="outline"
                   className="flex items-center"
                 >
@@ -235,7 +278,13 @@ const SmartSearch = () => {
                     <Button 
                       key={index}
                       variant="outline" 
-                      onClick={() => setQuery(drug)}
+                      onClick={() => {
+                        setQuery(drug);
+                        setTimeout(() => {
+                          const submitBtn = document.querySelector('form[onsubmit] button[type="submit"]') as HTMLElement;
+                          if (submitBtn) submitBtn.click();
+                        }, 100);
+                      }}
                       className="bg-white dark:bg-gray-800"
                     >
                       {drug}
