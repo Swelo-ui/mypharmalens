@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 199.2 83.7% 45.1%;
+    --primary: 209 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
@@ -23,7 +23,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 199.2 83.7% 95%;
+    --accent: 210 100% 97%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,7 +31,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 199.2 83.7% 45.1%;
+    --ring: 209 100% 50%;
 
     --radius: 0.75rem;
 
@@ -55,7 +55,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 199.2 83.7% 45.1%;
+    --primary: 209 100% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -109,6 +109,11 @@
       font-size: 16px !important;
     }
   }
+
+  /* Mobile bottom nav padding */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);
+  }
 }
 
 /* Mobile optimizations */
@@ -122,11 +127,16 @@
   }
   
   .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
   
   .safe-top {
-    padding-top: env(safe-area-inset-top);
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* Add padding to main content when mobile nav is present */
+  .mobile-nav-padding {
+    padding-bottom: 5rem;
   }
 }
 
@@ -215,5 +225,14 @@
   
   h2 {
     font-size: 1.5rem;
+  }
+
+  body {
+    padding-bottom: 4rem; /* Space for bottom navigation */
+  }
+
+  /* Fix for bottom navigation fixed positioning */
+  main {
+    padding-bottom: 5rem;
   }
 }

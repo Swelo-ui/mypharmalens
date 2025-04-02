@@ -19,31 +19,11 @@ import { toast } from 'sonner';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, theme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
-
-  // On mount and on theme change, ensure the theme is correctly applied
-  useEffect(() => {
-    // Get the theme from local storage or use the system preference
-    const savedTheme = localStorage.getItem('theme') || 'system';
-    
-    // Force correct theme application
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (savedTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      // System preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, [theme]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -75,16 +55,7 @@ const Header = () => {
   };
 
   const handleThemeToggle = () => {
-    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    
-    // Force the toggle to apply immediately
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // Updated main navigation links
@@ -95,13 +66,37 @@ const Header = () => {
     { name: 'Drug Database', path: '/search' },
   ];
 
+  // For mobile view, show a more minimal header
+  if (isMobile) {
+    return (
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-40 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 safe-top">
+        <div className="flex justify-between items-center h-14 px-4">
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-pharma-500 dark:bg-pharma-600 rounded-full flex items-center justify-center text-white">
+              <span className="font-bold text-lg">PL</span>
+            </div>
+          </Link>
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={handleThemeToggle}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 dark:bg-blue-500 rounded-full flex items-center justify-center text-white">
+            <div className="w-8 h-8 bg-pharma-500 dark:bg-pharma-600 rounded-full flex items-center justify-center text-white">
               <span className="font-bold text-lg">PL</span>
             </div>
             <span className="font-bold text-xl text-gray-800 dark:text-white hidden sm:inline">PharmaLens</span>
@@ -144,7 +139,7 @@ const Header = () => {
               className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors"
               aria-label="Toggle theme"
             >
-              {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {!isLoading && (
