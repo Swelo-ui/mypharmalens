@@ -17,7 +17,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { supabase } from '@/integrations/supabase/client';
-import { Progress } from '@/components/ui/progress';
 
 const DrugIdentify = () => {
   const { isAuthenticated, user } = useAuthStatus();
@@ -26,13 +25,12 @@ const DrugIdentify = () => {
   const [drugDetails, setDrugDetails] = useState<any>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
   const cameraRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if the user is authenticated and redirect if not
     if (!isAuthenticated) {
       navigate('/auth');
     }
@@ -90,20 +88,7 @@ const DrugIdentify = () => {
       return;
     }
 
-    if (isProcessing) {
-      return;
-    }
-
     try {
-      setIsProcessing(true);
-      
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          const newProgress = prev + 5;
-          return newProgress > 90 ? 90 : newProgress;
-        });
-      }, 300);
-
       const response = await fetch('/api/identify', {
         method: 'POST',
         headers: {
@@ -112,27 +97,17 @@ const DrugIdentify = () => {
         body: JSON.stringify({ image: imageData }),
       });
 
-      clearInterval(progressInterval);
-      setProgress(100);
-
       const result = await response.json();
 
       if (result.success) {
         setDrugName(result.drugName);
         setDrugDetails(result.drugDetails);
-        
-        if (isAuthenticated && user) {
-          await saveIdentificationData(result.drugName, result.drugDetails);
-        }
       } else {
         toast.error(result.error || "Failed to identify medication.");
       }
     } catch (error) {
       console.error("Error identifying image:", error);
       toast.error("Failed to identify medication. Please try again.");
-    } finally {
-      setIsProcessing(false);
-      setTimeout(() => setProgress(0), 1000);
     }
   };
 
@@ -143,7 +118,7 @@ const DrugIdentify = () => {
   };
 
   const saveIdentificationData = async (drugName: string, drugDetails: any) => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated) {
       toast.warning("Sign in to save your identification history");
       return;
     }
@@ -151,20 +126,20 @@ const DrugIdentify = () => {
     try {
       setIsSaving(true);
       
+      // Create an object with the correct types for Supabase
       const identificationData = {
-        user_id: user.id,
         drug_name: drugName,
         details: drugDetails,
-        image_url: imageData,
-        created_at: new Date().toISOString()
+        image_url: imageData || undefined,
+        user_id: user?.id
       };
       
+      // Cast to Record<string, any> to satisfy TypeScript
       const { data, error } = await supabase
         .from('drug_identifications')
-        .insert([identificationData]);
+        .insert(identificationData as Record<string, any>);
         
       if (error) {
-        console.error("Database error:", error);
         throw error;
       }
       
@@ -183,6 +158,7 @@ const DrugIdentify = () => {
       <div className="container max-w-3xl mx-auto px-4 pt-24 pb-12">
         <h1 className="text-3xl font-bold text-center mb-8">Medication Identification</h1>
 
+        {/* Camera Access Dialog */}
         <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -225,37 +201,20 @@ const DrugIdentify = () => {
                   <img src={imageData} alt="Medication" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex space-x-2">
-                  <Button 
-                    onClick={identifyImage} 
-                    disabled={!imageData || isProcessing}
-                    className="relative"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      "Identify Medication"
-                    )}
+                  <Button onClick={identifyImage} disabled={!imageData}>
+                    Identify Medication
                   </Button>
-                  <Button variant="outline" onClick={resetIdentification} disabled={isProcessing}>
+                  <Button variant="outline" onClick={resetIdentification}>
                     Retake
                   </Button>
                 </div>
-                
-                {isProcessing && (
-                  <div className="w-full mt-4">
-                    <Progress value={progress} className="h-2" />
-                  </div>
-                )}
               </>
             )}
           </CardContent>
         </Card>
 
         {drugName && drugDetails && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Identification Result</h2>
             <div className="mb-2">
               <span className="font-bold">Medication Name:</span> {drugName}
