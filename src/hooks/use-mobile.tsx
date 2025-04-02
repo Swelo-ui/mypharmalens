@@ -2,24 +2,39 @@
 import { useState, useEffect } from 'react';
 
 export const useMediaQuery = (query: string): boolean => {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    // Check for SSR
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
+    if (typeof window !== 'undefined') {
+      const media = window.matchMedia(query);
+      
+      const updateMatches = () => {
+        setMatches(media.matches);
+      };
+      
+      // Set initial value
+      updateMatches();
+      
+      // Use the modern event listener
+      media.addEventListener('change', updateMatches);
+      
+      // Cleanup
+      return () => {
+        media.removeEventListener('change', updateMatches);
+      };
     }
-
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-
-    return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
+  }, [query]);
 
   return matches;
 };
 
-// Add the useIsMobile hook specifically for detecting mobile devices
+// Export useIsMobile hook for detecting mobile devices
 export const useIsMobile = (): boolean => {
   return useMediaQuery('(max-width: 768px)');
 };
