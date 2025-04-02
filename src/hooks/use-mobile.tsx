@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
@@ -16,4 +17,29 @@ export function useIsMobile() {
   }, [])
 
   return !!isMobile
+}
+
+// Add the useMediaQuery function that's being imported in Header.tsx
+export function useMediaQuery(query: string) {
+  const [matches, setMatches] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    const media = window.matchMedia(query)
+    const updateMatch = () => {
+      setMatches(media.matches)
+    }
+    
+    // Set initial value
+    updateMatch()
+    
+    // Add listener
+    media.addEventListener("change", updateMatch)
+    
+    // Clean up
+    return () => {
+      media.removeEventListener("change", updateMatch)
+    }
+  }, [query])
+
+  return matches
 }
