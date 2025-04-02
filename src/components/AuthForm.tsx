@@ -200,7 +200,7 @@ const AuthForm = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    const signupTab = document.querySelector('[data-value="signup"]') as HTMLElement;
+                    const signupTab = document.querySelector('[data-value="signup"]') as HTMLElement | null;
                     if (signupTab) signupTab.click();
                   }}
                   className="font-medium text-pharma-600 hover:text-pharma-700"
@@ -306,7 +306,7 @@ const AuthForm = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    const signinTab = document.querySelector('[data-value="signin"]') as HTMLElement;
+                    const signinTab = document.querySelector('[data-value="signin"]') as HTMLElement | null;
                     if (signinTab) signinTab.click();
                   }}
                   className="font-medium text-pharma-600 hover:text-pharma-700"

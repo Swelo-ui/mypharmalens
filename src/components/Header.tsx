@@ -104,7 +104,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-blue-500 dark:bg-blue-500 rounded-full flex items-center justify-center text-white">
               <span className="font-bold text-lg">PL</span>
             </div>
-            <span className="font-bold text-xl text-gray-800 dark:text-white">PharmaLens</span>
+            <span className="font-bold text-xl text-gray-800 dark:text-white hidden sm:inline">PharmaLens</span>
           </Link>
 
           {/* Desktop Navigation */}
