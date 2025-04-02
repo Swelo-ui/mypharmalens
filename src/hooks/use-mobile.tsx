@@ -1,45 +1,22 @@
 
-import * as React from "react"
+import { useState, useEffect } from 'react';
 
-const MOBILE_BREAKPOINT = 768
+export const useMediaQuery = (query: string): boolean => {
+  const [matches, setMatches] = useState(false);
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
     }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
 
-  return !!isMobile
-}
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
 
-// Add the useMediaQuery function that's being imported in Header.tsx
-export function useMediaQuery(query: string) {
-  const [matches, setMatches] = React.useState<boolean>(false)
+    return () => media.removeEventListener('change', listener);
+  }, [matches, query]);
 
-  React.useEffect(() => {
-    const media = window.matchMedia(query)
-    const updateMatch = () => {
-      setMatches(media.matches)
-    }
-    
-    // Set initial value
-    updateMatch()
-    
-    // Add listener
-    media.addEventListener("change", updateMatch)
-    
-    // Clean up
-    return () => {
-      media.removeEventListener("change", updateMatch)
-    }
-  }, [query])
+  return matches;
+};
 
-  return matches
-}
+export default useMediaQuery;

@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
   const navigate = useNavigate();
@@ -52,6 +52,10 @@ const Header = () => {
       console.error('Error signing out:', error);
       toast.error("Failed to sign out");
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // Links for navigation
@@ -113,11 +117,15 @@ const Header = () => {
               </Link>
 
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={toggleTheme}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
-                aria-label="Toggle theme"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {theme === 'dark' ? (
+                  <Sun className="h-5 w-5 text-yellow-400" />
+                ) : (
+                  <Moon className="h-5 w-5 text-slate-700" />
+                )}
               </button>
 
               {!isLoading && (
