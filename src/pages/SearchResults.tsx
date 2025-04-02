@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
-import { Loader2, Filter, ChevronDown, X, Search, ExternalLink } from 'lucide-react';
+import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
 import { mockDrugsData } from '@/data/mockDrugsData';
 import { fetchDrugs } from '@/integrations/supabase/client';
 
@@ -18,7 +18,6 @@ const SearchResults = () => {
   const [results, setResults] = useState<DrugData[]>([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [noResults, setNoResults] = useState(false);
   
   // Extract unique categories from mockDrugsData
   const categories = Array.from(new Set(mockDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
@@ -26,7 +25,6 @@ const SearchResults = () => {
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
     setIsLoading(true);
-    setNoResults(false);
     window.scrollTo(0, 0);
     
     const loadDrugs = async () => {
@@ -77,7 +75,6 @@ const SearchResults = () => {
           : filtered;
         
         setResults(finalResults);
-        setNoResults(finalResults.length === 0);
       } catch (error) {
         console.error("Error fetching drugs:", error);
         // Fall back to mock data on error
@@ -93,7 +90,6 @@ const SearchResults = () => {
           : filtered;
           
         setResults(finalResults);
-        setNoResults(finalResults.length === 0);
       } finally {
         setIsLoading(false);
       }
@@ -109,13 +105,6 @@ const SearchResults = () => {
   
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
-  };
-
-  const handleDrugsComSearch = () => {
-    if (searchQuery) {
-      const drugsComUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(searchQuery)}`;
-      window.open(drugsComUrl, '_blank');
-    }
   };
   
   const toggleFilter = (category: string) => {
@@ -149,20 +138,7 @@ const SearchResults = () => {
               fullWidth 
               onSearch={handleSearch} 
               placeholder="Refine your search..." 
-              enableExternalSearch={true}
             />
-            
-            {searchQuery && (
-              <div className="mt-3 flex justify-end">
-                <button 
-                  onClick={handleDrugsComSearch}
-                  className="text-sm text-pharma-600 hover:text-pharma-700 flex items-center"
-                >
-                  <ExternalLink className="h-3.5 w-3.5 mr-1" />
-                  Search on drugs.com for more results
-                </button>
-              </div>
-            )}
           </div>
           
           <div className="flex flex-col lg:flex-row gap-8">
@@ -204,12 +180,6 @@ const SearchResults = () => {
                       ))}
                     </div>
                   </div>
-                </div>
-                
-                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Can't find what you're looking for? Try searching on <a href="https://www.drugs.com" target="_blank" rel="noopener noreferrer" className="text-pharma-600 hover:underline">drugs.com</a> for comprehensive drug information.
-                  </p>
                 </div>
               </div>
             </div>
@@ -341,27 +311,12 @@ const SearchResults = () => {
                   <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
                     We couldn't find any medications matching your search criteria.
                   </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button
-                      onClick={clearFilters}
-                      className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      Clear all filters
-                    </button>
-                    
-                    <button
-                      onClick={handleDrugsComSearch}
-                      className="px-4 py-2 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm flex items-center justify-center"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-1.5" />
-                      Search on drugs.com
-                    </button>
-                  </div>
-                  
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-center">
-                    Our database is continuously expanding. Try searching on drugs.com for the most comprehensive results.
-                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="px-4 py-2 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm"
+                  >
+                    Clear all filters
+                  </button>
                 </div>
               )}
             </div>

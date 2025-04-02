@@ -5,7 +5,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
-  onImageCapture?: (imageData: string) => void;
+  onImageCapture?: (file: File) => void;
   className?: string;
 }
 
@@ -72,19 +72,16 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
-      const base64Image = e.target?.result as string;
-      setPreviewImage(base64Image);
-      
-      // Also send the base64 image data to the parent component
-      if (onImageCapture) {
-        onImageCapture(base64Image);
-      }
+      setPreviewImage(e.target?.result as string);
     };
     reader.readAsDataURL(file);
     
     // Process file
     setIsLoading(true);
     setTimeout(() => {
+      if (onImageCapture) {
+        onImageCapture(file);
+      }
       setIsLoading(false);
     }, 1000);
   };

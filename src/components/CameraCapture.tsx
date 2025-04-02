@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 
 interface CameraCaptureProps {
-  onImageCapture?: (imageData: string) => void;
+  onImageCapture?: (file: File) => void;
   className?: string;
 }
 
@@ -30,20 +31,25 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
           video: { facingMode }
         };
         
+        // Stop any existing stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
         
+        // Get access to the camera
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         
+        // Check if device has multiple cameras
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
         setHasMultipleCameras(videoDevices.length > 1);
         
+        // Set the stream as the video element's source
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
         
+        // Store the stream reference for later cleanup
         streamRef.current = stream;
         setHasPermission(true);
         setCameraActive(true);
@@ -74,49 +80,39 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
     setCameraActive(false);
   };
 
-  const handleImageCapture = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64Image = e.target?.result as string;
-      if (onImageCapture) {
-        onImageCapture(base64Image);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       
+      // Set canvas dimensions to match video dimensions
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
+      // Draw the current video frame onto the canvas
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
+        // Convert canvas to data URL and then to a Blob
         canvas.toBlob((blob) => {
           if (blob) {
+            // Create a File object from the Blob
             const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
             
+            // Update state with the captured image
             const imageUrl = URL.createObjectURL(blob);
             setCapturedImage(imageUrl);
             
+            // Stop the camera since we've captured our image
             stopCamera();
             
+            // Process the captured image if a handler was provided
             if (onImageCapture) {
               setIsLoading(true);
               setTimeout(() => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                  if (onImageCapture && e.target?.result) {
-                    onImageCapture(e.target.result as string);
-                  }
-                  setIsLoading(false);
-                };
-                reader.readAsDataURL(blob);
+                onImageCapture(file);
+                setIsLoading(false);
               }, 1000);
             }
           }
@@ -145,6 +141,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
 
   useEffect(() => {
     return () => {
+      // Clean up on component unmount
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -155,6 +152,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
   }, [capturedImage]);
 
   useEffect(() => {
+    // Reinitialize camera when switching between front/back
     if (cameraActive) {
       initializeCamera();
     }
@@ -222,6 +220,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
             <X className="h-5 w-5" />
           </Button>
           
+          {/* Hidden canvas for image processing */}
           <canvas ref={canvasRef} className="hidden" />
         </div>
       ) : null}

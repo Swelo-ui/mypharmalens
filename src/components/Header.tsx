@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Database } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,8 +19,8 @@ import { toast } from 'sonner';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const isMobile = useIsMobile();
+  const { setTheme, theme } = useTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
@@ -54,52 +54,23 @@ const Header = () => {
     }
   };
 
-  const handleThemeToggle = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
-  // Updated main navigation links
+  // Links for navigation
   const mainLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Identify Medicine', path: '/identify' },
-    { name: 'Smart Search', path: '/smart-search' },
-    { name: 'Drug Database', path: '/search' },
+    { name: 'Identify', path: '/identify' },
+    { name: 'About', path: '/about' },
+    { name: 'FAQ', path: '/faq' },
+    { name: 'Help', path: '/help' },
+    { name: 'Contact', path: '/contact' },
   ];
 
-  // For mobile view, show a more minimal header
-  if (isMobile) {
-    return (
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-40 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 safe-top">
-        <div className="flex justify-between items-center h-14 px-4">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-pharma-500 dark:bg-pharma-600 rounded-full flex items-center justify-center text-white">
-              <span className="font-bold text-lg">PL</span>
-            </div>
-          </Link>
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={handleThemeToggle}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-      </header>
-    );
-  }
-
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-pharma-500 dark:bg-pharma-600 rounded-full flex items-center justify-center text-white">
-              <span className="font-bold text-lg">PL</span>
-            </div>
-            <span className="font-bold text-xl text-gray-800 dark:text-white hidden sm:inline">PharmaLens</span>
+          <Link to="/" className="flex items-center">
+            <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">MediScan</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -117,8 +88,7 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
-            
-            {isAuthenticated && !isLoading && (
+            {isAuthenticated && (
               <Link
                 to="/history"
                 className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
@@ -134,9 +104,13 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
+            <Link to="/search" className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors">
+              <Search className="h-5 w-5" />
+            </Link>
+
             <button
-              onClick={handleThemeToggle}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-600 transition-colors"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -151,18 +125,18 @@ const Header = () => {
                         <UserCircle className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="dark:bg-gray-800 border dark:border-gray-700">
-                      <DropdownMenuLabel className="dark:text-gray-200">
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>
                         {user?.email}
                       </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="dark:border-gray-700" />
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/history" className="flex items-center w-full cursor-pointer dark:text-gray-200 dark:hover:bg-gray-700">
+                        <Link to="/history" className="flex items-center w-full cursor-pointer">
                           <History className="mr-2 h-4 w-4" />
                           <span>History</span>
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 dark:hover:bg-gray-700">
+                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sign out</span>
                       </DropdownMenuItem>
@@ -249,16 +223,16 @@ const Header = () => {
             <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6">
               <div className="flex flex-col space-y-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  © {new Date().getFullYear()} PharmaLens. All rights reserved.
+                  © {new Date().getFullYear()} MediScan. All rights reserved.
                 </p>
                 <div className="flex space-x-4">
-                  <Link to="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-600">
+                  <Link to="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
                     Terms
                   </Link>
-                  <Link to="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-600">
+                  <Link to="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
                     Privacy
                   </Link>
-                  <Link to="/disclaimer" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-600">
+                  <Link to="/disclaimer" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
                     Disclaimer
                   </Link>
                 </div>

@@ -1,353 +1,441 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Upload, ArrowLeft, Info, AlertTriangle } from 'lucide-react';
-import Header from '@/components/Header';
+import { toast } from 'sonner';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { DetailedDrugData } from '@/components/DrugDetails';
+import DrugDetails from '@/components/DrugDetails';
 import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
+import Header from '@/components/Header';
+import { supabase, saveDrugIdentification } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
-import { toast } from 'sonner';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Progress } from '@/components/ui/progress';
-
-// Define the DrugIdentification interface
-interface DrugIdentification {
-  id?: string;
-  name: string;
-  genericName?: string;
-  manufacturer?: string;
-  category?: string;
-  description?: string;
-  markings?: string;
-  color?: string;
-  shape?: string;
-  imprint?: string;
-  confidence?: string | number;
-  verified?: boolean;
-  image?: string;
-  drugClass?: string;
-}
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 
 const DrugIdentify = () => {
-  const [activeTab, setActiveTab] = useState<string>('camera');
-  const [isIdentifying, setIsIdentifying] = useState<boolean>(false);
-  const [identificationResult, setIdentificationResult] = useState<DrugIdentification | null>(null);
+  const { isAuthenticated, isLoading: authLoading } = useAuthStatus();
+  const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
+  const [isIdentifying, setIsIdentifying] = useState(false);
+  const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState<boolean>(false);
-  const { isAuthenticated } = useAuthStatus();
+  const [blurryMode, setBlurryMode] = useState(false);
+  const [isImageLowRes, setIsImageLowRes] = useState(false);
+  const [enhancedMode, setEnhancedMode] = useState(true);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [processingPhase, setProcessingPhase] = useState("");
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
-  // Reset state when component mounts
-  useEffect(() => {
-    setIdentificationResult(null);
-    setCapturedImage(null);
-    setShowResults(false);
-  }, []);
-
-  const handleImageCapture = (imageData: string) => {
-    setCapturedImage(imageData);
-  };
-
-  const resetIdentification = () => {
-    setCapturedImage(null);
-    setIdentificationResult(null);
-    setShowResults(false);
-  };
-
-  const identifyDrug = async () => {
-    if (!capturedImage) {
-      toast.error('Please capture or upload an image first');
-      return;
-    }
-
-    setIsIdentifying(true);
-    setShowResults(false);
-
+  // Function to identify drug using the Supabase edge function
+  const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
     try {
-      const formData = new FormData();
+      // Track progress for better UX
+      setProcessingPhase("Initializing image analysis");
+      setProcessingProgress(10);
       
-      // Convert base64 to blob
-      const byteCharacters = atob(capturedImage.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      // Call the identify-drug function
+      setProcessingPhase("Sending image for analysis");
+      setProcessingProgress(30);
       
-      // Append the file to formData
-      formData.append('image', blob, 'drug-image.jpg');
-
-      // Call Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('identify-drug', {
-        body: formData,
+        body: { 
+          imageBase64: base64Image,
+          blurryMode: blurryMode || isImageLowRes || enhancedMode
+        }
       });
 
+      setProcessingPhase("Processing AI response");
+      setProcessingProgress(60);
+
       if (error) {
-        throw error;
+        console.error('Error calling identify-drug function:', error);
+        throw new Error(error.message || 'Failed to identify medication');
+      }
+      
+      setProcessingPhase("Finalizing results");
+      setProcessingProgress(80);
+
+      return data;
+    } catch (error: any) {
+      console.error('Error identifying drug:', error);
+      throw error;
+    }
+  };
+
+  // Function to check if an image is likely low resolution or blurry
+  const checkImageQuality = (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      // Check file size first - small files are likely low quality
+      if (file.size < 50 * 1024) {
+        setIsImageLowRes(true);
+        return resolve(true);
       }
 
-      // Process and set identification result
-      if (data) {
-        setIdentificationResult(data);
-        setShowResults(true);
-        
-        // Save to history if user is authenticated
-        if (isAuthenticated) {
+      // Create an Image object to check dimensions
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        // If image dimensions are small, consider it low quality
+        const isLowRes = img.width < 400 || img.height < 400;
+        setIsImageLowRes(isLowRes);
+        resolve(isLowRes);
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        setIsImageLowRes(false);
+        resolve(false);
+      };
+      
+      img.src = objectUrl;
+    });
+  };
+
+  const handleImageCapture = async (file: File) => {
+    try {
+      setIsIdentifying(true);
+      setErrorDetails(null);
+      setProcessingProgress(0);
+      setProcessingPhase("Preparing image");
+      toast.info("Processing your image...");
+      
+      // Check image quality
+      await checkImageQuality(file);
+      
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        if (event.target?.result) {
+          const base64Image = event.target.result.toString();
+          setCapturedImage(base64Image);
+          
           try {
-            await saveToHistory(data, capturedImage);
-          } catch (historyError) {
-            console.error('Error saving to history:', historyError);
-            // Continue showing results even if history save fails
+            // Identify the drug with advanced processing
+            const drugData = await identifyDrugFromImage(base64Image);
+            setProcessingProgress(90);
+            
+            if (drugData.error) {
+              throw new Error(drugData.error);
+            }
+            
+            if (drugData) {
+              setProcessingProgress(95);
+              // Format the drug data to match our DetailedDrugData interface
+              const formattedDrugData: DetailedDrugData = {
+                id: drugData.id,
+                name: drugData.name,
+                genericName: drugData.genericName || drugData.name,
+                manufacturer: drugData.manufacturer,
+                category: drugData.category || 'Unknown',
+                description: drugData.description,
+                dosageAndAdmin: drugData.dosageAndAdmin || 'Take as directed by your healthcare provider.',
+                sideEffects: drugData.sideEffects || [],
+                warnings: drugData.warnings || [],
+                interactions: drugData.interactions || [],
+                storage: drugData.storage || 'Store at room temperature away from moisture, heat, and light.',
+                mechanism: drugData.mechanism || 'Mechanism of action not specified.',
+                indications: drugData.indications || [],
+                contraindications: drugData.contraindications || [],
+                prescriptionStatus: drugData.prescriptionStatus as 'OTC' | 'Prescription Only' | 'Controlled',
+                pregnancy: drugData.pregnancy || 'Consult your healthcare provider before using during pregnancy.',
+                verified: false,
+                image: drugData.image,
+                drugClass: drugData.drugClass || 'Not specified',
+                brandNames: drugData.brandNames || []
+              };
+              
+              // Save the identification to Supabase if authenticated
+              if (isAuthenticated) {
+                try {
+                  await saveDrugIdentification({
+                    drug_name: drugData.name,
+                    image_url: drugData.image,
+                    details: drugData
+                  });
+                  console.log('Saved drug identification to Supabase');
+                } catch (saveError) {
+                  console.error('Failed to save drug identification:', saveError);
+                  // Don't block the UI for database errors
+                }
+              }
+              
+              setIdentifiedDrug(formattedDrugData);
+              setProcessingProgress(100);
+              
+              // Show different message based on confidence and analysis method
+              if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
+                if (drugData.confidence === 'high') {
+                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                    description: "Enhanced analysis provided high confidence results."
+                  });
+                } else if (drugData.confidence === 'medium') {
+                  toast.success(`Medication identified as ${drugData.name}`, { 
+                    description: "The identification has medium confidence. Consider the alternatives listed."
+                  });
+                } else {
+                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                    description: "Low confidence identification. Consider consulting a healthcare professional.",
+                    duration: 5000
+                  });
+                }
+              } else {
+                toast.success(`Medication successfully identified as ${drugData.name}!`);
+              }
+              
+              // Additional information about image quality if relevant
+              if (isImageLowRes || drugData.blurryModeUsed) {
+                toast.info("For better accuracy, consider uploading a higher quality image.", { 
+                  duration: 5000 
+                });
+              }
+              
+              // Remind users to login to save history if they're not authenticated
+              if (!isAuthenticated) {
+                toast.info("Sign in to save this identification to your history", {
+                  duration: 8000,
+                  action: {
+                    label: "Sign In",
+                    onClick: () => navigate('/auth')
+                  }
+                });
+              }
+            } else {
+              setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
+              toast.error("Could not identify the medication. Please try again with a clearer image.");
+            }
+          } catch (error: any) {
+            console.error('Error processing image:', error);
+            setErrorDetails(`Error: ${error.message || "Unknown error"}`);
+            toast.error("Failed to process the image. Please try another image.");
+          } finally {
+            setIsIdentifying(false);
           }
         }
-      }
-    } catch (err) {
-      console.error('Error identifying drug:', err);
-      toast.error('Failed to identify medication. Please try again.');
-    } finally {
+      };
+      
+      reader.onerror = () => {
+        toast.error("Failed to read the image file. Please try another image.");
+        setIsIdentifying(false);
+      };
+      
+      reader.readAsDataURL(file);
+      
+    } catch (error: any) {
+      console.error("Error identifying medication:", error);
+      setErrorDetails(`Unexpected Error: ${error.message || "Unknown error"}`);
+      toast.error("An unexpected error occurred. Please try again.");
       setIsIdentifying(false);
     }
   };
 
-  const saveToHistory = async (drugData: DrugIdentification, imageUrl: string) => {
-    try {
-      // Upload image to storage if needed
-      let finalImageUrl = imageUrl;
-      
-      // If the image is a data URL, upload it to storage
-      if (imageUrl.startsWith('data:')) {
-        const fileName = `drug-images/${Date.now()}.jpg`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('drug-images')
-          .upload(fileName, decode(imageUrl), {
-            contentType: 'image/jpeg',
-            upsert: false,
-          });
-          
-        if (uploadError) throw uploadError;
-        
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('drug-images')
-          .getPublicUrl(fileName);
-          
-        finalImageUrl = publicUrl;
-      }
-      
-      // Fix: Convert DrugIdentification to a proper JSON object for Supabase
-      // Save to drug_identifications table
-      const { error } = await supabase
-        .from('drug_identifications')
-        .insert({
-          drug_name: drugData.name,
-          image_url: finalImageUrl,
-          details: drugData as unknown as Record<string, any> // Cast to Record<string, any> to fix type error
-        });
-      
-      if (error) throw error;
-      
-    } catch (error) {
-      console.error('Error saving to history:', error);
-      throw error;
-    }
-  };
-  
-  // Helper function to decode base64 data URL
-  const decode = (dataUrl: string) => {
-    const base64 = dataUrl.split(',')[1];
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
+  const handleRetry = () => {
+    setIdentifiedDrug(null);
+    setErrorDetails(null);
+    setCapturedImage(null);
+    setIsImageLowRes(false);
+    setProcessingProgress(0);
+    setProcessingPhase("");
   };
 
-  const viewDrugDetails = () => {
-    if (identificationResult && identificationResult.id) {
-      navigate(`/drug/${identificationResult.id}`);
-    } else {
-      toast.error('Detailed information not available for this medication');
-    }
+  // Function for manual search as fallback
+  const handleManualSearch = () => {
+    // For now, we'll just reset the state and let the user try again
+    handleRetry();
+    toast.info("Please try uploading a clearer image or a different angle");
   };
 
   return (
     <>
       <Header />
-      <div className={`min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-16 ${isMobile ? 'pb-20' : 'pb-10'}`}>
-        <div className="container mx-auto px-4 py-8">
-          {/* Content Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Identify Medication</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
-              Take or upload a photo of your medication to identify it
-            </p>
-          </div>
-
-          {/* Main content area */}
-          <div className="max-w-2xl mx-auto">
-            {showResults ? (
-              // Results view
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-fade-in">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Identification Results
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetIdentification}
-                    className="text-gray-500 dark:text-gray-400"
-                  >
-                    <ArrowLeft className="mr-1 h-4 w-4" />
-                    Back
-                  </Button>
-                </div>
-                
-                {identificationResult ? (
-                  <div className="space-y-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      {capturedImage && (
-                        <div className="w-full md:w-1/3">
-                          <div className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
-                            <img 
-                              src={capturedImage} 
-                              alt="Captured medication" 
-                              className="w-full h-auto object-cover"
-                              onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="w-full md:w-2/3 space-y-3">
-                        <div>
-                          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {identificationResult.name}
-                          </h3>
-                          {identificationResult.genericName && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {identificationResult.genericName}
-                            </p>
-                          )}
-                        </div>
-                        
-                        {identificationResult.manufacturer && (
-                          <p className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <span className="font-medium">Manufacturer:</span>
-                            <span className="ml-2">{identificationResult.manufacturer}</span>
-                          </p>
-                        )}
-                        
-                        {identificationResult.category && (
-                          <p className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <span className="font-medium">Category:</span>
-                            <span className="ml-2">{identificationResult.category}</span>
-                          </p>
-                        )}
-                        
-                        {identificationResult.drugClass && (
-                          <p className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <span className="font-medium">Drug Class:</span>
-                            <span className="ml-2">{identificationResult.drugClass}</span>
-                          </p>
-                        )}
-                        
-                        <div className="pt-3">
-                          <Button onClick={viewDrugDetails}>
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {identificationResult.description && (
-                      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Description</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{identificationResult.description}</p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2 pt-2">
-                      <Info className="h-4 w-4 text-gray-400" />
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Always verify medication information with a healthcare professional
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">
-                      Identification Failed
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6">
-                      We couldn't identify this medication. Please try again with a clearer image.
-                    </p>
-                    <Button onClick={resetIdentification}>Try Again</Button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              // Capture view
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="w-full grid grid-cols-2">
-                    <TabsTrigger value="camera" className="flex items-center gap-2">
-                      <Camera className="h-4 w-4" />
-                      <span>Camera</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="upload" className="flex items-center gap-2">
-                      <Upload className="h-4 w-4" />
-                      <span>Upload</span>
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="camera" className="p-0">
-                    {/* Fix: Change onCapture to onImageCapture to match CameraCapture props */}
-                    <CameraCapture onImageCapture={handleImageCapture} />
-                  </TabsContent>
-                  
-                  <TabsContent value="upload" className="p-4">
-                    {/* Fix: Change onUpload to onImageCapture to match ImageUpload props */}
-                    <ImageUpload onImageCapture={handleImageCapture} />
-                  </TabsContent>
-                </Tabs>
-                
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button 
-                    onClick={identifyDrug}
-                    disabled={isIdentifying || !capturedImage}
-                    className="w-full"
-                  >
-                    {isIdentifying ? 'Identifying...' : 'Identify Medication'}
-                  </Button>
-                  
-                  {isIdentifying && (
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Analyzing image...</p>
-                      <Progress value={50} className="h-2 w-full" />
-                    </div>
-                  )}
-                  
-                  {!isAuthenticated && (
-                    <div className="mt-4 flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md text-sm">
-                      <Info className="h-4 w-4 text-blue-500 dark:text-blue-400 flex-shrink-0" />
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <a href="/auth" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Sign in</a> to save your identification history
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <h1 className="text-3xl font-bold">Identify Medication</h1>
+          
+          {!isAuthenticated && !authLoading && (
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => navigate('/auth')}
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Sign in to save history</span>
+            </Button>
+          )}
+          
+          {isAuthenticated && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/history')}
+            >
+              View Identification History
+            </Button>
+          )}
         </div>
+        
+        {!identifiedDrug ? (
+          <>
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <Button
+                  variant={identificationMode === 'upload' ? 'default' : 'outline'}
+                  onClick={() => setIdentificationMode('upload')}
+                  className="rounded-l-md rounded-r-none"
+                >
+                  Upload Image
+                </Button>
+                <Button
+                  variant={identificationMode === 'camera' ? 'default' : 'outline'}
+                  onClick={() => setIdentificationMode('camera')}
+                  className="rounded-r-md rounded-l-none"
+                >
+                  Use Camera
+                </Button>
+              </div>
+            </div>
+            
+            {errorDetails && capturedImage && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Identification Failed</AlertTitle>
+                <AlertDescription>
+                  {errorDetails}
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                    <Button size="sm" onClick={handleRetry}>Try Again</Button>
+                    <Button size="sm" variant="outline" onClick={handleManualSearch}>
+                      Try a Different Image
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8">
+              <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
+                {identificationMode === 'upload' 
+                  ? "Upload a clear image of the medication for identification" 
+                  : "Take a clear photo of the medication for identification"}
+              </p>
+              
+              <Tabs defaultValue="standard" className="mb-4">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
+                  <TabsTrigger value="standard">Standard Mode</TabsTrigger>
+                  <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="standard" className="space-y-4">
+                  <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <span className="text-sm font-medium">Basic Analysis</span>
+                      </div>
+                      <Switch 
+                        id="blur-mode" 
+                        checked={blurryMode}
+                        onCheckedChange={setBlurryMode}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Standard mode works best with clear, well-lit images. Enable blur mode for lower-quality images.
+                    </p>
+                    {isImageLowRes && (
+                      <p className="text-xs text-amber-500 mt-2">
+                        Your image appears to be low resolution. Blur mode is recommended.
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="enhanced" className="space-y-4">
+                  <div className="rounded-lg border p-4 bg-pharma-50 dark:bg-pharma-900/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-4 w-4 text-pharma-600" />
+                        <span className="text-sm font-medium">Advanced Analysis</span>
+                      </div>
+                      <Switch 
+                        id="enhanced-mode" 
+                        checked={enhancedMode}
+                        onCheckedChange={setEnhancedMode}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      Enhanced mode uses multiple AI models to analyze the image from different angles, 
+                      improving accuracy for blurry or difficult-to-identify medications.
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
+              {identificationMode === 'upload' ? (
+                <ImageUpload onImageCapture={handleImageCapture} />
+              ) : (
+                <CameraCapture onImageCapture={handleImageCapture} />
+              )}
+              
+              {isIdentifying && (
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{processingPhase || "Analyzing medication..."}</span>
+                    <span>{processingProgress}%</span>
+                  </div>
+                  <Progress value={processingProgress} className="h-2" />
+                  <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                    {enhancedMode 
+                      ? "Using enhanced multi-model analysis for optimal results" 
+                      : "Using standard analysis"}
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-pharma-50 dark:bg-pharma-900/20 rounded-2xl p-6">
+              <h3 className="font-medium text-lg mb-4">Tips for better identification:</h3>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li className="flex items-start">
+                  <ZoomIn className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span>Use good lighting and ensure the pill is clearly visible</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded" />
+                  <span>Place the medication against a plain, contrasting background</span>
+                </li>
+                <li className="flex items-start">
+                  <RotateCw className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span>Try multiple angles if identification fails initially</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 rounded-full border border-pharma-600" />
+                  <span>Make sure any markings, logos, or text are visible</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-pharma-100 rounded-sm" />
+                  <span>Include the packaging if available for better accuracy</span>
+                </li>
+                <li className="flex items-start">
+                  <Zap className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span>Use Enhanced Mode for blurry images or hard-to-identify medications</span>
+                </li>
+              </ul>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Identification Result</h2>
+              <Button variant="outline" onClick={handleRetry}>
+                Identify Another
+              </Button>
+            </div>
+            <DrugDetails drug={identifiedDrug} />
+          </div>
+        )}
       </div>
     </>
   );
