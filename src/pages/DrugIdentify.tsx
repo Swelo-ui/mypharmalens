@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Progress } from '@/components/ui/progress';
 
 // Define the DrugIdentification interface
 interface DrugIdentification {
@@ -138,13 +139,14 @@ const DrugIdentify = () => {
         finalImageUrl = publicUrl;
       }
       
+      // Fix: Convert DrugIdentification to a proper JSON object for Supabase
       // Save to drug_identifications table
       const { error } = await supabase
         .from('drug_identifications')
         .insert({
           drug_name: drugData.name,
           image_url: finalImageUrl,
-          details: drugData,
+          details: drugData as unknown as Record<string, any> // Cast to Record<string, any> to fix type error
         });
       
       if (error) throw error;
@@ -307,11 +309,13 @@ const DrugIdentify = () => {
                   </TabsList>
                   
                   <TabsContent value="camera" className="p-0">
-                    <CameraCapture onCapture={handleImageCapture} />
+                    {/* Fix: Change onCapture to onImageCapture to match CameraCapture props */}
+                    <CameraCapture onImageCapture={handleImageCapture} />
                   </TabsContent>
                   
                   <TabsContent value="upload" className="p-4">
-                    <ImageUpload onUpload={handleImageCapture} />
+                    {/* Fix: Change onUpload to onImageCapture to match ImageUpload props */}
+                    <ImageUpload onImageCapture={handleImageCapture} />
                   </TabsContent>
                 </Tabs>
                 
@@ -323,6 +327,13 @@ const DrugIdentify = () => {
                   >
                     {isIdentifying ? 'Identifying...' : 'Identify Medication'}
                   </Button>
+                  
+                  {isIdentifying && (
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Analyzing image...</p>
+                      <Progress value={50} className="h-2 w-full" />
+                    </div>
+                  )}
                   
                   {!isAuthenticated && (
                     <div className="mt-4 flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md text-sm">
