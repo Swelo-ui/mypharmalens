@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import DrugIdentify from "./pages/DrugIdentify";
 import DrugPage from "./pages/DrugPage";
+import DrugDetails from "./pages/DrugDetails";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import HelpCenter from "./pages/HelpCenter";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/drug/:id" element={<DrugPage />} />
+          <Route path="/drug-details" element={<DrugDetails />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/history" element={<IdentificationHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

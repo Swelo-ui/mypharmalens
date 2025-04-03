@@ -86,24 +86,15 @@ const IdentificationHistory = () => {
     const record = history.find(item => item.id === id);
     console.log("Clicked record:", record);
     
-    if (record && record.details) {
-      // Navigate to the drug's detail page
-      if (record.details.id) {
-        navigate(`/drug/${record.details.id}`);
-      } else if (typeof record.details === 'string') {
-        // Handle case where details might be a string (possibly a stringified JSON)
-        try {
-          const parsedDetails = JSON.parse(record.details);
-          if (parsedDetails.id) {
-            navigate(`/drug/${parsedDetails.id}`);
-          }
-        } catch (e) {
-          console.error("Error parsing details:", e);
-          toast.error("Cannot display details for this medication");
-        }
-      } else {
-        toast.info("Detailed information for this medication is not available");
-      }
+    if (record) {
+      // For direct navigation with the data we already have
+      navigate(`/drug-details`, { 
+        state: { 
+          drugData: record.details,
+          imageUrl: record.image_url,
+          drugName: record.drug_name
+        } 
+      });
     }
   };
 
