@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -19,6 +18,7 @@ interface IdentificationRecord {
   image_url?: string;
   details: any;
   user_id?: string;
+  image_features?: string;
 }
 
 const IdentificationHistory = () => {
@@ -30,13 +30,11 @@ const IdentificationHistory = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to auth page if not authenticated
     if (!authLoading && !isAuthenticated) {
       navigate('/auth');
       return;
     }
 
-    // Fetch history if authenticated
     if (isAuthenticated && user) {
       fetchIdentificationHistory();
     }
@@ -97,14 +95,11 @@ const IdentificationHistory = () => {
     }
   };
   
-  // Helper function to extract drug ID from details
   const extractDrugId = (details: any): string | null => {
     if (!details) return null;
     
-    // If details is already an object with id
     if (details.id) return details.id;
     
-    // If details might be a string (stringified JSON)
     if (typeof details === 'string') {
       try {
         const parsedDetails = JSON.parse(details);

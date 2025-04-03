@@ -17,6 +17,58 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
+// Helper function to extract image features for similarity comparison
+const extractImageFeatures = (base64Image: string): Promise<string> => {
+  return new Promise((resolve) => {
+    // This is a simplified feature extraction
+    // In a real implementation, this would use more advanced image processing
+    const img = new Image();
+    img.onload = () => {
+      // Create a small thumbnail to use as a feature vector
+      const canvas = document.createElement('canvas');
+      const size = 16; // Small size for feature comparison
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, size, size);
+        // Get grayscale pixel data as a simple feature vector
+        const imageData = ctx.getImageData(0, 0, size, size);
+        const data = imageData.data;
+        
+        // Create a feature hash from the downsampled image
+        let featureHash = '';
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale and threshold
+          const gray = Math.floor((data[i] + data[i + 1] + data[i + 2]) / 3);
+          featureHash += gray > 128 ? '1' : '0';
+        }
+        
+        resolve(featureHash);
+      } else {
+        resolve('');
+      }
+    };
+    
+    img.src = base64Image;
+  });
+};
+
+// Function to calculate similarity between two feature hashes
+const calculateSimilarity = (hash1: string, hash2: string): number => {
+  if (!hash1 || !hash2 || hash1.length !== hash2.length) return 0;
+  
+  let matchingBits = 0;
+  for (let i = 0; i < hash1.length; i++) {
+    if (hash1[i] === hash2[i]) {
+      matchingBits++;
+    }
+  }
+  
+  return matchingBits / hash1.length;
+};
+
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
@@ -29,7 +81,78 @@ const DrugIdentify = () => {
   const [enhancedMode, setEnhancedMode] = useState(true);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
+  const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
+  const [imageFeatures, setImageFeatures] = useState<string>('');
   const navigate = useNavigate();
+
+  // Fetch user's previous identifications when component loads
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchPreviousIdentifications();
+    }
+  }, [isAuthenticated, user]);
+
+  // Function to fetch user's previous identifications
+  const fetchPreviousIdentifications = async () => {
+    try {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('drug_identifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching previous identifications:', error);
+        return;
+      }
+      
+      // Store previous identifications for potential matching
+      setPreviousIdentifications(data || []);
+      console.log('Loaded previous identifications for learning:', data?.length || 0);
+    } catch (err) {
+      console.error('Error in fetchPreviousIdentifications:', err);
+    }
+  };
+
+  // Function to check if the current image matches any previously identified medications
+  const findMatchInHistory = async (base64Image: string): Promise<any | null> => {
+    if (!previousIdentifications.length) return null;
+    
+    try {
+      // Extract features from current image
+      const features = await extractImageFeatures(base64Image);
+      setImageFeatures(features);
+      
+      // Set minimum similarity threshold
+      const SIMILARITY_THRESHOLD = 0.85;
+      
+      // Check each previous identification for a match
+      for (const prevIdentification of previousIdentifications) {
+        // Skip if no image features stored
+        if (!prevIdentification.image_features) continue;
+        
+        const similarity = calculateSimilarity(features, prevIdentification.image_features);
+        
+        // If similarity is above threshold, we have a match
+        if (similarity >= SIMILARITY_THRESHOLD) {
+          console.log(`Found match in history with similarity: ${similarity}`, prevIdentification);
+          return {
+            ...prevIdentification.details,
+            confidence: 'high',
+            fromHistory: true,
+            matchSimilarity: similarity
+          };
+        }
+      }
+      
+      return null;
+    } catch (err) {
+      console.error('Error in findMatchInHistory:', err);
+      return null;
+    }
+  };
 
   // Function to save drug identification to the database
   const saveDrugIdentification = async (drugData: any) => {
@@ -46,7 +169,8 @@ const DrugIdentify = () => {
             user_id: user.id,
             drug_name: drugData.drug_name,
             image_url: drugData.image_url,
-            details: drugData.details
+            details: drugData.details,
+            image_features: imageFeatures // Store image features for future matching
           }
         ]);
 
@@ -70,7 +194,21 @@ const DrugIdentify = () => {
       setProcessingPhase("Initializing image analysis");
       setProcessingProgress(10);
       
-      // Call the identify-drug function
+      // First check if this medication was previously identified
+      setProcessingPhase("Checking against previously identified medications");
+      setProcessingProgress(20);
+      const historicalMatch = await findMatchInHistory(base64Image);
+      
+      if (historicalMatch) {
+        setProcessingPhase("Match found in your history");
+        setProcessingProgress(100);
+        return {
+          ...historicalMatch,
+          fromHistory: true
+        };
+      }
+      
+      // No match found, proceed with API identification
       setProcessingPhase("Sending image for analysis");
       setProcessingProgress(30);
       
@@ -201,8 +339,12 @@ const DrugIdentify = () => {
               setIdentifiedDrug(formattedDrugData);
               setProcessingProgress(100);
               
-              // Show different message based on confidence and analysis method
-              if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
+              // Customize message based on whether this was from history or new identification
+              if (drugData.fromHistory) {
+                toast.success(`Matched with previously identified ${drugData.name}!`, { 
+                  description: "Using your history helped identify this medication faster."
+                });
+              } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
                 if (drugData.confidence === 'high') {
                   toast.success(`Medication successfully identified as ${drugData.name}!`, { 
                     description: "Enhanced analysis provided high confidence results."
