@@ -87,24 +87,34 @@ const IdentificationHistory = () => {
     console.log("Clicked record:", record);
     
     if (record && record.details) {
-      // Navigate to the drug's detail page
-      if (record.details.id) {
-        navigate(`/drug/${record.details.id}`);
-      } else if (typeof record.details === 'string') {
-        // Handle case where details might be a string (possibly a stringified JSON)
-        try {
-          const parsedDetails = JSON.parse(record.details);
-          if (parsedDetails.id) {
-            navigate(`/drug/${parsedDetails.id}`);
-          }
-        } catch (e) {
-          console.error("Error parsing details:", e);
-          toast.error("Cannot display details for this medication");
-        }
+      const drugId = extractDrugId(record.details);
+      
+      if (drugId) {
+        navigate(`/drug/${drugId}`);
       } else {
         toast.info("Detailed information for this medication is not available");
       }
     }
+  };
+  
+  // Helper function to extract drug ID from details
+  const extractDrugId = (details: any): string | null => {
+    if (!details) return null;
+    
+    // If details is already an object with id
+    if (details.id) return details.id;
+    
+    // If details might be a string (stringified JSON)
+    if (typeof details === 'string') {
+      try {
+        const parsedDetails = JSON.parse(details);
+        if (parsedDetails.id) return parsedDetails.id;
+      } catch (e) {
+        console.error("Error parsing details:", e);
+      }
+    }
+    
+    return null;
   };
 
   const refreshHistory = () => {
@@ -164,7 +174,7 @@ const IdentificationHistory = () => {
                 </div>
                 <DrugCard
                   drug={{
-                    id: item.details?.id || item.id,
+                    id: extractDrugId(item.details) || item.id,
                     name: item.drug_name || "Unknown Medication",
                     genericName: item.details?.genericName || item.details?.generic_name || "",
                     manufacturer: item.details?.manufacturer || "",
