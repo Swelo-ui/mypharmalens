@@ -84,10 +84,25 @@ const IdentificationHistory = () => {
 
   const handleCardClick = (id: string) => {
     const record = history.find(item => item.id === id);
+    console.log("Clicked record:", record);
+    
     if (record && record.details) {
-      // Navigate to the drug's detail page if possible
+      // Navigate to the drug's detail page
       if (record.details.id) {
         navigate(`/drug/${record.details.id}`);
+      } else if (typeof record.details === 'string') {
+        // Handle case where details might be a string (possibly a stringified JSON)
+        try {
+          const parsedDetails = JSON.parse(record.details);
+          if (parsedDetails.id) {
+            navigate(`/drug/${parsedDetails.id}`);
+          }
+        } catch (e) {
+          console.error("Error parsing details:", e);
+          toast.error("Cannot display details for this medication");
+        }
+      } else {
+        toast.info("Detailed information for this medication is not available");
       }
     }
   };
@@ -142,7 +157,7 @@ const IdentificationHistory = () => {
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map((item) => (
-              <div key={item.id} className="relative">
+              <div key={item.id} className="relative cursor-pointer transition-transform hover:scale-105" onClick={() => handleCardClick(item.id)}>
                 <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
                   {format(new Date(item.created_at), 'MMM d, yyyy')}
@@ -159,7 +174,6 @@ const IdentificationHistory = () => {
                     verified: item.details?.verified || false,
                     image: item.image_url || item.details?.image || "",
                   }}
-                  onClick={() => handleCardClick(item.id)}
                 />
               </div>
             ))}

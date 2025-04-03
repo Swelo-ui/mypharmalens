@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Home, Pill, HelpCircle, Info, Mail } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Home, Pill, HelpCircle, Info, Mail, Coffee } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, theme } = useTheme();
+  const { setTheme, theme, resolvedTheme } = useTheme();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,6 +43,12 @@ const Header = () => {
     };
   }, [isOpen]);
 
+  // Handle theme toggle with improved reliability
+  const toggleTheme = () => {
+    const currentTheme = resolvedTheme || theme;
+    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  };
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -52,6 +58,10 @@ const Header = () => {
       console.error('Error signing out:', error);
       toast.error("Failed to sign out");
     }
+  };
+
+  const handleDonation = () => {
+    window.open('https://buymeacoffee.com/_himanshusharma', '_blank');
   };
 
   // Links for navigation
@@ -66,7 +76,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800">
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -113,11 +123,11 @@ const Header = () => {
               </Link>
 
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={toggleTheme}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
                 aria-label="Toggle theme"
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
 
               {!isLoading && (
@@ -140,6 +150,11 @@ const Header = () => {
                             <span>History</span>
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDonation} className="flex items-center cursor-pointer">
+                          <Coffee className="mr-2 h-4 w-4 text-amber-600" />
+                          <span>Buy Me a Coffee</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Sign out</span>
@@ -169,7 +184,7 @@ const Header = () => {
 
         {/* Mobile Menu Overlay */}
         {isOpen && (
-          <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 pt-16">
+          <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 pt-16 transition-colors duration-300">
             <nav className="container mx-auto px-4 py-8 flex flex-col space-y-6">
               {mainLinks.map((link) => (
                 <Link
@@ -199,6 +214,17 @@ const Header = () => {
                   >
                     History
                   </Link>
+                  
+                  <button
+                    onClick={() => {
+                      handleDonation();
+                      setIsOpen(false);
+                    }}
+                    className="text-lg font-medium text-amber-600 transition-colors flex items-center"
+                  >
+                    <Coffee className="mr-2 h-5 w-5" />
+                    Buy Me a Coffee
+                  </button>
                   
                   <button
                     onClick={() => {
@@ -249,7 +275,7 @@ const Header = () => {
 
       {/* Mobile Bottom Navigation - Only visible on mobile */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 h-16">
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 h-16 transition-colors duration-300">
           <div className="grid grid-cols-5 h-full">
             {mainLinks.slice(0, 5).map((link) => (
               <Link
