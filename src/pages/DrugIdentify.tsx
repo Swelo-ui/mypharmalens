@@ -11,14 +11,14 @@ import DrugDetails from '@/components/DrugDetails';
 import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
 import Header from '@/components/Header';
-import { supabase, saveDrugIdentification } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
 const DrugIdentify = () => {
-  const { isAuthenticated, isLoading: authLoading } = useAuthStatus();
+  const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
@@ -30,6 +30,38 @@ const DrugIdentify = () => {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
   const navigate = useNavigate();
+
+  // Function to save drug identification to the database
+  const saveDrugIdentification = async (drugData: any) => {
+    try {
+      if (!isAuthenticated || !user) {
+        console.log('User not authenticated, skipping history save');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('drug_identifications')
+        .insert([
+          {
+            user_id: user.id,
+            drug_name: drugData.drug_name,
+            image_url: drugData.image_url,
+            details: drugData.details
+          }
+        ]);
+
+      if (error) {
+        console.error("Error saving drug identification:", error);
+        throw error;
+      }
+
+      console.log("Successfully saved drug identification to history:", data);
+      return data;
+    } catch (error) {
+      console.error("Error in saveDrugIdentification:", error);
+      throw error;
+    }
+  };
 
   // Function to identify drug using the Supabase edge function
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
@@ -152,7 +184,7 @@ const DrugIdentify = () => {
               };
               
               // Save the identification to Supabase if authenticated
-              if (isAuthenticated) {
+              if (isAuthenticated && user) {
                 try {
                   await saveDrugIdentification({
                     drug_name: drugData.name,

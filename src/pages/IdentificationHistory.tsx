@@ -10,6 +10,7 @@ import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 
 interface IdentificationRecord {
   id: string;
@@ -17,6 +18,7 @@ interface IdentificationRecord {
   drug_name: string;
   image_url?: string;
   details: any;
+  user_id?: string;
 }
 
 const IdentificationHistory = () => {
@@ -45,7 +47,7 @@ const IdentificationHistory = () => {
       setFilteredHistory(history);
     } else {
       const filtered = history.filter(item => 
-        item.drug_name.toLowerCase().includes(searchTerm.toLowerCase())
+        item.drug_name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredHistory(filtered);
     }
@@ -54,19 +56,27 @@ const IdentificationHistory = () => {
   const fetchIdentificationHistory = async () => {
     try {
       setIsLoading(true);
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
       const { data, error } = await supabase
         .from('drug_identifications')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
         throw error;
       }
 
+      console.log("Fetched history data:", data);
       setHistory(data || []);
       setFilteredHistory(data || []);
     } catch (error) {
       console.error('Error fetching identification history:', error);
+      toast.error("Failed to load your identification history");
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +89,12 @@ const IdentificationHistory = () => {
       if (record.details.id) {
         navigate(`/drug/${record.details.id}`);
       }
+    }
+  };
+
+  const refreshHistory = () => {
+    if (isAuthenticated && user) {
+      fetchIdentificationHistory();
     }
   };
 
@@ -106,7 +122,7 @@ const IdentificationHistory = () => {
               />
             </div>
             
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" onClick={refreshHistory}>
               <Filter className="h-4 w-4" />
             </Button>
           </div>
@@ -134,14 +150,14 @@ const IdentificationHistory = () => {
                 <DrugCard
                   drug={{
                     id: item.details?.id || item.id,
-                    name: item.drug_name,
-                    genericName: item.details?.genericName,
-                    manufacturer: item.details?.manufacturer,
-                    category: item.details?.category,
-                    description: item.details?.description,
-                    drugClass: item.details?.drugClass,
+                    name: item.drug_name || "Unknown Medication",
+                    genericName: item.details?.genericName || item.details?.generic_name || "",
+                    manufacturer: item.details?.manufacturer || "",
+                    category: item.details?.category || "",
+                    description: item.details?.description || "",
+                    drugClass: item.details?.drugClass || item.details?.drug_class || "",
                     verified: item.details?.verified || false,
-                    image: item.image_url || item.details?.image,
+                    image: item.image_url || item.details?.image || "",
                   }}
                   onClick={() => handleCardClick(item.id)}
                 />
