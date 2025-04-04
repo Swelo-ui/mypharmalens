@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Clock, Search, AlertTriangle, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, Search, AlertTriangle, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
@@ -11,16 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Badge } from "@/components/ui/badge";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 interface IdentificationRecord {
   id: string;
@@ -38,10 +27,6 @@ const IdentificationHistory = () => {
   const [filteredHistory, setFilteredHistory] = useState<IdentificationRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const itemsPerPage = 9;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,7 +38,7 @@ const IdentificationHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory();
     }
-  }, [isAuthenticated, authLoading, user, currentPage]);
+  }, [isAuthenticated, authLoading, user]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -69,51 +54,26 @@ const IdentificationHistory = () => {
   const fetchIdentificationHistory = async () => {
     try {
       setIsLoading(true);
-      setErrorMessage(null);
       
       if (!user) {
         throw new Error("User not authenticated");
       }
       
-      // First get the total count for pagination
-      const { count, error: countError } = await supabase
-        .from('drug_identifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-        
-      if (countError) {
-        throw countError;
-      }
-      
-      setTotalItems(count || 0);
-      
-      // Now fetch the records for the current page
-      const from = (currentPage - 1) * itemsPerPage;
-      const to = from + itemsPerPage - 1;
-      
       const { data, error } = await supabase
         .from('drug_identifications')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .range(from, to);
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw error;
       }
 
       console.log("Fetched history data:", data);
-      if (data && data.length === 0 && currentPage > 1) {
-        // No data on this page, go back to previous page
-        setCurrentPage(currentPage - 1);
-        return;
-      }
-      
       setHistory(data || []);
       setFilteredHistory(data || []);
     } catch (error) {
       console.error('Error fetching identification history:', error);
-      setErrorMessage("Failed to load your identification history. Please try again.");
       toast.error("Failed to load your identification history");
     } finally {
       setIsLoading(false);
@@ -130,8 +90,7 @@ const IdentificationHistory = () => {
       if (drugId) {
         navigate(`/drug/${drugId}`);
       } else {
-        // Instead of showing a toast, navigate to a detailed history view
-        navigate(`/history/detail/${id}`);
+        toast.info("Detailed information for this medication is not available");
       }
     }
   };
@@ -139,10 +98,8 @@ const IdentificationHistory = () => {
   const extractDrugId = (details: any): string | null => {
     if (!details) return null;
     
-    // Try to extract id directly from the object
     if (details.id) return details.id;
     
-    // If details is a string, try to parse it as JSON
     if (typeof details === 'string') {
       try {
         const parsedDetails = JSON.parse(details);
@@ -159,87 +116,6 @@ const IdentificationHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory();
     }
-  };
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-    
-    return (
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious 
-              onClick={() => handlePageChange(currentPage - 1)} 
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-            />
-          </PaginationItem>
-          
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            let pageNum;
-            
-            if (totalPages <= 5) {
-              // Show all pages if 5 or fewer
-              pageNum = i + 1;
-            } else if (currentPage <= 3) {
-              // Near start
-              pageNum = i + 1;
-              if (i === 4) return (
-                <PaginationItem key="ellipsis-end">
-                  <PaginationEllipsis />
-                </PaginationItem>
-              );
-            } else if (currentPage >= totalPages - 2) {
-              // Near end
-              pageNum = totalPages - 4 + i;
-              if (i === 0) return (
-                <PaginationItem key="ellipsis-start">
-                  <PaginationEllipsis />
-                </PaginationItem>
-              );
-            } else {
-              // Middle
-              if (i === 0) return (
-                <PaginationItem key="ellipsis-start">
-                  <PaginationEllipsis />
-                </PaginationItem>
-              );
-              if (i === 4) return (
-                <PaginationItem key="ellipsis-end">
-                  <PaginationEllipsis />
-                </PaginationItem>
-              );
-              pageNum = currentPage - 1 + i;
-            }
-            
-            return (
-              <PaginationItem key={pageNum}>
-                <PaginationLink 
-                  isActive={currentPage === pageNum}
-                  onClick={() => handlePageChange(pageNum)}
-                >
-                  {pageNum}
-                </PaginationLink>
-              </PaginationItem>
-            );
-          })}
-          
-          <PaginationItem>
-            <PaginationNext 
-              onClick={() => handlePageChange(currentPage + 1)} 
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    );
   };
 
   return (
@@ -272,18 +148,6 @@ const IdentificationHistory = () => {
           </div>
         </div>
 
-        {errorMessage && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <div className="flex">
-              <AlertTriangle className="h-5 w-5 text-red-500 mr-3 flex-shrink-0" />
-              <p className="text-red-700 dark:text-red-300">{errorMessage}</p>
-            </div>
-            <Button variant="outline" className="mt-2" onClick={refreshHistory}>
-              Try Again
-            </Button>
-          </div>
-        )}
-
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -296,47 +160,29 @@ const IdentificationHistory = () => {
             ))}
           </div>
         ) : filteredHistory.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredHistory.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="relative cursor-pointer transition-transform hover:scale-105" 
-                  onClick={() => handleCardClick(item.id)}
-                >
-                  <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {format(new Date(item.created_at), 'MMM d, yyyy')}
-                  </div>
-                  
-                  <Badge 
-                    className="absolute bottom-4 right-4 z-10" 
-                    variant="outline"
-                  >
-                    View Details
-                  </Badge>
-                  
-                  <DrugCard
-                    drug={{
-                      id: extractDrugId(item.details) || item.id,
-                      name: item.drug_name || "Unknown Medication",
-                      genericName: item.details?.genericName || item.details?.generic_name || "",
-                      manufacturer: item.details?.manufacturer || "",
-                      category: item.details?.category || "",
-                      description: item.details?.description || "",
-                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
-                      verified: item.details?.verified || false,
-                      image: item.image_url || item.details?.image || "",
-                    }}
-                  />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredHistory.map((item) => (
+              <div key={item.id} className="relative cursor-pointer transition-transform hover:scale-105" onClick={() => handleCardClick(item.id)}>
+                <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {format(new Date(item.created_at), 'MMM d, yyyy')}
                 </div>
-              ))}
-            </div>
-            
-            <div className="mt-8">
-              {renderPagination()}
-            </div>
-          </>
+                <DrugCard
+                  drug={{
+                    id: extractDrugId(item.details) || item.id,
+                    name: item.drug_name || "Unknown Medication",
+                    genericName: item.details?.genericName || item.details?.generic_name || "",
+                    manufacturer: item.details?.manufacturer || "",
+                    category: item.details?.category || "",
+                    description: item.details?.description || "",
+                    drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                    verified: item.details?.verified || false,
+                    image: item.image_url || item.details?.image || "",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">

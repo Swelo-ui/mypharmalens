@@ -16,23 +16,30 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
+// Helper function to extract image features for similarity comparison
 const extractImageFeatures = (base64Image: string): Promise<string> => {
   return new Promise((resolve) => {
+    // This is a simplified feature extraction
+    // In a real implementation, this would use more advanced image processing
     const img = new Image();
     img.onload = () => {
+      // Create a small thumbnail to use as a feature vector
       const canvas = document.createElement('canvas');
-      const size = 16;
+      const size = 16; // Small size for feature comparison
       canvas.width = size;
       canvas.height = size;
       const ctx = canvas.getContext('2d');
       
       if (ctx) {
         ctx.drawImage(img, 0, 0, size, size);
+        // Get grayscale pixel data as a simple feature vector
         const imageData = ctx.getImageData(0, 0, size, size);
         const data = imageData.data;
         
+        // Create a feature hash from the downsampled image
         let featureHash = '';
         for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale and threshold
           const gray = Math.floor((data[i] + data[i + 1] + data[i + 2]) / 3);
           featureHash += gray > 128 ? '1' : '0';
         }
@@ -47,6 +54,7 @@ const extractImageFeatures = (base64Image: string): Promise<string> => {
   });
 };
 
+// Function to calculate similarity between two feature hashes
 const calculateSimilarity = (hash1: string, hash2: string): number => {
   if (!hash1 || !hash2 || hash1.length !== hash2.length) return 0;
   
@@ -78,6 +86,7 @@ const DrugIdentify = () => {
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch user's previous identifications when component loads
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchPreviousIdentifications();
@@ -85,6 +94,7 @@ const DrugIdentify = () => {
     }
   }, [isAuthenticated, user]);
 
+  // Function to check subscription status
   const checkSubscription = async () => {
     try {
       setCheckingSubscription(true);
@@ -112,6 +122,7 @@ const DrugIdentify = () => {
     }
   };
 
+  // Function to fetch user's previous identifications
   const fetchPreviousIdentifications = async () => {
     try {
       if (!user) return;
@@ -127,6 +138,7 @@ const DrugIdentify = () => {
         return;
       }
       
+      // Store previous identifications for potential matching
       setPreviousIdentifications(data || []);
       console.log('Loaded previous identifications for learning:', data?.length || 0);
     } catch (err) {
@@ -134,20 +146,26 @@ const DrugIdentify = () => {
     }
   };
 
+  // Function to check if the current image matches any previously identified medications
   const findMatchInHistory = async (base64Image: string): Promise<any | null> => {
     if (!previousIdentifications.length) return null;
     
     try {
+      // Extract features from current image
       const features = await extractImageFeatures(base64Image);
       setImageFeatures(features);
       
+      // Set minimum similarity threshold
       const SIMILARITY_THRESHOLD = 0.85;
       
+      // Check each previous identification for a match
       for (const prevIdentification of previousIdentifications) {
+        // Skip if no image features stored
         if (!prevIdentification.image_features) continue;
         
         const similarity = calculateSimilarity(features, prevIdentification.image_features);
         
+        // If similarity is above threshold, we have a match
         if (similarity >= SIMILARITY_THRESHOLD) {
           console.log(`Found match in history with similarity: ${similarity}`, prevIdentification);
           return {
@@ -166,6 +184,7 @@ const DrugIdentify = () => {
     }
   };
 
+  // Function to save drug identification to the database
   const saveDrugIdentification = async (drugData: any) => {
     try {
       if (!isAuthenticated || !user) {
@@ -173,47 +192,23 @@ const DrugIdentify = () => {
         return;
       }
 
+      // Check subscription status before saving
       if (subscriptionStatus && !subscriptionStatus.canIdentify) {
         console.log('User subscription limit reached, skipping save');
         return;
       }
-
-      const drug_name = drugData.name || drugData.drug_name || "Unknown Medication";
-      
-      const image_url = drugData.image || drugData.image_url || null;
-      
-      let details = drugData;
-      if (!drugData.details) {
-        details = {
-          ...drugData,
-          name: drug_name,
-          image: image_url,
-        };
-      } else {
-        details = drugData.details;
-      }
-
-      details.identified_at = new Date().toISOString();
-      
-      console.log('Saving identification with details:', {
-        drug_name,
-        image_url,
-        details,
-        image_features: imageFeatures
-      });
 
       const { data, error } = await supabase
         .from('drug_identifications')
         .insert([
           {
             user_id: user.id,
-            drug_name: drug_name,
-            image_url: image_url,
-            details: details,
-            image_features: imageFeatures
+            drug_name: drugData.drug_name,
+            image_url: drugData.image_url,
+            details: drugData.details,
+            image_features: imageFeatures // Store image features for future matching
           }
-        ])
-        .select();
+        ]);
 
       if (error) {
         console.error("Error saving drug identification:", error);
@@ -222,23 +217,24 @@ const DrugIdentify = () => {
 
       console.log("Successfully saved drug identification to history:", data);
       
+      // Refresh subscription status after using an identification
       checkSubscription();
-      
-      toast.success("Identification saved to your history");
       
       return data;
     } catch (error) {
       console.error("Error in saveDrugIdentification:", error);
-      toast.error("Could not save to history. Please try again later.");
       throw error;
     }
   };
 
+  // Function to identify drug using the Supabase edge function
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
     try {
+      // Track progress for better UX
       setProcessingPhase("Initializing image analysis");
       setProcessingProgress(10);
       
+      // First check if this medication was previously identified
       setProcessingPhase("Checking against previously identified medications");
       setProcessingProgress(20);
       const historicalMatch = await findMatchInHistory(base64Image);
@@ -252,6 +248,7 @@ const DrugIdentify = () => {
         };
       }
       
+      // No match found, proceed with API identification
       setProcessingPhase("Sending image for analysis");
       setProcessingProgress(30);
       
@@ -280,18 +277,22 @@ const DrugIdentify = () => {
     }
   };
 
+  // Function to check if an image is likely low resolution or blurry
   const checkImageQuality = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
+      // Check file size first - small files are likely low quality
       if (file.size < 50 * 1024) {
         setIsImageLowRes(true);
         return resolve(true);
       }
 
+      // Create an Image object to check dimensions
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
       
       img.onload = () => {
         URL.revokeObjectURL(objectUrl);
+        // If image dimensions are small, consider it low quality
         const isLowRes = img.width < 400 || img.height < 400;
         setIsImageLowRes(isLowRes);
         resolve(isLowRes);
@@ -309,6 +310,7 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
+      // Check subscription status first
       if (!isAuthenticated) {
         toast.info("Sign in to use drug identification", {
           action: {
@@ -335,6 +337,7 @@ const DrugIdentify = () => {
       setProcessingPhase("Preparing image");
       toast.info("Processing your image...");
       
+      // Check image quality
       await checkImageQuality(file);
       
       const reader = new FileReader();
@@ -345,6 +348,7 @@ const DrugIdentify = () => {
           setCapturedImage(base64Image);
           
           try {
+            // Identify the drug with advanced processing
             const drugData = await identifyDrugFromImage(base64Image);
             setProcessingProgress(90);
             
@@ -354,6 +358,7 @@ const DrugIdentify = () => {
             
             if (drugData) {
               setProcessingProgress(95);
+              // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
                 id: drugData.id,
                 name: drugData.name,
@@ -377,6 +382,7 @@ const DrugIdentify = () => {
                 brandNames: drugData.brandNames || []
               };
               
+              // Save the identification to Supabase if authenticated
               if (isAuthenticated && user) {
                 try {
                   await saveDrugIdentification({
@@ -387,12 +393,14 @@ const DrugIdentify = () => {
                   console.log('Saved drug identification to Supabase');
                 } catch (saveError) {
                   console.error('Failed to save drug identification:', saveError);
+                  // Don't block the UI for database errors
                 }
               }
               
               setIdentifiedDrug(formattedDrugData);
               setProcessingProgress(100);
               
+              // Customize message based on whether this was from history or new identification
               if (drugData.fromHistory) {
                 toast.success(`Matched with previously identified ${drugData.name}!`, { 
                   description: "Using your history helped identify this medication faster."
@@ -416,12 +424,14 @@ const DrugIdentify = () => {
                 toast.success(`Medication successfully identified as ${drugData.name}!`);
               }
               
+              // Additional information about image quality if relevant
               if (isImageLowRes || drugData.blurryModeUsed) {
                 toast.info("For better accuracy, consider uploading a higher quality image.", { 
                   duration: 5000 
                 });
               }
               
+              // Remind users to login to save history if they're not authenticated
               if (!isAuthenticated) {
                 toast.info("Sign in to save this identification to your history", {
                   duration: 8000,
@@ -469,7 +479,9 @@ const DrugIdentify = () => {
     setProcessingPhase("");
   };
 
+  // Function for manual search as fallback
   const handleManualSearch = () => {
+    // For now, we'll just reset the state and let the user try again
     handleRetry();
     toast.info("Please try uploading a clearer image or a different angle");
   };
@@ -510,6 +522,7 @@ const DrugIdentify = () => {
           )}
         </div>
         
+        {/* Subscription Status Banner */}
         {isAuthenticated && subscriptionStatus && (
           <div className={`mb-6 p-4 rounded-lg border ${
             subscriptionStatus.canIdentify 
