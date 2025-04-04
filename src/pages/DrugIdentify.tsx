@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -83,14 +83,45 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
+  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+  const [checkingSubscription, setCheckingSubscription] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user's previous identifications when component loads
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchPreviousIdentifications();
+      checkSubscription();
     }
   }, [isAuthenticated, user]);
+
+  // Function to check subscription status
+  const checkSubscription = async () => {
+    try {
+      setCheckingSubscription(true);
+      const { data, error } = await supabase.functions.invoke('subscription-management/check-subscription-status');
+      
+      if (error) {
+        console.error('Error checking subscription status:', error);
+        return;
+      }
+      
+      setSubscriptionStatus(data);
+      
+      if (!data.canIdentify) {
+        toast.warning(data.message, {
+          action: {
+            label: "Upgrade",
+            onClick: () => navigate('/subscription')
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    } finally {
+      setCheckingSubscription(false);
+    }
+  };
 
   // Function to fetch user's previous identifications
   const fetchPreviousIdentifications = async () => {
@@ -162,6 +193,12 @@ const DrugIdentify = () => {
         return;
       }
 
+      // Check subscription status before saving
+      if (subscriptionStatus && !subscriptionStatus.canIdentify) {
+        console.log('User subscription limit reached, skipping save');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('drug_identifications')
         .insert([
@@ -180,6 +217,10 @@ const DrugIdentify = () => {
       }
 
       console.log("Successfully saved drug identification to history:", data);
+      
+      // Refresh subscription status after using an identification
+      checkSubscription();
+      
       return data;
     } catch (error) {
       console.error("Error in saveDrugIdentification:", error);
@@ -270,6 +311,27 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
+      // Check subscription status first
+      if (!isAuthenticated) {
+        toast.info("Sign in to use drug identification", {
+          action: {
+            label: "Sign In",
+            onClick: () => navigate('/auth')
+          }
+        });
+        return;
+      }
+      
+      if (subscriptionStatus && !subscriptionStatus.canIdentify) {
+        toast.error(subscriptionStatus.message, {
+          action: {
+            label: "Upgrade",
+            onClick: () => navigate('/subscription')
+          }
+        });
+        return;
+      }
+      
       setIsIdentifying(true);
       setErrorDetails(null);
       setProcessingProgress(0);
@@ -444,14 +506,70 @@ const DrugIdentify = () => {
           )}
           
           {isAuthenticated && (
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/history')}
-            >
-              View Identification History
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/history')}
+              >
+                View History
+              </Button>
+              <Button 
+                variant="default" 
+                onClick={() => navigate('/subscription')}
+              >
+                Subscription
+              </Button>
+            </div>
           )}
         </div>
+        
+        {/* Subscription Status Banner */}
+        {isAuthenticated && subscriptionStatus && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            subscriptionStatus.canIdentify 
+              ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900' 
+              : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-900'
+          }`}>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                {subscriptionStatus.canIdentify ? (
+                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" />
+                ) : (
+                  <Lock className="h-5 w-5 mr-2 text-amber-600" />
+                )}
+                <div>
+                  <p className="font-medium">
+                    {subscriptionStatus.canIdentify ? 'Subscribed' : 'Upgrade Needed'}
+                  </p>
+                  <p className="text-sm">
+                    {subscriptionStatus.message}
+                  </p>
+                </div>
+              </div>
+              
+              {subscriptionStatus.usage && (
+                <div className="text-right hidden md:block">
+                  <p className="text-sm font-medium">
+                    {subscriptionStatus.usage.used} / {subscriptionStatus.usage.total} identifications
+                  </p>
+                  <Progress 
+                    value={subscriptionStatus.usage.percentage} 
+                    className="h-2 w-32 mt-1" 
+                  />
+                </div>
+              )}
+              
+              {!subscriptionStatus.canIdentify && (
+                <Button 
+                  size="sm"
+                  onClick={() => navigate('/subscription')}
+                >
+                  Upgrade
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
         
         {!identifiedDrug ? (
           <>
