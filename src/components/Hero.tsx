@@ -207,7 +207,7 @@ const Hero = () => {
           </div>
           
           <div className="text-center mt-8">
-            <Link to="/subscription" className="text-pharma-600 hover:text-pharma-800 font-medium transition-colors">
+            <Link to="/subscription?compare=true" className="text-pharma-600 hover:text-pharma-800 font-medium transition-colors">
               Compare all features →
             </Link>
           </div>

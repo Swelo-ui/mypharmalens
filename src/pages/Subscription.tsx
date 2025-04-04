@@ -44,7 +44,23 @@ const Subscription = () => {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [razorpayData, setRazorpayData] = useState<any>(null);
+  const [showComparison, setShowComparison] = useState(false);
   const navigate = useNavigate();
+
+  // Load Razorpay script
+  useEffect(() => {
+    const loadRazorpayScript = () => {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onload = () => resolve(true);
+        document.body.appendChild(script);
+      });
+    };
+
+    loadRazorpayScript();
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -75,18 +91,21 @@ const Subscription = () => {
 
   const fetchSubscriptionPlans = async () => {
     try {
-      const { data } = await supabase.functions.invoke('subscription-management/subscription-plans');
+      const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
+      if (error) throw error;
       if (data?.plans) {
         setPlans(data.plans);
       }
     } catch (error) {
       console.error('Error fetching plans:', error);
+      toast.error('Failed to fetch subscription plans');
     }
   };
 
   const fetchUserSubscription = async () => {
     try {
-      const { data } = await supabase.functions.invoke('subscription-management/user-subscription');
+      const { data, error } = await supabase.functions.invoke('subscription-management/user-subscription');
+      if (error) throw error;
       if (data?.subscription) {
         setCurrentSubscription(data.subscription);
       }
@@ -97,7 +116,8 @@ const Subscription = () => {
 
   const fetchUsageData = async () => {
     try {
-      const { data } = await supabase.functions.invoke('subscription-management/identification-usage');
+      const { data, error } = await supabase.functions.invoke('subscription-management/identification-usage');
+      if (error) throw error;
       if (data) {
         setUsage(data);
       }
@@ -109,6 +129,7 @@ const Subscription = () => {
   const handleSelectPlan = async (plan: Plan) => {
     if (!user) {
       toast.error('Please sign in to subscribe');
+      navigate('/auth');
       return;
     }
 
@@ -118,9 +139,11 @@ const Subscription = () => {
       // For free plan, just activate it
       if (plan.price_inr === 0) {
         setProcessingPayment(true);
-        const { data } = await supabase.functions.invoke('subscription-management/create-order', {
+        const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
           body: { planId: plan.id }
         });
+        
+        if (error) throw error;
         
         if (data?.success) {
           toast.success(data.message);
@@ -168,12 +191,14 @@ const Subscription = () => {
       handler: async (response: any) => {
         try {
           setProcessingPayment(true);
-          const { data } = await supabase.functions.invoke('subscription-management/verify-payment', {
+          const { data, error } = await supabase.functions.invoke('subscription-management/verify-payment', {
             body: { 
               ...response, 
               plan_id: razorpayData.plan.id 
             }
           });
+          
+          if (error) throw error;
           
           if (data?.success) {
             toast.success(data.message);
@@ -201,7 +226,7 @@ const Subscription = () => {
     };
 
     // Initialize Razorpay
-    const razorpay = (window as any).Razorpay(options);
+    const razorpay = new (window as any).Razorpay(options);
     razorpay.open();
   };
 
@@ -216,6 +241,26 @@ const Subscription = () => {
 
   const isPlanActive = (planName: string) => {
     return currentSubscription?.subscription_plans.name === planName;
+  };
+
+  const toggleComparison = () => {
+    setShowComparison(!showComparison);
+  };
+
+  const getFeatureAvailability = (featureName: string, planName: string) => {
+    // Define which features are available for each plan
+    const featureMap: Record<string, string[]> = {
+      "Drug identification": ["Free", "Advanced", "Elite"],
+      "History storage": ["Free", "Advanced", "Elite"],
+      "Response time": ["Free", "Advanced", "Elite"],
+      "Detailed reports": ["Advanced", "Elite"],
+      "Bulk identification": ["Elite"],
+      "Priority support": ["Elite"],
+      "API access": ["Elite"],
+      "Custom alerts": ["Advanced", "Elite"]
+    };
+
+    return featureMap[featureName]?.includes(planName) || false;
   };
 
   if (isLoading || authLoading) {
@@ -279,63 +324,169 @@ const Subscription = () => {
           </div>
         )}
 
-        {/* Subscription Plans */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <div 
-              key={plan.id} 
-              className={`border rounded-lg overflow-hidden ${
-                isPlanActive(plan.name) 
-                  ? 'border-primary border-2 bg-primary/5' 
-                  : 'bg-white dark:bg-gray-800'
-              }`}
+        {/* Toggle between Plans and Comparison View */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex rounded-md shadow-sm">
+            <Button 
+              variant={!showComparison ? "default" : "outline"}
+              className="rounded-r-none"
+              onClick={() => setShowComparison(false)}
             >
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
-                
-                <div className="mb-6">
-                  <span className="text-3xl font-bold">₹{plan.price_inr}</span>
-                  <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
-                </div>
-                
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>{plan.monthly_identifications} identifications / month</span>
-                  </li>
-                  {Array.isArray(plan.features) && plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Button
-                  className="w-full"
-                  variant={isPlanActive(plan.name) ? "outline" : "default"}
-                  disabled={isPlanActive(plan.name) || processingPayment}
-                  onClick={() => handleSelectPlan(plan)}
-                >
-                  {processingPayment ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : null}
-                  {isPlanActive(plan.name) 
-                    ? "Current Plan" 
-                    : plan.price_inr === 0 
-                      ? "Start Free" 
-                      : `Subscribe - ₹${plan.price_inr}`
-                  }
-                </Button>
-              </div>
-            </div>
-          ))}
+              Plans
+            </Button>
+            <Button 
+              variant={showComparison ? "default" : "outline"}
+              className="rounded-l-none"
+              onClick={() => setShowComparison(true)}
+            >
+              Compare Features
+            </Button>
+          </div>
         </div>
+
+        {!showComparison ? (
+          // Subscription Plans Cards
+          <div className="grid md:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <div 
+                key={plan.id} 
+                className={`border rounded-lg overflow-hidden ${
+                  isPlanActive(plan.name) 
+                    ? 'border-primary border-2 bg-primary/5' 
+                    : 'bg-white dark:bg-gray-800'
+                }`}
+              >
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
+                  
+                  <div className="mb-6">
+                    <span className="text-3xl font-bold">₹{plan.price_inr}</span>
+                    <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <span>{plan.monthly_identifications} identifications / month</span>
+                    </li>
+                    {Array.isArray(plan.features) && plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button
+                    className="w-full"
+                    variant={isPlanActive(plan.name) ? "outline" : "default"}
+                    disabled={isPlanActive(plan.name) || processingPayment}
+                    onClick={() => handleSelectPlan(plan)}
+                  >
+                    {processingPayment ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {isPlanActive(plan.name) 
+                      ? "Current Plan" 
+                      : plan.price_inr === 0 
+                        ? "Start Free" 
+                        : `Subscribe - ₹${plan.price_inr}`
+                    }
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Comparison Table
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-800">
+                  <th className="p-4 text-left border-b">Features</th>
+                  {plans.map((plan) => (
+                    <th key={plan.id} className="p-4 text-center border-b">
+                      <div className="font-bold text-lg">{plan.name}</div>
+                      <div className="text-sm text-gray-500">₹{plan.price_inr}/month</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  "Drug identification",
+                  "History storage",
+                  "Response time",
+                  "Detailed reports",
+                  "Bulk identification",
+                  "Priority support",
+                  "API access",
+                  "Custom alerts"
+                ].map((feature, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'}>
+                    <td className="p-4 border-b">{feature}</td>
+                    {plans.map((plan) => (
+                      <td key={`${plan.id}-${feature}`} className="p-4 text-center border-b">
+                        {getFeatureAvailability(feature, plan.name) ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                        ) : (
+                          <X className="h-5 w-5 text-gray-300 mx-auto" />
+                        )}
+                        {feature === 'History storage' && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {plan.name === 'Free' ? '10 items' : 
+                             plan.name === 'Advanced' ? '100 items' : 
+                             'Unlimited'}
+                          </div>
+                        )}
+                        {feature === 'Response time' && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {plan.name === 'Free' ? 'Standard' : 
+                             plan.name === 'Advanced' ? 'Fast' : 
+                             'Priority'}
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                <tr className="bg-gray-50 dark:bg-gray-800">
+                  <td className="p-4 border-b font-medium">Monthly identifications</td>
+                  {plans.map((plan) => (
+                    <td key={`${plan.id}-identifications`} className="p-4 text-center border-b font-medium">
+                      {plan.monthly_identifications}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="p-4"></td>
+                  {plans.map((plan) => (
+                    <td key={`${plan.id}-action`} className="p-4 text-center">
+                      <Button
+                        variant="default"
+                        className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
+                        disabled={isPlanActive(plan.name) || processingPayment}
+                        onClick={() => handleSelectPlan(plan)}
+                      >
+                        {isPlanActive(plan.name) 
+                          ? "Current Plan" 
+                          : plan.name === "Free" 
+                            ? "Start Free" 
+                            : `Choose ${plan.name}`
+                        }
+                      </Button>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Payment Dialog - only for display purposes, actual payment handled by Razorpay */}
         <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Complete Your Payment</DialogTitle>
               <DialogDescription>
