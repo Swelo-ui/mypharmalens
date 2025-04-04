@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Plan {
   id: string;
@@ -17,6 +18,7 @@ interface Plan {
   price_inr: number;
   monthly_identifications: number;
   features: string[];
+  razorpay_plan_id?: string;
 }
 
 interface SubscriptionData {
@@ -45,6 +47,7 @@ const Subscription = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [razorpayData, setRazorpayData] = useState<any>(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Load Razorpay script
@@ -76,6 +79,7 @@ const Subscription = () => {
   const loadSubscriptionData = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       await Promise.all([
         fetchSubscriptionPlans(),
         fetchUserSubscription(),
@@ -83,6 +87,7 @@ const Subscription = () => {
       ]);
     } catch (error) {
       console.error('Error loading subscription data:', error);
+      setError('Failed to load subscription data. Please try refreshing the page.');
       toast.error('Failed to load subscription data');
     } finally {
       setIsLoading(false);
@@ -92,37 +97,42 @@ const Subscription = () => {
   const fetchSubscriptionPlans = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       if (data?.plans) {
         setPlans(data.plans);
+      } else {
+        throw new Error('No plans returned from server');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching plans:', error);
-      toast.error('Failed to fetch subscription plans');
+      setError(`Failed to fetch subscription plans: ${error.message}`);
+      throw error;
     }
   };
 
   const fetchUserSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('subscription-management/user-subscription');
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       if (data?.subscription) {
         setCurrentSubscription(data.subscription);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching subscription:', error);
+      throw error;
     }
   };
 
   const fetchUsageData = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('subscription-management/identification-usage');
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       if (data) {
         setUsage(data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching usage data:', error);
+      // Non-critical error, don't throw
     }
   };
 
@@ -136,14 +146,15 @@ const Subscription = () => {
     setSelectedPlan(plan);
     
     try {
+      setProcessingPayment(true);
+      
       // For free plan, just activate it
       if (plan.price_inr === 0) {
-        setProcessingPayment(true);
         const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
           body: { planId: plan.id }
         });
         
-        if (error) throw error;
+        if (error) throw new Error(error.message);
         
         if (data?.success) {
           toast.success(data.message);
@@ -154,7 +165,6 @@ const Subscription = () => {
       }
       
       // For paid plans, open payment dialog
-      setProcessingPayment(true);
       const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
         body: { planId: plan.id }
       });
@@ -170,9 +180,9 @@ const Subscription = () => {
       });
       
       setPaymentDialogOpen(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error selecting plan:', error);
-      toast.error('Failed to initialize payment');
+      toast.error(`Failed to initialize payment: ${error.message}`);
     } finally {
       setProcessingPayment(false);
     }
@@ -198,16 +208,16 @@ const Subscription = () => {
             }
           });
           
-          if (error) throw error;
+          if (error) throw new Error(error.message);
           
           if (data?.success) {
             toast.success(data.message);
             setPaymentDialogOpen(false);
             await loadSubscriptionData();
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Payment verification failed:', error);
-          toast.error('Payment verification failed. Please contact support.');
+          toast.error(`Payment verification failed: ${error.message}`);
         } finally {
           setProcessingPayment(false);
         }
@@ -216,7 +226,7 @@ const Subscription = () => {
         email: user.email,
       },
       theme: {
-        color: "#3b82f6",
+        color: "#6e59a5",
       },
       modal: {
         ondismiss: () => {
@@ -263,13 +273,41 @@ const Subscription = () => {
     return featureMap[featureName]?.includes(planName) || false;
   };
 
+  const handleRetry = () => {
+    loadSubscriptionData();
+  };
+
   if (isLoading || authLoading) {
     return (
       <>
         <Header />
         <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex flex-col justify-center items-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-gray-500">Loading subscription information...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
+          <div className="flex flex-col justify-center items-center py-12">
+            <div className="w-full max-w-md">
+              <Alert className="mb-6 border-red-200 bg-red-50">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <AlertDescription className="text-red-600">
+                  {error}
+                </AlertDescription>
+              </Alert>
+              <Button onClick={handleRetry} className="w-full">
+                Retry Loading
+              </Button>
+            </div>
           </div>
         </div>
       </>
@@ -287,7 +325,7 @@ const Subscription = () => {
 
         {/* Current Subscription Info */}
         {currentSubscription && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 mb-8 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Current Subscription</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -345,143 +383,155 @@ const Subscription = () => {
         </div>
 
         {!showComparison ? (
-          // Subscription Plans Cards
-          <div className="grid md:grid-cols-3 gap-6">
-            {plans.map((plan) => (
-              <div 
-                key={plan.id} 
-                className={`border rounded-lg overflow-hidden ${
-                  isPlanActive(plan.name) 
-                    ? 'border-primary border-2 bg-primary/5' 
-                    : 'bg-white dark:bg-gray-800'
-                }`}
-              >
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
-                  
-                  <div className="mb-6">
-                    <span className="text-3xl font-bold">₹{plan.price_inr}</span>
-                    <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
-                  </div>
-                  
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span>{plan.monthly_identifications} identifications / month</span>
-                    </li>
-                    {Array.isArray(plan.features) && plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
+          plans && plans.length > 0 ? (
+            // Subscription Plans Cards
+            <div className="grid md:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <div 
+                  key={plan.id} 
+                  className={`border rounded-lg overflow-hidden ${
+                    isPlanActive(plan.name) 
+                      ? 'border-primary border-2 bg-primary/5' 
+                      : 'bg-white dark:bg-gray-800'
+                  } shadow-sm hover:shadow-md transition-all duration-300`}
+                >
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
+                    
+                    <div className="mb-6">
+                      <span className="text-3xl font-bold">₹{plan.price_inr}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
+                    </div>
+                    
+                    <ul className="space-y-3 mb-6">
+                      <li className="flex items-start">
                         <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                        <span>{feature}</span>
+                        <span>{plan.monthly_identifications} identifications / month</span>
                       </li>
-                    ))}
-                  </ul>
-                  
-                  <Button
-                    className="w-full"
-                    variant={isPlanActive(plan.name) ? "outline" : "default"}
-                    disabled={isPlanActive(plan.name) || processingPayment}
-                    onClick={() => handleSelectPlan(plan)}
-                  >
-                    {processingPayment ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : null}
-                    {isPlanActive(plan.name) 
-                      ? "Current Plan" 
-                      : plan.price_inr === 0 
-                        ? "Start Free" 
-                        : `Subscribe - ₹${plan.price_inr}`
-                    }
-                  </Button>
+                      {Array.isArray(plan.features) && plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Button
+                      className="w-full"
+                      variant={isPlanActive(plan.name) ? "outline" : "default"}
+                      disabled={isPlanActive(plan.name) || processingPayment}
+                      onClick={() => handleSelectPlan(plan)}
+                    >
+                      {processingPayment ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      {isPlanActive(plan.name) 
+                        ? "Current Plan" 
+                        : plan.price_inr === 0 
+                          ? "Start Free" 
+                          : `Subscribe - ₹${plan.price_inr}`
+                      }
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No subscription plans available</p>
+            </div>
+          )
         ) : (
           // Comparison Table
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-800">
-                  <th className="p-4 text-left border-b">Features</th>
-                  {plans.map((plan) => (
-                    <th key={plan.id} className="p-4 text-center border-b">
-                      <div className="font-bold text-lg">{plan.name}</div>
-                      <div className="text-sm text-gray-500">₹{plan.price_inr}/month</div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  "Drug identification",
-                  "History storage",
-                  "Response time",
-                  "Detailed reports",
-                  "Bulk identification",
-                  "Priority support",
-                  "API access",
-                  "Custom alerts"
-                ].map((feature, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'}>
-                    <td className="p-4 border-b">{feature}</td>
+          plans && plans.length > 0 ? (
+            <div className="overflow-x-auto rounded-lg border shadow">
+              <table className="w-full border-collapse bg-white dark:bg-gray-800">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-800/80">
+                    <th className="p-4 text-left border-b">Features</th>
                     {plans.map((plan) => (
-                      <td key={`${plan.id}-${feature}`} className="p-4 text-center border-b">
-                        {getFeatureAvailability(feature, plan.name) ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
-                        ) : (
-                          <X className="h-5 w-5 text-gray-300 mx-auto" />
-                        )}
-                        {feature === 'History storage' && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {plan.name === 'Free' ? '10 items' : 
-                             plan.name === 'Advanced' ? '100 items' : 
-                             'Unlimited'}
-                          </div>
-                        )}
-                        {feature === 'Response time' && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {plan.name === 'Free' ? 'Standard' : 
-                             plan.name === 'Advanced' ? 'Fast' : 
-                             'Priority'}
-                          </div>
-                        )}
+                      <th key={plan.id} className="p-4 text-center border-b">
+                        <div className="font-bold text-lg">{plan.name}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">₹{plan.price_inr}/month</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    "Drug identification",
+                    "History storage",
+                    "Response time",
+                    "Detailed reports",
+                    "Bulk identification",
+                    "Priority support",
+                    "API access",
+                    "Custom alerts"
+                  ].map((feature, index) => (
+                    <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'}>
+                      <td className="p-4 border-b">{feature}</td>
+                      {plans.map((plan) => (
+                        <td key={`${plan.id}-${feature}`} className="p-4 text-center border-b">
+                          {getFeatureAvailability(feature, plan.name) ? (
+                            <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="h-5 w-5 text-gray-300 mx-auto" />
+                          )}
+                          {feature === 'History storage' && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {plan.name === 'Free' ? '10 items' : 
+                               plan.name === 'Advanced' ? '100 items' : 
+                               'Unlimited'}
+                            </div>
+                          )}
+                          {feature === 'Response time' && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {plan.name === 'Free' ? 'Standard' : 
+                               plan.name === 'Advanced' ? 'Fast' : 
+                               'Priority'}
+                            </div>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr className="bg-gray-50 dark:bg-gray-800/80">
+                    <td className="p-4 border-b font-medium">Monthly identifications</td>
+                    {plans.map((plan) => (
+                      <td key={`${plan.id}-identifications`} className="p-4 text-center border-b font-medium">
+                        {plan.monthly_identifications}
                       </td>
                     ))}
                   </tr>
-                ))}
-                <tr className="bg-gray-50 dark:bg-gray-800">
-                  <td className="p-4 border-b font-medium">Monthly identifications</td>
-                  {plans.map((plan) => (
-                    <td key={`${plan.id}-identifications`} className="p-4 text-center border-b font-medium">
-                      {plan.monthly_identifications}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="p-4"></td>
-                  {plans.map((plan) => (
-                    <td key={`${plan.id}-action`} className="p-4 text-center">
-                      <Button
-                        variant="default"
-                        className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
-                        disabled={isPlanActive(plan.name) || processingPayment}
-                        onClick={() => handleSelectPlan(plan)}
-                      >
-                        {isPlanActive(plan.name) 
-                          ? "Current Plan" 
-                          : plan.name === "Free" 
-                            ? "Start Free" 
-                            : `Choose ${plan.name}`
-                        }
-                      </Button>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  <tr>
+                    <td className="p-4"></td>
+                    {plans.map((plan) => (
+                      <td key={`${plan.id}-action`} className="p-4 text-center">
+                        <Button
+                          variant="default"
+                          className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
+                          disabled={isPlanActive(plan.name) || processingPayment}
+                          onClick={() => handleSelectPlan(plan)}
+                        >
+                          {isPlanActive(plan.name) 
+                            ? "Current Plan" 
+                            : plan.name === "Free" 
+                              ? "Start Free" 
+                              : `Choose ${plan.name}`
+                          }
+                        </Button>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No subscription plans available to compare</p>
+            </div>
+          )
         )}
 
         {/* Payment Dialog - only for display purposes, actual payment handled by Razorpay */}
