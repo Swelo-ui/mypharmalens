@@ -23,6 +23,16 @@ interface PlanCardProps {
 }
 
 const PlanCard = ({ plan, isActive, processingPayment, selectedPlan, onSelectPlan }: PlanCardProps) => {
+  // Function to determine if this plan is currently being processed
+  const isProcessingThisPlan = processingPayment && selectedPlan?.id === plan.id;
+  
+  // Determine button variant
+  const getButtonVariant = () => {
+    if (isActive) return "outline";
+    if (plan.name !== 'Free') return "premium";
+    return "default";
+  };
+  
   return (
     <div 
       className={`border rounded-lg overflow-hidden ${
@@ -54,51 +64,22 @@ const PlanCard = ({ plan, isActive, processingPayment, selectedPlan, onSelectPla
         </ul>
         
         {/* Different button types based on plan */}
-        {plan.name === 'Free' ? (
-          <Button
-            className="w-full"
-            variant={isActive ? "outline" : "default"}
-            disabled={isActive || processingPayment}
-            onClick={() => onSelectPlan(plan)}
-          >
-            {processingPayment && plan.name === selectedPlan?.name ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : null}
-            {isActive 
-              ? "Current Plan" 
-              : "Start Free"
-            }
-          </Button>
-        ) : (
-          <>
-            {/* Only render this button for UI/navigation purposes */}
-            <Button
-              className="w-full mb-4"
-              variant={isActive ? "outline" : "default"}
-              disabled={isActive}
-              onClick={() => onSelectPlan(plan)}
-            >
-              {isActive 
-                ? "Current Plan" 
-                : `Subscribe - ₹${plan.price_inr}`
-              }
-            </Button>
-            
-            {/* Hidden div that will be revealed in the dialog */}
-            {plan.subscription_button_id && !isActive && (
-              <div id={`razorpay-button-${plan.name}`} className="hidden">
-                <form>
-                  <script 
-                    src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                    data-subscription_button_id={plan.subscription_button_id} 
-                    data-button_theme="brand-color"
-                    async
-                  ></script>
-                </form>
-              </div>
-            )}
-          </>
-        )}
+        <Button
+          className="w-full"
+          variant={getButtonVariant()}
+          disabled={isActive || isProcessingThisPlan}
+          onClick={() => onSelectPlan(plan)}
+        >
+          {isProcessingThisPlan && (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          )}
+          {isActive 
+            ? "Current Plan" 
+            : plan.name === 'Free'
+              ? "Start Free"
+              : `Subscribe - ₹${plan.price_inr}`
+          }
+        </Button>
       </div>
     </div>
   );

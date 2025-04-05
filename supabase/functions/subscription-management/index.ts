@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.33.2";
 
@@ -42,10 +41,10 @@ serve(async (req) => {
     const url = new URL(req.url);
     const path = url.pathname.split('/').pop();
     
-    // Routes that don't require authentication
+    // Routes that don't require authentication - added subscription-plans
     const publicRoutes = ['subscription-plans'];
     
-    // Check if authentication is required for this route
+    // Check if authentication is required for this route - but allow public routes
     if (!publicRoutes.includes(path || '') && !user) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
@@ -79,6 +78,10 @@ serve(async (req) => {
           return await getSubscriptionPlans(supabase);
         case 'user-subscription':
           if (!user) {
+            // For subscription plans, return default plans even if not authenticated
+            if (path === 'subscription-plans') {
+              return await getDefaultSubscriptionPlans();
+            }
             return new Response(
               JSON.stringify({ error: 'Authentication required for user subscription' }),
               { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -107,12 +110,58 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in edge function:', error);
+    // Return a fallback for subscription plans if that's the endpoint
+    const url = new URL(req.url);
+    const path = url.pathname.split('/').pop();
+    if (path === 'subscription-plans') {
+      return await getDefaultSubscriptionPlans();
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
+
+// Function to return default plans when database access fails
+async function getDefaultSubscriptionPlans() {
+  const defaultPlans = [
+    {
+      id: "free-plan",
+      name: 'Free',
+      description: 'Basic features for getting started',
+      price_inr: 0,
+      monthly_identifications: 5,
+      features: ['Basic drug identification', 'Limited history storage (10 items)', 'Standard response time']
+    },
+    {
+      id: "advanced-plan",
+      name: 'Advanced',
+      description: 'Enhanced features for regular users',
+      price_inr: 299,
+      monthly_identifications: 30,
+      features: ['Enhanced drug identification', 'Full history access (100 items)', 'Faster response time', 'Detailed medication reports'],
+      razorpay_plan_id: 'plan_QF0j2DLuOBwNHE',
+      subscription_button_id: 'pl_QF1itg7gdfQFbF'
+    },
+    {
+      id: "elite-plan",
+      name: 'Elite',
+      description: 'Premium features for power users',
+      price_inr: 599,
+      monthly_identifications: 100,
+      features: ['Premium drug identification', 'Unlimited history storage', 'Priority response time', 'Comprehensive medication reports'],
+      razorpay_plan_id: 'plan_QF0jNqqpycThRR',
+      subscription_button_id: 'pl_QFGGMMuM37x0Sp'
+    }
+  ];
+  
+  return new Response(
+    JSON.stringify({ plans: defaultPlans }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
 
 // Get all subscription plans
 async function getSubscriptionPlans(supabase) {
@@ -124,7 +173,8 @@ async function getSubscriptionPlans(supabase) {
       .order('price_inr', { ascending: true });
     
     if (error) {
-      throw error;
+      // If database error, return default plans
+      return await getDefaultSubscriptionPlans();
     }
     
     // If no plans exist in the database, create default plans
@@ -143,7 +193,8 @@ async function getSubscriptionPlans(supabase) {
           price_inr: 299,
           monthly_identifications: 30,
           features: ['Enhanced drug identification', 'Full history access (100 items)', 'Faster response time', 'Detailed medication reports'],
-          razorpay_plan_id: 'plan_QF0j2DLuOBwNHE'
+          razorpay_plan_id: 'plan_QF0j2DLuOBwNHE',
+          subscription_button_id: 'pl_QF1itg7gdfQFbF'
         },
         {
           name: 'Elite',
@@ -151,7 +202,8 @@ async function getSubscriptionPlans(supabase) {
           price_inr: 599,
           monthly_identifications: 100,
           features: ['Premium drug identification', 'Unlimited history storage', 'Priority response time', 'Comprehensive medication reports'],
-          razorpay_plan_id: 'plan_QF0jNqqpycThRR'
+          razorpay_plan_id: 'plan_QF0jNqqpycThRR',
+          subscription_button_id: 'pl_QFGGMMuM37x0Sp'
         }
       ];
       
@@ -161,7 +213,7 @@ async function getSubscriptionPlans(supabase) {
         .select();
       
       if (insertError) {
-        throw insertError;
+        return await getDefaultSubscriptionPlans();
       }
       
       return new Response(
@@ -170,16 +222,23 @@ async function getSubscriptionPlans(supabase) {
       );
     }
     
+    // Add subscription button IDs to plans
+    const plansWithButtonIds = data.map(plan => {
+      if (plan.name === 'Advanced') {
+        return { ...plan, subscription_button_id: 'pl_QF1itg7gdfQFbF' };
+      } else if (plan.name === 'Elite') {
+        return { ...plan, subscription_button_id: 'pl_QFGGMMuM37x0Sp' };
+      }
+      return plan;
+    });
+    
     return new Response(
-      JSON.stringify({ plans: data }),
+      JSON.stringify({ plans: plansWithButtonIds }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error getting subscription plans:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return await getDefaultSubscriptionPlans();
   }
 }
 
