@@ -46,14 +46,16 @@ serve(async (req) => {
     const path = url.pathname.split('/').pop();
     
     if (req.method === 'POST') {
-      const { data } = await req.json();
+      const { body } = await req.json();
       
       // Different operations based on the path
       switch (path) {
         case 'create-order':
-          return await createOrder(data, user, supabase);
+          return await createOrder(body, user, supabase);
         case 'verify-payment':
-          return await verifyPayment(data, user, supabase);
+          return await verifyPayment(body, user, supabase);
+        case 'verify-subscription':
+          return await verifySubscription(body, user, supabase);
         case 'check-subscription-status':
           return await checkSubscriptionStatus(user.id, supabase);
         default:
@@ -274,7 +276,7 @@ async function getIdentificationUsage(userId, supabase) {
   }
 }
 
-// Create a Razorpay order
+// Create a Razorpay order (mainly used for free plan activation now)
 async function createOrder(data, user, supabase) {
   try {
     const { planId } = data;
@@ -333,45 +335,11 @@ async function createOrder(data, user, supabase) {
       );
     }
     
-    // For paid plans, create Razorpay order
-    const orderAmount = plan.price_inr * 100; // Convert to paise
-    
-    // Create a Razorpay order using their API
-    const razorpayUrl = 'https://api.razorpay.com/v1/orders';
-    const credentials = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
-    
-    const response = await fetch(razorpayUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        amount: orderAmount,
-        currency: 'INR',
-        receipt: `order_rcpt_${user.id}_${Date.now()}`,
-        notes: {
-          user_id: user.id,
-          plan_id: planId,
-          plan_name: plan.name,
-          razorpay_plan_id: plan.razorpay_plan_id || ''
-        }
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Razorpay API error:', errorData);
-      throw new Error(`Failed to create order with Razorpay: ${errorData.error?.description || 'Unknown error'}`);
-    }
-    
-    const razorpayResponse = await response.json();
-    
+    // For paid plans, we're now using the Razorpay subscription buttons
+    // so we just return the plan information for now
     return new Response(
       JSON.stringify({ 
-        order: razorpayResponse,
-        key_id: razorpayKeyId,
-        plan: plan
+        plan: plan,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -384,7 +352,77 @@ async function createOrder(data, user, supabase) {
   }
 }
 
-// Verify Razorpay payment and create subscription
+// Endpoint to verify a Razorpay subscription that was completed through the button
+async function verifySubscription(data, user, supabase) {
+  try {
+    const { 
+      razorpay_subscription_id, 
+      razorpay_payment_id, 
+      plan_name 
+    } = data;
+    
+    if (!razorpay_subscription_id || !razorpay_payment_id || !plan_name) {
+      throw new Error('Missing subscription verification details');
+    }
+    
+    // Get the plan details
+    const { data: plan, error: planError } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('name', plan_name)
+      .single();
+    
+    if (planError || !plan) {
+      throw new Error('Plan not found');
+    }
+    
+    // Update existing subscriptions to cancelled
+    await supabase
+      .from('user_subscriptions')
+      .update({ status: 'cancelled' })
+      .eq('user_id', user.id)
+      .eq('status', 'active');
+    
+    // Create a new subscription (1 month)
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+    
+    const { data: subscription, error: subscriptionError } = await supabase
+      .from('user_subscriptions')
+      .insert({
+        user_id: user.id,
+        plan_id: plan.id,
+        status: 'active',
+        subscription_start: new Date().toISOString(),
+        subscription_end: oneMonthLater.toISOString(),
+        razorpay_subscription_id: razorpay_subscription_id,
+        razorpay_payment_id: razorpay_payment_id,
+      })
+      .select('*, subscription_plans(*)')
+      .single();
+    
+    if (subscriptionError) {
+      throw new Error('Could not create subscription');
+    }
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        subscription,
+        message: `${plan.name} plan activated successfully` 
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error verifying subscription:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
+// Legacy payment verification method - kept for backwards compatibility
 async function verifyPayment(data, user, supabase) {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, plan_id } = data;

@@ -19,6 +19,7 @@ interface Plan {
   monthly_identifications: number;
   features: string[];
   razorpay_plan_id?: string;
+  subscription_button_id?: string;
 }
 
 interface SubscriptionData {
@@ -45,25 +46,9 @@ const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const [razorpayData, setRazorpayData] = useState<any>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  // Load Razorpay script
-  useEffect(() => {
-    const loadRazorpayScript = () => {
-      return new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.async = true;
-        script.onload = () => resolve(true);
-        document.body.appendChild(script);
-      });
-    };
-
-    loadRazorpayScript();
-  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -75,6 +60,21 @@ const Subscription = () => {
       loadSubscriptionData();
     }
   }, [isAuthenticated, authLoading, user]);
+
+  // Load subscription button scripts when plans are loaded
+  useEffect(() => {
+    if (plans && plans.length > 0) {
+      // Load Razorpay subscription button script
+      const script = document.createElement('script');
+      script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
+      script.async = true;
+      document.body.appendChild(script);
+      
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [plans]);
 
   const loadSubscriptionData = async () => {
     try {
@@ -99,7 +99,16 @@ const Subscription = () => {
       const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
       if (error) throw new Error(error.message);
       if (data?.plans) {
-        setPlans(data.plans);
+        // Add subscription button IDs to the plans
+        const updatedPlans = data.plans.map(plan => {
+          if (plan.name === 'Advanced') {
+            return { ...plan, subscription_button_id: 'pl_QF1itg7gdfQFbF' };
+          } else if (plan.name === 'Elite') {
+            return { ...plan, subscription_button_id: 'pl_QFGGMMuM37x0Sp' };
+          }
+          return plan;
+        });
+        setPlans(updatedPlans);
       } else {
         throw new Error('No plans returned from server');
       }
@@ -160,84 +169,16 @@ const Subscription = () => {
           toast.success(data.message);
           await loadSubscriptionData();
         }
-        setProcessingPayment(false);
-        return;
+      } else {
+        // For paid plans, we'll use the Razorpay buttons instead of our custom solution
+        setPaymentDialogOpen(true);
       }
-      
-      // For paid plans, open payment dialog
-      const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
-        body: { planId: plan.id }
-      });
-      
-      if (error || !data?.order) {
-        throw new Error(error?.message || 'Failed to create order');
-      }
-      
-      setRazorpayData({
-        key: data.key_id,
-        order: data.order,
-        plan: data.plan
-      });
-      
-      setPaymentDialogOpen(true);
     } catch (error: any) {
       console.error('Error selecting plan:', error);
-      toast.error(`Failed to initialize payment: ${error.message}`);
+      toast.error(`Failed to initialize subscription: ${error.message}`);
     } finally {
       setProcessingPayment(false);
     }
-  };
-
-  const handlePayment = () => {
-    if (!razorpayData || !user) return;
-
-    const options = {
-      key: razorpayData.key,
-      amount: razorpayData.order.amount,
-      currency: razorpayData.order.currency,
-      name: "PharmaLens",
-      description: `Subscription: ${razorpayData.plan.name} Plan`,
-      order_id: razorpayData.order.id,
-      handler: async (response: any) => {
-        try {
-          setProcessingPayment(true);
-          const { data, error } = await supabase.functions.invoke('subscription-management/verify-payment', {
-            body: { 
-              ...response, 
-              plan_id: razorpayData.plan.id 
-            }
-          });
-          
-          if (error) throw new Error(error.message);
-          
-          if (data?.success) {
-            toast.success(data.message);
-            setPaymentDialogOpen(false);
-            await loadSubscriptionData();
-          }
-        } catch (error: any) {
-          console.error('Payment verification failed:', error);
-          toast.error(`Payment verification failed: ${error.message}`);
-        } finally {
-          setProcessingPayment(false);
-        }
-      },
-      prefill: {
-        email: user.email,
-      },
-      theme: {
-        color: "#6e59a5",
-      },
-      modal: {
-        ondismiss: () => {
-          setPaymentDialogOpen(false);
-        },
-      },
-    };
-
-    // Initialize Razorpay
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
   };
 
   const formatDate = (dateString: string) => {
@@ -417,22 +358,52 @@ const Subscription = () => {
                       ))}
                     </ul>
                     
-                    <Button
-                      className="w-full"
-                      variant={isPlanActive(plan.name) ? "outline" : "default"}
-                      disabled={isPlanActive(plan.name) || processingPayment}
-                      onClick={() => handleSelectPlan(plan)}
-                    >
-                      {processingPayment ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : null}
-                      {isPlanActive(plan.name) 
-                        ? "Current Plan" 
-                        : plan.price_inr === 0 
-                          ? "Start Free" 
-                          : `Subscribe - ₹${plan.price_inr}`
-                      }
-                    </Button>
+                    {/* Different button types based on plan */}
+                    {plan.name === 'Free' ? (
+                      <Button
+                        className="w-full"
+                        variant={isPlanActive(plan.name) ? "outline" : "default"}
+                        disabled={isPlanActive(plan.name) || processingPayment}
+                        onClick={() => handleSelectPlan(plan)}
+                      >
+                        {processingPayment && plan.name === selectedPlan?.name ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : null}
+                        {isPlanActive(plan.name) 
+                          ? "Current Plan" 
+                          : "Start Free"
+                        }
+                      </Button>
+                    ) : (
+                      <>
+                        {/* Only render this button for UI/navigation purposes */}
+                        <Button
+                          className="w-full mb-4"
+                          variant={isPlanActive(plan.name) ? "outline" : "default"}
+                          disabled={isPlanActive(plan.name)}
+                          onClick={() => handleSelectPlan(plan)}
+                        >
+                          {isPlanActive(plan.name) 
+                            ? "Current Plan" 
+                            : `Subscribe - ₹${plan.price_inr}`
+                          }
+                        </Button>
+                        
+                        {/* Hidden div that will be revealed in the dialog */}
+                        {plan.subscription_button_id && !isPlanActive(plan.name) && (
+                          <div id={`razorpay-button-${plan.name}`} className="hidden">
+                            <form>
+                              <script 
+                                src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
+                                data-subscription_button_id={plan.subscription_button_id} 
+                                data-button_theme="brand-color"
+                                async
+                              ></script>
+                            </form>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -508,19 +479,30 @@ const Subscription = () => {
                     <td className="p-4"></td>
                     {plans.map((plan) => (
                       <td key={`${plan.id}-action`} className="p-4 text-center">
-                        <Button
-                          variant="default"
-                          className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
-                          disabled={isPlanActive(plan.name) || processingPayment}
-                          onClick={() => handleSelectPlan(plan)}
-                        >
-                          {isPlanActive(plan.name) 
-                            ? "Current Plan" 
-                            : plan.name === "Free" 
-                              ? "Start Free" 
+                        {plan.name === 'Free' ? (
+                          <Button
+                            variant="default"
+                            disabled={isPlanActive(plan.name) || processingPayment}
+                            onClick={() => handleSelectPlan(plan)}
+                          >
+                            {isPlanActive(plan.name) 
+                              ? "Current Plan" 
+                              : "Start Free" 
+                            }
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="default"
+                            className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
+                            disabled={isPlanActive(plan.name)}
+                            onClick={() => handleSelectPlan(plan)}
+                          >
+                            {isPlanActive(plan.name) 
+                              ? "Current Plan"
                               : `Choose ${plan.name}`
-                          }
-                        </Button>
+                            }
+                          </Button>
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -534,11 +516,11 @@ const Subscription = () => {
           )
         )}
 
-        {/* Payment Dialog - only for display purposes, actual payment handled by Razorpay */}
+        {/* Payment Dialog with Razorpay Buttons */}
         <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Complete Your Payment</DialogTitle>
+              <DialogTitle>Complete Your Subscription</DialogTitle>
               <DialogDescription>
                 Make a secure payment using Razorpay to activate your subscription.
               </DialogDescription>
@@ -556,16 +538,37 @@ const Subscription = () => {
                       <span>₹{selectedPlan.price_inr}</span>
                     </div>
                   </div>
+                  
+                  {/* Render the appropriate Razorpay button */}
+                  <div className="mt-6">
+                    {selectedPlan.name === 'Advanced' && (
+                      <form>
+                        <script 
+                          src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
+                          data-subscription_button_id="pl_QF1itg7gdfQFbF" 
+                          data-button_theme="brand-color"
+                          async
+                        ></script>
+                      </form>
+                    )}
+                    
+                    {selectedPlan.name === 'Elite' && (
+                      <form>
+                        <script 
+                          src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
+                          data-subscription_button_id="pl_QFGGMMuM37x0Sp" 
+                          data-button_theme="brand-color"
+                          async
+                        ></script>
+                      </form>
+                    )}
+                  </div>
                 </>
               )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>
                 Cancel
-              </Button>
-              <Button onClick={handlePayment} disabled={processingPayment}>
-                {processingPayment ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Proceed to Payment
               </Button>
             </DialogFooter>
           </DialogContent>
