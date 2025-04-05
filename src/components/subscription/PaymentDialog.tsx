@@ -27,30 +27,32 @@ interface PaymentDialogProps {
 }
 
 const PaymentDialog = ({ open, onOpenChange, selectedPlan }: PaymentDialogProps) => {
-  const advancedButtonRef = useRef<HTMLDivElement>(null);
-  const eliteButtonRef = useRef<HTMLDivElement>(null);
+  const buttonContainerRef = useRef<HTMLDivElement>(null);
   
-  // Effect to load the Razorpay button script when the dialog opens
+  // Effect to render the Razorpay button when the dialog opens and plan is selected
   useEffect(() => {
-    if (open && selectedPlan) {
-      // Clear any existing scripts first
-      const existingScript = document.querySelector('script[src="https://cdn.razorpay.com/static/widget/subscription-button.js"]');
-      if (existingScript) {
-        existingScript.remove();
+    if (open && selectedPlan && buttonContainerRef.current) {
+      // Clear any existing content first
+      buttonContainerRef.current.innerHTML = '';
+      
+      if (selectedPlan.subscription_button_id) {
+        // Create the form and script elements for the button
+        const form = document.createElement('form');
+        const script = document.createElement('script');
+        
+        // Set attributes for the script
+        script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
+        script.setAttribute('data-subscription_button_id', selectedPlan.subscription_button_id);
+        script.setAttribute('data-button_theme', 'brand-color');
+        script.async = true;
+        
+        // Append script to form and form to container
+        form.appendChild(script);
+        buttonContainerRef.current.appendChild(form);
+        
+        // Log for debugging
+        console.log(`Rendering Razorpay button for plan: ${selectedPlan.name} with ID: ${selectedPlan.subscription_button_id}`);
       }
-      
-      // Add the new script
-      const script = document.createElement('script');
-      script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
-      script.async = true;
-      document.body.appendChild(script);
-      
-      // Return cleanup function
-      return () => {
-        if (document.body.contains(script)) {
-          document.body.removeChild(script);
-        }
-      };
     }
   }, [open, selectedPlan]);
 
@@ -77,33 +79,9 @@ const PaymentDialog = ({ open, onOpenChange, selectedPlan }: PaymentDialogProps)
                 </div>
               </div>
               
-              {/* Render the appropriate Razorpay button */}
+              {/* Razorpay button container */}
               <div className="mt-6">
-                {selectedPlan.name === 'Advanced' && (
-                  <div ref={advancedButtonRef} className="advanced-button">
-                    <form>
-                      <script 
-                        src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                        data-subscription_button_id="pl_QF1itg7gdfQFbF" 
-                        data-button_theme="brand-color"
-                        async
-                      ></script>
-                    </form>
-                  </div>
-                )}
-                
-                {selectedPlan.name === 'Elite' && (
-                  <div ref={eliteButtonRef} className="elite-button">
-                    <form>
-                      <script 
-                        src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                        data-subscription_button_id="pl_QFGGMMuM37x0Sp" 
-                        data-button_theme="brand-color"
-                        async
-                      ></script>
-                    </form>
-                  </div>
-                )}
+                <div ref={buttonContainerRef} className="razorpay-button-container"></div>
                 
                 {/* Fallback if button doesn't load properly */}
                 <div className="text-center mt-4">

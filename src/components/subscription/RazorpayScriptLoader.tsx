@@ -14,6 +14,15 @@ const RazorpayScriptLoader = ({ children }: RazorpayScriptLoaderProps) => {
       script.async = true;
       script.id = 'razorpay-subscription-script';
       document.body.appendChild(script);
+
+      // Add event listener for script load
+      script.onload = () => {
+        console.log('Razorpay script loaded successfully');
+      };
+
+      script.onerror = () => {
+        console.error('Failed to load Razorpay script');
+      };
     };
 
     // Check if script is already loaded
@@ -23,11 +32,7 @@ const RazorpayScriptLoader = ({ children }: RazorpayScriptLoaderProps) => {
 
     // Cleanup
     return () => {
-      const script = document.getElementById('razorpay-subscription-script');
-      if (script) {
-        // Don't remove the script to avoid reloading issues
-        // document.body.removeChild(script);
-      }
+      // We don't remove the script to avoid reloading issues
     };
   }, []);
 
