@@ -14,7 +14,7 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders, status: 200 });
   }
   
   try {
@@ -41,7 +41,7 @@ serve(async (req) => {
     const url = new URL(req.url);
     const path = url.pathname.split('/').pop();
     
-    // Routes that don't require authentication - added subscription-plans
+    // Routes that don't require authentication
     const publicRoutes = ['subscription-plans'];
     
     // Check if authentication is required for this route - but allow public routes
@@ -69,7 +69,7 @@ serve(async (req) => {
         default:
           return new Response(
             JSON.stringify({ error: 'Invalid endpoint' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
       }
     } else if (req.method === 'GET') {
@@ -84,7 +84,7 @@ serve(async (req) => {
             }
             return new Response(
               JSON.stringify({ error: 'Authentication required for user subscription' }),
-              { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
           }
           return await getUserSubscription(user.id, supabase);
@@ -92,21 +92,21 @@ serve(async (req) => {
           if (!user) {
             return new Response(
               JSON.stringify({ error: 'Authentication required for identification usage' }),
-              { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
           }
           return await getIdentificationUsage(user.id, supabase);
         default:
           return new Response(
             JSON.stringify({ error: 'Invalid endpoint' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
       }
     }
     
     return new Response(
       JSON.stringify({ error: 'Method not allowed' }),
-      { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error in edge function:', error);
@@ -119,7 +119,7 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
@@ -159,7 +159,7 @@ async function getDefaultSubscriptionPlans() {
   
   return new Response(
     JSON.stringify({ plans: defaultPlans }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 }
 

@@ -17,7 +17,7 @@ const RazorpayCallback = () => {
     // Extract parameters from URL
     const params = new URLSearchParams(window.location.search);
     const razorpay_payment_id = params.get('razorpay_payment_id');
-    const razorpay_subscription_id = params.get('razorpay_subscription_id');
+    const razorpay_subscription_id = params.get('razorpay_subscription_id') || params.get('razorpay_order_id'); // Accept either parameter
     const razorpay_signature = params.get('razorpay_signature');
     const plan_name = params.get('plan_name') || getPlanNameFromSubscriptionId(razorpay_subscription_id);
     
@@ -35,7 +35,8 @@ const RazorpayCallback = () => {
           setIsProcessing(true);
           setError(null);
           
-          const { data, error } = await supabase.functions.invoke(
+          // Try verify-subscription endpoint first
+          let response = await supabase.functions.invoke(
             'subscription-management/verify-subscription',
             {
               body: {
@@ -46,6 +47,24 @@ const RazorpayCallback = () => {
               }
             }
           );
+          
+          // If that fails for some reason, try the verify-payment endpoint as fallback
+          if (response.error) {
+            console.log("Trying fallback verification method");
+            response = await supabase.functions.invoke(
+              'subscription-management/verify-payment',
+              {
+                body: {
+                  razorpay_payment_id,
+                  razorpay_order_id: razorpay_subscription_id,
+                  razorpay_signature,
+                  plan_id: plan_name === 'Advanced' ? 'advanced-plan' : 'elite-plan'
+                }
+              }
+            );
+          }
+          
+          const { data, error } = response;
           
           if (error) {
             setError('Payment verification failed: ' + error.message);
@@ -102,7 +121,7 @@ const RazorpayCallback = () => {
     
     if (subscriptionId.includes('QF1itg')) {
       return 'Advanced';
-    } else if (subscriptionId.includes('QFGGMMuM37x0Sp')) {
+    } else if (subscriptionId.includes('QFGGM')) {
       return 'Elite';
     }
     
@@ -138,7 +157,7 @@ const RazorpayCallback = () => {
               <p className="mb-4">Your subscription has been activated successfully.</p>
             </div>
           )}
-          <Button onClick={handleNavigateToSubscription}>
+          <Button onClick={handleNavigateToSubscription} variant="premium">
             Go to Subscription Page
           </Button>
         </>

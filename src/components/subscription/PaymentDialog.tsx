@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,8 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import RazorpayScriptLoader from './RazorpayScriptLoader';
 
 interface Plan {
   id: string;
@@ -28,33 +30,48 @@ interface PaymentDialogProps {
 
 const PaymentDialog = ({ open, onOpenChange, selectedPlan }: PaymentDialogProps) => {
   const buttonContainerRef = useRef<HTMLDivElement>(null);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
   
-  // Effect to render the Razorpay button when the dialog opens and plan is selected
   useEffect(() => {
-    if (open && selectedPlan && buttonContainerRef.current) {
-      // Clear any existing content first
-      buttonContainerRef.current.innerHTML = '';
-      
-      if (selectedPlan.subscription_button_id) {
-        // Create the form and script elements for the button
-        const form = document.createElement('form');
-        const script = document.createElement('script');
+    if (open && selectedPlan && buttonContainerRef.current && scriptLoaded) {
+      try {
+        // Clear any existing content
+        buttonContainerRef.current.innerHTML = '';
         
-        // Set attributes for the script
-        script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
-        script.setAttribute('data-subscription_button_id', selectedPlan.subscription_button_id);
-        script.setAttribute('data-button_theme', 'brand-color');
-        script.async = true;
-        
-        // Append script to form and form to container
-        form.appendChild(script);
-        buttonContainerRef.current.appendChild(form);
-        
-        // Log for debugging
-        console.log(`Rendering Razorpay button for plan: ${selectedPlan.name} with ID: ${selectedPlan.subscription_button_id}`);
+        if (selectedPlan.subscription_button_id) {
+          // Create HTML for the button exactly as provided by Razorpay
+          const buttonHtml = `
+            <form>
+              <script 
+                src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
+                data-subscription_button_id="${selectedPlan.subscription_button_id}" 
+                data-button_theme="brand-color" 
+                async>
+              </script>
+            </form>
+          `;
+          
+          // Set the HTML
+          buttonContainerRef.current.innerHTML = buttonHtml;
+          
+          console.log(`Rendering Razorpay button for plan: ${selectedPlan.name} with ID: ${selectedPlan.subscription_button_id}`);
+        }
+      } catch (error) {
+        console.error("Error rendering Razorpay button:", error);
+        setScriptError(true);
       }
     }
-  }, [open, selectedPlan]);
+  }, [open, selectedPlan, scriptLoaded]);
+
+  const handleScriptLoaded = () => {
+    setScriptLoaded(true);
+    setScriptError(false);
+  };
+
+  const handleScriptError = () => {
+    setScriptError(true);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,37 +96,52 @@ const PaymentDialog = ({ open, onOpenChange, selectedPlan }: PaymentDialogProps)
                 </div>
               </div>
               
-              {/* Razorpay button container */}
-              <div className="mt-6">
-                <div ref={buttonContainerRef} className="razorpay-button-container"></div>
-                
-                {/* Fallback if button doesn't load properly */}
-                <div className="text-center mt-4">
-                  <p className="text-sm text-gray-500 mb-2">
-                    If the payment button doesn't appear, please try the direct link below:
-                  </p>
-                  {selectedPlan.name === 'Advanced' && (
-                    <a 
-                      href="https://rzp.io/l/pl_QF1itg7gdfQFbF" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Pay for Advanced Plan (₹299/month)
-                    </a>
+              <RazorpayScriptLoader onLoaded={handleScriptLoaded} onError={handleScriptError}>
+                {/* Razorpay button container */}
+                <div className="mt-6">
+                  {!scriptLoaded && !scriptError && (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2">Loading payment options...</span>
+                    </div>
                   )}
-                  {selectedPlan.name === 'Elite' && (
-                    <a 
-                      href="https://rzp.io/l/pl_QFGGMMuM37x0Sp" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Pay for Elite Plan (₹599/month)
-                    </a>
+                  
+                  {scriptError && (
+                    <div className="text-center text-red-500 py-2">
+                      Failed to load payment options. Please use the direct links below.
+                    </div>
                   )}
+                  
+                  <div ref={buttonContainerRef} className="razorpay-button-container py-2"></div>
+                  
+                  {/* Direct payment links as fallback */}
+                  <div className="text-center mt-4 border-t pt-4">
+                    <p className="text-sm text-gray-500 mb-2">
+                      {scriptError ? "Please use the direct link below:" : "You can also use the direct link:"}
+                    </p>
+                    {selectedPlan.name === 'Advanced' && (
+                      <a 
+                        href="https://rzp.io/l/pl_QF1itg7gdfQFbF" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-block bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2 transition"
+                      >
+                        Pay for Advanced Plan (₹299/month)
+                      </a>
+                    )}
+                    {selectedPlan.name === 'Elite' && (
+                      <a 
+                        href="https://rzp.io/l/pl_QFGGMMuM37x0Sp" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-block bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2 transition"
+                      >
+                        Pay for Elite Plan (₹599/month)
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </RazorpayScriptLoader>
             </>
           )}
         </div>
