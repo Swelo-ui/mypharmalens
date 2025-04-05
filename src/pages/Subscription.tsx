@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { CheckCircle2, Loader2, AlertCircle, X } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import CurrentSubscription from '@/components/subscription/CurrentSubscription';
+import PlanCard from '@/components/subscription/PlanCard';
+import ComparisonTable from '@/components/subscription/ComparisonTable';
+import PaymentDialog from '@/components/subscription/PaymentDialog';
 
 interface Plan {
   id: string;
@@ -85,10 +87,10 @@ const Subscription = () => {
         fetchUserSubscription(),
         fetchUsageData()
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading subscription data:', error);
-      setError('Failed to load subscription data. Please try refreshing the page.');
-      toast.error('Failed to load subscription data');
+      setError(`Failed to load subscription data: ${error.message || 'Unknown error'}`);
+      toast.error(`Failed to load subscription data: ${error.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -96,11 +98,49 @@ const Subscription = () => {
 
   const fetchSubscriptionPlans = async () => {
     try {
+      // Try to fetch plans, but provide fallback if there's an error
       const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
-      if (error) throw new Error(error.message);
-      if (data?.plans) {
+      
+      if (error) {
+        console.error('Error fetching plans:', error);
+        // Provide default plans as fallback
+        const defaultPlans = [
+          {
+            id: "free-plan",
+            name: 'Free',
+            description: 'Basic features for getting started',
+            price_inr: 0,
+            monthly_identifications: 5,
+            features: ['Basic drug identification', 'Limited history storage (10 items)', 'Standard response time']
+          },
+          {
+            id: "advanced-plan",
+            name: 'Advanced',
+            description: 'Enhanced features for regular users',
+            price_inr: 299,
+            monthly_identifications: 30,
+            features: ['Enhanced drug identification', 'Full history access (100 items)', 'Faster response time', 'Detailed medication reports'],
+            razorpay_plan_id: 'plan_QF0j2DLuOBwNHE',
+            subscription_button_id: 'pl_QF1itg7gdfQFbF'
+          },
+          {
+            id: "elite-plan",
+            name: 'Elite',
+            description: 'Premium features for power users',
+            price_inr: 599,
+            monthly_identifications: 100,
+            features: ['Premium drug identification', 'Unlimited history storage', 'Priority response time', 'Comprehensive medication reports'],
+            razorpay_plan_id: 'plan_QF0jNqqpycThRR',
+            subscription_button_id: 'pl_QFGGMMuM37x0Sp'
+          }
+        ];
+        setPlans(defaultPlans);
+        return;
+      }
+      
+      if (data?.plans && data.plans.length > 0) {
         // Add subscription button IDs to the plans
-        const updatedPlans = data.plans.map(plan => {
+        const updatedPlans = data.plans.map((plan: Plan) => {
           if (plan.name === 'Advanced') {
             return { ...plan, subscription_button_id: 'pl_QF1itg7gdfQFbF' };
           } else if (plan.name === 'Elite') {
@@ -114,7 +154,6 @@ const Subscription = () => {
       }
     } catch (error: any) {
       console.error('Error fetching plans:', error);
-      setError(`Failed to fetch subscription plans: ${error.message}`);
       throw error;
     }
   };
@@ -181,37 +220,12 @@ const Subscription = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   const isPlanActive = (planName: string) => {
     return currentSubscription?.subscription_plans.name === planName;
   };
 
   const toggleComparison = () => {
     setShowComparison(!showComparison);
-  };
-
-  const getFeatureAvailability = (featureName: string, planName: string) => {
-    // Define which features are available for each plan
-    const featureMap: Record<string, string[]> = {
-      "Drug identification": ["Free", "Advanced", "Elite"],
-      "History storage": ["Free", "Advanced", "Elite"],
-      "Response time": ["Free", "Advanced", "Elite"],
-      "Detailed reports": ["Advanced", "Elite"],
-      "Bulk identification": ["Elite"],
-      "Priority support": ["Elite"],
-      "API access": ["Elite"],
-      "Custom alerts": ["Advanced", "Elite"]
-    };
-
-    return featureMap[featureName]?.includes(planName) || false;
   };
 
   const handleRetry = () => {
@@ -266,41 +280,10 @@ const Subscription = () => {
 
         {/* Current Subscription Info */}
         {currentSubscription && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 mb-8 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Current Subscription</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center mb-2">
-                  <span className="text-lg font-medium">{currentSubscription.subscription_plans.name} Plan</span>
-                  <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                    Active
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                  {currentSubscription.subscription_plans.description}
-                </p>
-                <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">Started:</span> {formatDate(currentSubscription.subscription_start)}</p>
-                  <p><span className="font-medium">Expires:</span> {formatDate(currentSubscription.subscription_end)}</p>
-                  <p><span className="font-medium">Monthly identifications:</span> {currentSubscription.subscription_plans.monthly_identifications}</p>
-                </div>
-              </div>
-
-              {usage && (
-                <div className="flex flex-col justify-center">
-                  <p className="text-sm font-medium mb-1">Usage this month</p>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>{usage.used} used</span>
-                    <span>{usage.remaining} remaining</span>
-                  </div>
-                  <Progress value={usage.percentage} className="h-2 mb-4" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {usage.percentage}% of your monthly limit
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <CurrentSubscription 
+            subscription={currentSubscription} 
+            usage={usage} 
+          />
         )}
 
         {/* Toggle between Plans and Comparison View */}
@@ -328,84 +311,14 @@ const Subscription = () => {
             // Subscription Plans Cards
             <div className="grid md:grid-cols-3 gap-6">
               {plans.map((plan) => (
-                <div 
-                  key={plan.id} 
-                  className={`border rounded-lg overflow-hidden ${
-                    isPlanActive(plan.name) 
-                      ? 'border-primary border-2 bg-primary/5' 
-                      : 'bg-white dark:bg-gray-800'
-                  } shadow-sm hover:shadow-md transition-all duration-300`}
-                >
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
-                    
-                    <div className="mb-6">
-                      <span className="text-3xl font-bold">₹{plan.price_inr}</span>
-                      <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
-                    </div>
-                    
-                    <ul className="space-y-3 mb-6">
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                        <span>{plan.monthly_identifications} identifications / month</span>
-                      </li>
-                      {Array.isArray(plan.features) && plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    {/* Different button types based on plan */}
-                    {plan.name === 'Free' ? (
-                      <Button
-                        className="w-full"
-                        variant={isPlanActive(plan.name) ? "outline" : "default"}
-                        disabled={isPlanActive(plan.name) || processingPayment}
-                        onClick={() => handleSelectPlan(plan)}
-                      >
-                        {processingPayment && plan.name === selectedPlan?.name ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
-                        {isPlanActive(plan.name) 
-                          ? "Current Plan" 
-                          : "Start Free"
-                        }
-                      </Button>
-                    ) : (
-                      <>
-                        {/* Only render this button for UI/navigation purposes */}
-                        <Button
-                          className="w-full mb-4"
-                          variant={isPlanActive(plan.name) ? "outline" : "default"}
-                          disabled={isPlanActive(plan.name)}
-                          onClick={() => handleSelectPlan(plan)}
-                        >
-                          {isPlanActive(plan.name) 
-                            ? "Current Plan" 
-                            : `Subscribe - ₹${plan.price_inr}`
-                          }
-                        </Button>
-                        
-                        {/* Hidden div that will be revealed in the dialog */}
-                        {plan.subscription_button_id && !isPlanActive(plan.name) && (
-                          <div id={`razorpay-button-${plan.name}`} className="hidden">
-                            <form>
-                              <script 
-                                src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                                data-subscription_button_id={plan.subscription_button_id} 
-                                data-button_theme="brand-color"
-                                async
-                              ></script>
-                            </form>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
+                <PlanCard 
+                  key={plan.id}
+                  plan={plan}
+                  isActive={isPlanActive(plan.name)}
+                  processingPayment={processingPayment}
+                  selectedPlan={selectedPlan}
+                  onSelectPlan={handleSelectPlan}
+                />
               ))}
             </div>
           ) : (
@@ -416,99 +329,11 @@ const Subscription = () => {
         ) : (
           // Comparison Table
           plans && plans.length > 0 ? (
-            <div className="overflow-x-auto rounded-lg border shadow">
-              <table className="w-full border-collapse bg-white dark:bg-gray-800">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-800/80">
-                    <th className="p-4 text-left border-b">Features</th>
-                    {plans.map((plan) => (
-                      <th key={plan.id} className="p-4 text-center border-b">
-                        <div className="font-bold text-lg">{plan.name}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">₹{plan.price_inr}/month</div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    "Drug identification",
-                    "History storage",
-                    "Response time",
-                    "Detailed reports",
-                    "Bulk identification",
-                    "Priority support",
-                    "API access",
-                    "Custom alerts"
-                  ].map((feature, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'}>
-                      <td className="p-4 border-b">{feature}</td>
-                      {plans.map((plan) => (
-                        <td key={`${plan.id}-${feature}`} className="p-4 text-center border-b">
-                          {getFeatureAvailability(feature, plan.name) ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
-                          ) : (
-                            <X className="h-5 w-5 text-gray-300 mx-auto" />
-                          )}
-                          {feature === 'History storage' && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {plan.name === 'Free' ? '10 items' : 
-                               plan.name === 'Advanced' ? '100 items' : 
-                               'Unlimited'}
-                            </div>
-                          )}
-                          {feature === 'Response time' && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {plan.name === 'Free' ? 'Standard' : 
-                               plan.name === 'Advanced' ? 'Fast' : 
-                               'Priority'}
-                            </div>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                  <tr className="bg-gray-50 dark:bg-gray-800/80">
-                    <td className="p-4 border-b font-medium">Monthly identifications</td>
-                    {plans.map((plan) => (
-                      <td key={`${plan.id}-identifications`} className="p-4 text-center border-b font-medium">
-                        {plan.monthly_identifications}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="p-4"></td>
-                    {plans.map((plan) => (
-                      <td key={`${plan.id}-action`} className="p-4 text-center">
-                        {plan.name === 'Free' ? (
-                          <Button
-                            variant="default"
-                            disabled={isPlanActive(plan.name) || processingPayment}
-                            onClick={() => handleSelectPlan(plan)}
-                          >
-                            {isPlanActive(plan.name) 
-                              ? "Current Plan" 
-                              : "Start Free" 
-                            }
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="default"
-                            className={plan.name === 'Advanced' ? "bg-pharma-600 hover:bg-pharma-700" : ""}
-                            disabled={isPlanActive(plan.name)}
-                            onClick={() => handleSelectPlan(plan)}
-                          >
-                            {isPlanActive(plan.name) 
-                              ? "Current Plan"
-                              : `Choose ${plan.name}`
-                            }
-                          </Button>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <ComparisonTable 
+              plans={plans}
+              isPlanActive={isPlanActive}
+              handleSelectPlan={handleSelectPlan}
+            />
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500">No subscription plans available to compare</p>
@@ -517,62 +342,11 @@ const Subscription = () => {
         )}
 
         {/* Payment Dialog with Razorpay Buttons */}
-        <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Complete Your Subscription</DialogTitle>
-              <DialogDescription>
-                Make a secure payment using Razorpay to activate your subscription.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              {selectedPlan && (
-                <>
-                  <div className="flex justify-between">
-                    <span className="font-medium">{selectedPlan.name} Plan</span>
-                    <span>₹{selectedPlan.price_inr}</span>
-                  </div>
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between font-bold">
-                      <span>Total</span>
-                      <span>₹{selectedPlan.price_inr}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Render the appropriate Razorpay button */}
-                  <div className="mt-6">
-                    {selectedPlan.name === 'Advanced' && (
-                      <form>
-                        <script 
-                          src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                          data-subscription_button_id="pl_QF1itg7gdfQFbF" 
-                          data-button_theme="brand-color"
-                          async
-                        ></script>
-                      </form>
-                    )}
-                    
-                    {selectedPlan.name === 'Elite' && (
-                      <form>
-                        <script 
-                          src="https://cdn.razorpay.com/static/widget/subscription-button.js" 
-                          data-subscription_button_id="pl_QFGGMMuM37x0Sp" 
-                          data-button_theme="brand-color"
-                          async
-                        ></script>
-                      </form>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>
-                Cancel
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <PaymentDialog 
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          selectedPlan={selectedPlan}
+        />
       </div>
     </>
   );

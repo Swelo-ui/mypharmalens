@@ -23,30 +23,39 @@ serve(async (req) => {
     
     // Get the authorization header from the request
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'No authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
     
     // Extract the JWT token from the authorization header
-    const token = authHeader.replace('Bearer ', '');
+    let user = null;
+    let token = null;
     
-    // Get the user from the JWT token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid token or user not found' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (authHeader) {
+      token = authHeader.replace('Bearer ', '');
+      
+      // Get the user from the JWT token
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      
+      if (!userError && userData?.user) {
+        user = userData.user;
+      }
     }
     
     const url = new URL(req.url);
     const path = url.pathname.split('/').pop();
     
+    // Routes that don't require authentication
+    const publicRoutes = ['subscription-plans'];
+    
+    // Check if authentication is required for this route
+    if (!publicRoutes.includes(path || '') && !user) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     if (req.method === 'POST') {
-      const { body } = await req.json();
+      const reqJson = await req.json();
+      const { body } = reqJson;
       
       // Different operations based on the path
       switch (path) {
@@ -69,8 +78,20 @@ serve(async (req) => {
         case 'subscription-plans':
           return await getSubscriptionPlans(supabase);
         case 'user-subscription':
+          if (!user) {
+            return new Response(
+              JSON.stringify({ error: 'Authentication required for user subscription' }),
+              { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
           return await getUserSubscription(user.id, supabase);
         case 'identification-usage':
+          if (!user) {
+            return new Response(
+              JSON.stringify({ error: 'Authentication required for identification usage' }),
+              { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
           return await getIdentificationUsage(user.id, supabase);
         default:
           return new Response(
@@ -172,7 +193,7 @@ async function getUserSubscription(userId, supabase) {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     
     // If no subscription found, assign the free plan
     if (!data || error) {
@@ -235,7 +256,7 @@ async function getIdentificationUsage(userId, supabase) {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     
     if (subError || !subscription) {
       throw new Error('No active subscription found');
@@ -260,10 +281,10 @@ async function getIdentificationUsage(userId, supabase) {
     
     return new Response(
       JSON.stringify({
-        used: count,
+        used: count || 0,
         total: monthly_identifications,
-        remaining: monthly_identifications - count,
-        percentage: Math.round((count / monthly_identifications) * 100)
+        remaining: monthly_identifications - (count || 0),
+        percentage: Math.round(((count || 0) / monthly_identifications) * 100)
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -502,7 +523,7 @@ async function checkSubscriptionStatus(userId, supabase) {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     
     if (subError || !subscription) {
       // If no subscription, check if they have a free plan
@@ -605,10 +626,10 @@ async function checkSubscriptionStatus(userId, supabase) {
         message: 'You can identify this medication',
         subscription,
         usage: {
-          used: count,
+          used: count || 0,
           total: monthly_identifications,
-          remaining: monthly_identifications - count,
-          percentage: Math.round((count / monthly_identifications) * 100)
+          remaining: monthly_identifications - (count || 0),
+          percentage: Math.round(((count || 0) / monthly_identifications) * 100)
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
