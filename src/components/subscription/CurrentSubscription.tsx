@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { InfoIcon } from 'lucide-react';
 
 interface Plan {
   id: string;
@@ -24,6 +26,8 @@ interface UsageData {
   total: number;
   remaining: number;
   percentage: number;
+  base_monthly?: number;
+  bonus_from_coupons?: number;
 }
 
 interface CurrentSubscriptionProps {
@@ -58,7 +62,27 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
           <div className="space-y-2 text-sm">
             <p><span className="font-medium">Started:</span> {formatDate(subscription.subscription_start)}</p>
             <p><span className="font-medium">Expires:</span> {formatDate(subscription.subscription_end)}</p>
-            <p><span className="font-medium">Monthly identifications:</span> {subscription.subscription_plans.monthly_identifications}</p>
+            
+            <div className="flex items-center">
+              <span className="font-medium mr-1">Monthly identifications:</span> 
+              {subscription.subscription_plans.monthly_identifications}
+              
+              {usage?.bonus_from_coupons ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900/30 dark:text-blue-300 flex items-center">
+                        +{usage.bonus_from_coupons} bonus
+                        <InfoIcon className="h-3 w-3 ml-1" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Bonus identifications from redeemed coupons</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -72,6 +96,11 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
             <Progress value={usage.percentage} className="h-2 mb-4" />
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {usage.percentage}% of your monthly limit
+              {usage.bonus_from_coupons ? (
+                <span className="ml-1">
+                  (Includes {usage.bonus_from_coupons} bonus identifications from coupons)
+                </span>
+              ) : null}
             </p>
           </div>
         )}

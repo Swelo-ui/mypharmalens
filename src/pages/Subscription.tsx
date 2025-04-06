@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -12,6 +11,7 @@ import CurrentSubscription from '@/components/subscription/CurrentSubscription';
 import PlanCard from '@/components/subscription/PlanCard';
 import ComparisonTable from '@/components/subscription/ComparisonTable';
 import PaymentDialog from '@/components/subscription/PaymentDialog';
+import CouponRedemption from '@/components/subscription/CouponRedemption';
 
 interface Plan {
   id: string;
@@ -37,6 +37,8 @@ interface UsageData {
   total: number;
   remaining: number;
   percentage: number;
+  base_monthly?: number;
+  bonus_from_coupons?: number;
 }
 
 const Subscription = () => {
@@ -63,10 +65,8 @@ const Subscription = () => {
     }
   }, [isAuthenticated, authLoading, user]);
 
-  // Load subscription button scripts when plans are loaded
   useEffect(() => {
     if (plans && plans.length > 0) {
-      // Load Razorpay subscription button script
       const script = document.createElement('script');
       script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
       script.async = true;
@@ -98,12 +98,10 @@ const Subscription = () => {
 
   const fetchSubscriptionPlans = async () => {
     try {
-      // Try to fetch plans, but provide fallback if there's an error
       const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
       
       if (error) {
         console.error('Error fetching plans:', error);
-        // Provide default plans as fallback
         const defaultPlans = [
           {
             id: "free-plan",
@@ -139,7 +137,6 @@ const Subscription = () => {
       }
       
       if (data?.plans && data.plans.length > 0) {
-        // Add subscription button IDs to the plans
         const updatedPlans = data.plans.map((plan: Plan) => {
           if (plan.name === 'Advanced') {
             return { ...plan, subscription_button_id: 'pl_QF1itg7gdfQFbF' };
@@ -196,7 +193,6 @@ const Subscription = () => {
     try {
       setProcessingPayment(true);
       
-      // For free plan, just activate it
       if (plan.price_inr === 0) {
         const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
           body: { planId: plan.id }
@@ -209,7 +205,6 @@ const Subscription = () => {
           await loadSubscriptionData();
         }
       } else {
-        // For paid plans, we'll use the Razorpay buttons instead of our custom solution
         setPaymentDialogOpen(true);
       }
     } catch (error: any) {
@@ -218,6 +213,11 @@ const Subscription = () => {
     } finally {
       setProcessingPayment(false);
     }
+  };
+
+  const handleCouponSuccess = () => {
+    fetchUsageData();
+    fetchUserSubscription();
   };
 
   const isPlanActive = (planName: string) => {
@@ -278,7 +278,6 @@ const Subscription = () => {
           Choose the right plan for your medication identification needs
         </p>
 
-        {/* Current Subscription Info */}
         {currentSubscription && (
           <CurrentSubscription 
             subscription={currentSubscription} 
@@ -286,7 +285,12 @@ const Subscription = () => {
           />
         )}
 
-        {/* Toggle between Plans and Comparison View */}
+        {isAuthenticated && (
+          <div className="mb-8">
+            <CouponRedemption onSuccess={handleCouponSuccess} />
+          </div>
+        )}
+
         <div className="flex justify-center mb-8">
           <div className="inline-flex rounded-md shadow-sm">
             <Button 
@@ -308,7 +312,6 @@ const Subscription = () => {
 
         {!showComparison ? (
           plans && plans.length > 0 ? (
-            // Subscription Plans Cards
             <div className="grid md:grid-cols-3 gap-6">
               {plans.map((plan) => (
                 <PlanCard 
@@ -327,7 +330,6 @@ const Subscription = () => {
             </div>
           )
         ) : (
-          // Comparison Table
           plans && plans.length > 0 ? (
             <ComparisonTable 
               plans={plans}
@@ -341,7 +343,6 @@ const Subscription = () => {
           )
         )}
 
-        {/* Payment Dialog with Razorpay Buttons */}
         <PaymentDialog 
           open={paymentDialogOpen}
           onOpenChange={setPaymentDialogOpen}

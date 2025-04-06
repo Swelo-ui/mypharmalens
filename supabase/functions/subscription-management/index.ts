@@ -66,6 +66,8 @@ serve(async (req) => {
           return await verifySubscription(body, user, supabase);
         case 'check-subscription-status':
           return await checkSubscriptionStatus(user.id, supabase);
+        case 'redeem-coupon':
+          return await redeemCoupon(body, user, supabase);
         default:
           return new Response(
             JSON.stringify({ error: 'Invalid endpoint' }),
@@ -308,6 +310,7 @@ async function getUserSubscription(userId, supabase) {
 // Get user's identification usage
 async function getIdentificationUsage(userId, supabase) {
   try {
+    // Get user's normal subscription
     const { data: subscription, error: subError } = await supabase
       .from('user_subscriptions')
       .select('*, subscription_plans(*)')
@@ -316,6 +319,12 @@ async function getIdentificationUsage(userId, supabase) {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+    
+    // Get bonus identifications from coupon redemptions
+    const { data: redemptions, error: redemptionError } = await supabase
+      .from('coupon_redemptions')
+      .select('identifications_granted')
+      .eq('user_id', userId);
     
     if (subError || !subscription) {
       throw new Error('No active subscription found');
@@ -336,14 +345,23 @@ async function getIdentificationUsage(userId, supabase) {
       throw new Error('Could not retrieve usage information');
     }
     
+    // Calculate bonus identifications from coupons
+    const bonusIdentifications = redemptions?.reduce(
+      (total, redemption) => total + redemption.identifications_granted, 
+      0
+    ) || 0;
+    
     const { monthly_identifications } = subscription.subscription_plans;
+    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications;
     
     return new Response(
       JSON.stringify({
         used: count || 0,
-        total: monthly_identifications,
-        remaining: monthly_identifications - (count || 0),
-        percentage: Math.round(((count || 0) / monthly_identifications) * 100)
+        total: totalAllowedIdentifications,
+        remaining: totalAllowedIdentifications - (count || 0),
+        percentage: Math.round(((count || 0) / totalAllowedIdentifications) * 100),
+        base_monthly: monthly_identifications,
+        bonus_from_coupons: bonusIdentifications
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -351,7 +369,7 @@ async function getIdentificationUsage(userId, supabase) {
     console.error('Error getting identification usage:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
@@ -584,6 +602,17 @@ async function checkSubscriptionStatus(userId, supabase) {
       .limit(1)
       .maybeSingle();
     
+    // Get bonus identifications from coupon redemptions
+    const { data: redemptions, error: redemptionError } = await supabase
+      .from('coupon_redemptions')
+      .select('identifications_granted')
+      .eq('user_id', userId);
+    
+    const bonusIdentifications = redemptions?.reduce(
+      (total, redemption) => total + redemption.identifications_granted, 
+      0
+    ) || 0;
+    
     if (subError || !subscription) {
       // If no subscription, check if they have a free plan
       const { data: freePlan, error: planError } = await supabase
@@ -617,9 +646,12 @@ async function checkSubscriptionStatus(userId, supabase) {
       
       return new Response(
         JSON.stringify({ 
-          canIdentify: true, 
-          message: 'Free plan usage',
+          canIdentify: bonusIdentifications > 0 || true, // Free plan + any bonus
+          message: bonusIdentifications > 0 ? 
+            `Free plan with ${bonusIdentifications} bonus identifications from coupons` : 
+            'Free plan usage',
           subscription: newSubscription,
+          bonus_identifications: bonusIdentifications
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -635,11 +667,15 @@ async function checkSubscriptionStatus(userId, supabase) {
         .update({ status: 'expired' })
         .eq('id', subscription.id);
       
+      const canIdentify = bonusIdentifications > 0;
       return new Response(
         JSON.stringify({ 
-          canIdentify: false, 
-          message: 'Your subscription has expired. Please renew.',
-          subscription
+          canIdentify: canIdentify,
+          message: canIdentify ? 
+            `Your subscription has expired but you have ${bonusIdentifications} bonus identifications from coupons.` : 
+            'Your subscription has expired. Please renew.',
+          subscription,
+          bonus_identifications: bonusIdentifications
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -661,18 +697,21 @@ async function checkSubscriptionStatus(userId, supabase) {
     }
     
     const { monthly_identifications } = subscription.subscription_plans;
+    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications;
     
-    if (count >= monthly_identifications) {
+    if (count >= totalAllowedIdentifications) {
       return new Response(
         JSON.stringify({ 
           canIdentify: false, 
-          message: 'You have reached your monthly identification limit. Please upgrade your plan.',
+          message: 'You have reached your monthly identification limit. Please upgrade your plan or redeem a coupon.',
           subscription,
           usage: {
             used: count,
-            total: monthly_identifications,
+            total: totalAllowedIdentifications,
             remaining: 0,
-            percentage: 100
+            percentage: 100,
+            base_monthly: monthly_identifications,
+            bonus_from_coupons: bonusIdentifications
           }
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -686,9 +725,11 @@ async function checkSubscriptionStatus(userId, supabase) {
         subscription,
         usage: {
           used: count || 0,
-          total: monthly_identifications,
-          remaining: monthly_identifications - (count || 0),
-          percentage: Math.round(((count || 0) / monthly_identifications) * 100)
+          total: totalAllowedIdentifications,
+          remaining: totalAllowedIdentifications - (count || 0),
+          percentage: Math.round(((count || 0) / totalAllowedIdentifications) * 100),
+          base_monthly: monthly_identifications,
+          bonus_from_coupons: bonusIdentifications
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -698,6 +739,117 @@ async function checkSubscriptionStatus(userId, supabase) {
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
+// New function to redeem coupon codes
+async function redeemCoupon(data, user, supabase) {
+  try {
+    const { couponCode } = data;
+    
+    if (!couponCode) {
+      throw new Error('Coupon code is required');
+    }
+    
+    // Check if the coupon exists and is active
+    const { data: coupon, error: couponError } = await supabase
+      .from('coupon_codes')
+      .select('*')
+      .eq('code', couponCode.trim().toUpperCase())
+      .eq('is_active', true)
+      .single();
+    
+    if (couponError || !coupon) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'Invalid or expired coupon code' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Check if the coupon has expired
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'This coupon has expired' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Check if the coupon has reached max uses
+    if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'This coupon has reached its maximum number of uses' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Check if the user has already redeemed this coupon
+    const { data: existingRedemption, error: redemptionError } = await supabase
+      .from('coupon_redemptions')
+      .select('*')
+      .eq('coupon_id', coupon.id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (existingRedemption) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'You have already redeemed this coupon' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Create a redemption record
+    const { data: redemption, error: createError } = await supabase
+      .from('coupon_redemptions')
+      .insert({
+        coupon_id: coupon.id,
+        user_id: user.id,
+        identifications_granted: coupon.identifications_granted
+      })
+      .select()
+      .single();
+    
+    if (createError) {
+      console.error('Error creating redemption:', createError);
+      throw new Error('Failed to redeem coupon');
+    }
+    
+    // Update the coupon usage count
+    await supabase
+      .from('coupon_codes')
+      .update({ current_uses: (coupon.current_uses || 0) + 1 })
+      .eq('id', coupon.id);
+    
+    // Return success with the bonus identifications
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Successfully redeemed coupon for ${coupon.identifications_granted} bonus identifications!`,
+        identifications_granted: coupon.identifications_granted,
+        redemption: redemption
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error redeeming coupon:', error);
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }

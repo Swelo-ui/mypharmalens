@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, Lock, CheckCircle2 } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, Lock, CheckCircle2, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -522,7 +522,7 @@ const DrugIdentify = () => {
           )}
         </div>
         
-        {/* Subscription Status Banner */}
+        {/* Updated Subscription Status Banner */}
         {isAuthenticated && subscriptionStatus && (
           <div className={`mb-6 p-4 rounded-lg border ${
             subscriptionStatus.canIdentify 
@@ -548,24 +548,41 @@ const DrugIdentify = () => {
               
               {subscriptionStatus.usage && (
                 <div className="text-right hidden md:block">
-                  <p className="text-sm font-medium">
-                    {subscriptionStatus.usage.used} / {subscriptionStatus.usage.total} identifications
-                  </p>
+                  <div className="flex items-center justify-end mb-1">
+                    <p className="text-sm font-medium mr-2">
+                      {subscriptionStatus.usage.used} / {subscriptionStatus.usage.total} identifications
+                    </p>
+                    {subscriptionStatus.usage.bonus_from_coupons > 0 && (
+                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900/30 dark:text-blue-300 flex items-center">
+                        <Gift className="h-3 w-3 mr-1" />
+                        +{subscriptionStatus.usage.bonus_from_coupons} bonus
+                      </span>
+                    )}
+                  </div>
                   <Progress 
                     value={subscriptionStatus.usage.percentage} 
-                    className="h-2 w-32 mt-1" 
+                    className="h-2 w-32" 
                   />
                 </div>
               )}
               
-              {!subscriptionStatus.canIdentify && (
+              <div className="flex items-center gap-2">
+                {!subscriptionStatus.canIdentify && (
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/subscription')}
+                  >
+                    Upgrade
+                  </Button>
+                )}
                 <Button 
-                  size="sm"
+                  size="sm" 
+                  variant="outline"
                   onClick={() => navigate('/subscription')}
                 >
-                  Upgrade
+                  Details
                 </Button>
-              )}
+              </div>
             </div>
           </div>
         )}
