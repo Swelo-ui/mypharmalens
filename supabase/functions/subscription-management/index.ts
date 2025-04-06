@@ -752,13 +752,17 @@ async function redeemCoupon(data, user, supabase) {
       throw new Error('Coupon code is required');
     }
     
-    // Check if the coupon exists and is active
+    console.log(`Attempting to redeem coupon: ${couponCode}`);
+    
+    // Check if the coupon exists and is active - case insensitive search
     const { data: coupon, error: couponError } = await supabase
       .from('coupon_codes')
       .select('*')
-      .eq('code', couponCode.trim().toUpperCase())
+      .ilike('code', couponCode)
       .eq('is_active', true)
       .single();
+    
+    console.log('Coupon lookup result:', { coupon, error: couponError });
     
     if (couponError || !coupon) {
       return new Response(
@@ -800,6 +804,8 @@ async function redeemCoupon(data, user, supabase) {
       .eq('user_id', user.id)
       .maybeSingle();
     
+    console.log('Existing redemption check:', { existingRedemption, error: redemptionError });
+    
     if (existingRedemption) {
       return new Response(
         JSON.stringify({ 
@@ -820,6 +826,8 @@ async function redeemCoupon(data, user, supabase) {
       })
       .select()
       .single();
+    
+    console.log('Redemption creation result:', { redemption, error: createError });
     
     if (createError) {
       console.error('Error creating redemption:', createError);

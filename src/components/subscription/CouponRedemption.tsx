@@ -30,9 +30,16 @@ const CouponRedemption = ({ onSuccess }: CouponRedemptionProps) => {
       setError(null);
       setSuccessMessage(null);
       
+      // Convert coupon code to uppercase to ensure matching
+      const normalizedCode = couponCode.trim().toUpperCase();
+      
+      console.log('Redeeming coupon code:', normalizedCode);
+      
       const { data, error } = await supabase.functions.invoke('subscription-management/redeem-coupon', {
-        body: { couponCode: couponCode.trim() }
+        body: { couponCode: normalizedCode }
       });
+      
+      console.log('Coupon redemption response:', { data, error });
       
       if (error) {
         throw new Error(error.message);
@@ -53,6 +60,7 @@ const CouponRedemption = ({ onSuccess }: CouponRedemptionProps) => {
       }
       
     } catch (err: any) {
+      console.error('Error redeeming coupon:', err);
       setError(err.message || 'An unexpected error occurred');
       toast.error('Failed to redeem coupon');
     } finally {
