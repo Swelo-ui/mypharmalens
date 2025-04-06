@@ -2,7 +2,10 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, Gift } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Plan {
   id: string;
@@ -28,6 +31,8 @@ interface UsageData {
   percentage: number;
   base_monthly?: number;
   bonus_from_coupons?: number;
+  daily_free?: number;
+  last_claimed?: string;
 }
 
 interface CurrentSubscriptionProps {
@@ -36,6 +41,8 @@ interface CurrentSubscriptionProps {
 }
 
 const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) => {
+  const [claimingDailyBonus, setClaimingDailyBonus] = React.useState(false);
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -44,6 +51,38 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
       day: 'numeric'
     });
   };
+  
+  const handleClaimDailyBonus = async () => {
+    try {
+      setClaimingDailyBonus(true);
+      const { data, error } = await supabase.functions.invoke('subscription-management/daily-free-identifications');
+      
+      if (error) throw new Error(error.message);
+      
+      if (data && data.success) {
+        toast.success(data.message);
+        // Force reload the page to update usage data
+        window.location.reload();
+      } else {
+        toast.info(data.message);
+      }
+    } catch (err: any) {
+      console.error('Error claiming daily bonus:', err);
+      toast.error(`Failed to claim daily bonus: ${err.message}`);
+    } finally {
+      setClaimingDailyBonus(false);
+    }
+  };
+  
+  // Check if user has already claimed today's bonus
+  const hasClaimedToday = React.useMemo(() => {
+    if (!usage?.last_claimed) return false;
+    
+    const lastClaimedDate = new Date(usage.last_claimed).toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    
+    return lastClaimedDate === today;
+  }, [usage?.last_claimed]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 mb-8 shadow-sm">
@@ -82,6 +121,48 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
                   </Tooltip>
                 </TooltipProvider>
               ) : null}
+              
+              {usage?.daily_free ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-green-900/30 dark:text-green-300 flex items-center">
+                        +{usage.daily_free} daily
+                        <Gift className="h-3 w-3 ml-1" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Daily free identifications</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : null}
+            </div>
+            
+            {/* Daily Bonus Section */}
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <span className="font-medium flex items-center">
+                  <Gift className="h-4 w-4 mr-1 text-green-600" /> 
+                  Daily Free Identifications
+                </span>
+                
+                <Button
+                  size="sm"
+                  variant={hasClaimedToday ? "outline" : "default"}
+                  disabled={hasClaimedToday || claimingDailyBonus}
+                  onClick={handleClaimDailyBonus}
+                  className="text-xs"
+                >
+                  {claimingDailyBonus ? "Claiming..." : 
+                   hasClaimedToday ? "Already claimed" : "Claim 2 free"}
+                </Button>
+              </div>
+              {usage?.daily_free !== undefined && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {usage.daily_free} remaining today
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -96,12 +177,21 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
             <Progress value={usage.percentage} className="h-2 mb-4" />
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {usage.percentage}% of your monthly limit
-              {usage.bonus_from_coupons ? (
-                <span className="ml-1">
-                  (Includes {usage.bonus_from_coupons} bonus identifications from coupons)
-                </span>
-              ) : null}
             </p>
+            <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-500">
+              <div className="p-2 bg-gray-50 dark:bg-gray-700/30 rounded flex items-center justify-between">
+                <span>Base plan:</span>
+                <span className="font-medium">{usage.base_monthly}</span>
+              </div>
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded flex items-center justify-between">
+                <span>Coupons:</span>
+                <span className="font-medium">{usage.bonus_from_coupons || 0}</span>
+              </div>
+              <div className="p-2 bg-green-50 dark:bg-green-900/10 rounded flex items-center justify-between">
+                <span>Daily:</span>
+                <span className="font-medium">{usage.daily_free || 0}</span>
+              </div>
+            </div>
           </div>
         )}
       </div>

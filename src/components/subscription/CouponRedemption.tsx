@@ -30,8 +30,8 @@ const CouponRedemption = ({ onSuccess }: CouponRedemptionProps) => {
       setError(null);
       setSuccessMessage(null);
       
-      // Convert coupon code to uppercase to ensure matching
-      const normalizedCode = couponCode.trim().toUpperCase();
+      // Send the code exactly as entered
+      const normalizedCode = couponCode.trim();
       
       console.log('Redeeming coupon code:', normalizedCode);
       

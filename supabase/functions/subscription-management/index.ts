@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.33.2";
 
@@ -97,6 +98,14 @@ serve(async (req) => {
             );
           }
           return await getIdentificationUsage(user.id, supabase);
+        case 'daily-free-identifications':
+          if (!user) {
+            return new Response(
+              JSON.stringify({ error: 'Authentication required for daily free identifications' }),
+              { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          return await claimDailyFreeIdentifications(user.id, supabase);
         default:
           return new Response(
             JSON.stringify({ error: 'Invalid endpoint' }),
@@ -286,6 +295,9 @@ async function getUserSubscription(userId, supabase) {
       if (subscriptionError) {
         throw new Error('Could not create free subscription');
       }
+
+      // Also create a daily free identifications record
+      await createDailyFreeIdentificationsRecord(userId, supabase);
       
       return new Response(
         JSON.stringify({ subscription: newSubscription }),
@@ -325,6 +337,13 @@ async function getIdentificationUsage(userId, supabase) {
       .select('identifications_granted')
       .eq('user_id', userId);
     
+    // Check daily free identifications
+    const { data: dailyFree, error: dailyFreeError } = await supabase
+      .from('daily_free_identifications')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+      
     if (subError || !subscription) {
       throw new Error('No active subscription found');
     }
@@ -350,8 +369,11 @@ async function getIdentificationUsage(userId, supabase) {
       0
     ) || 0;
     
+    // Add daily free identifications
+    const dailyFreeRemaining = dailyFree?.remaining_identifications || 0;
+    
     const { monthly_identifications } = subscription.subscription_plans;
-    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications;
+    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications + dailyFreeRemaining;
     
     return new Response(
       JSON.stringify({
@@ -360,7 +382,9 @@ async function getIdentificationUsage(userId, supabase) {
         remaining: totalAllowedIdentifications - (count || 0),
         percentage: Math.round(((count || 0) / totalAllowedIdentifications) * 100),
         base_monthly: monthly_identifications,
-        bonus_from_coupons: bonusIdentifications
+        bonus_from_coupons: bonusIdentifications,
+        daily_free: dailyFreeRemaining,
+        last_claimed: dailyFree?.last_claimed_at || null
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -607,10 +631,20 @@ async function checkSubscriptionStatus(userId, supabase) {
       .select('identifications_granted')
       .eq('user_id', userId);
     
+    // Check daily free identifications
+    const { data: dailyFree, error: dailyFreeError } = await supabase
+      .from('daily_free_identifications')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
     const bonusIdentifications = redemptions?.reduce(
       (total, redemption) => total + redemption.identifications_granted, 
       0
     ) || 0;
+    
+    // Add daily free identifications
+    const dailyFreeRemaining = dailyFree?.remaining_identifications || 0;
     
     if (subError || !subscription) {
       // If no subscription, check if they have a free plan
@@ -642,15 +676,24 @@ async function checkSubscriptionStatus(userId, supabase) {
       if (subscriptionError) {
         throw new Error('Could not create free subscription');
       }
+
+      // Create or update daily free identifications
+      if (!dailyFree) {
+        await createDailyFreeIdentificationsRecord(userId, supabase);
+      }
+      
+      const canIdentify = (bonusIdentifications > 0 || dailyFreeRemaining > 0 || true);
       
       return new Response(
         JSON.stringify({ 
-          canIdentify: bonusIdentifications > 0 || true, // Free plan + any bonus
-          message: bonusIdentifications > 0 ? 
-            `Free plan with ${bonusIdentifications} bonus identifications from coupons` : 
+          canIdentify: canIdentify, 
+          message: 
+            dailyFreeRemaining > 0 ? `You have ${dailyFreeRemaining} free daily identifications remaining` :
+            bonusIdentifications > 0 ? `Free plan with ${bonusIdentifications} bonus identifications from coupons` : 
             'Free plan usage',
           subscription: newSubscription,
-          bonus_identifications: bonusIdentifications
+          bonus_identifications: bonusIdentifications,
+          daily_free: dailyFreeRemaining
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -666,15 +709,24 @@ async function checkSubscriptionStatus(userId, supabase) {
         .update({ status: 'expired' })
         .eq('id', subscription.id);
       
-      const canIdentify = bonusIdentifications > 0;
+      const canIdentify = (bonusIdentifications > 0 || dailyFreeRemaining > 0);
+      let message = 'Your subscription has expired. Please renew.';
+      
+      if (dailyFreeRemaining > 0 && bonusIdentifications > 0) {
+        message = `Your subscription has expired but you have ${dailyFreeRemaining} daily free identifications and ${bonusIdentifications} bonus identifications available.`;
+      } else if (dailyFreeRemaining > 0) {
+        message = `Your subscription has expired but you have ${dailyFreeRemaining} daily free identifications available.`;
+      } else if (bonusIdentifications > 0) {
+        message = `Your subscription has expired but you have ${bonusIdentifications} bonus identifications from coupons.`;
+      }
+      
       return new Response(
         JSON.stringify({ 
           canIdentify: canIdentify,
-          message: canIdentify ? 
-            `Your subscription has expired but you have ${bonusIdentifications} bonus identifications from coupons.` : 
-            'Your subscription has expired. Please renew.',
+          message: message,
           subscription,
-          bonus_identifications: bonusIdentifications
+          bonus_identifications: bonusIdentifications,
+          daily_free: dailyFreeRemaining
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -696,7 +748,7 @@ async function checkSubscriptionStatus(userId, supabase) {
     }
     
     const { monthly_identifications } = subscription.subscription_plans;
-    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications;
+    const totalAllowedIdentifications = monthly_identifications + bonusIdentifications + dailyFreeRemaining;
     
     if (count >= totalAllowedIdentifications) {
       return new Response(
@@ -710,7 +762,8 @@ async function checkSubscriptionStatus(userId, supabase) {
             remaining: 0,
             percentage: 100,
             base_monthly: monthly_identifications,
-            bonus_from_coupons: bonusIdentifications
+            bonus_from_coupons: bonusIdentifications,
+            daily_free: dailyFreeRemaining
           }
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -728,7 +781,8 @@ async function checkSubscriptionStatus(userId, supabase) {
           remaining: totalAllowedIdentifications - (count || 0),
           percentage: Math.round(((count || 0) / totalAllowedIdentifications) * 100),
           base_monthly: monthly_identifications,
-          bonus_from_coupons: bonusIdentifications
+          bonus_from_coupons: bonusIdentifications,
+          daily_free: dailyFreeRemaining
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -742,7 +796,131 @@ async function checkSubscriptionStatus(userId, supabase) {
   }
 }
 
-// New function to redeem coupon codes
+// Function to claim daily free identifications
+async function claimDailyFreeIdentifications(userId, supabase) {
+  try {
+    console.log('Claiming daily free identifications for user:', userId);
+    
+    // Check if user has a daily_free_identifications record
+    const { data: existingRecord, error: recordError } = await supabase
+      .from('daily_free_identifications')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (recordError) {
+      console.error('Error checking daily free identifications:', recordError);
+      throw new Error('Could not check daily free identifications');
+    }
+    
+    const now = new Date();
+    const todayDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // If no record exists, create one with 2 identifications
+    if (!existingRecord) {
+      const { data: newRecord, error: insertError } = await supabase
+        .from('daily_free_identifications')
+        .insert({
+          user_id: userId,
+          remaining_identifications: 2,
+          last_claimed_at: now.toISOString(),
+          claimed_date: todayDate
+        })
+        .select()
+        .single();
+      
+      if (insertError) {
+        console.error('Error creating daily free identifications record:', insertError);
+        throw new Error('Could not create daily free identifications');
+      }
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Claimed 2 free daily identifications',
+          daily_free: newRecord
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const lastClaimedDate = existingRecord.claimed_date;
+    
+    // If already claimed today, return the existing record
+    if (lastClaimedDate === todayDate) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'You have already claimed your daily free identifications today',
+          daily_free: existingRecord
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // If not claimed today, reset to 2 identifications
+    const { data: updatedRecord, error: updateError } = await supabase
+      .from('daily_free_identifications')
+      .update({
+        remaining_identifications: 2,
+        last_claimed_at: now.toISOString(),
+        claimed_date: todayDate
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+    
+    if (updateError) {
+      console.error('Error updating daily free identifications:', updateError);
+      throw new Error('Could not update daily free identifications');
+    }
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Claimed 2 free daily identifications',
+        daily_free: updatedRecord
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+    
+  } catch (error) {
+    console.error('Error claiming daily free identifications:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
+// Helper function to create daily free identifications record
+async function createDailyFreeIdentificationsRecord(userId, supabase) {
+  const now = new Date();
+  const todayDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+  
+  try {
+    const { error: insertError } = await supabase
+      .from('daily_free_identifications')
+      .insert({
+        user_id: userId,
+        remaining_identifications: 2,
+        last_claimed_at: now.toISOString(),
+        claimed_date: todayDate
+      });
+    
+    if (insertError) {
+      console.error('Error creating daily free identifications record:', insertError);
+      throw new Error('Could not create daily free identifications record');
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in createDailyFreeIdentificationsRecord:', error);
+    return false;
+  }
+}
+
+// New function to redeem coupon codes - improved with better error handling
 async function redeemCoupon(data, user, supabase) {
   try {
     const { couponCode } = data;
@@ -830,7 +1008,7 @@ async function redeemCoupon(data, user, supabase) {
     
     if (createError) {
       console.error('Error creating redemption:', createError);
-      throw new Error('Failed to redeem coupon');
+      throw new Error('Failed to redeem coupon: ' + createError.message);
     }
     
     // Update the coupon usage count
@@ -860,3 +1038,4 @@ async function redeemCoupon(data, user, supabase) {
     );
   }
 }
+
