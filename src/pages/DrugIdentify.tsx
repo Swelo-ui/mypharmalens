@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, Lock, CheckCircle2, Gift } from 'lucide-react';
@@ -94,6 +94,13 @@ const DrugIdentify = () => {
     }
   }, [isAuthenticated, user]);
 
+  // Add a refresh function that can be called to update subscription status
+  const refreshSubscriptionStatus = useCallback(async () => {
+    if (isAuthenticated && user) {
+      await checkSubscription();
+    }
+  }, [isAuthenticated, user]);
+
   // Function to check subscription status
   const checkSubscription = async () => {
     try {
@@ -106,7 +113,9 @@ const DrugIdentify = () => {
       }
       
       setSubscriptionStatus(data);
+      console.log('Subscription status:', data);
       
+      // Don't show warning if the user can identify
       if (!data.canIdentify) {
         toast.warning(data.message, {
           action: {
@@ -192,12 +201,9 @@ const DrugIdentify = () => {
         return;
       }
 
-      // Check subscription status before saving
-      if (subscriptionStatus && !subscriptionStatus.canIdentify) {
-        console.log('User subscription limit reached, skipping save');
-        return;
-      }
-
+      // We'll save even if subscription status isn't checked or is out of identifications
+      // This is because we already processed the image and should record it
+      
       const { data, error } = await supabase
         .from('drug_identifications')
         .insert([
@@ -218,7 +224,7 @@ const DrugIdentify = () => {
       console.log("Successfully saved drug identification to history:", data);
       
       // Refresh subscription status after using an identification
-      checkSubscription();
+      refreshSubscriptionStatus();
       
       return data;
     } catch (error) {
@@ -310,7 +316,7 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
-      // Check subscription status first
+      // Check if the user is authenticated
       if (!isAuthenticated) {
         toast.info("Sign in to use drug identification", {
           action: {
@@ -321,16 +327,8 @@ const DrugIdentify = () => {
         return;
       }
       
-      if (subscriptionStatus && !subscriptionStatus.canIdentify) {
-        toast.error(subscriptionStatus.message, {
-          action: {
-            label: "Upgrade",
-            onClick: () => navigate('/subscription')
-          }
-        });
-        return;
-      }
-      
+      // Check subscription status and continue regardless
+      // We'll process the image and then check if we have enough identifications
       setIsIdentifying(true);
       setErrorDetails(null);
       setProcessingProgress(0);
@@ -441,6 +439,9 @@ const DrugIdentify = () => {
                   }
                 });
               }
+              
+              // Always refresh the subscription status after identification
+              refreshSubscriptionStatus();
             } else {
               setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
               toast.error("Could not identify the medication. Please try again with a clearer image.");

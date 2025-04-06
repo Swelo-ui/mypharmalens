@@ -4,18 +4,15 @@ project_id = "vcshydrusnuxsxwctnod"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
+schemas = ["public", "storage"]
 
 [db]
 port = 54322
 
 [studio]
-enabled = true
 port = 54323
-api_url = "http://localhost"
 
 [inbucket]
-enabled = true
 port = 54324
 
 [storage]
@@ -28,8 +25,14 @@ enabled = true
 enabled = true
 
 [functions]
-[functions.identify-drug]
+[functions.daily-free-identifications]
 verify_jwt = true
 
-[functions.subscription-management]
+[functions.check-subscription-status]
+verify_jwt = true
+
+[functions.redeem-coupon]
+verify_jwt = true
+
+[functions.identification-usage]
 verify_jwt = true

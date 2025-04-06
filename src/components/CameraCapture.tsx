@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';

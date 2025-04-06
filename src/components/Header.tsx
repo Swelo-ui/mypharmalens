@@ -1,303 +1,180 @@
 
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Home, Pill, HelpCircle, Info, Mail, Coffee } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
-import { useMediaQuery } from '@/hooks/use-mobile';
-import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { 
+  Menu, 
+  Search, 
+  Sun, 
+  Moon, 
+  User, 
+  LogOut, 
+  Settings,
+  History,
+  Home,
+  Pill,
+  CreditCard,
+  BarChart
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, theme, resolvedTheme } = useTheme();
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const location = useLocation();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const { isAuthenticated, user, isLoading } = useAuthStatus();
+  const { isAuthenticated, isLoading, user } = useAuthStatus();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
-  
-  // Handle scroll lock when mobile menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('overflow-hidden');
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
-    
-    return () => {
-      document.body.classList.remove('overflow-hidden');
-    };
-  }, [isOpen]);
-
-  // Handle theme toggle with improved reliability
-  const toggleTheme = () => {
-    const currentTheme = resolvedTheme || theme;
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-  };
-
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      toast.success("Signed out successfully");
+      toast.success("Logged out successfully");
       navigate('/');
     } catch (error) {
-      console.error('Error signing out:', error);
-      toast.error("Failed to sign out");
+      toast.error("Error during logout");
+      console.error("Logout error:", error);
     }
   };
 
-  const handleDonation = () => {
-    window.open('https://buymeacoffee.com/_himanshusharma', '_blank');
-  };
+  const menuItems = [
+    { name: 'Home', path: '/', icon: <Home className="h-4 w-4 mr-2" /> },
+    { name: 'Identify Medication', path: '/identify', icon: <Pill className="h-4 w-4 mr-2" /> },
+    { name: 'Help Center', path: '/help', icon: <Settings className="h-4 w-4 mr-2" /> },
+    { name: 'Contact Us', path: '/contact', icon: <Settings className="h-4 w-4 mr-2" /> },
+  ];
 
-  // Links for navigation
-  const mainLinks = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Identify', path: '/identify', icon: Pill },
-    { name: 'About', path: '/about', icon: Info },
-    { name: 'FAQ', path: '/faq', icon: HelpCircle },
-    { name: 'Help', path: '/help', icon: HelpCircle },
-    { name: 'Contact', path: '/contact', icon: Mail },
+  const userMenuItems = [
+    { name: 'Profile', icon: <User className="h-4 w-4 mr-2" />, action: () => navigate('/profile') },
+    { name: 'History', icon: <History className="h-4 w-4 mr-2" />, action: () => navigate('/history') },
+    { name: 'Subscription', icon: <CreditCard className="h-4 w-4 mr-2" />, action: () => navigate('/subscription') },
+    { name: 'Usage Management', icon: <BarChart className="h-4 w-4 mr-2" />, action: () => navigate('/subscription') },
+    { name: 'Logout', icon: <LogOut className="h-4 w-4 mr-2" />, action: handleLogout }
   ];
 
   return (
-    <>
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+    <header className="fixed top-0 w-full z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild className="lg:hidden">
+                <Button variant="ghost" size="icon" className="mr-2">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64">
+                <div className="flex flex-col py-4">
+                  <h2 className="text-lg font-semibold mb-4 px-4">Navigation</h2>
+                  <nav className="space-y-2">
+                    {menuItems.map((item) => (
+                      <Link 
+                        key={item.name} 
+                        to={item.path} 
+                        className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                        onClick={() => setSheetOpen(false)}
+                      >
+                        {item.icon}
+                        {item.name}
+                      </Link>
+                    ))}
+                    
+                    {isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                        <Link 
+                          to="/history" 
+                          className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                          onClick={() => setSheetOpen(false)}
+                        >
+                          <History className="h-4 w-4 mr-2" />
+                          Identification History
+                        </Link>
+                        <Link 
+                          to="/subscription" 
+                          className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                          onClick={() => setSheetOpen(false)}
+                        >
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Subscription
+                        </Link>
+                      </>
+                    )}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+            
             <Link to="/" className="flex items-center">
-              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
-                <span className="font-bold text-sm">PL</span>
-              </div>
-              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
+              <span className="font-bold text-xl">PharmaLens</span>
             </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-6">
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                    location.pathname === link.path
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                  }`}
-                >
-                  {link.name}
+            
+            <nav className="hidden lg:flex ml-8 space-x-2">
+              {menuItems.map((item) => (
+                <Link key={item.name} to={item.path} className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-pharma-600 dark:hover:text-pharma-400">
+                  {item.name}
                 </Link>
               ))}
-              {isAuthenticated && (
-                <Link
-                  to="/history"
-                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                    location.pathname === '/history'
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                  }`}
-                >
-                  History
-                </Link>
-              )}
             </nav>
-
-            {/* Right Side Actions */}
-            <div className="flex items-center space-x-2">
-              <Link to="/search" className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors">
-                <Search className="h-5 w-5" />
-              </Link>
-
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
-
-              {!isLoading && (
-                <>
-                  {isAuthenticated ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                          <UserCircle className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>
-                          {user?.email}
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link to="/history" className="flex items-center w-full cursor-pointer">
-                            <History className="mr-2 h-4 w-4" />
-                            <span>History</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDonation} className="flex items-center cursor-pointer">
-                          <Coffee className="mr-2 h-4 w-4 text-amber-600" />
-                          <span>Buy Me a Coffee</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Sign out</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="hidden md:flex">
-                      <LogIn className="mr-2 h-4 w-4" />
-                      Sign In
-                    </Button>
-                  )}
-                </>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={() => navigate('/search')}>
+              <Search className="h-[1.2rem] w-[1.2rem]" />
+            </Button>
+            
+            <Button variant="outline" size="icon" className="rounded-full" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+              {theme === 'dark' ? (
+                <Sun className="h-[1.2rem] w-[1.2rem]" />
+              ) : (
+                <Moon className="h-[1.2rem] w-[1.2rem]" />
               )}
-
-              {/* Mobile Menu Toggle - Only visible on non-bottom nav screens */}
-              <button
-                className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-              >
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            </div>
+            </Button>
+            
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+            ) : isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full w-9 h-9 p-0 bg-pharma-50 dark:bg-pharma-900/20">
+                    <span className="sr-only">User menu</span>
+                    <span className="flex h-full w-full items-center justify-center rounded-full text-pharma-700 dark:text-pharma-300">
+                      {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex flex-col p-2">
+                    <p className="text-sm font-medium">{user?.email}</p>
+                    <p className="text-xs text-gray-500 truncate">Signed in</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  {userMenuItems.map((item) => (
+                    <DropdownMenuItem key={item.name} onClick={item.action} className="cursor-pointer">
+                      {item.icon}
+                      <span>{item.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="default" onClick={() => navigate('/auth')}>
+                Login
+              </Button>
+            )}
           </div>
         </div>
-
-        {/* Mobile Menu Overlay */}
-        {isOpen && (
-          <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 pt-16 transition-colors duration-300">
-            <nav className="container mx-auto px-4 py-8 flex flex-col space-y-6">
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`text-lg font-medium transition-colors ${
-                    location.pathname === link.path
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-800 dark:text-gray-200'
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              
-              {isAuthenticated && (
-                <>
-                  <Link
-                    to="/history"
-                    className={`text-lg font-medium transition-colors ${
-                      location.pathname === '/history'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-800 dark:text-gray-200'
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    History
-                  </Link>
-                  
-                  <button
-                    onClick={() => {
-                      handleDonation();
-                      setIsOpen(false);
-                    }}
-                    className="text-lg font-medium text-amber-600 transition-colors flex items-center"
-                  >
-                    <Coffee className="mr-2 h-5 w-5" />
-                    Buy Me a Coffee
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      handleSignOut();
-                      setIsOpen(false);
-                    }}
-                    className="text-lg font-medium text-red-500 transition-colors flex items-center"
-                  >
-                    <LogOut className="mr-2 h-5 w-5" />
-                    Sign Out
-                  </button>
-                </>
-              )}
-              
-              {!isAuthenticated && !isLoading && (
-                <Link
-                  to="/auth"
-                  className="text-lg font-medium text-pharma-600 dark:text-pharma-400 transition-colors flex items-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Sign In
-                </Link>
-              )}
-              
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6">
-                <div className="flex flex-col space-y-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    © {new Date().getFullYear()} PharmaLens. All rights reserved.
-                  </p>
-                  <div className="flex space-x-4">
-                    <Link to="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
-                      Terms
-                    </Link>
-                    <Link to="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
-                      Privacy
-                    </Link>
-                    <Link to="/disclaimer" className="text-sm text-gray-500 dark:text-gray-400 hover:text-pharma-600 dark:hover:text-pharma-400">
-                      Disclaimer
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </nav>
-          </div>
-        )}
-      </header>
-
-      {/* Mobile Bottom Navigation - Only visible on mobile */}
-      {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 h-16 transition-colors duration-300">
-          <div className="grid grid-cols-5 h-full">
-            {mainLinks.slice(0, 5).map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`flex flex-col items-center justify-center space-y-1 ${
-                  location.pathname === link.path
-                    ? 'text-pharma-600 dark:text-pharma-400'
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}
-              >
-                <link.icon className="h-5 w-5" />
-                <span className="text-xs">{link.name}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-      )}
-
-      {/* Add padding to bottom of page on mobile to account for bottom navigation */}
-      {isMobile && <div className="h-16" />}
-    </>
+      </div>
+    </header>
   );
 };
 
