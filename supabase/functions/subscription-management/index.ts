@@ -53,21 +53,20 @@ serve(async (req) => {
     }
     
     if (req.method === 'POST') {
-      const reqJson = await req.json();
-      const { body } = reqJson;
+      const reqBody = await req.json();
       
       // Different operations based on the path
       switch (path) {
         case 'create-order':
-          return await createOrder(body, user, supabase);
+          return await createOrder(reqBody, user, supabase);
         case 'verify-payment':
-          return await verifyPayment(body, user, supabase);
+          return await verifyPayment(reqBody, user, supabase);
         case 'verify-subscription':
-          return await verifySubscription(body, user, supabase);
+          return await verifySubscription(reqBody, user, supabase);
         case 'check-subscription-status':
           return await checkSubscriptionStatus(user.id, supabase);
         case 'redeem-coupon':
-          return await redeemCoupon(body, user, supabase);
+          return await redeemCoupon(reqBody, user, supabase);
         default:
           return new Response(
             JSON.stringify({ error: 'Invalid endpoint' }),
