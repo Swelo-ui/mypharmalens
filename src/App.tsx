@@ -21,8 +21,6 @@ import Disclaimer from "./pages/Disclaimer";
 import Auth from "./pages/Auth";
 import IdentificationHistory from "./pages/IdentificationHistory";
 import Subscription from "./pages/Subscription";
-import RazorpayCallback from "./components/RazorpayCallback";
-import RazorpayScriptLoader from "./components/subscription/RazorpayScriptLoader";
 
 const queryClient = new QueryClient();
 
@@ -31,31 +29,28 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <RazorpayScriptLoader>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/identify" element={<DrugIdentify />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/help" element={<HelpCenter />} />
-            <Route path="/help/:categoryId" element={<HelpCategory />} />
-            <Route path="/help/article/:articleId" element={<HelpArticlePage />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-            <Route path="/drug/:id" element={<DrugPage />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/history" element={<IdentificationHistory />} />
-            <Route path="/subscription" element={<Subscription />} />
-            <Route path="/payment/callback" element={<RazorpayCallback />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </RazorpayScriptLoader>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/identify" element={<DrugIdentify />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/help/:categoryId" element={<HelpCategory />} />
+          <Route path="/help/article/:articleId" element={<HelpArticlePage />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/drug/:id" element={<DrugPage />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/history" element={<IdentificationHistory />} />
+          <Route path="/subscription" element={<Subscription />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -42,16 +42,7 @@ interface CurrentSubscriptionProps {
 
 const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) => {
   const [claimingDailyBonus, setClaimingDailyBonus] = React.useState(false);
-  
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-  
+
   const handleClaimDailyBonus = async () => {
     try {
       setClaimingDailyBonus(true);
@@ -86,58 +77,48 @@ const CurrentSubscription = ({ subscription, usage }: CurrentSubscriptionProps) 
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 mb-8 shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Current Subscription</h2>
+      <h2 className="text-xl font-semibold mb-4">Identification Usage</h2>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <div className="flex items-center mb-2">
-            <span className="text-lg font-medium">{subscription.subscription_plans.name} Plan</span>
-            <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-              Active
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            {subscription.subscription_plans.description}
-          </p>
           <div className="space-y-2 text-sm">
-            <p><span className="font-medium">Started:</span> {formatDate(subscription.subscription_start)}</p>
-            <p><span className="font-medium">Expires:</span> {formatDate(subscription.subscription_end)}</p>
-            
-            <div className="flex items-center">
-              <span className="font-medium mr-1">Monthly identifications:</span> 
-              {subscription.subscription_plans.monthly_identifications}
-              
-              {usage?.bonus_from_coupons ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900/30 dark:text-blue-300 flex items-center">
-                        +{usage.bonus_from_coupons} bonus
-                        <InfoIcon className="h-3 w-3 ml-1" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Bonus identifications from redeemed coupons</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : null}
-              
-              {usage?.daily_free ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-green-900/30 dark:text-green-300 flex items-center">
-                        +{usage.daily_free} daily
-                        <Gift className="h-3 w-3 ml-1" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Daily free identifications</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : null}
-            </div>
+            {usage && (
+              <div className="flex items-center">
+                <span className="font-medium mr-1">Monthly identifications:</span> 
+                {subscription.subscription_plans.monthly_identifications}
+                
+                {usage?.bonus_from_coupons ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900/30 dark:text-blue-300 flex items-center">
+                          +{usage.bonus_from_coupons} bonus
+                          <InfoIcon className="h-3 w-3 ml-1" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Bonus identifications from redeemed coupons</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : null}
+                
+                {usage?.daily_free ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-green-900/30 dark:text-green-300 flex items-center">
+                          +{usage.daily_free} daily
+                          <Gift className="h-3 w-3 ml-1" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Daily free identifications</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : null}
+              </div>
+            )}
             
             {/* Daily Bonus Section */}
             <div className="mt-4 pt-4 border-t">

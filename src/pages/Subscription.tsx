@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -8,29 +9,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import CurrentSubscription from '@/components/subscription/CurrentSubscription';
-import PlanCard from '@/components/subscription/PlanCard';
-import ComparisonTable from '@/components/subscription/ComparisonTable';
-import PaymentDialog from '@/components/subscription/PaymentDialog';
 import CouponRedemption from '@/components/subscription/CouponRedemption';
-
-interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  price_inr: number;
-  monthly_identifications: number;
-  features: string[];
-  razorpay_plan_id?: string;
-  subscription_button_id?: string;
-}
-
-interface SubscriptionData {
-  id: string;
-  status: string;
-  subscription_start: string;
-  subscription_end: string;
-  subscription_plans: Plan;
-}
 
 interface UsageData {
   used: number;
@@ -39,18 +18,15 @@ interface UsageData {
   percentage: number;
   base_monthly?: number;
   bonus_from_coupons?: number;
+  daily_free?: number;
+  last_claimed?: string;
 }
 
 const Subscription = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStatus();
   const [isLoading, setIsLoading] = useState(true);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [currentSubscription, setCurrentSubscription] = useState<SubscriptionData | null>(null);
+  const [currentSubscription, setCurrentSubscription] = useState(null);
   const [usage, setUsage] = useState<UsageData | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [processingPayment, setProcessingPayment] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -65,25 +41,11 @@ const Subscription = () => {
     }
   }, [isAuthenticated, authLoading, user]);
 
-  useEffect(() => {
-    if (plans && plans.length > 0) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.razorpay.com/static/widget/subscription-button.js';
-      script.async = true;
-      document.body.appendChild(script);
-      
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [plans]);
-
   const loadSubscriptionData = async () => {
     try {
       setIsLoading(true);
       setError(null);
       await Promise.all([
-        fetchSubscriptionPlans(),
         fetchUserSubscription(),
         fetchUsageData()
       ]);
@@ -93,65 +55,6 @@ const Subscription = () => {
       toast.error(`Failed to load subscription data: ${error.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchSubscriptionPlans = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('subscription-management/subscription-plans');
-      
-      if (error) {
-        console.error('Error fetching plans:', error);
-        const defaultPlans = [
-          {
-            id: "free-plan",
-            name: 'Free',
-            description: 'Basic features for getting started',
-            price_inr: 0,
-            monthly_identifications: 5,
-            features: ['Basic drug identification', 'Limited history storage (10 items)', 'Standard response time']
-          },
-          {
-            id: "advanced-plan",
-            name: 'Advanced',
-            description: 'Enhanced features for regular users',
-            price_inr: 299,
-            monthly_identifications: 30,
-            features: ['Enhanced drug identification', 'Full history access (100 items)', 'Faster response time', 'Detailed medication reports'],
-            razorpay_plan_id: 'plan_QF0j2DLuOBwNHE',
-            subscription_button_id: 'pl_QF1itg7gdfQFbF'
-          },
-          {
-            id: "elite-plan",
-            name: 'Elite',
-            description: 'Premium features for power users',
-            price_inr: 599,
-            monthly_identifications: 100,
-            features: ['Premium drug identification', 'Unlimited history storage', 'Priority response time', 'Comprehensive medication reports'],
-            razorpay_plan_id: 'plan_QF0jNqqpycThRR',
-            subscription_button_id: 'pl_QFGGMMuM37x0Sp'
-          }
-        ];
-        setPlans(defaultPlans);
-        return;
-      }
-      
-      if (data?.plans && data.plans.length > 0) {
-        const updatedPlans = data.plans.map((plan: Plan) => {
-          if (plan.name === 'Advanced') {
-            return { ...plan, subscription_button_id: 'pl_QF1itg7gdfQFbF' };
-          } else if (plan.name === 'Elite') {
-            return { ...plan, subscription_button_id: 'pl_QFGGMMuM37x0Sp' };
-          }
-          return plan;
-        });
-        setPlans(updatedPlans);
-      } else {
-        throw new Error('No plans returned from server');
-      }
-    } catch (error: any) {
-      console.error('Error fetching plans:', error);
-      throw error;
     }
   };
 
@@ -181,51 +84,9 @@ const Subscription = () => {
     }
   };
 
-  const handleSelectPlan = async (plan: Plan) => {
-    if (!user) {
-      toast.error('Please sign in to subscribe');
-      navigate('/auth');
-      return;
-    }
-
-    setSelectedPlan(plan);
-    
-    try {
-      setProcessingPayment(true);
-      
-      if (plan.price_inr === 0) {
-        const { data, error } = await supabase.functions.invoke('subscription-management/create-order', {
-          body: { planId: plan.id }
-        });
-        
-        if (error) throw new Error(error.message);
-        
-        if (data?.success) {
-          toast.success(data.message);
-          await loadSubscriptionData();
-        }
-      } else {
-        setPaymentDialogOpen(true);
-      }
-    } catch (error: any) {
-      console.error('Error selecting plan:', error);
-      toast.error(`Failed to initialize subscription: ${error.message}`);
-    } finally {
-      setProcessingPayment(false);
-    }
-  };
-
   const handleCouponSuccess = () => {
     fetchUsageData();
     fetchUserSubscription();
-  };
-
-  const isPlanActive = (planName: string) => {
-    return currentSubscription?.subscription_plans.name === planName;
-  };
-
-  const toggleComparison = () => {
-    setShowComparison(!showComparison);
   };
 
   const handleRetry = () => {
@@ -273,9 +134,9 @@ const Subscription = () => {
     <>
       <Header />
       <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-3xl font-bold mb-2">Subscription Plans</h1>
+        <h1 className="text-3xl font-bold mb-2">Usage Management</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Choose the right plan for your medication identification needs
+          Monitor your medication identification usage and add bonus identifications
         </p>
 
         {currentSubscription && (
@@ -290,64 +151,6 @@ const Subscription = () => {
             <CouponRedemption onSuccess={handleCouponSuccess} />
           </div>
         )}
-
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-md shadow-sm">
-            <Button 
-              variant={!showComparison ? "default" : "outline"}
-              className="rounded-r-none"
-              onClick={() => setShowComparison(false)}
-            >
-              Plans
-            </Button>
-            <Button 
-              variant={showComparison ? "default" : "outline"}
-              className="rounded-l-none"
-              onClick={() => setShowComparison(true)}
-            >
-              Compare Features
-            </Button>
-          </div>
-        </div>
-
-        {!showComparison ? (
-          plans && plans.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {plans.map((plan) => (
-                <PlanCard 
-                  key={plan.id}
-                  plan={plan}
-                  isActive={isPlanActive(plan.name)}
-                  processingPayment={processingPayment}
-                  selectedPlan={selectedPlan}
-                  onSelectPlan={handleSelectPlan}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No subscription plans available</p>
-            </div>
-          )
-        ) : (
-          plans && plans.length > 0 ? (
-            <ComparisonTable 
-              plans={plans}
-              isPlanActive={isPlanActive}
-              handleSelectPlan={handleSelectPlan}
-            />
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No subscription plans available to compare</p>
-            </div>
-          )
-        )}
-
-        <PaymentDialog 
-          open={paymentDialogOpen}
-          onOpenChange={setPaymentDialogOpen}
-          selectedPlan={selectedPlan}
-        />
       </div>
     </>
   );
