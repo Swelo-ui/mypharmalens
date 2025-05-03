@@ -1,8 +1,14 @@
+
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
   onImageCapture?: (file: File) => void;
@@ -156,7 +162,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
         <div className="w-full relative rounded-xl overflow-hidden shadow-lg transition-all animate-scale-in">
           <div className="absolute top-2 right-2 z-10 flex gap-2">
             {imageQualityWarning && (
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="p-2 rounded-full bg-yellow-500/80 text-white">
