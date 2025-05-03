@@ -5,6 +5,7 @@ import './index.css'
 import { ThemeProvider } from 'next-themes'
 import BottomNavigation from './components/BottomNavigation'
 import { BrowserRouter } from 'react-router-dom'
+import { Toaster } from 'sonner'
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -13,6 +14,7 @@ root.render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
       <BottomNavigation />
+      <Toaster position="top-center" />
     </ThemeProvider>
   </BrowserRouter>
 );
