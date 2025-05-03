@@ -20,9 +20,6 @@ import Terms from "./pages/Terms";
 import Disclaimer from "./pages/Disclaimer";
 import Auth from "./pages/Auth";
 import IdentificationHistory from "./pages/IdentificationHistory";
-import Subscription from "./pages/Subscription";
-import Profile from "./pages/Profile";
-import BottomNavigation from "./components/BottomNavigation";
 
 const queryClient = new QueryClient();
 
@@ -48,12 +45,9 @@ const App = () => (
           <Route path="/drug/:id" element={<DrugPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/history" element={<IdentificationHistory />} />
-          <Route path="/subscription" element={<Subscription />} />
-          <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <BottomNavigation />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

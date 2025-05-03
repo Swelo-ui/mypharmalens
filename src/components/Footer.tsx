@@ -2,13 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pill, Heart, ExternalLink, Mail, Linkedin, Github } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const Footer = () => {
-  const isMobile = useIsMobile();
-  
   return (
-    <footer className={`border-t border-gray-200 dark:border-gray-800 mt-12 py-12 px-4 ${isMobile ? "pb-20" : ""}`}>
+    <footer className="border-t border-gray-200 dark:border-gray-800 mt-12 py-12 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">

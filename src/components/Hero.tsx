@@ -1,9 +1,8 @@
 
 import React, { useEffect, useRef } from 'react';
-import { Search, Camera, Pill, FileText, CheckCircle2 } from 'lucide-react';
+import { Search, Camera, Pill, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -91,7 +90,7 @@ const Hero = () => {
         </div>
         
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((feature, i) => (
             <div
               key={i}
