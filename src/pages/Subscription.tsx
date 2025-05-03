@@ -50,9 +50,9 @@ const Subscription = () => {
         fetchUsageData()
       ]);
     } catch (error: any) {
-      console.error('Error loading subscription data:', error);
-      setError(`Failed to load subscription data: ${error.message || 'Unknown error'}`);
-      toast.error(`Failed to load subscription data: ${error.message || 'Unknown error'}`);
+      console.error('Error loading usage data:', error);
+      setError(`Failed to load usage data: ${error.message || 'Unknown error'}`);
+      toast.error(`Failed to load usage data: ${error.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -97,10 +97,10 @@ const Subscription = () => {
     return (
       <>
         <Header />
-        <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
+        <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12 mb-16">
           <div className="flex flex-col justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-gray-500">Loading subscription information...</p>
+            <p className="text-gray-500">Loading usage information...</p>
           </div>
         </div>
       </>
@@ -111,7 +111,7 @@ const Subscription = () => {
     return (
       <>
         <Header />
-        <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
+        <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12 mb-16">
           <div className="flex flex-col justify-center items-center py-12">
             <div className="w-full max-w-md">
               <Alert className="mb-6 border-red-200 bg-red-50">
@@ -133,7 +133,7 @@ const Subscription = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12 mb-16">
         <h1 className="text-3xl font-bold mb-2">Usage Management</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-8">
           Monitor your medication identification usage and add bonus identifications

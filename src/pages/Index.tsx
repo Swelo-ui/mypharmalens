@@ -6,8 +6,11 @@ import Hero from '@/components/Hero';
 import SearchBar from '@/components/SearchBar';
 import Footer from '@/components/Footer';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain } from 'lucide-react';
+import { useMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
+  const { isMobile } = useMobile();
+  
   // Function to handle animations on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -34,7 +37,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col ${isMobile ? "pb-16" : ""}`}>
       <Header />
       
       <main className="flex-1">

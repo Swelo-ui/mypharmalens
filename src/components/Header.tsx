@@ -12,9 +12,7 @@ import {
   Settings,
   History,
   Home,
-  Pill,
-  CreditCard,
-  BarChart
+  Pill
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,12 +26,14 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuthStatus();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { isMobile } = useMobile();
 
   const handleLogout = async () => {
     try {
@@ -56,13 +56,16 @@ const Header = () => {
   const userMenuItems = [
     { name: 'Profile', icon: <User className="h-4 w-4 mr-2" />, action: () => navigate('/profile') },
     { name: 'History', icon: <History className="h-4 w-4 mr-2" />, action: () => navigate('/history') },
-    { name: 'Subscription', icon: <CreditCard className="h-4 w-4 mr-2" />, action: () => navigate('/subscription') },
-    { name: 'Usage Management', icon: <BarChart className="h-4 w-4 mr-2" />, action: () => navigate('/subscription') },
     { name: 'Logout', icon: <LogOut className="h-4 w-4 mr-2" />, action: handleLogout }
   ];
 
+  // Add padding to the bottom if mobile to accommodate the bottom navigation
+  const headerClasses = isMobile 
+    ? "fixed top-0 w-full z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800" 
+    : "fixed top-0 w-full z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800";
+
   return (
-    <header className="fixed top-0 w-full z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+    <header className={headerClasses}>
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -99,14 +102,6 @@ const Header = () => {
                           <History className="h-4 w-4 mr-2" />
                           Identification History
                         </Link>
-                        <Link 
-                          to="/subscription" 
-                          className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-                          onClick={() => setSheetOpen(false)}
-                        >
-                          <CreditCard className="h-4 w-4 mr-2" />
-                          Subscription
-                        </Link>
                       </>
                     )}
                   </nav>
@@ -128,48 +123,54 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => navigate('/search')}>
-              <Search className="h-[1.2rem] w-[1.2rem]" />
-            </Button>
+            {!isMobile && (
+              <>
+                <Button variant="outline" size="icon" className="rounded-full" onClick={() => navigate('/search')}>
+                  <Search className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+                
+                <Button variant="outline" size="icon" className="rounded-full" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                  {theme === 'dark' ? (
+                    <Sun className="h-[1.2rem] w-[1.2rem]" />
+                  ) : (
+                    <Moon className="h-[1.2rem] w-[1.2rem]" />
+                  )}
+                </Button>
+              </>
+            )}
             
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-              {theme === 'dark' ? (
-                <Sun className="h-[1.2rem] w-[1.2rem]" />
+            {!isMobile && (
+              isLoading ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+              ) : isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="rounded-full w-9 h-9 p-0 bg-pharma-50 dark:bg-pharma-900/20">
+                      <span className="sr-only">User menu</span>
+                      <span className="flex h-full w-full items-center justify-center rounded-full text-pharma-700 dark:text-pharma-300">
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="flex flex-col p-2">
+                      <p className="text-sm font-medium">{user?.email}</p>
+                      <p className="text-xs text-gray-500 truncate">Signed in</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    {userMenuItems.map((item) => (
+                      <DropdownMenuItem key={item.name} onClick={item.action} className="cursor-pointer">
+                        {item.icon}
+                        <span>{item.name}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <Moon className="h-[1.2rem] w-[1.2rem]" />
-              )}
-            </Button>
-            
-            {isLoading ? (
-              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
-            ) : isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="rounded-full w-9 h-9 p-0 bg-pharma-50 dark:bg-pharma-900/20">
-                    <span className="sr-only">User menu</span>
-                    <span className="flex h-full w-full items-center justify-center rounded-full text-pharma-700 dark:text-pharma-300">
-                      {user?.email?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="flex flex-col p-2">
-                    <p className="text-sm font-medium">{user?.email}</p>
-                    <p className="text-xs text-gray-500 truncate">Signed in</p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  {userMenuItems.map((item) => (
-                    <DropdownMenuItem key={item.name} onClick={item.action} className="cursor-pointer">
-                      {item.icon}
-                      <span>{item.name}</span>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button variant="default" onClick={() => navigate('/auth')}>
-                Login
-              </Button>
+                <Button variant="default" onClick={() => navigate('/auth')}>
+                  Login
+                </Button>
+              )
             )}
           </div>
         </div>

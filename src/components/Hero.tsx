@@ -59,48 +59,6 @@ const Hero = () => {
     },
   ];
 
-  // Subscription plans for the hero section
-  const subscriptionPlans = [
-    {
-      name: "Free",
-      price: 0,
-      identifications: 5,
-      features: [
-        "Basic drug identification",
-        "Limited history storage (10 items)",
-        "Standard response time"
-      ],
-      buttonText: "Get Started",
-      highlighted: false
-    },
-    {
-      name: "Advanced",
-      price: 299,
-      identifications: 30,
-      features: [
-        "Enhanced drug identification",
-        "Full history access (100 items)",
-        "Faster response time",
-        "Detailed medication reports"
-      ],
-      buttonText: "Upgrade Now",
-      highlighted: true
-    },
-    {
-      name: "Elite",
-      price: 599,
-      identifications: 100,
-      features: [
-        "Premium drug identification",
-        "Unlimited history storage",
-        "Priority response time",
-        "Comprehensive medication reports"
-      ],
-      buttonText: "Go Premium",
-      highlighted: false
-    }
-  ];
-
   return (
     <div className="relative pt-16 pb-12 md:pt-24 md:pb-16 overflow-hidden">
       {/* Background Gradient */}
@@ -153,64 +111,6 @@ const Hero = () => {
               </p>
             </div>
           ))}
-        </div>
-        
-        {/* Subscription Plans */}
-        <div className="mt-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Choose Your Plan</h2>
-          <p className="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-10">
-            Select the subscription that fits your needs and enhance your medication identification experience
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {subscriptionPlans.map((plan, index) => (
-              <div 
-                key={index}
-                className={cn(
-                  "rounded-xl border bg-white dark:bg-gray-800 p-6 shadow-sm transition-all duration-300",
-                  plan.highlighted ? "border-pharma-500 shadow-md dark:border-pharma-400" : "border-gray-200 dark:border-gray-700"
-                )}
-              >
-                <div className="text-center">
-                  <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-3xl font-bold">₹{plan.price}</span>
-                    <span className="text-gray-500 dark:text-gray-400 ml-1">/month</span>
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 font-medium">
-                    {plan.identifications} identifications per month
-                  </p>
-                </div>
-                
-                <div className="space-y-3 mb-6">
-                  {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-pharma-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                
-                <Link to="/subscription">
-                  <Button 
-                    variant={plan.highlighted ? "default" : "outline"} 
-                    className={cn(
-                      "w-full", 
-                      plan.highlighted ? "bg-pharma-600 hover:bg-pharma-700" : ""
-                    )}
-                  >
-                    {plan.buttonText}
-                  </Button>
-                </Link>
-              </div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link to="/subscription?compare=true" className="text-pharma-600 hover:text-pharma-800 font-medium transition-colors">
-              Compare all features →
-            </Link>
-          </div>
         </div>
       </div>
     </div>
