@@ -16,7 +16,7 @@ const BottomNavigation = () => {
     { path: '/search', icon: Search, label: 'Search' },
     { path: '/identify', icon: Camera, label: 'Identify' },
     { path: '/history', icon: History, label: 'History' },
-    { path: '/auth', icon: User, label: 'Profile' },
+    { path: '/profile', icon: User, label: 'Profile' },
   ];
 
   return (

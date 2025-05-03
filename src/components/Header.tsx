@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
@@ -100,6 +101,14 @@ const Header = () => {
                         >
                           <History className="h-4 w-4 mr-2" />
                           Identification History
+                        </Link>
+                        <Link 
+                          to="/profile" 
+                          className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                          onClick={() => setSheetOpen(false)}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          Profile
                         </Link>
                       </>
                     )}
