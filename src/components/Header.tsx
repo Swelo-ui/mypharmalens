@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
@@ -26,14 +25,14 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuthStatus();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
 
   const handleLogout = async () => {
     try {

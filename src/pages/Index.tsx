@@ -6,10 +6,10 @@ import Hero from '@/components/Hero';
 import SearchBar from '@/components/SearchBar';
 import Footer from '@/components/Footer';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain } from 'lucide-react';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   
   // Function to handle animations on scroll
   useEffect(() => {

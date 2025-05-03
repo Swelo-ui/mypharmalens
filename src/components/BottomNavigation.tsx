@@ -3,11 +3,11 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Camera, History, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const BottomNavigation = () => {
   const location = useLocation();
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
 
   if (!isMobile) return null;
 
