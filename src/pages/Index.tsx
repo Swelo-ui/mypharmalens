@@ -5,9 +5,13 @@ import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import SearchBar from '@/components/SearchBar';
 import Footer from '@/components/Footer';
+import BottomNavigation from '@/components/BottomNavigation';
+import { useMediaQuery } from '@/hooks/use-mobile';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain } from 'lucide-react';
 
 const Index = () => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
   // Function to handle animations on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -219,6 +223,8 @@ const Index = () => {
       </main>
       
       <Footer />
+      
+      {isMobile && <BottomNavigation />}
     </div>
   );
 };

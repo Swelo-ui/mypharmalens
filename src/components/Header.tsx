@@ -74,6 +74,39 @@ const Header = () => {
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
 
+  // Don't render the full header on specific pages when on mobile
+  const isCompactHeader = isMobile && ['/identify', '/search', '/history', '/profile'].includes(location.pathname);
+
+  // If it's a page with bottom navigation on mobile, render a minimal header
+  if (isCompactHeader) {
+    return (
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
+              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-sm">PL</span>
+              </div>
+              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
+            </Link>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
@@ -145,6 +178,12 @@ const Header = () => {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
+                          <Link to="/profile" className="flex items-center w-full cursor-pointer">
+                            <UserCircle className="mr-2 h-4 w-4" />
+                            <span>Profile</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link to="/history" className="flex items-center w-full cursor-pointer">
                             <History className="mr-2 h-4 w-4" />
                             <span>History</span>
@@ -171,13 +210,15 @@ const Header = () => {
               )}
 
               {/* Mobile Menu Toggle - Only visible on non-bottom nav screens */}
-              <button
-                className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-              >
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
+              {!isMobile && (
+                <button
+                  className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
+                  onClick={() => setIsOpen(!isOpen)}
+                  aria-label="Toggle menu"
+                >
+                  {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -213,6 +254,18 @@ const Header = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     History
+                  </Link>
+                  
+                  <Link
+                    to="/profile"
+                    className={`text-lg font-medium transition-colors ${
+                      location.pathname === '/profile'
+                        ? 'text-pharma-600 dark:text-pharma-400'
+                        : 'text-gray-800 dark:text-gray-200'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile
                   </Link>
                   
                   <button
@@ -272,31 +325,6 @@ const Header = () => {
           </div>
         )}
       </header>
-
-      {/* Mobile Bottom Navigation - Only visible on mobile */}
-      {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 h-16 transition-colors duration-300">
-          <div className="grid grid-cols-5 h-full">
-            {mainLinks.slice(0, 5).map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`flex flex-col items-center justify-center space-y-1 ${
-                  location.pathname === link.path
-                    ? 'text-pharma-600 dark:text-pharma-400'
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}
-              >
-                <link.icon className="h-5 w-5" />
-                <span className="text-xs">{link.name}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-      )}
-
-      {/* Add padding to bottom of page on mobile to account for bottom navigation */}
-      {isMobile && <div className="h-16" />}
     </>
   );
 };
