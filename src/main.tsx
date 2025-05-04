@@ -14,7 +14,7 @@ root.render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
       <BottomNavigation />
-      <Toaster position="top-center" />
+      <Toaster position="bottom-center" />
     </ThemeProvider>
   </BrowserRouter>
 );

@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -82,6 +83,8 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user's previous identifications when component loads
@@ -96,22 +99,29 @@ const DrugIdentify = () => {
     try {
       if (!user) return;
       
-      const { data, error } = await supabase
-        .from('drug_identifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        console.error('Error fetching previous identifications:', error);
-        return;
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
       }
-      
-      // Store previous identifications for potential matching
-      setPreviousIdentifications(data || []);
-      console.log('Loaded previous identifications for learning:', data?.length || 0);
+
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getIdentificationHistory',
+          data: { userId: user.id }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to fetch history");
+      }
+
+      console.log("Loaded previous identifications for learning:", response.data.data?.length || 0);
+      setPreviousIdentifications(response.data.data || []);
     } catch (err) {
-      console.error('Error in fetchPreviousIdentifications:', err);
+      console.error('Error fetching previous identifications:', err);
     }
   };
 
@@ -153,12 +163,49 @@ const DrugIdentify = () => {
     }
   };
 
+  // Function to manually save drug identification to the database
+  const handleSaveToHistory = async () => {
+    try {
+      if (!identifiedDrug) return;
+      if (!isAuthenticated) {
+        toast.info("Please sign in to save to history", {
+          action: {
+            label: "Sign In",
+            onClick: () => navigate('/auth')
+          }
+        });
+        return;
+      }
+
+      setIsSaving(true);
+      const result = await saveDrugIdentification({
+        name: identifiedDrug.name,
+        drug_name: identifiedDrug.name,
+        image: identifiedDrug.image,
+        image_url: identifiedDrug.image,
+        details: identifiedDrug
+      });
+
+      if (result) {
+        toast.success("Added to your history");
+        setIsSaved(true);
+      } else {
+        toast.error("Failed to save to history");
+      }
+    } catch (error) {
+      console.error("Error saving to history:", error);
+      toast.error("Failed to save to history");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Function to save drug identification to the database
   const saveDrugIdentification = async (drugData: any) => {
     try {
       if (!isAuthenticated || !user) {
         console.log('User not authenticated, skipping history save');
-        return;
+        return null;
       }
 
       const { data: sessionData } = await supabase.auth.getSession();
@@ -328,24 +375,8 @@ const DrugIdentify = () => {
                 brandNames: drugData.brandNames || []
               };
               
-              // Save the identification to Supabase if authenticated
-              if (isAuthenticated && user) {
-                try {
-                  await saveDrugIdentification({
-                    name: drugData.name,
-                    drug_name: drugData.name,
-                    image: drugData.image,
-                    image_url: drugData.image,
-                    details: drugData
-                  });
-                  console.log('Saved drug identification to Supabase');
-                } catch (saveError) {
-                  console.error('Failed to save drug identification:', saveError);
-                  // Don't block the UI for database errors
-                }
-              }
-              
               setIdentifiedDrug(formattedDrugData);
+              setIsSaved(false);
               setProcessingProgress(100);
               
               // Customize message based on whether this was from history or new identification
@@ -376,17 +407,6 @@ const DrugIdentify = () => {
               if (isImageLowRes || drugData.blurryModeUsed) {
                 toast.info("For better accuracy, consider uploading a higher quality image.", { 
                   duration: 5000 
-                });
-              }
-              
-              // Remind users to login to save history if they're not authenticated
-              if (!isAuthenticated) {
-                toast.info("Sign in to save this identification to your history", {
-                  duration: 8000,
-                  action: {
-                    label: "Sign In",
-                    onClick: () => navigate('/auth')
-                  }
                 });
               }
             } else {
@@ -425,6 +445,7 @@ const DrugIdentify = () => {
     setIsImageLowRes(false);
     setProcessingProgress(0);
     setProcessingPhase("");
+    setIsSaved(false);
   };
 
   // Function for manual search as fallback
@@ -437,7 +458,7 @@ const DrugIdentify = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-8">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-24">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold">Identify Medication</h1>
           
@@ -610,12 +631,42 @@ const DrugIdentify = () => {
           </>
         ) : (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-3">
               <h2 className="text-2xl font-semibold">Identification Result</h2>
-              <Button variant="outline" onClick={handleRetry}>
-                Identify Another
-              </Button>
+              <div className="flex gap-3">
+                {isAuthenticated && !isSaved && (
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleSaveToHistory}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="h-4 w-4" />
+                        <span>Save to History</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+                <Button variant="outline" onClick={handleRetry}>
+                  Identify Another
+                </Button>
+              </div>
             </div>
+            {isSaved && (
+              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <BookmarkPlus className="h-4 w-4" />
+                  <span>Saved to your identification history</span>
+                </div>
+              </Alert>
+            )}
             <DrugDetails drug={identifiedDrug} />
           </div>
         )}
