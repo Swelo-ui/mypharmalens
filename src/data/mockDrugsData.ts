@@ -495,6 +495,8 @@ export const mockDrugsData: DrugData[] = [
     description: 'Macrolide antibiotic used to treat a wide variety of bacterial infections including respiratory infections, skin infections, ear infections, and sexually transmitted diseases.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
+    image: 'https://www.drugs.com/images/pills/mmx/t109508f/azithromycin.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/11/VT/JO/VM/28186990/azithromycin-tablet-500x500.jpg'
   },
   {
     id: '42',
@@ -505,6 +507,8 @@ export const mockDrugsData: DrugData[] = [
     description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including infections of the skin, bone, joint, respiratory tract, and urinary tract.',
     drugClass: 'Fluoroquinolone antibiotic',
     verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/167140115.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/BO/HT/SY/28186990/ciprofloxacin-tablets-500x500.jpg'
   },
   {
     id: '43',
@@ -515,6 +519,8 @@ export const mockDrugsData: DrugData[] = [
     description: 'Tetracycline antibiotic used to treat a wide variety of bacterial infections, including respiratory tract infections, urinary tract infections, and severe acne.',
     drugClass: 'Tetracycline antibiotic',
     verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/006035430.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/8/IY/LB/AR/88223930/doxycycline-tablet-500x500.jpg'
   },
   {
     id: '44',
@@ -525,6 +531,8 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antibiotic and antiprotozoal medication used to treat bacterial infections of the vagina, stomach, liver, skin, joints, brain, and respiratory tract.',
     drugClass: 'Nitroimidazole antibiotic',
     verified: true,
+    image: 'https://www.drugs.com/images/pills/mmx/t110104f/metronidazole.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/RN/BU/HS/166734160/metronidazole-tablets-500x500.jpg'
   },
   {
     id: '45',
@@ -535,6 +543,8 @@ export const mockDrugsData: DrugData[] = [
     description: 'Combination antibiotic used to treat a variety of bacterial infections, including urinary tract infections, middle ear infections, and respiratory infections.',
     drugClass: 'Sulfonamide antibiotic',
     verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/167141151.jpg',
+    packageImage: 'https://5.imimg.com/data5/ANDROID/Default/2022/1/ZG/MY/DR/56660397/product-jpeg-500x500.jpg'
   },
   
   // Adding Essential Antihypertensives
@@ -548,7 +558,183 @@ export const mockDrugsData: DrugData[] = [
     drugClass: 'ACE inhibitor',
     verified: true,
     image: 'https://www.drugs.com/images/pills/nlm/000060131.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/MT/FH/ZR/13260118/enalapril-tablets-500x500.jpg'
+  },
+  {
+    id: '47',
+    name: 'Valsartan',
+    genericName: 'Valsartan',
+    manufacturer: 'Various',
+    category: 'Antihypertensive',
+    description: 'Angiotensin II receptor blocker used to treat high blood pressure and heart failure.',
+    drugClass: 'Angiotensin II receptor antagonist',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/000930776.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/1/QM/KO/PO/105951293/valsartan-tablets-500x500.jpg'
+  },
+  {
+    id: '48',
+    name: 'Diltiazem',
+    genericName: 'Diltiazem hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antihypertensive',
+    description: 'Calcium channel blocker used to treat high blood pressure and certain types of chest pain.',
+    drugClass: 'Calcium channel blocker',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/000930931.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/XD/JJ/GI/105951293/diltiazem-tablets-500x500.jpg'
+  },
+  
+  // Adding Pain Medications
+  {
+    id: '49',
+    name: 'Tramadol',
+    genericName: 'Tramadol hydrochloride',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Opioid pain medication used to treat moderate to moderately severe pain.',
+    drugClass: 'Opioid analgesic',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/006035346.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/IG/HC/XO/86588935/tramadol-hydrochloride-tablets-500x500.jpg'
+  },
+  {
+    id: '50',
+    name: 'Diclofenac',
+    genericName: 'Diclofenac sodium',
+    manufacturer: 'Various',
+    category: 'Anti-inflammatory',
+    description: 'NSAID used to treat pain, inflammatory disorders, and dysmenorrhea.',
+    drugClass: 'NSAID',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/006729022.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/YE/HI/OW/73800746/diclofenac-sodium-tablets-bp-500x500.jpg'
+  },
+  {
+    id: '51',
+    name: 'Naproxen',
+    genericName: 'Naproxen',
+    manufacturer: 'Various',
+    category: 'Anti-inflammatory',
+    description: 'NSAID used to treat pain, fever, and inflammation.',
+    drugClass: 'NSAID',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/001862272.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/4/EP/BV/QQ/138404772/naproxen-sodium-tablets-500x500.jpg'
+  },
+  
+  // Adding Diabetes Medications
+  {
+    id: '52',
+    name: 'Glimepiride',
+    genericName: 'Glimepiride',
+    manufacturer: 'Various',
+    category: 'Antidiabetic',
+    description: 'Sulfonylurea used to treat type 2 diabetes by increasing the amount of insulin produced by the pancreas.',
+    drugClass: 'Sulfonylurea',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/005910461.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/5/UG/CA/MG/10332382/glimepiride-tablets-500x500.jpg'
+  },
+  {
+    id: '53',
+    name: 'Pioglitazone',
+    genericName: 'Pioglitazone hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antidiabetic',
+    description: 'Thiazolidinedione used to treat type 2 diabetes by decreasing insulin resistance.',
+    drugClass: 'Thiazolidinedione',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/600780166.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/8/JS/KD/YP/2704753/pioglitazone-tablets-500x500.jpg'
+  },
+  {
+    id: '54',
+    name: 'Empagliflozin',
+    genericName: 'Empagliflozin',
+    manufacturer: 'Boehringer Ingelheim',
+    category: 'Antidiabetic',
+    description: 'SGLT-2 inhibitor used to treat type 2 diabetes by helping the kidneys get rid of glucose from the bloodstream.',
+    drugClass: 'SGLT-2 inhibitor',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/mmx/t110631f/jardiance.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/6/CH/PE/NK/83054226/empagliflozin-tablets-500x500.png'
+  },
+  
+  // Adding Mental Health Medications
+  {
+    id: '55',
+    name: 'Venlafaxine',
+    genericName: 'Venlafaxine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'SNRI used to treat major depressive disorder, generalized anxiety disorder, and social anxiety disorder.',
+    drugClass: 'SNRI',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/005910878.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/5/MC/OZ/GY/116051148/venlafaxine-tablets-500x500.jpg'
+  },
+  {
+    id: '56',
+    name: 'Duloxetine',
+    genericName: 'Duloxetine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'SNRI used to treat depression, anxiety, and certain types of chronic pain.',
+    drugClass: 'SNRI',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/mmx/t110307f/cymbalta.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/5/DI/BB/KR/105951293/duloxetine-capsules-500x500.jpg'
+  },
+  {
+    id: '57',
+    name: 'Quetiapine',
+    genericName: 'Quetiapine fumarate',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and as an add-on treatment for major depressive disorder.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/655950204.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/7/AE/XZ/TO/105951293/quetiapine-tablets-500x500.jpg'
+  },
+  
+  // Adding More Gastrointestinal Medications
+  {
+    id: '58',
+    name: 'Ranitidine',
+    genericName: 'Ranitidine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'H2 antagonist used to treat and prevent ulcers in the stomach and intestines.',
+    drugClass: 'H2 antagonist',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/000930538.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/1/GJ/RD/KH/13085548/ranitidine-tablets-ip-500x500.jpg'
+  },
+  {
+    id: '59',
+    name: 'Ondansetron',
+    genericName: 'Ondansetron hydrochloride',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'Serotonin 5-HT3 receptor antagonist used to prevent nausea and vomiting caused by cancer chemotherapy, radiation therapy, and surgery.',
+    drugClass: 'Serotonin 5-HT3 receptor antagonist',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/nlm/000930931.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/ME/HZ/MQ/109099452/ondansetron-tablet-500x500.png'
+  },
+  {
+    id: '60',
+    name: 'Domperidone',
+    genericName: 'Domperidone',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'Dopamine antagonist used to treat nausea and vomiting, and to increase milk production in breastfeeding mothers.',
+    drugClass: 'Dopamine antagonist',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/custom/pill22307-1/domperidone.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/10/UQ/IN/WM/44672480/domperidone-tablets-ip-500x500.jpg'
   }
 ]
 

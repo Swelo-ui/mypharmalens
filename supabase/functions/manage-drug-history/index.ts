@@ -34,21 +34,31 @@ serve(async (req) => {
 
     // Parse request body
     const { action, data } = await req.json();
+    console.log(`Received action: ${action} with data:`, data);
 
     let result;
     switch (action) {
       case 'addIdentification':
+        // Validate required fields
+        if (!data.userId || !data.drugName) {
+          throw new Error('Missing required fields: userId and drugName are required');
+        }
+        
+        console.log(`Adding identification for user ${data.userId}, drug ${data.drugName}`);
+        
         // Add a new drug identification to history
         result = await supabaseClient
           .from('drug_identifications')
           .insert({
             user_id: data.userId,
             drug_name: data.drugName,
-            image_url: data.imageUrl,
-            details: data.details,
+            image_url: data.imageUrl || null,
+            details: data.details || null,
             image_features: data.imageFeatures || null
           })
           .select();
+          
+        console.log('Insert result:', result);
         break;
         
       case 'removeIdentification':
@@ -73,10 +83,14 @@ serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
+    if (result.error) {
+      throw new Error(`Database operation failed: ${result.error.message}`);
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
       data: result.data, 
-      error: result.error 
+      error: null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -85,6 +99,7 @@ serve(async (req) => {
     console.error('Error in manage-drug-history function:', error);
     return new Response(JSON.stringify({ 
       success: false, 
+      data: null,
       error: error.message 
     }), {
       status: 400,

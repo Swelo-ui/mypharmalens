@@ -4,10 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
-// Avatar options with the new image URL
+// New cute cartoon avatars
 const avatars = [
-  { id: 'avatar-1', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=0-0', alt: 'Red Hair Girl Avatar' },
-  { id: 'avatar-2', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=1-0', alt: 'Boy Avatar' },
+  { id: 'avatar-1', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=0-0', alt: 'Girl with Red Hair Avatar' },
+  { id: 'avatar-2', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=1-0', alt: 'Boy with Blue Shirt Avatar' },
   { id: 'avatar-3', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=2-0', alt: 'Girl with Pigtails Avatar' },
   { id: 'avatar-4', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=3-0', alt: 'Boy with Glasses Avatar' },
   { id: 'avatar-5', src: '/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=0-1', alt: 'Red Hair Boy Avatar' },
@@ -37,7 +37,7 @@ const MedicineAvatarPicker = ({ value, onChange }: MedicineAvatarPickerProps) =>
         {avatars.map((avatar) => (
           <div key={avatar.id} className="flex flex-col items-center gap-2">
             <Label
-              htmlFor={`avatar-${avatar.id}`}
+              htmlFor={avatar.id}
               className={`cursor-pointer rounded-full p-1 flex items-center justify-center ${
                 value === avatar.id ? 'ring-2 ring-[#0384c6]' : 'hover:ring-2 hover:ring-gray-300'
               }`}
@@ -49,7 +49,7 @@ const MedicineAvatarPicker = ({ value, onChange }: MedicineAvatarPickerProps) =>
             </Label>
             <RadioGroupItem
               value={avatar.id}
-              id={`avatar-${avatar.id}`}
+              id={avatar.id}
               className="sr-only"
             />
           </div>
