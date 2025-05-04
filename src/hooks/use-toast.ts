@@ -1,19 +1,14 @@
 
-import { toast as sonnerToast, type ToastT } from "sonner";
-
-export interface Toast {
-  id: string;
-  title?: string;
-  description?: string;
-  action?: React.ReactNode;
-  variant?: "default" | "destructive";
-}
+import { toast as sonnerToast } from "sonner";
 
 export interface ToastOptions {
-  message: string;
+  message?: string;
+  title?: string;
   description?: string;
   type?: "default" | "success" | "info" | "warning" | "error";
   duration?: number;
+  variant?: "default" | "destructive";
+  action?: React.ReactNode;
 }
 
 export const useToast = () => {
@@ -22,38 +17,57 @@ export const useToast = () => {
       return sonnerToast(options);
     }
     
-    const { message, description, type = "default", duration } = options;
+    const { 
+      message, 
+      title, 
+      description, 
+      type = "default", 
+      duration,
+      action,
+      variant 
+    } = options;
+    
+    // Use title or message as the primary content
+    const content = title || message || "";
     
     switch (type) {
       case "success":
-        return sonnerToast.success(message, {
+        return sonnerToast.success(content, {
           description,
           duration,
+          action,
         });
       case "error":
-        return sonnerToast.error(message, {
+        return sonnerToast.error(content, {
           description,
           duration,
+          action,
         });
       case "warning":
-        return sonnerToast.warning(message, {
+        return sonnerToast.warning(content, {
           description,
           duration,
+          action,
         });
       case "info":
-        return sonnerToast.info(message, {
+        return sonnerToast.info(content, {
           description,
           duration,
+          action,
         });
       default:
-        return sonnerToast(message, {
+        return sonnerToast(content, {
           description,
           duration,
+          action,
         });
     }
   };
 
-  return { toast };
+  // This is needed for compatibility with the shadcn/ui toaster component
+  const toasts = [];
+
+  return { toast, toasts };
 };
 
 export { sonnerToast as toast };

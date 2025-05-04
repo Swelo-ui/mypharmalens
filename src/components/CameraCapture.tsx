@@ -1,9 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CameraCaptureProps {
   onImageCapture?: (file: File) => void;
@@ -55,18 +54,16 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
         setCameraActive(true);
       } else {
         toast({
-          title: "Camera not supported",
-          description: "Your browser doesn't support camera access.",
-          variant: "destructive",
+          message: "Camera not supported",
+          description: "Your browser doesn't support camera access."
         });
         setHasPermission(false);
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
-        title: "Camera access denied",
-        description: "Please grant permission to access your camera.",
-        variant: "destructive",
+        message: "Camera access denied", 
+        description: "Please grant permission to access your camera."
       });
       setHasPermission(false);
     }

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
@@ -50,9 +50,8 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     // Check if file is an image
     if (!file.type.match('image.*')) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, etc.)",
-        variant: "destructive",
+        message: "Invalid file type",
+        description: "Please upload an image file (JPEG, PNG, etc.)"
       });
       return;
     }
@@ -61,9 +60,8 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     if (file.size < 50 * 1024) {
       setImageQualityWarning(true);
       toast({
-        title: "Low quality image",
-        description: "This image may be too small for accurate identification. Consider using a higher resolution image.",
-        variant: "destructive",
+        message: "Low quality image",
+        description: "This image may be too small for accurate identification. Consider using a higher resolution image."
       });
     } else {
       setImageQualityWarning(false);

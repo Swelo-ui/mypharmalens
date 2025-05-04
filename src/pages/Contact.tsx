@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -34,9 +33,8 @@ const Contact = () => {
     // Validate form
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       toast({
-        title: "Incomplete form",
-        description: "Please fill in all fields",
-        variant: "destructive"
+        message: "Incomplete form",
+        description: "Please fill in all fields"
       });
       return;
     }
@@ -62,9 +60,8 @@ const Contact = () => {
       // Show success message
       setIsSuccess(true);
       toast({
-        title: "Message sent",
-        description: "We've received your message and will get back to you soon.",
-        variant: "default"
+        message: "Message sent",
+        description: "We've received your message and will get back to you soon."
       });
       
       // Reset form
@@ -82,9 +79,8 @@ const Contact = () => {
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: "Error",
-        description: "Failed to send your message. Please try again later.",
-        variant: "destructive"
+        message: "Error",
+        description: "Failed to send your message. Please try again later."
       });
     } finally {
       setIsSubmitting(false);
