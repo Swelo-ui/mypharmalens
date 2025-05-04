@@ -4,17 +4,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
-// Medicine avatar options
-const medicineAvatars = [
-  { id: 'pill-blue', src: '/lovable-uploads/0c37ed0c-2fd6-4344-9c87-2deb2ce28ac6.png', alt: 'Blue Pill Avatar' },
-  { id: 'pill-red', src: '/lovable-uploads/7f661aae-5eba-4e72-bd24-0e791d37ab5d.png', alt: 'Red Pill Avatar' },
-  { id: 'pill-green', src: '/lovable-uploads/85cbd19d-4eb1-48a3-b5ea-053e257ddac5.png', alt: 'Green Pill Avatar' },
-  { id: 'pill-yellow', src: '/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png', alt: 'Yellow Pill Avatar' },
-  { id: 'pill-orange', src: '/lovable-uploads/e598b849-9cf5-4101-8deb-b478c474baef.png', alt: 'Orange Pill Avatar' },
-  { id: 'capsule', src: 'https://img.icons8.com/?size=96&id=115496&format=png', alt: 'Capsule Avatar' },
-  { id: 'syringe', src: 'https://img.icons8.com/?size=96&id=118289&format=png', alt: 'Syringe Avatar' },
-  { id: 'stethoscope', src: 'https://img.icons8.com/?size=96&id=43755&format=png', alt: 'Stethoscope Avatar' },
-  { id: 'first-aid', src: 'https://img.icons8.com/?size=96&id=43859&format=png', alt: 'First Aid Avatar' },
+// Avatar options with the new image
+const avatars = [
+  { id: 'avatar-1', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=0-0', alt: 'Red Hair Boy Avatar' },
+  { id: 'avatar-2', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=1-0', alt: 'Brown Hair Girl Avatar' },
+  { id: 'avatar-3', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=2-0', alt: 'Blonde Hair Girl Avatar' },
+  { id: 'avatar-4', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=3-0', alt: 'Boy with Glasses Avatar' },
+  { id: 'avatar-5', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=0-1', alt: 'Red Hair Boy with Green Background Avatar' },
+  { id: 'avatar-6', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=1-1', alt: 'Crying Boy Avatar' },
+  { id: 'avatar-7', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=2-1', alt: 'Happy Girl with Purple Background Avatar' },
+  { id: 'avatar-8', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=3-1', alt: 'Boy with Blue Glasses Avatar' },
+  { id: 'avatar-9', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=0-2', alt: 'Boy with Cap Avatar' },
+  { id: 'avatar-10', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=1-2', alt: 'Girl with Hair Buns Avatar' },
+  { id: 'avatar-11', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=2-2', alt: 'Girl with Purple Hair Avatar' },
+  { id: 'avatar-12', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=3-2', alt: 'Boy with Curly Hair Avatar' },
+  { id: 'avatar-13', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=0-3', alt: 'Girl with Black Hair Avatar' },
+  { id: 'avatar-14', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=1-3', alt: 'Boy with Short Brown Hair Avatar' },
+  { id: 'avatar-15', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=2-3', alt: 'Boy with Fade Haircut Avatar' },
+  { id: 'avatar-16', src: '/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=3-3', alt: 'Boy with Cap and Yellow Background Avatar' },
 ];
 
 interface MedicineAvatarPickerProps {
@@ -26,8 +33,8 @@ const MedicineAvatarPicker = ({ value, onChange }: MedicineAvatarPickerProps) =>
   return (
     <div className="mb-6">
       <h3 className="text-lg font-medium mb-4">Choose an Avatar</h3>
-      <RadioGroup value={value} onValueChange={onChange} className="grid grid-cols-3 md:grid-cols-5 gap-4">
-        {medicineAvatars.map((avatar) => (
+      <RadioGroup value={value} onValueChange={onChange} className="grid grid-cols-4 gap-4">
+        {avatars.map((avatar) => (
           <div key={avatar.id} className="flex flex-col items-center gap-2">
             <Label
               htmlFor={`avatar-${avatar.id}`}
@@ -36,7 +43,7 @@ const MedicineAvatarPicker = ({ value, onChange }: MedicineAvatarPickerProps) =>
               }`}
             >
               <Avatar className="h-16 w-16">
-                <AvatarImage src={avatar.src} alt={avatar.alt} />
+                <AvatarImage src={avatar.src} alt={avatar.alt} className="object-cover" />
                 <AvatarFallback>{avatar.alt.charAt(0)}</AvatarFallback>
               </Avatar>
             </Label>

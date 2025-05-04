@@ -19,7 +19,7 @@ const Profile = () => {
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
-  const [avatar, setAvatar] = useState('pill-blue');
+  const [avatar, setAvatar] = useState('avatar-1');
   const [isUpdating, setIsUpdating] = useState(false);
   
   // Password change states
@@ -46,7 +46,7 @@ const Profile = () => {
           
           if (data) {
             setDisplayName(data.display_name || '');
-            setAvatar(data.avatar_url || 'pill-blue');
+            setAvatar(data.avatar_url || 'avatar-1');
           }
           
           // Set email from auth user
@@ -231,7 +231,18 @@ const Profile = () => {
                     
                     <div className="flex items-center justify-center mb-4">
                       <Avatar className="h-24 w-24 border-2 border-[#0384c6]">
-                        <AvatarImage src={avatar.startsWith('http') ? avatar : `/lovable-uploads/${avatar}.png`} />
+                        <AvatarImage 
+                          src={avatar.includes('avatar-') ? 
+                            `/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=${
+                              parseInt(avatar.split('-')[1]) - 1 > 0 ? 
+                              (parseInt(avatar.split('-')[1]) - 1) % 4 : 0
+                            }-${
+                              Math.floor((parseInt(avatar.split('-')[1]) - 1) / 4)
+                            }` : 
+                            avatar} 
+                          alt="User Avatar"
+                          className="object-cover"
+                        />
                         <AvatarFallback>{displayName?.charAt(0) || 'U'}</AvatarFallback>
                       </Avatar>
                     </div>

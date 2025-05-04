@@ -2,13 +2,18 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Scan, History, User } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 const BottomNavigation = () => {
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+  
+  // Don't render on desktop
+  if (!isMobile) return null;
   
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-40">
