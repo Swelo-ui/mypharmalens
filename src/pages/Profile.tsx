@@ -1,24 +1,22 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { toast } from 'sonner';
 import { Loader2, Save, Key, User, Mail } from 'lucide-react';
-import MedicineAvatarPicker from '@/components/MedicineAvatarPicker';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
-  const [avatar, setAvatar] = useState('avatar-1');
   const [isUpdating, setIsUpdating] = useState(false);
   
   // Password change states
@@ -34,7 +32,7 @@ const Profile = () => {
           // Fetch user profile from profiles table
           const { data, error } = await supabase
             .from('profiles')
-            .select('display_name, avatar_url')
+            .select('display_name')
             .eq('id', user.id)
             .single();
             
@@ -45,7 +43,6 @@ const Profile = () => {
           
           if (data) {
             setDisplayName(data.display_name || '');
-            setAvatar(data.avatar_url || 'avatar-1');
           }
           
           // Set email from auth user
@@ -70,7 +67,6 @@ const Profile = () => {
         .from('profiles')
         .update({
           display_name: displayName,
-          avatar_url: avatar,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -185,66 +181,39 @@ const Profile = () => {
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
                 <CardDescription>
-                  Update your profile details and avatar
+                  Update your profile details
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="flex-1">
-                    <div className="mb-6">
-                      <Label htmlFor="displayName" className="mb-2 block">
-                        <User className="inline-block w-4 h-4 mr-2" />
-                        Display Name
-                      </Label>
-                      <Input
-                        id="displayName"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="Your display name"
-                      />
-                    </div>
-                    
-                    <div className="mb-6">
-                      <Label htmlFor="email" className="mb-2 block">
-                        <Mail className="inline-block w-4 h-4 mr-2" />
-                        Email Address
-                      </Label>
-                      <Input
-                        id="email"
-                        value={email}
-                        readOnly
-                        disabled
-                        className="bg-gray-100 dark:bg-gray-800"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Email address cannot be changed
-                      </p>
-                    </div>
+                <div className="flex flex-col gap-6">
+                  <div className="mb-6">
+                    <Label htmlFor="displayName" className="mb-2 block">
+                      <User className="inline-block w-4 h-4 mr-2" />
+                      Display Name
+                    </Label>
+                    <Input
+                      id="displayName"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="Your display name"
+                    />
                   </div>
                   
-                  <div className="flex-1">
-                    <MedicineAvatarPicker 
-                      value={avatar}
-                      onChange={setAvatar}
+                  <div className="mb-6">
+                    <Label htmlFor="email" className="mb-2 block">
+                      <Mail className="inline-block w-4 h-4 mr-2" />
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      value={email}
+                      readOnly
+                      disabled
+                      className="bg-gray-100 dark:bg-gray-800"
                     />
-                    
-                    <div className="flex items-center justify-center mb-4">
-                      <Avatar className="h-24 w-24 border-2 border-[#0384c6]">
-                        <AvatarImage 
-                          src={avatar.includes('avatar-') ? 
-                            `/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=${
-                              parseInt(avatar.split('-')[1]) - 1 > 0 ? 
-                              (parseInt(avatar.split('-')[1]) - 1) % 4 : 0
-                            }-${
-                              Math.floor((parseInt(avatar.split('-')[1]) - 1) / 4)
-                            }` : 
-                            avatar} 
-                          alt="User Avatar"
-                          className="object-cover"
-                        />
-                        <AvatarFallback>{displayName?.charAt(0) || 'U'}</AvatarFallback>
-                      </Avatar>
-                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Email address cannot be changed
+                    </p>
                   </div>
                 </div>
                 

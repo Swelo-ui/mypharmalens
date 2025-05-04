@@ -46,16 +46,37 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${data.drugName}`);
         
-        // Add a new drug identification to history
+        // Create object with only fields that exist in the database table
+        const identificationData = {
+          user_id: data.userId,
+          drug_name: data.drugName,
+          image_url: data.imageUrl || null,
+          details: data.details || null,
+        };
+        
+        // Add image_features only if the column exists in the schema
+        try {
+          // First attempt to check if we can query the table with the image_features column
+          const { error: columnCheckError } = await supabaseClient
+            .from('drug_identifications')
+            .select('image_features')
+            .limit(1);
+          
+          if (!columnCheckError) {
+            // Column exists, we can add the image_features field
+            if (data.imageFeatures) {
+              identificationData.image_features = data.imageFeatures;
+            }
+          } else {
+            console.log('image_features column does not exist, skipping this field');
+          }
+        } catch (err) {
+          console.log('Error checking for image_features column, skipping this field:', err.message);
+        }
+          
         result = await supabaseClient
           .from('drug_identifications')
-          .insert({
-            user_id: data.userId,
-            drug_name: data.drugName,
-            image_url: data.imageUrl || null,
-            details: data.details || null,
-            image_features: data.imageFeatures || null
-          })
+          .insert([identificationData])
           .select();
           
         console.log('Insert result:', result);
