@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -162,25 +161,33 @@ const DrugIdentify = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from('drug_identifications')
-        .insert([
-          {
-            user_id: user.id,
-            drug_name: drugData.drug_name,
-            image_url: drugData.image_url,
-            details: drugData.details,
-            image_features: imageFeatures // Store image features for future matching
-          }
-        ]);
-
-      if (error) {
-        console.error("Error saving drug identification:", error);
-        throw error;
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
       }
 
-      console.log("Successfully saved drug identification to history:", data);
-      return data;
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'addIdentification',
+          data: {
+            userId: user.id,
+            drugName: drugData.drug_name || drugData.name,
+            imageUrl: drugData.image_url || drugData.image,
+            details: drugData,
+            imageFeatures: imageFeatures
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to save identification");
+      }
+
+      console.log("Successfully saved drug identification to history:", response.data);
+      return response.data.data;
     } catch (error) {
       console.error("Error in saveDrugIdentification:", error);
       throw error;
@@ -325,7 +332,9 @@ const DrugIdentify = () => {
               if (isAuthenticated && user) {
                 try {
                   await saveDrugIdentification({
+                    name: drugData.name,
                     drug_name: drugData.name,
+                    image: drugData.image,
                     image_url: drugData.image,
                     details: drugData
                   });

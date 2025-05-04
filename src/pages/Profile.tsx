@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -233,7 +232,7 @@ const Profile = () => {
                       <Avatar className="h-24 w-24 border-2 border-[#0384c6]">
                         <AvatarImage 
                           src={avatar.includes('avatar-') ? 
-                            `/lovable-uploads/4bfb9c75-694a-43a8-ba1a-744638328f3a.png#sprite=${
+                            `/lovable-uploads/d42a8973-1833-4422-99c2-bd70a3f60668.png#sprite=${
                               parseInt(avatar.split('-')[1]) - 1 > 0 ? 
                               (parseInt(avatar.split('-')[1]) - 1) % 4 : 0
                             }-${

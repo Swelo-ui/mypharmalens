@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Clock, Search, AlertTriangle, Filter } from 'lucide-react';
+import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
@@ -10,6 +11,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface IdentificationRecord {
   id: string;
@@ -27,6 +38,9 @@ const IdentificationHistory = () => {
   const [filteredHistory, setFilteredHistory] = useState<IdentificationRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,24 +73,79 @@ const IdentificationHistory = () => {
         throw new Error("User not authenticated");
       }
       
-      const { data, error } = await supabase
-        .from('drug_identifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
       }
 
-      console.log("Fetched history data:", data);
-      setHistory(data || []);
-      setFilteredHistory(data || []);
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getIdentificationHistory',
+          data: { userId: user.id }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to fetch history");
+      }
+
+      console.log("Fetched history data:", response.data.data);
+      setHistory(response.data.data || []);
+      setFilteredHistory(response.data.data || []);
     } catch (error) {
       console.error('Error fetching identification history:', error);
       toast.error("Failed to load your identification history");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteRecord = async (id: string) => {
+    setItemToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      if (!itemToDelete || !user) return;
+      
+      setIsDeleting(true);
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
+      }
+
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'removeIdentification',
+          data: { 
+            id: itemToDelete,
+            userId: user.id 
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to delete record");
+      }
+
+      // Update local state to remove the deleted item
+      setHistory(prev => prev.filter(item => item.id !== itemToDelete));
+      toast.success("Record deleted successfully");
+    } catch (error) {
+      console.error('Error deleting record:', error);
+      toast.error("Failed to delete record");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -162,24 +231,40 @@ const IdentificationHistory = () => {
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map((item) => (
-              <div key={item.id} className="relative cursor-pointer transition-transform hover:scale-105" onClick={() => handleCardClick(item.id)}>
-                <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {format(new Date(item.created_at), 'MMM d, yyyy')}
+              <div key={item.id} className="relative group">
+                <div 
+                  className="cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => handleCardClick(item.id)}
+                >
+                  <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(new Date(item.created_at), 'MMM d, yyyy')}
+                  </div>
+                  <DrugCard
+                    drug={{
+                      id: extractDrugId(item.details) || item.id,
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                      verified: item.details?.verified || false,
+                      image: item.image_url || item.details?.image || "",
+                    }}
+                  />
                 </div>
-                <DrugCard
-                  drug={{
-                    id: extractDrugId(item.details) || item.id,
-                    name: item.drug_name || "Unknown Medication",
-                    genericName: item.details?.genericName || item.details?.generic_name || "",
-                    manufacturer: item.details?.manufacturer || "",
-                    category: item.details?.category || "",
-                    description: item.details?.description || "",
-                    drugClass: item.details?.drugClass || item.details?.drug_class || "",
-                    verified: item.details?.verified || false,
-                    image: item.image_url || item.details?.image || "",
+                <Button 
+                  variant="destructive"
+                  size="icon"
+                  className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteRecord(item.id);
                   }}
-                />
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
           </div>
@@ -202,6 +287,35 @@ const IdentificationHistory = () => {
           </div>
         )}
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this medication record from your history.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? (
+                <>
+                  <span className="mr-2">Deleting</span>
+                  <span className="animate-spin">●</span>
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

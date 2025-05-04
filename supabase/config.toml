@@ -1,9 +1,32 @@
 
 project_id = "vcshydrusnuxsxwctnod"
 
-[storage]
-[storage.user-avatars]
-public = true
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
 
-[storage.medicine-avatars]
-public = true
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+port = 54325
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+
+[functions]
+[functions.manage-drug-history]
+verify_jwt = true
