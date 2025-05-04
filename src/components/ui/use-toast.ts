@@ -3,4 +3,4 @@
 import { toast } from 'sonner';
 
 export { toast };
-export { toast as useToast };
+export { useToast } from '@/hooks/use-toast';
