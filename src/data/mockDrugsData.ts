@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -1066,3 +1067,12 @@ export const mockDrugsData: DrugData[] = [
     id: '89',
     name: 'Ivermectin',
     genericName: 'Ivermectin',
+    manufacturer: 'Various',
+    category: 'Anthelmintic',
+    description: 'Medication used to treat many types of parasite infestations, including head lice, scabies, river blindness, and others.',
+    drugClass: 'Anthelmintic',
+    verified: true,
+    image: 'https://www.drugs.com/images/pills/mtm/Ivermectin%203%20mg-TEV.jpg',
+    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/TN/WI/XC/13085548/ivermectin-tablets-500x500.jpg'
+  }
+];
