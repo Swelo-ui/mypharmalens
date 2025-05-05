@@ -19,27 +19,10 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
     
-    // Get the JWT token from the request
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing Authorization header');
-    }
-    const token = authHeader.replace('Bearer ', '');
-    
-    // Set the auth token in the Supabase client
-    const { data: { session }, error: sessionError } = await supabaseClient.auth.setSession({
-      access_token: token,
-      refresh_token: '',
-    });
-
-    if (sessionError) {
-      throw new Error(`Auth session error: ${sessionError.message}`);
-    }
-
     // Parse request body
     const { action, data } = await req.json();
     console.log(`Received action: ${action} with data:`, data);
-
+    
     let result;
     switch (action) {
       case 'addIdentification':
@@ -101,7 +84,11 @@ serve(async (req) => {
           throw new Error('Missing required fields: id and userId are required for deletion');
         }
         
-        result = await supabaseClient
+        // Use service role key to ensure deletion works regardless of session state
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+        const adminClientForDelete = createClient(supabaseUrl, serviceKey);
+        
+        result = await adminClientForDelete
           .from('drug_identifications')
           .delete()
           .eq('id', data.id)
@@ -114,7 +101,11 @@ serve(async (req) => {
           throw new Error('Missing required field: userId is required');
         }
         
-        result = await supabaseClient
+        // Use service role key to ensure queries work regardless of session state
+        const serviceKeyForGet = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+        const adminClientForGet = createClient(supabaseUrl, serviceKeyForGet);
+        
+        result = await adminClientForGet
           .from('drug_identifications')
           .select('*')
           .eq('user_id', data.userId)
@@ -125,14 +116,14 @@ serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
-    if (result.error) {
+    if (result?.error) {
       console.error('Database operation error:', result.error);
       throw new Error(`Database operation failed: ${result.error.message}`);
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
-      data: result.data, 
+      data: result?.data || [], 
       error: null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -10,7 +10,7 @@ import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +41,7 @@ const IdentificationHistory = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +79,7 @@ const IdentificationHistory = () => {
         throw new Error("No active session");
       }
 
+      // Use direct function invocation with service key in the function itself
       const response = await supabase.functions.invoke('manage-drug-history', {
         body: { 
           action: 'getIdentificationHistory',
@@ -87,6 +89,15 @@ const IdentificationHistory = () => {
           Authorization: `Bearer ${sessionData.session.access_token}`
         }
       });
+      
+      // Handle empty response
+      if (!response?.data) {
+        console.log("Empty response from function");
+        setHistory([]);
+        setFilteredHistory([]);
+        setIsLoading(false);
+        return;
+      }
 
       if (!response.data.success) {
         throw new Error(response.data.error || "Failed to fetch history");
@@ -97,7 +108,14 @@ const IdentificationHistory = () => {
       setFilteredHistory(response.data.data || []);
     } catch (error) {
       console.error('Error fetching identification history:', error);
-      toast.error("Failed to load your identification history");
+      toast({
+        title: "Failed to load history",
+        description: "Could not retrieve your identification history",
+        type: "error"
+      });
+      // Set empty arrays to avoid undefined errors
+      setHistory([]);
+      setFilteredHistory([]);
     } finally {
       setIsLoading(false);
     }
@@ -132,16 +150,25 @@ const IdentificationHistory = () => {
         }
       });
 
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to delete record");
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || "Failed to delete record");
       }
 
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
-      toast.success("Record deleted successfully");
+      setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
+      toast({
+        title: "Record deleted",
+        description: "Record deleted successfully",
+        type: "success"
+      });
     } catch (error) {
       console.error('Error deleting record:', error);
-      toast.error("Failed to delete record");
+      toast({
+        title: "Deletion failed",
+        description: "Failed to delete record",
+        type: "error"
+      });
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -159,7 +186,11 @@ const IdentificationHistory = () => {
       if (drugId) {
         navigate(`/drug/${drugId}`);
       } else {
-        toast.info("Detailed information for this medication is not available");
+        toast({
+          title: "Information unavailable",
+          description: "Detailed information for this medication is not available",
+          type: "info"
+        });
       }
     }
   };

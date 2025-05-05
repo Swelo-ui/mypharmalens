@@ -9,11 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Key, User, Mail } from 'lucide-react';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
+  const { toast } = useToast();
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,6 +30,11 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       if (user?.id) {
         try {
+          // Set email from auth user first
+          if (user.email) {
+            setEmail(user.email);
+          }
+          
           // Fetch user profile from profiles table
           const { data, error } = await supabase
             .from('profiles')
@@ -37,18 +43,36 @@ const Profile = () => {
             .single();
             
           if (error) {
-            console.error('Error fetching profile:', error);
+            // If no profile exists, create one
+            if (error.code === 'PGRST116') {
+              console.log('No profile found, creating one...');
+              
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: user.id,
+                  display_name: user.user_metadata?.full_name || '',
+                  updated_at: new Date().toISOString()
+                });
+                
+              if (insertError) {
+                console.error('Error creating profile:', insertError);
+                return;
+              }
+              
+              // Set display name from user metadata if available
+              setDisplayName(user.user_metadata?.full_name || '');
+            } else {
+              console.error('Error fetching profile:', error);
+            }
             return;
           }
           
           if (data) {
             setDisplayName(data.display_name || '');
           }
-          
-          // Set email from auth user
-          setEmail(user.email || '');
         } catch (error) {
-          console.error('Error:', error);
+          console.error('Error fetching profile:', error);
         }
       }
     };
@@ -73,10 +97,18 @@ const Profile = () => {
       
       if (error) throw error;
       
-      toast.success('Profile updated successfully');
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully",
+        type: "success"
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      toast({
+        title: "Update failed",
+        description: "Failed to update your profile",
+        type: "error"
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -84,12 +116,20 @@ const Profile = () => {
   
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
+      toast({
+        title: "Passwords don't match",
+        description: "New passwords do not match",
+        type: "error"
+      });
       return;
     }
     
     if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters",
+        type: "error"
+      });
       return;
     }
     
@@ -104,13 +144,22 @@ const Profile = () => {
       
       if (error) throw error;
       
-      toast.success('Password updated successfully');
+      toast({
+        title: "Password updated",
+        description: "Your password has been updated successfully",
+        type: "success"
+      });
+      
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error) {
       console.error('Error changing password:', error);
-      toast.error('Failed to change password');
+      toast({
+        title: "Update failed",
+        description: "Failed to change your password",
+        type: "error"
+      });
     } finally {
       setIsChangingPassword(false);
     }

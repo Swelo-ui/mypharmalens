@@ -13,11 +13,11 @@ export interface ToastOptions {
 
 // Create a global request tracker to prevent duplicate toasts
 const recentToasts = new Set<string>();
-const TOAST_DEBOUNCE_TIME = 3000; // 3 seconds
+const TOAST_DEBOUNCE_TIME = 5000; // Increase debounce time to 5 seconds
 
 // Helper function to create a unique key for a toast message
 const getToastKey = (content: string, type: string): string => {
-  return `${content}-${type}`;
+  return `${content}-${type}-${Date.now()}`;
 };
 
 export const useToast = () => {
@@ -60,33 +60,41 @@ export const useToast = () => {
     recentToasts.add(toastKey);
     setTimeout(() => recentToasts.delete(toastKey), TOAST_DEBOUNCE_TIME);
     
+    // Ensure each toast has a unique ID by adding a timestamp
+    const uniqueId = Date.now().toString();
+    
     switch (type) {
       case "success":
         return sonnerToast.success(content, {
+          id: `${content}-success-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "error":
         return sonnerToast.error(content, {
+          id: `${content}-error-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "warning":
         return sonnerToast.warning(content, {
+          id: `${content}-warning-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "info":
         return sonnerToast.info(content, {
+          id: `${content}-info-${uniqueId}`,
           description,
           duration,
           action,
         });
       default:
         return sonnerToast(content, {
+          id: `${content}-default-${uniqueId}`,
           description,
           duration,
           action,
