@@ -120,10 +120,17 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full mb-8">
-          <TabsList className="grid grid-cols-3 mb-6 w-full">
-            <TabsTrigger value="general" className="text-xs sm:text-sm px-1 sm:px-3">General Information</TabsTrigger>
-            <TabsTrigger value="usage" className="text-xs sm:text-sm px-1 sm:px-3">Usage & Precautions</TabsTrigger>
-            <TabsTrigger value="alternatives" className="text-xs sm:text-sm px-1 sm:px-3">Alternatives</TabsTrigger>
+          {/* Updated tabs layout to prevent overlap on mobile */}
+          <TabsList className="flex w-full mb-6 overflow-x-auto">
+            <TabsTrigger value="general" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+              General Information
+            </TabsTrigger>
+            <TabsTrigger value="usage" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+              Usage & Precautions
+            </TabsTrigger>
+            <TabsTrigger value="alternatives" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+              Alternatives & Brands
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
