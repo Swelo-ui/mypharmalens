@@ -1,4 +1,3 @@
-
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -1076,3 +1075,60 @@ export const mockDrugsData: DrugData[] = [
     packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/TN/WI/XC/13085548/ivermectin-tablets-500x500.jpg'
   }
 ];
+
+// Function to get detailed drug data by ID
+export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+  // First, find the basic drug information in the mockDrugsData array
+  const drug = mockDrugsData.find(drug => drug.id === id);
+  
+  if (!drug) return null;
+  
+  // Create a detailed drug data object with additional information
+  const detailedDrug: DetailedDrugData = {
+    ...drug,
+    dosageAndAdmin: `The standard dosage for ${drug.name} varies based on patient weight, age, and condition severity. Always follow your physician's instructions.`,
+    sideEffects: [
+      `Headache and dizziness`,
+      `Nausea or upset stomach`,
+      `Fatigue or drowsiness`,
+      `Mild allergic reactions in sensitive individuals`
+    ],
+    warnings: [
+      `Do not take if you have a known allergy to ${drug.genericName} or related compounds.`,
+      `Consult your doctor before use if you have liver or kidney problems.`,
+      `Not recommended during pregnancy unless benefits outweigh risks.`,
+      `May cause drowsiness; avoid driving or operating machinery until effects are known.`
+    ],
+    interactions: [
+      `May interact with other medications that affect liver enzymes.`,
+      `Avoid alcohol consumption while taking this medication.`,
+      `May have reduced effectiveness when taken with antacids.`,
+      `Tell your doctor about all other medications you are currently taking.`
+    ],
+    storage: `Store at room temperature (59-86°F or 15-30°C) away from light and moisture. Keep out of reach of children.`,
+    mechanism: `${drug.name} works by ${drug.drugClass === 'NSAID' ? 'inhibiting the production of prostaglandins, chemicals involved in inflammation and pain signaling.' : 'targeting specific receptors to produce its therapeutic effect.'}`,
+    indications: [
+      `Treatment of ${drug.category.toLowerCase()} conditions as prescribed by your physician.`,
+      `Relief of symptoms associated with the condition it's prescribed for.`,
+      `May be used as part of combination therapy for certain conditions.`
+    ],
+    contraindications: [
+      `Known hypersensitivity to ${drug.name} or any component of the formulation.`,
+      `Severe liver or kidney impairment may require dosage adjustment.`,
+      `Certain pre-existing medical conditions may preclude use.`
+    ],
+    prescriptionStatus: drug.verified ? 'Prescription Only' : 'OTC',
+    pregnancy: `Limited data available on use during pregnancy. Should only be used if potential benefit justifies potential risk to the fetus. Consult your healthcare provider.`,
+    similarDrugs: getSimilarDrugs(drug.category, drug.id)
+  };
+  
+  return detailedDrug;
+};
+
+// Helper function to get similar drugs based on category
+const getSimilarDrugs = (category: string, excludeId: string): { id: string; name: string }[] => {
+  return mockDrugsData
+    .filter(drug => drug.category === category && drug.id !== excludeId)
+    .slice(0, 4)  // Limit to 4 similar drugs
+    .map(drug => ({ id: drug.id, name: drug.name }));
+};
