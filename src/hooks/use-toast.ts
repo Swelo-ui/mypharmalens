@@ -13,11 +13,11 @@ export interface ToastOptions {
 
 // Create a global request tracker to prevent duplicate toasts
 const recentToasts = new Set<string>();
-const TOAST_DEBOUNCE_TIME = 5000; // Increase debounce time to 5 seconds
+const TOAST_DEBOUNCE_TIME = 5000; // 5 seconds debounce time
 
 // Helper function to create a unique key for a toast message
 const getToastKey = (content: string, type: string): string => {
-  return `${content}-${type}-${Date.now()}`;
+  return `${content}-${type}`;
 };
 
 export const useToast = () => {
