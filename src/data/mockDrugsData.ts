@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 
@@ -1085,7 +1086,16 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   
   // Create a detailed drug data object with additional information
   const detailedDrug: DetailedDrugData = {
-    ...drug,
+    id: drug.id,
+    name: drug.name,
+    genericName: drug.genericName,
+    manufacturer: drug.manufacturer,
+    category: drug.category,
+    description: drug.description,
+    verified: drug.verified,
+    image: drug.image,
+    packageImage: drug.packageImage,
+    drugClass: drug.drugClass || '',
     dosageAndAdmin: `The standard dosage for ${drug.name} varies based on patient weight, age, and condition severity. Always follow your physician's instructions.`,
     sideEffects: [
       `Headache and dizziness`,
