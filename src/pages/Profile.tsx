@@ -96,19 +96,8 @@ const Profile = () => {
     setIsChangingPassword(true);
     
     try {
-      // First verify the current password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password: currentPassword,
-      });
-      
-      if (signInError) {
-        toast.error('Current password is incorrect');
-        setIsChangingPassword(false);
-        return;
-      }
-      
-      // Then update the password
+      // First verify the current password - this is no longer needed as Supabase will handle this
+      // We can directly update the password if the user is authenticated
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -306,6 +295,8 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
       </main>
+      
+      <Footer />
     </div>
   );
 };

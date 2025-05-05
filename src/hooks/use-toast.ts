@@ -11,9 +11,29 @@ export interface ToastOptions {
   action?: React.ReactNode;
 }
 
+// Create a global request tracker to prevent duplicate toasts
+const recentToasts = new Set<string>();
+const TOAST_DEBOUNCE_TIME = 3000; // 3 seconds
+
+// Helper function to create a unique key for a toast message
+const getToastKey = (content: string, type: string): string => {
+  return `${content}-${type}`;
+};
+
 export const useToast = () => {
   const toast = (options: ToastOptions | string) => {
     if (typeof options === "string") {
+      const toastKey = getToastKey(options, "default");
+      
+      // Check if this toast was recently shown
+      if (recentToasts.has(toastKey)) {
+        return;
+      }
+      
+      // Add to recent toasts and set timeout to remove it
+      recentToasts.add(toastKey);
+      setTimeout(() => recentToasts.delete(toastKey), TOAST_DEBOUNCE_TIME);
+      
       return sonnerToast(options);
     }
     
@@ -29,6 +49,16 @@ export const useToast = () => {
     
     // Use title or message as the primary content
     const content = title || message || "";
+    const toastKey = getToastKey(content, type);
+    
+    // Check if this toast was recently shown
+    if (recentToasts.has(toastKey)) {
+      return;
+    }
+    
+    // Add to recent toasts and set timeout to remove it
+    recentToasts.add(toastKey);
+    setTimeout(() => recentToasts.delete(toastKey), TOAST_DEBOUNCE_TIME);
     
     switch (type) {
       case "success":
