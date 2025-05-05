@@ -12,6 +12,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -65,7 +66,7 @@ const DrugPage = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-4xl mx-auto px-4 pt-24 pb-12">
+      <div className="container max-w-4xl mx-auto px-4 pt-24 pb-24 mb-16 sm:pb-12 sm:mb-0">
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)} 
@@ -119,10 +120,10 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full mb-8">
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="general">General Information</TabsTrigger>
-            <TabsTrigger value="usage">Usage & Precautions</TabsTrigger>
-            <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
+          <TabsList className="grid grid-cols-3 mb-6 w-full">
+            <TabsTrigger value="general" className="text-xs sm:text-sm px-1 sm:px-3">General Information</TabsTrigger>
+            <TabsTrigger value="usage" className="text-xs sm:text-sm px-1 sm:px-3">Usage & Precautions</TabsTrigger>
+            <TabsTrigger value="alternatives" className="text-xs sm:text-sm px-1 sm:px-3">Alternatives</TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
@@ -252,6 +253,7 @@ const DrugPage = () => {
           </ul>
         </div>
       </div>
+      <BottomNavigation />
       <Footer />
     </>
   );
