@@ -522,4 +522,4 @@ export const mockDrugsData: DrugData[] = [
     packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/8/IY/LB/AR/88223930/doxycycline-tablet-500x500.jpg'
   },
   {
-    id: '44',
+    id: '4
