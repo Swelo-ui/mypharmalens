@@ -59,14 +59,14 @@ export function useDrugDetail(options: UseDrugDetailOptions = {}) {
         // Map fields directly if they exist in the details property
         ...(responseData.details && typeof responseData.details === 'object' ? responseData.details : {}),
         // Also map snake_case to camelCase for common fields
-        genericName: responseData.generic_name || "",
-        dosageAndAdmin: responseData.dosage_and_admin || "",
-        sideEffects: responseData.side_effects || [],
-        prescriptionStatus: responseData.prescription_status || "OTC",
-        image: responseData.image_url || "",
-        packageImage: responseData.package_image_url || "",
-        drugClass: responseData.drug_class || "",
-        brandNames: responseData.brand_names || []
+        generic_name: responseData.generic_name || "",
+        dosage_and_admin: responseData.dosage_and_admin || "",
+        side_effects: responseData.side_effects || [],
+        prescription_status: responseData.prescription_status || "OTC",
+        image_url: responseData.image_url || "",
+        package_image_url: responseData.package_image_url || "",
+        drug_class: responseData.drug_class || "",
+        brand_names: responseData.brand_names || []
       } : null;
       
       setData(processedData);

@@ -33,7 +33,7 @@ interface DatabaseDrugData {
   mechanism?: string;
   indications?: string[];
   contraindications?: string[];
-  prescription_status?: 'OTC' | 'Prescription Only' | 'Controlled';
+  prescription_status?: string; // Changed from string literals to just string to match database
   pregnancy?: string;
   verified?: boolean;
   image_url?: string;
@@ -42,6 +42,7 @@ interface DatabaseDrugData {
   brand_names?: string[];
   drug_name?: string; // For history records
   details?: any; // For nested details
+  created_at?: string;
 }
 
 const DrugPage = () => {
@@ -97,7 +98,7 @@ const DrugPage = () => {
             mechanism: drugData.mechanism || "Mechanism of action information not available.",
             indications: drugData.indications || ["Information not available."],
             contraindications: drugData.contraindications || ["Information not available."],
-            prescriptionStatus: drugData.prescription_status || "OTC",
+            prescriptionStatus: drugData.prescription_status as 'OTC' | 'Prescription Only' | 'Controlled' || "OTC",
             pregnancy: drugData.pregnancy || "Consult your doctor before use if pregnant or breastfeeding.",
             verified: drugData.verified || false,
             image: drugData.image_url || "",

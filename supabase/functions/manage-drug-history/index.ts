@@ -140,6 +140,11 @@ serve(async (req) => {
               result.data[field] = [];
             }
           });
+          
+          // Ensure prescription_status has a valid value
+          if (!result.data.prescription_status) {
+            result.data.prescription_status = "OTC";
+          }
         }
         break;
         
