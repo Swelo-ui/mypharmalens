@@ -25,8 +25,8 @@ const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
   
-  // Logo URL
-  const logoUrl = "/lovable-uploads/02fa3a90-3ed4-453f-b79a-2f9bd40d5bbd.png";
+  // Logo URL - using the new PharmaLens logo
+  const logoUrl = "/lovable-uploads/c41d19fe-0981-42ba-890b-d0369d436de0.png";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -88,7 +88,7 @@ const Header = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-8" />
+              <img src={logoUrl} alt="PharmaLens" className="h-10" />
             </Link>
 
             {/* Right Side Actions */}
@@ -111,10 +111,11 @@ const Header = () => {
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-8" />
+              <img src={logoUrl} alt="PharmaLens" className="h-14" />
+              <span className="ml-2 text-2xl font-bold text-gray-800 dark:text-white hidden md:block">PharmaLens</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -166,7 +167,7 @@ const Header = () => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full">
-                          <UserCircle className="h-5 w-5" />
+                          <UserCircle className="h-6 w-6" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

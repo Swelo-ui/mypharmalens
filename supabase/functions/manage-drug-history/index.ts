@@ -36,12 +36,25 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
+        // Process and normalize details before saving to ensure consistency
+        let processedDetails = data.details || {};
+        
+        // Ensure all details are properly structured
+        if (typeof processedDetails === 'string') {
+          try {
+            processedDetails = JSON.parse(processedDetails);
+          } catch (e) {
+            console.error("Error parsing details string:", e);
+            processedDetails = {};
+          }
+        }
+        
         // Save full drug details to enable proper viewing in history
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
           image_url: data.imageUrl || null,
-          details: data.details || null,
+          details: processedDetails || null,
           image_features: data.imageFeatures || null,
         };
         
@@ -108,22 +121,23 @@ serve(async (req) => {
           .eq('user_id', data.userId)
           .single();
         
-        // If the record is found but details are stored as a string, parse it to JSON
-        if (result?.data && result.data.details && typeof result.data.details === 'string') {
-          try {
-            result.data.details = JSON.parse(result.data.details);
-          } catch (e) {
-            console.error('Error parsing drug details from string:', e);
+        // Parse details if they're stored as a string
+        if (result?.data && result.data.details) {
+          if (typeof result.data.details === 'string') {
+            try {
+              result.data.details = JSON.parse(result.data.details);
+            } catch (e) {
+              console.error('Error parsing drug details from string:', e);
+            }
           }
-        }
-        
-        // If there are still details as an object, add them to the main data object
-        // for easier access in the frontend
-        if (result?.data?.details && typeof result.data.details === 'object') {
-          result.data = {
-            ...result.data,
-            ...result.data.details
-          };
+          
+          // Merge details into the main object for easier access
+          if (result.data.details && typeof result.data.details === 'object') {
+            result.data = {
+              ...result.data,
+              ...result.data.details
+            };
+          }
         }
         
         // Ensure all expected fields exist with proper types
@@ -145,6 +159,16 @@ serve(async (req) => {
           if (!result.data.prescription_status) {
             result.data.prescription_status = "OTC";
           }
+
+          // Add camelCase versions of fields for compatibility with DrugDetails component
+          result.data.genericName = result.data.generic_name || "";
+          result.data.dosageAndAdmin = result.data.dosage_and_admin || "";
+          result.data.sideEffects = result.data.side_effects || [];
+          result.data.prescriptionStatus = result.data.prescription_status || "OTC";
+          result.data.image = result.data.image_url || "";
+          result.data.packageImage = result.data.package_image_url || "";
+          result.data.drugClass = result.data.drug_class || "";
+          result.data.brandNames = result.data.brand_names || [];
         }
         break;
         
