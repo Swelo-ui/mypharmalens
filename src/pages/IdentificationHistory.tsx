@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface IdentificationRecord {
   id: string;
@@ -31,6 +32,22 @@ interface IdentificationRecord {
   user_id?: string;
   image_features?: string;
 }
+
+// Create a cache mechanism for history data
+const historyCache = {
+  data: null as IdentificationRecord[] | null,
+  timestamp: 0,
+  // Cache validity is 5 minutes
+  isValid: () => (Date.now() - historyCache.timestamp) < 300000,
+  set: (data: IdentificationRecord[]) => {
+    historyCache.data = data;
+    historyCache.timestamp = Date.now();
+  },
+  clear: () => {
+    historyCache.data = null;
+    historyCache.timestamp = 0;
+  }
+};
 
 const IdentificationHistory = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStatus();
@@ -44,29 +61,7 @@ const IdentificationHistory = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/auth');
-      return;
-    }
-
-    if (isAuthenticated && user) {
-      fetchIdentificationHistory();
-    }
-  }, [isAuthenticated, authLoading, user]);
-
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredHistory(history);
-    } else {
-      const filtered = history.filter(item => 
-        item.drug_name?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredHistory(filtered);
-    }
-  }, [searchTerm, history]);
-
-  const fetchIdentificationHistory = async () => {
+  const fetchIdentificationHistory = useCallback(async (forceRefresh = false) => {
     try {
       setIsLoading(true);
       
@@ -74,6 +69,14 @@ const IdentificationHistory = () => {
         throw new Error("User not authenticated");
       }
       
+      // Check if we have valid cached data and not forcing refresh
+      if (!forceRefresh && historyCache.isValid() && historyCache.data) {
+        setHistory(historyCache.data);
+        setFilteredHistory(historyCache.data);
+        setIsLoading(false);
+        return;
+      }
+
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
         throw new Error("No active session");
@@ -104,8 +107,12 @@ const IdentificationHistory = () => {
       }
 
       console.log("Fetched history data:", response.data.data);
-      setHistory(response.data.data || []);
-      setFilteredHistory(response.data.data || []);
+      
+      // Save data to cache and state
+      const historyData = response.data.data || [];
+      historyCache.set(historyData);
+      setHistory(historyData);
+      setFilteredHistory(historyData);
     } catch (error) {
       console.error('Error fetching identification history:', error);
       toast({
@@ -119,7 +126,29 @@ const IdentificationHistory = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, toast]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/auth');
+      return;
+    }
+
+    if (isAuthenticated && user) {
+      fetchIdentificationHistory();
+    }
+  }, [isAuthenticated, authLoading, user, navigate, fetchIdentificationHistory]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredHistory(history);
+    } else {
+      const filtered = history.filter(item => 
+        item.drug_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredHistory(filtered);
+    }
+  }, [searchTerm, history]);
 
   const handleDeleteRecord = async (id: string) => {
     setItemToDelete(id);
@@ -154,6 +183,9 @@ const IdentificationHistory = () => {
         throw new Error(response.data?.error || "Failed to delete record");
       }
 
+      // Clear cache on successful deletion
+      historyCache.clear();
+      
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
       setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
@@ -214,7 +246,7 @@ const IdentificationHistory = () => {
 
   const refreshHistory = () => {
     if (isAuthenticated && user) {
-      fetchIdentificationHistory();
+      fetchIdentificationHistory(true); // Force refresh
     }
   };
 
@@ -318,6 +350,7 @@ const IdentificationHistory = () => {
           </div>
         )}
       </div>
+      <BottomNavigation />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

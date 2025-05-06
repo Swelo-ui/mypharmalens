@@ -36,7 +36,7 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
-        // Create object with only fields that exist in the database table
+        // Ensure we store all available drug details to show in history
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
