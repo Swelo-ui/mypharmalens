@@ -116,6 +116,15 @@ serve(async (req) => {
             console.error('Error parsing drug details from string:', e);
           }
         }
+        
+        // If there are still details as an object, add them to the main data object
+        // for easier access in the frontend
+        if (result?.data?.details && typeof result.data.details === 'object') {
+          result.data = {
+            ...result.data,
+            ...result.data.details
+          };
+        }
         break;
         
       default:

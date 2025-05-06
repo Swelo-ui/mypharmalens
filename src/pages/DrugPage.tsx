@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -69,7 +70,7 @@ const DrugPage = () => {
         }
         
         if (drugData) {
-          // Transform to DetailedDrugData format if needed
+          // Transform to DetailedDrugData format, mapping snake_case to camelCase
           const formattedDrug: DetailedDrugData = {
             id: drugData.id || id,
             name: drugData.name || drugData.drug_name || "Unknown Medication",
