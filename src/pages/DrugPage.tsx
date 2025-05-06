@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -43,17 +42,23 @@ const DrugPage = () => {
           // Try to fetch the drug from identification history
           const historyRecord = await fetchDrugDetail(id);
           
-          if (historyRecord && historyRecord.details) {
-            // Could be stored as a string (JSON)
-            if (typeof historyRecord.details === 'string') {
-              try {
-                drugData = JSON.parse(historyRecord.details);
-              } catch (e) {
-                console.error('Failed to parse drug details:', e);
+          if (historyRecord) {
+            // Could have details directly or nested in a details property
+            if (historyRecord.details) {
+              // Could be stored as a string (JSON)
+              if (typeof historyRecord.details === 'string') {
+                try {
+                  drugData = JSON.parse(historyRecord.details);
+                } catch (e) {
+                  console.error('Failed to parse drug details:', e);
+                }
+              } else if (typeof historyRecord.details === 'object') {
+                // Or directly as an object
+                drugData = historyRecord.details;
               }
-            } else if (typeof historyRecord.details === 'object') {
-              // Or directly as an object
-              drugData = historyRecord.details;
+            } else {
+              // Or the history record itself might have all the data
+              drugData = historyRecord;
             }
           }
         }

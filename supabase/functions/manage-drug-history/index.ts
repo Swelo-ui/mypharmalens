@@ -42,6 +42,7 @@ serve(async (req) => {
           drug_name: drugName,
           image_url: data.imageUrl || null,
           details: data.details || null,
+          image_features: data.imageFeatures || null,
         };
         
         // Use the service role key to bypass RLS policies for insertion
@@ -106,6 +107,15 @@ serve(async (req) => {
           .eq('id', data.id)
           .eq('user_id', data.userId)
           .single();
+        
+        // If the record is found but details are stored as a string, parse it to JSON
+        if (result?.data && result.data.details && typeof result.data.details === 'string') {
+          try {
+            result.data.details = JSON.parse(result.data.details);
+          } catch (e) {
+            console.error('Error parsing drug details from string:', e);
+          }
+        }
         break;
         
       default:

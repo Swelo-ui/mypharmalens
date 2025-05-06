@@ -50,9 +50,19 @@ export function useDrugDetail(options: UseDrugDetailOptions = {}) {
         throw new Error(response.data?.error || "Failed to retrieve drug details");
       }
       
-      setData(response.data.data);
-      options.onSuccess?.(response.data.data);
-      return response.data.data;
+      // Process the data to match our frontend data structure
+      const responseData = response.data.data;
+      
+      // Map database field names to frontend property names if necessary
+      const processedData = responseData ? {
+        ...responseData,
+        // Map fields directly if they exist in the details property
+        ...(responseData.details && typeof responseData.details === 'object' ? responseData.details : {})
+      } : null;
+      
+      setData(processedData);
+      options.onSuccess?.(processedData);
+      return processedData;
     } catch (error: any) {
       console.error('Error fetching drug details:', error);
       setError(error);
