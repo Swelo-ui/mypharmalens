@@ -36,28 +36,35 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
-        // Process and normalize details before saving to ensure consistency
-        let processedDetails = data.details || {};
-        
-        // Ensure all details are properly structured
-        if (typeof processedDetails === 'string') {
-          try {
-            processedDetails = JSON.parse(processedDetails);
-          } catch (e) {
-            console.error("Error parsing details string:", e);
-            processedDetails = {};
-          }
-        }
-        
-        // Save full drug details to enable proper viewing in history
+        // Ensure we store all available drug details to show in history
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
           image_url: data.imageUrl || null,
-          details: processedDetails || null,
-          image_features: data.imageFeatures || null,
+          details: data.details || null,
         };
         
+        // Add image_features only if the column exists in the schema and if data is provided
+        try {
+          // First attempt to check if the image_features column exists
+          const { data: columnsData, error: columnsError } = await supabaseClient
+            .from('information_schema.columns')
+            .select('column_name')
+            .eq('table_name', 'drug_identifications')
+            .eq('column_name', 'image_features');
+            
+          if (!columnsError && columnsData && columnsData.length > 0) {
+            // Column exists, we can add the image_features field
+            if (data.imageFeatures) {
+              identificationData.image_features = data.imageFeatures;
+            }
+          } else {
+            console.log('image_features column does not exist, skipping this field');
+          }
+        } catch (err) {
+          console.log('Error checking for image_features column, skipping this field:', err.message);
+        }
+          
         // Use the service role key to bypass RLS policies for insertion
         // This ensures that we can always save the identification regardless of RLS policies
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -103,73 +110,6 @@ serve(async (req) => {
           .select('*')
           .eq('user_id', data.userId)
           .order('created_at', { ascending: false });
-        break;
-        
-      case 'getDrugDetail':
-        // Get detailed drug information from history
-        if (!data.id || !data.userId) {
-          throw new Error('Missing required fields: id and userId are required');
-        }
-        
-        const serviceKeyForDetail = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-        const adminClientForDetail = createClient(supabaseUrl, serviceKeyForDetail);
-        
-        result = await adminClientForDetail
-          .from('drug_identifications')
-          .select('*')
-          .eq('id', data.id)
-          .eq('user_id', data.userId)
-          .single();
-        
-        // Parse details if they're stored as a string
-        if (result?.data && result.data.details) {
-          if (typeof result.data.details === 'string') {
-            try {
-              result.data.details = JSON.parse(result.data.details);
-            } catch (e) {
-              console.error('Error parsing drug details from string:', e);
-            }
-          }
-          
-          // Merge details into the main object for easier access
-          if (result.data.details && typeof result.data.details === 'object') {
-            result.data = {
-              ...result.data,
-              ...result.data.details
-            };
-          }
-        }
-        
-        // Ensure all expected fields exist with proper types
-        if (result?.data) {
-          // Convert arrays if they're stored as strings
-          ['side_effects', 'warnings', 'interactions', 'indications', 'contraindications', 'brand_names'].forEach(field => {
-            if (result.data[field] && typeof result.data[field] === 'string') {
-              try {
-                result.data[field] = JSON.parse(result.data[field]);
-              } catch (e) {
-                result.data[field] = [];
-              }
-            } else if (!result.data[field]) {
-              result.data[field] = [];
-            }
-          });
-          
-          // Ensure prescription_status has a valid value
-          if (!result.data.prescription_status) {
-            result.data.prescription_status = "OTC";
-          }
-
-          // Add camelCase versions of fields for compatibility with DrugDetails component
-          result.data.genericName = result.data.generic_name || "";
-          result.data.dosageAndAdmin = result.data.dosage_and_admin || "";
-          result.data.sideEffects = result.data.side_effects || [];
-          result.data.prescriptionStatus = result.data.prescription_status || "OTC";
-          result.data.image = result.data.image_url || "";
-          result.data.packageImage = result.data.package_image_url || "";
-          result.data.drugClass = result.data.drug_class || "";
-          result.data.brandNames = result.data.brand_names || [];
-        }
         break;
         
       default:

@@ -24,9 +24,6 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
-  
-  // Logo URL - using the new PharmaLens logo
-  const logoUrl = "/lovable-uploads/c41d19fe-0981-42ba-890b-d0369d436de0.png";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -88,7 +85,10 @@ const Header = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-10" />
+              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-sm">PL</span>
+              </div>
+              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
             </Link>
 
             {/* Right Side Actions */}
@@ -111,11 +111,13 @@ const Header = () => {
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-14" />
-              <span className="ml-2 text-2xl font-bold text-gray-800 dark:text-white hidden md:block">PharmaLens</span>
+              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-sm">PL</span>
+              </div>
+              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -167,7 +169,7 @@ const Header = () => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full">
-                          <UserCircle className="h-6 w-6" />
+                          <UserCircle className="h-5 w-5" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
