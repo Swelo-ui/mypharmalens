@@ -10,12 +10,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getDetailedDrugData } from '@/data/mockDrugsData';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { DetailedDrugData } from '@/components/DrugDetails';
+import DrugDetails, { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
 import BottomNavigation from '@/components/BottomNavigation';
 import { fetchDrugById } from '@/integrations/supabase/client';
 import { useDrugDetail } from '@/hooks/useDrugDetail';
 import { useToast } from '@/hooks/use-toast';
+
+// Interface to match the database structure
+interface DatabaseDrugData {
+  id: string;
+  name?: string;
+  generic_name?: string;
+  manufacturer?: string;
+  category?: string;
+  description?: string;
+  dosage_and_admin?: string;
+  side_effects?: string[];
+  warnings?: string[];
+  interactions?: string[];
+  storage?: string;
+  mechanism?: string;
+  indications?: string[];
+  contraindications?: string[];
+  prescription_status?: 'OTC' | 'Prescription Only' | 'Controlled';
+  pregnancy?: string;
+  verified?: boolean;
+  image_url?: string;
+  package_image_url?: string;
+  drug_class?: string;
+  brand_names?: string[];
+  drug_name?: string; // For history records
+  details?: any; // For nested details
+}
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +63,7 @@ const DrugPage = () => {
         setLoading(true);
 
         // First, try to fetch from the drug database
-        let drugData = await fetchDrugById(id);
+        let drugData: DatabaseDrugData | null = await fetchDrugById(id);
         
         // If not found in the drugs table, it might be a history record
         if (!drugData) {
@@ -44,56 +71,40 @@ const DrugPage = () => {
           const historyRecord = await fetchDrugDetail(id);
           
           if (historyRecord) {
-            // Could have details directly or nested in a details property
-            if (historyRecord.details) {
-              // Could be stored as a string (JSON)
-              if (typeof historyRecord.details === 'string') {
-                try {
-                  drugData = JSON.parse(historyRecord.details);
-                } catch (e) {
-                  console.error('Failed to parse drug details:', e);
-                }
-              } else if (typeof historyRecord.details === 'object') {
-                // Or directly as an object
-                drugData = historyRecord.details;
-              }
-            } else {
-              // Or the history record itself might have all the data
-              drugData = historyRecord;
-            }
+            drugData = historyRecord;
           }
         }
 
         // If still not found, try mock data as a fallback (for development)
         if (!drugData) {
-          drugData = getDetailedDrugData(id);
+          drugData = getDetailedDrugData(id) as unknown as DatabaseDrugData;
         }
         
         if (drugData) {
-          // Transform to DetailedDrugData format, mapping snake_case to camelCase
+          // Transform database format to DetailedDrugData format
           const formattedDrug: DetailedDrugData = {
             id: drugData.id || id,
             name: drugData.name || drugData.drug_name || "Unknown Medication",
-            genericName: drugData.generic_name || drugData.genericName || "",
+            genericName: drugData.generic_name || "",
             manufacturer: drugData.manufacturer || "",
             category: drugData.category || "",
             description: drugData.description || "No description available.",
-            dosageAndAdmin: drugData.dosage_and_admin || drugData.dosageAndAdmin || "Information not available.",
-            sideEffects: drugData.side_effects || drugData.sideEffects || ["Information not available."],
+            dosageAndAdmin: drugData.dosage_and_admin || "Information not available.",
+            sideEffects: drugData.side_effects || ["Information not available."],
             warnings: drugData.warnings || ["No specific warnings available."],
             interactions: drugData.interactions || ["No known drug interactions."],
             storage: drugData.storage || "Store at room temperature away from moisture, heat, and light.",
             mechanism: drugData.mechanism || "Mechanism of action information not available.",
             indications: drugData.indications || ["Information not available."],
             contraindications: drugData.contraindications || ["Information not available."],
-            prescriptionStatus: drugData.prescription_status || drugData.prescriptionStatus || "OTC",
+            prescriptionStatus: drugData.prescription_status || "OTC",
             pregnancy: drugData.pregnancy || "Consult your doctor before use if pregnant or breastfeeding.",
             verified: drugData.verified || false,
-            image: drugData.image_url || drugData.image || "",
-            packageImage: drugData.package_image_url || drugData.packageImage || "",
-            drugClass: drugData.drug_class || drugData.drugClass || "",
-            brandNames: drugData.brand_names || drugData.brandNames || [],
-            similarDrugs: drugData.similarDrugs || []
+            image: drugData.image_url || "",
+            packageImage: drugData.package_image_url || "",
+            drugClass: drugData.drug_class || "",
+            brandNames: drugData.brand_names || [],
+            similarDrugs: []
           };
           
           setDrug(formattedDrug);

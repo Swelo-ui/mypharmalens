@@ -125,6 +125,22 @@ serve(async (req) => {
             ...result.data.details
           };
         }
+        
+        // Ensure all expected fields exist with proper types
+        if (result?.data) {
+          // Convert arrays if they're stored as strings
+          ['side_effects', 'warnings', 'interactions', 'indications', 'contraindications', 'brand_names'].forEach(field => {
+            if (result.data[field] && typeof result.data[field] === 'string') {
+              try {
+                result.data[field] = JSON.parse(result.data[field]);
+              } catch (e) {
+                result.data[field] = [];
+              }
+            } else if (!result.data[field]) {
+              result.data[field] = [];
+            }
+          });
+        }
         break;
         
       default:
