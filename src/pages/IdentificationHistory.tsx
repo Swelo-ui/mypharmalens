@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -30,7 +29,6 @@ interface IdentificationRecord {
   image_url?: string;
   details: any;
   user_id?: string;
-  image_features?: string;
 }
 
 // Create a cache mechanism for history data
@@ -117,8 +115,7 @@ const IdentificationHistory = () => {
       console.error('Error fetching identification history:', error);
       toast({
         title: "Failed to load history",
-        description: "Could not retrieve your identification history",
-        type: "error"
+        description: "Could not retrieve your identification history"
       });
       // Set empty arrays to avoid undefined errors
       setHistory([]);
@@ -191,15 +188,13 @@ const IdentificationHistory = () => {
       setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
       toast({
         title: "Record deleted",
-        description: "Record deleted successfully",
-        type: "success"
+        description: "Record deleted successfully"
       });
     } catch (error) {
       console.error('Error deleting record:', error);
       toast({
         title: "Deletion failed",
-        description: "Failed to delete record",
-        type: "error"
+        description: "Failed to delete record"
       });
     } finally {
       setIsDeleting(false);
@@ -208,22 +203,79 @@ const IdentificationHistory = () => {
     }
   };
 
-  const handleCardClick = (id: string) => {
-    const record = history.find(item => item.id === id);
-    console.log("Clicked record:", record);
-    
-    if (record && record.details) {
-      const drugId = extractDrugId(record.details);
-      
-      if (drugId) {
-        navigate(`/drug/${drugId}`);
-      } else {
-        toast({
-          title: "Information unavailable",
-          description: "Detailed information for this medication is not available",
-          type: "info"
-        });
+  const fetchDrugDetails = async (id: string) => {
+    try {
+      if (!user) {
+        throw new Error("User not authenticated");
       }
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
+      }
+      
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getDrugDetail',
+          data: { 
+            id: id,
+            userId: user.id 
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+      
+      if (!response.data?.success || !response.data?.data) {
+        throw new Error("Failed to retrieve drug details");
+      }
+      
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching drug details:', error);
+      toast({
+        title: "Error",
+        description: "Could not retrieve drug details"
+      });
+      return null;
+    }
+  };
+
+  const handleCardClick = async (id: string) => {
+    const record = history.find(item => item.id === id);
+    
+    // If we already have detailed information in the record
+    if (record && record.details) {
+      navigateToDrugDetail(record);
+      return;
+    }
+    
+    // Otherwise fetch the full details
+    const detailedRecord = await fetchDrugDetails(id);
+    if (detailedRecord) {
+      navigateToDrugDetail(detailedRecord);
+    } else {
+      toast({
+        title: "Information unavailable",
+        description: "Detailed information for this medication is not available"
+      });
+    }
+  };
+  
+  const navigateToDrugDetail = (record: IdentificationRecord) => {
+    const drugId = extractDrugId(record.details);
+    
+    if (drugId) {
+      navigate(`/drug/${drugId}`);
+    } else if (record.details && typeof record.details === 'object') {
+      // If we have the complete details but no specific ID, construct a URL with the record ID
+      navigate(`/drug/${record.id}`);
+    } else {
+      toast({
+        title: "Information unavailable",
+        description: "Detailed information for this medication is not available"
+      });
     }
   };
   

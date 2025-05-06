@@ -13,22 +13,98 @@ import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
 import BottomNavigation from '@/components/BottomNavigation';
+import { fetchDrugById } from '@/integrations/supabase/client';
+import { useDrugDetail } from '@/hooks/useDrugDetail';
+import { useToast } from '@/hooks/use-toast';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { fetchDrugDetail } = useDrugDetail();
 
   useEffect(() => {
-    if (id) {
-      const drugData = getDetailedDrugData(id);
-      if (drugData) {
-        setDrug(drugData);
-      }
+    if (!id) {
       setLoading(false);
+      return;
     }
-  }, [id]);
+
+    const fetchDrug = async () => {
+      try {
+        setLoading(true);
+
+        // First, try to fetch from the drug database
+        let drugData = await fetchDrugById(id);
+        
+        // If not found in the drugs table, it might be a history record
+        if (!drugData) {
+          // Try to fetch the drug from identification history
+          const historyRecord = await fetchDrugDetail(id);
+          
+          if (historyRecord && historyRecord.details) {
+            // Could be stored as a string (JSON)
+            if (typeof historyRecord.details === 'string') {
+              try {
+                drugData = JSON.parse(historyRecord.details);
+              } catch (e) {
+                console.error('Failed to parse drug details:', e);
+              }
+            } else if (typeof historyRecord.details === 'object') {
+              // Or directly as an object
+              drugData = historyRecord.details;
+            }
+          }
+        }
+
+        // If still not found, try mock data as a fallback (for development)
+        if (!drugData) {
+          drugData = getDetailedDrugData(id);
+        }
+        
+        if (drugData) {
+          // Transform to DetailedDrugData format if needed
+          const formattedDrug: DetailedDrugData = {
+            id: drugData.id || id,
+            name: drugData.name || drugData.drug_name || "Unknown Medication",
+            genericName: drugData.generic_name || drugData.genericName || "",
+            manufacturer: drugData.manufacturer || "",
+            category: drugData.category || "",
+            description: drugData.description || "No description available.",
+            dosageAndAdmin: drugData.dosage_and_admin || drugData.dosageAndAdmin || "Information not available.",
+            sideEffects: drugData.side_effects || drugData.sideEffects || ["Information not available."],
+            warnings: drugData.warnings || ["No specific warnings available."],
+            interactions: drugData.interactions || ["No known drug interactions."],
+            storage: drugData.storage || "Store at room temperature away from moisture, heat, and light.",
+            mechanism: drugData.mechanism || "Mechanism of action information not available.",
+            indications: drugData.indications || ["Information not available."],
+            contraindications: drugData.contraindications || ["Information not available."],
+            prescriptionStatus: drugData.prescription_status || drugData.prescriptionStatus || "OTC",
+            pregnancy: drugData.pregnancy || "Consult your doctor before use if pregnant or breastfeeding.",
+            verified: drugData.verified || false,
+            image: drugData.image_url || drugData.image || "",
+            packageImage: drugData.package_image_url || drugData.packageImage || "",
+            drugClass: drugData.drug_class || drugData.drugClass || "",
+            brandNames: drugData.brand_names || drugData.brandNames || [],
+            similarDrugs: drugData.similarDrugs || []
+          };
+          
+          setDrug(formattedDrug);
+        }
+      } catch (error) {
+        console.error('Error fetching drug data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load drug information"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDrug();
+  }, [id, fetchDrugDetail, toast]);
 
   if (loading) {
     return (
@@ -220,7 +296,7 @@ const DrugPage = () => {
                 {drug.similarDrugs.map((similar) => (
                   <div 
                     key={similar.id} 
-                    className="glass-card p-4 hover:shadow-md transition-shadow"
+                    className="glass-card p-4 hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => navigate(`/drug/${similar.id}`)}
                   >
                     <div className="flex items-center">
@@ -229,11 +305,11 @@ const DrugPage = () => {
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">{similar.name}</h4>
-                        <button 
+                        <span 
                           className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
                         >
                           View details
-                        </button>
+                        </span>
                       </div>
                     </div>
                   </div>
