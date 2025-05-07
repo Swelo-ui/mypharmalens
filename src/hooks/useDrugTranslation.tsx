@@ -155,18 +155,21 @@ export const useDrugTranslation = () => {
   };
   
   // Function to translate object properties recursively
+  // Fix: Updated the generic type handling to avoid index assignment errors
   const translateDrugObject = <T extends Record<string, any>>(obj: T | null | undefined): T => {
     if (!obj) return {} as T;
     if (language === 'en') return obj;
     
-    const result = { ...obj };
+    // Create a copy of the object that we can safely modify
+    const result = { ...obj } as Record<string, any>;
     
+    // Process each key in the object
     Object.keys(result).forEach(key => {
       const value = result[key];
       
       if (typeof value === 'string') {
         result[key] = translateDrugText(value);
-      } else if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+      } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
         result[key] = translateDrugArray(value);
       } else if (value !== null && typeof value === 'object') {
         result[key] = translateDrugObject(value);
