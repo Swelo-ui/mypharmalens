@@ -72,6 +72,16 @@ type TranslationKey =
   | 'history.delete'
   | 'history.viewDetails'
   | 'history.identifiedOn'
+  | 'history.searchMedications'
+  | 'history.noResults'
+  | 'history.tryDifferentSearch'
+  | 'history.identifyMedication'
+  | 'history.deleteConfirm'
+  | 'history.deleteConfirmMessage'
+  | 'history.cancelDelete'
+  | 'history.confirmDelete'
+  | 'history.deleting'
+  | 'history.previousMedications'
   | 'error.authRequired'
   | 'error.loginRequired'
   | 'error.goToLogin';
@@ -147,6 +157,16 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'history.delete': 'Delete',
     'history.viewDetails': 'View Details',
     'history.identifiedOn': 'Identified on',
+    'history.searchMedications': 'Search medications...',
+    'history.noResults': 'No results match your search criteria',
+    'history.tryDifferentSearch': 'Try a different search term',
+    'history.identifyMedication': 'Identify a Medication',
+    'history.deleteConfirm': 'Are you sure?',
+    'history.deleteConfirmMessage': 'This will permanently delete this medication record from your history. This action cannot be undone.',
+    'history.cancelDelete': 'Cancel',
+    'history.confirmDelete': 'Delete',
+    'history.deleting': 'Deleting',
+    'history.previousMedications': 'View your previous medication identifications',
     'error.authRequired': 'Authentication Required',
     'error.loginRequired': 'Please log in to view this page',
     'error.goToLogin': 'Go to Login'
@@ -200,7 +220,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'hero.feature4Desc': 'अपने निर्देशों को बेहतर ढंग से समझने के लिए दवा गाइड और शैक्षिक सामग्री तक पहुंच प्राप्त करें।',
     'drug.usage': 'उपयोग',
     'drug.sideEffects': 'दुष्प्रभाव',
-    'drug.prescriptionStatus': 'प्रिस्क्रिप्शन स्थिति',
+    'drug.prescriptionStatus': 'नुस्खे की स्थिति',
     'drug.dosage': 'खुराक और प्रशासन',
     'drug.class': 'दवा वर्ग',
     'drug.brandNames': 'ब्रांड नाम',
@@ -220,6 +240,16 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'history.delete': 'हटाएं',
     'history.viewDetails': 'विवरण देखें',
     'history.identifiedOn': 'पहचाना गया',
+    'history.searchMedications': 'दवाएं खोजें...',
+    'history.noResults': 'आपके खोज मानदंड से कोई परिणाम मेल नहीं खाते',
+    'history.tryDifferentSearch': 'कोई अलग खोज शब्द आज़माएं',
+    'history.identifyMedication': 'एक दवा की पहचान करें',
+    'history.deleteConfirm': 'क्या आप सुनिश्चित हैं?',
+    'history.deleteConfirmMessage': 'यह आपके इतिहास से इस दवा के रिकॉर्ड को स्थायी रूप से हटा देगा। यह क्रिया पूर्ववत नहीं की जा सकती।',
+    'history.cancelDelete': 'रद्द करें',
+    'history.confirmDelete': 'हटाएं',
+    'history.deleting': 'हटाया जा रहा है',
+    'history.previousMedications': 'अपनी पिछली दवा पहचानें देखें',
     'error.authRequired': 'प्रमाणीकरण आवश्यक',
     'error.loginRequired': 'इस पृष्ठ को देखने के लिए कृपया लॉग इन करें',
     'error.goToLogin': 'लॉगिन पर जाएँ'

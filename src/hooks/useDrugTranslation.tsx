@@ -62,6 +62,61 @@ const drugTranslations = {
   'With food': 'भोजन के साथ',
   'Without food': 'भोजन के बिना',
   'Take as directed': 'निर्देशानुसार लें',
+  
+  // Common medicines
+  'Paracetamol': 'पैरासिटामोल',
+  'Aspirin': 'एस्पिरिन',
+  'Ibuprofen': 'आइबुप्रोफेन',
+  'Amoxicillin': 'अमॉक्सिसिलिन',
+  'Omeprazole': 'ओमेप्राज़ोल',
+  'Metformin': 'मेटफॉर्मिन',
+  'Atorvastatin': 'अटोरवास्टैटिन',
+  'Amlodipine': 'एम्लोडिपीन',
+  'Losartan': 'लोसार्टन',
+  'Cetirizine': 'सिटरीज़िन',
+  'Diazepam': 'डायजेपाम',
+  'Fluoxetine': 'फ्लुओक्सेटीन',
+  'Levothyroxine': 'लेवोथाइरोक्सिन',
+  'Salbutamol': 'सालबुटामोल',
+  'Ramipril': 'रैमिप्रिल',
+  'Simvastatin': 'सिमवास्टैटिन',
+  'Lisinopril': 'लिसिनोप्रिल',
+  'Warfarin': 'वारफरिन',
+  'Clopidogrel': 'क्लोपिडोग्रेल',
+
+  // Usage and indications
+  'For pain relief': 'दर्द से राहत के लिए',
+  'For fever': 'बुखार के लिए',
+  'For bacterial infections': 'बैक्टीरियल संक्रमण के लिए',
+  'For heartburn': 'अपच के लिए',
+  'For diabetes': 'मधुमेह के लिए',
+  'For high cholesterol': 'उच्च कोलेस्ट्रॉल के लिए',
+  'For high blood pressure': 'उच्च रक्तचाप के लिए',
+  'For allergies': 'एलर्जी के लिए',
+  'For anxiety': 'चिंता के लिए',
+  'For depression': 'अवसाद के लिए',
+  'For thyroid disorders': 'थायरॉयड विकारों के लिए',
+  'For asthma': 'अस्थमा के लिए',
+  'For heart failure': 'हृदय विफलता के लिए',
+  'For blood thinning': 'रक्त पतला करने के लिए',
+  'For inflammation': 'सूजन के लिए',
+  
+  // Drug identification related
+  'Drug details': 'दवा का विवरण',
+  'Identified medication': 'पहचानी गई दवा',
+  'View details': 'विवरण देखें',
+  'More information': 'अधिक जानकारी',
+  'Generic name': 'जेनेरिक नाम',
+  'Brand name': 'ब्रांड नाम',
+  'Manufacturer': 'निर्माता',
+  'Usage information': 'उपयोग जानकारी',
+  'Safety information': 'सुरक्षा जानकारी',
+  'Medication identifier': 'दवा पहचानकर्ता',
+  'No results found': 'कोई परिणाम नहीं मिला',
+  'Uploading image': 'छवि अपलोड हो रही है',
+  'Processing': 'प्रसंस्करण हो रहा है',
+  'Take a picture of medication': 'दवा की तस्वीर लें',
+  'Upload an image': 'छवि अपलोड करें'
 };
 
 export const useDrugTranslation = () => {
@@ -99,8 +154,31 @@ export const useDrugTranslation = () => {
     return items.map(item => translateDrugText(item));
   };
   
+  // Function to translate object properties recursively
+  const translateDrugObject = <T extends Record<string, any>>(obj: T | null | undefined): T => {
+    if (!obj) return {} as T;
+    if (language === 'en') return obj;
+    
+    const result = { ...obj };
+    
+    Object.keys(result).forEach(key => {
+      const value = result[key];
+      
+      if (typeof value === 'string') {
+        result[key] = translateDrugText(value);
+      } else if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+        result[key] = translateDrugArray(value);
+      } else if (value !== null && typeof value === 'object') {
+        result[key] = translateDrugObject(value);
+      }
+    });
+    
+    return result as T;
+  };
+  
   return {
     translateDrugText,
-    translateDrugArray
+    translateDrugArray,
+    translateDrugObject
   };
 };

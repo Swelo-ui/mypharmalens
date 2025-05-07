@@ -42,56 +42,56 @@ const TranslatedHeader = () => {
       <div className="container mx-auto h-full px-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <div className="text-xl font-bold text-pharma-700 dark:text-pharma-500 flex items-center">
-            <span className="bg-pharma-600 text-white rounded-md p-1 mr-1.5">PL</span>
+          <div className="text-2xl font-bold text-pharma-700 dark:text-pharma-500 flex items-center">
+            <span className="bg-pharma-600 text-white rounded-md p-1.5 mr-2 text-xl">PL</span>
             <span>PharmaLens</span>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
-          <Link to="/search" className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-sm font-medium">
+        <nav className="hidden md:flex items-center space-x-2">
+          <Link to="/search" className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-md font-medium">
             {translate('common.search')}
           </Link>
-          <Link to="/identify" className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-sm font-medium">
+          <Link to="/identify" className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-md font-medium">
             {translate('common.identify')}
           </Link>
           {isAuthenticated && (
-            <Link to="/history" className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-sm font-medium">
+            <Link to="/history" className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 rounded-md text-md font-medium">
               {translate('common.history')}
             </Link>
           )}
         </nav>
 
         {/* Desktop Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-3">
           {isAuthenticated ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <Link to="/profile">
-                <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300">
-                  <User className="w-4 h-4 mr-2" />
+                <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 text-md">
+                  <User className="w-5 h-5 mr-2" />
                   {translate('common.profile')}
                 </Button>
               </Link>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-gray-700 dark:text-gray-300"
+                className="text-gray-700 dark:text-gray-300 text-md"
                 onClick={handleLogout}
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-5 h-5 mr-2" />
                 {translate('common.logout')}
               </Button>
             </div>
           ) : (
             <Link to="/auth">
-              <Button variant="primary" size="sm">
+              <Button variant="primary" size="sm" className="text-md px-6 py-2">
                 {translate('common.login')}
               </Button>
             </Link>
           )}
           <Link to="/search">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="h-10 w-10">
               <Search className="w-5 h-5" />
             </Button>
           </Link>
