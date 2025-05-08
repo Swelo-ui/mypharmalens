@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -13,9 +13,11 @@ import ImageUpload from '@/components/ImageUpload';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
+import useDrugTranslation from '@/hooks/useDrugTranslation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 // Helper function to extract image features for similarity comparison
 const extractImageFeatures = (base64Image: string): Promise<string> => {
@@ -71,6 +73,7 @@ const calculateSimilarity = (hash1: string, hash2: string): number => {
 
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
+  const { translateDrugObject, isTranslating, detectedLanguage } = useDrugTranslation();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
@@ -79,6 +82,7 @@ const DrugIdentify = () => {
   const [blurryMode, setBlurryMode] = useState(false);
   const [isImageLowRes, setIsImageLowRes] = useState(false);
   const [enhancedMode, setEnhancedMode] = useState(true);
+  const [multilingualMode, setMultilingualMode] = useState(true);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
@@ -263,7 +267,9 @@ const DrugIdentify = () => {
       }
       
       // No match found, proceed with API identification
-      setProcessingPhase("Sending image for analysis");
+      setProcessingPhase(multilingualMode ? 
+        "Sending image for multilingual analysis" : 
+        "Sending image for analysis");
       setProcessingProgress(30);
       
       const { data, error } = await supabase.functions.invoke('identify-drug', {
@@ -273,7 +279,9 @@ const DrugIdentify = () => {
         }
       });
 
-      setProcessingPhase("Processing AI response");
+      setProcessingPhase(data?.textLanguage && data.textLanguage !== 'english' ? 
+        `Processing AI response (detected ${data.textLanguage})` : 
+        "Processing AI response");
       setProcessingProgress(60);
 
       if (error) {
@@ -351,6 +359,7 @@ const DrugIdentify = () => {
             
             if (drugData) {
               setProcessingProgress(95);
+              
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
                 id: drugData.id,
@@ -372,12 +381,24 @@ const DrugIdentify = () => {
                 verified: false,
                 image: drugData.image,
                 drugClass: drugData.drugClass || 'Not specified',
-                brandNames: drugData.brandNames || []
+                brandNames: drugData.brandNames || [],
+                textLanguage: drugData.textLanguage || null,
+                translatedImprint: drugData.translatedImprint || null,
+                translatedName: drugData.translatedName || null,
               };
               
               setIdentifiedDrug(formattedDrugData);
               setIsSaved(false);
               setProcessingProgress(100);
+              
+              // Show language detection info if applicable
+              if (drugData.textLanguage && 
+                  drugData.textLanguage.toLowerCase() !== 'english' && 
+                  drugData.textLanguage.toLowerCase() !== 'en') {
+                toast.info(`Detected ${drugData.textLanguage} text on medication`, {
+                  description: "Translation features have been applied"
+                });
+              }
               
               // Customize message based on whether this was from history or new identification
               if (drugData.fromHistory) {
@@ -386,21 +407,21 @@ const DrugIdentify = () => {
                 });
               } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
                 if (drugData.confidence === 'high') {
-                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                  toast.success(`Medication successfully identified as ${drugData.translatedName || drugData.name}!`, { 
                     description: "Enhanced analysis provided high confidence results."
                   });
                 } else if (drugData.confidence === 'medium') {
-                  toast.success(`Medication identified as ${drugData.name}`, { 
+                  toast.success(`Medication identified as ${drugData.translatedName || drugData.name}`, { 
                     description: "The identification has medium confidence. Consider the alternatives listed."
                   });
                 } else {
-                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                  toast.info(`Medication possibly identified as ${drugData.translatedName || drugData.name}`, { 
                     description: "Low confidence identification. Consider consulting a healthcare professional.",
                     duration: 5000
                   });
                 }
               } else {
-                toast.success(`Medication successfully identified as ${drugData.name}!`);
+                toast.success(`Medication successfully identified as ${drugData.translatedName || drugData.name}!`);
               }
               
               // Additional information about image quality if relevant
@@ -527,7 +548,7 @@ const DrugIdentify = () => {
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <Tabs defaultValue="standard" className="mb-4">
+              <Tabs defaultValue="enhanced" className="mb-4">
                 <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
@@ -574,6 +595,24 @@ const DrugIdentify = () => {
                       improving accuracy for blurry or difficult-to-identify medications.
                     </p>
                   </div>
+                  
+                  {/* Multilingual Mode Toggle */}
+                  <div className="rounded-lg border p-4 bg-blue-50 dark:bg-blue-900/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Globe className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium">Multilingual Support</span>
+                      </div>
+                      <Switch 
+                        id="multilingual-mode" 
+                        checked={multilingualMode}
+                        onCheckedChange={setMultilingualMode}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      Identify medications with non-English text or packaging. Automatically detects the language and translates results.
+                    </p>
+                  </div>
                 </TabsContent>
               </Tabs>
               
@@ -592,7 +631,9 @@ const DrugIdentify = () => {
                   <Progress value={processingProgress} className="h-2" />
                   <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
                     {enhancedMode 
-                      ? "Using enhanced multi-model analysis for optimal results" 
+                      ? multilingualMode 
+                        ? "Using enhanced multi-model analysis with language detection" 
+                        : "Using enhanced multi-model analysis"
                       : "Using standard analysis"}
                   </p>
                 </div>
@@ -626,13 +667,31 @@ const DrugIdentify = () => {
                   <Zap className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
                   <span>Use Enhanced Mode for blurry images or hard-to-identify medications</span>
                 </li>
+                <li className="flex items-start">
+                  <Globe className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-blue-600" />
+                  <span>Enable Multilingual Support for medications with non-English text</span>
+                </li>
               </ul>
             </div>
           </>
         ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center flex-wrap gap-3">
-              <h2 className="text-2xl font-semibold">Identification Result</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-semibold">Identification Result</h2>
+                {identifiedDrug.textLanguage && identifiedDrug.textLanguage.toLowerCase() !== 'english' && (
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400">
+                    <Globe className="h-3 w-3 mr-1" />
+                    {identifiedDrug.textLanguage}
+                  </Badge>
+                )}
+                {isTranslating && (
+                  <span className="text-sm text-gray-500 flex items-center">
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    Translating...
+                  </span>
+                )}
+              </div>
               <div className="flex gap-3">
                 {isAuthenticated && !isSaved && (
                   <Button 
@@ -659,6 +718,7 @@ const DrugIdentify = () => {
                 </Button>
               </div>
             </div>
+            
             {isSaved && (
               <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
@@ -667,6 +727,41 @@ const DrugIdentify = () => {
                 </div>
               </Alert>
             )}
+            
+            {/* Display original name and translated name if available */}
+            {identifiedDrug.textLanguage && identifiedDrug.textLanguage.toLowerCase() !== 'english' && identifiedDrug.translatedName && (
+              <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                    <Globe className="h-4 w-4" />
+                    <span className="font-medium">Text detected in {identifiedDrug.textLanguage}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Original Name:</p>
+                      <p className="text-sm font-medium">{identifiedDrug.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Translated Name:</p>
+                      <p className="text-sm font-medium">{identifiedDrug.translatedName}</p>
+                    </div>
+                    {identifiedDrug.imprint && identifiedDrug.translatedImprint && (
+                      <>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Original Imprint:</p>
+                          <p className="text-sm">{identifiedDrug.imprint}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Translated Imprint:</p>
+                          <p className="text-sm">{identifiedDrug.translatedImprint}</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Alert>
+            )}
+            
             <DrugDetails drug={identifiedDrug} />
           </div>
         )}
