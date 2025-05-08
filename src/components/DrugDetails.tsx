@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
@@ -15,6 +14,7 @@ export interface DetailedDrugData {
   category: string;
   description: string;
   dosageAndAdmin: string;
+  detailedDosage?: string; // More comprehensive dosage information
   sideEffects: string[];
   warnings: string[];
   interactions: string[];
@@ -29,6 +29,7 @@ export interface DetailedDrugData {
   packageImage?: string;
   drugClass?: string;
   brandNames?: string[];
+  alternativeMedications?: string[]; // Additional alternatives
   similarDrugs?: {
     id: string;
     name: string;
@@ -79,9 +80,19 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               expanded={expandedSections.dosage}
               onToggle={() => toggleSection('dosage')}
               content={
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {drug.dosageAndAdmin}
-                </p>
+                <div className="space-y-3">
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    {drug.dosageAndAdmin}
+                  </p>
+                  {drug.detailedDosage && (
+                    <div className="mt-3 bg-pharma-50 dark:bg-pharma-900/20 p-3 rounded-md">
+                      <h4 className="text-xs font-semibold mb-2 text-pharma-700">Detailed Dosing Information:</h4>
+                      <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                        {drug.detailedDosage}
+                      </p>
+                    </div>
+                  )}
+                </div>
               }
             />
             
@@ -201,6 +212,20 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                     <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
                       <Tag className="h-3 w-3 mr-1" />
                       {brand}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {drug.alternativeMedications && drug.alternativeMedications.length > 0 && (
+              <div className="glass-card p-4">
+                <h3 className="text-sm font-medium mb-3">Alternative Medications</h3>
+                <div className="flex flex-col space-y-2">
+                  {drug.alternativeMedications.map((alternative, index) => (
+                    <div key={index} className="flex items-start">
+                      <Pill className="h-4 w-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{alternative}</span>
                     </div>
                   ))}
                 </div>

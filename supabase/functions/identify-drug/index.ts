@@ -188,10 +188,12 @@ function parseHtmlForDrugInfo(html, drugName) {
       name: drugName,
       genericName: "",
       brandNames: [],
+      alternativeMedications: [],
       manufacturer: "",
       category: "",
       description: "",
       dosageAndAdmin: "",
+      detailedDosage: "",
       sideEffects: [],
       warnings: [],
       interactions: [],
@@ -325,6 +327,22 @@ function parseHtmlForDrugInfo(html, drugName) {
         .replace(/<[^>]*>/g, '')
         .replace(/\s+/g, ' ')
         .trim();
+      
+      // Extract detailed dosage by combining multiple paragraphs if available
+      const detailedDosageMatches = html.match(/<h2[^>]*>Dosage[\s\S]*?<\/h2>([\s\S]*?)(?:<h2|<div class="contentBox)/i);
+      if (detailedDosageMatches && detailedDosageMatches[1]) {
+        // Extract all paragraphs in the dosage section
+        const paragraphs = detailedDosageMatches[1].match(/<p[^>]*>([\s\S]*?)<\/p>/g);
+        if (paragraphs && paragraphs.length > 1) {
+          const allDosageInfo = paragraphs.map(p => 
+            p.replace(/<[^>]*>/g, '')
+             .replace(/\s+/g, ' ')
+             .trim()
+          ).join('\n\n');
+          
+          drugInfo.detailedDosage = allDosageInfo;
+        }
+      }
     }
     
     // Extract indications (improved)
@@ -393,6 +411,39 @@ function parseHtmlForDrugInfo(html, drugName) {
       drugInfo.storage = "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.";
     }
     
+    // Enhanced alternative medications extraction
+    const alternativesMatch = html.match(/<h2[^>]*>Alternative[s]? (?:to|for)[^<]*<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i) ||
+                            html.match(/<h3[^>]*>Alternative[s]? (?:to|for)[^<]*<\/h3>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i) ||
+                            html.match(/<p[^>]*>Alternative[s]?(?:[^<]*):([^<]+)<\/p>/i);
+    
+    if (alternativesMatch) {
+      if (alternativesMatch[1].includes("<li")) {
+        // Extract alternatives from list items
+        const alternatives = alternativesMatch[1].match(/<li[^>]*>([\s\S]*?)<\/li>/g);
+        if (alternatives) {
+          drugInfo.alternativeMedications = alternatives.map(item => 
+            item.replace(/<li[^>]*>/, '')
+                .replace(/<\/li>/, '')
+                .replace(/<[^>]*>/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+          );
+        }
+      } else {
+        // Extract alternatives from text
+        drugInfo.alternativeMedications = alternativesMatch[1].split(/,|;/).map(item => item.trim());
+      }
+    }
+    
+    // Look for similar drugs mentioned in text
+    const similarDrugsMatch = html.match(/(?:similar to|like|such as|including|alternatives include)[:\s]+([^.<]+)(?:\.|<)/i);
+    if (similarDrugsMatch && similarDrugsMatch[1]) {
+      const mentionedDrugs = similarDrugsMatch[1].split(/,|;|\band\b/).map(drug => drug.trim());
+      drugInfo.alternativeMedications = [
+        ...new Set([...drugInfo.alternativeMedications, ...mentionedDrugs])
+      ].filter(drug => drug && drug.length > 2);
+    }
+    
     console.log(`Successfully parsed drug info for: ${drugName}`);
     return drugInfo;
   } catch (error) {
@@ -401,7 +452,43 @@ function parseHtmlForDrugInfo(html, drugName) {
   }
 }
 
-// New function to get drug information from MedlinePlus
+// New function to get alternative medications from MedlinePlus
+async function getAlternativeMedicationsFromMedlinePlus(drugName) {
+  try {
+    // MedlinePlus often has a "Related Information" or "See Also" section with alternatives
+    const response = await fetch(`https://medlineplus.gov/druginfo/meds/a${drugName.toLowerCase().replace(/\s+/g, '')}.html`);
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const html = await response.text();
+    
+    // Look for related medications section
+    const relatedSection = html.match(/<h2[^>]*>(?:See Also|Related Information)[^<]*<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i);
+    
+    if (relatedSection && relatedSection[1]) {
+      const relatedItems = relatedSection[1].match(/<li[^>]*>([\s\S]*?)<\/li>/g);
+      
+      if (relatedItems) {
+        return relatedItems.map(item => 
+          item.replace(/<li[^>]*>/, '')
+              .replace(/<\/li>/, '')
+              .replace(/<[^>]*>/g, '')
+              .replace(/\s+/g, ' ')
+              .trim()
+        ).filter(item => item.length > 2);
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`Error getting alternatives from MedlinePlus: ${error.message}`);
+    return null;
+  }
+}
+
+// Function to get drug information from MedlinePlus
 async function getDrugInfoFromMedlinePlus(drugName) {
   try {
     console.log(`Searching MedlinePlus for: ${drugName}`);
@@ -1022,10 +1109,12 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
     name: "Unknown Medication",
     genericName: "",
     brandNames: [],
+    alternativeMedications: [],
     manufacturer: "Unknown",
     category: "",
     description: "",
     dosageAndAdmin: "",
+    detailedDosage: "",
     sideEffects: [],
     warnings: [],
     interactions: [],
@@ -1086,6 +1175,7 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
     combinedData.category = standardAnalysis.category || combinedData.category;
     combinedData.description = standardAnalysis.description || combinedData.description;
     combinedData.dosageAndAdmin = standardAnalysis.dosageAndAdmin || combinedData.dosageAndAdmin;
+    combinedData.detailedDosage = standardAnalysis.detailedDosage || combinedData.detailedDosage;
     combinedData.sideEffects = standardAnalysis.sideEffects || combinedData.sideEffects;
     combinedData.warnings = standardAnalysis.warnings || combinedData.warnings;
     combinedData.interactions = standardAnalysis.interactions || combinedData.interactions;
@@ -1097,6 +1187,7 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
     combinedData.pregnancy = standardAnalysis.pregnancy || combinedData.pregnancy;
     combinedData.imprint = standardAnalysis.imprint || combinedData.imprint;
     combinedData.drugClass = standardAnalysis.drugClass || combinedData.drugClass;
+    combinedData.alternativeMedications = standardAnalysis.alternativeMedications || combinedData.alternativeMedications;
     
     // Language detection and translation
     combinedData.textLanguage = standardAnalysis.textLanguage || combinedData.textLanguage;
@@ -1134,6 +1225,16 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
       
       if (medlinePlusData.usageInstructions) {
         combinedData.dosageAndAdmin = medlinePlusData.usageInstructions;
+        // Add more detailed dosage if the instructions are comprehensive
+        if (medlinePlusData.usageInstructions.length > 150) {
+          combinedData.detailedDosage = medlinePlusData.usageInstructions;
+        }
+      }
+      
+      // Get alternative medications from MedlinePlus
+      const medlinePlusAlternatives = await getAlternativeMedicationsFromMedlinePlus(combinedData.name);
+      if (medlinePlusAlternatives && medlinePlusAlternatives.length > 0) {
+        combinedData.alternativeMedications = medlinePlusAlternatives;
       }
     }
     
@@ -1155,6 +1256,7 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
       // Only use drugs.com dosage if we don't have MedlinePlus data
       if (!medlinePlusData || !medlinePlusData.usageInstructions) {
         combinedData.dosageAndAdmin = drugsComData.dosageAndAdmin || combinedData.dosageAndAdmin;
+        combinedData.detailedDosage = drugsComData.detailedDosage || combinedData.detailedDosage;
       }
       
       // Only use these fields from drugs.com if MedlinePlus didn't provide them
@@ -1196,6 +1298,14 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
       if (drugsComData.brandNames && drugsComData.brandNames.length > 0) {
         combinedData.brandNames = [...new Set([...combinedData.brandNames, ...drugsComData.brandNames])];
       }
+      
+      // Add alternative medications
+      if (drugsComData.alternativeMedications && drugsComData.alternativeMedications.length > 0) {
+        if (!combinedData.alternativeMedications) {
+          combinedData.alternativeMedications = [];
+        }
+        combinedData.alternativeMedications = [...new Set([...combinedData.alternativeMedications, ...drugsComData.alternativeMedications])];
+      }
     }
   } else if (combinedData.imprint) {
     // If we have an imprint but no drug name, try searching by imprint
@@ -1212,6 +1322,7 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
       combinedData.drugClass = imprintResults.drugClass || combinedData.drugClass;
       combinedData.description = imprintResults.description || combinedData.description;
       combinedData.dosageAndAdmin = imprintResults.dosageAndAdmin || combinedData.dosageAndAdmin;
+      combinedData.detailedDosage = imprintResults.detailedDosage || combinedData.detailedDosage;
       
       if (imprintResults.sideEffects && imprintResults.sideEffects.length > 0) {
         combinedData.sideEffects = imprintResults.sideEffects;
@@ -1245,6 +1356,14 @@ async function constructFinalResponse(multiModelAnalysis, standardAnalysis, imag
       // Add brand names from imprint search if available
       if (imprintResults.brandNames && imprintResults.brandNames.length > 0) {
         combinedData.brandNames = [...new Set([...combinedData.brandNames, ...imprintResults.brandNames])];
+      }
+      
+      // Add alternative medications
+      if (imprintResults.alternativeMedications && imprintResults.alternativeMedications.length > 0) {
+        if (!combinedData.alternativeMedications) {
+          combinedData.alternativeMedications = [];
+        }
+        combinedData.alternativeMedications = [...new Set([...combinedData.alternativeMedications, ...imprintResults.alternativeMedications])];
       }
     }
   }

@@ -104,6 +104,11 @@ export const useDrugTranslation = () => {
       if (translatedDrug.storage) {
         translatedDrug.storage = await translateText(translatedDrug.storage, targetLang);
       }
+
+      // Translate detailed dosage information if available
+      if (translatedDrug.detailedDosage) {
+        translatedDrug.detailedDosage = await translateText(translatedDrug.detailedDosage, targetLang);
+      }
       
       // Translate array fields
       if (translatedDrug.sideEffects && translatedDrug.sideEffects.length > 0) {
@@ -124,6 +129,14 @@ export const useDrugTranslation = () => {
       
       if (translatedDrug.contraindications && translatedDrug.contraindications.length > 0) {
         translatedDrug.contraindications = await translateArray(translatedDrug.contraindications, targetLang);
+      }
+      
+      if (translatedDrug.brandNames && translatedDrug.brandNames.length > 0) {
+        translatedDrug.brandNames = await translateArray(translatedDrug.brandNames, targetLang);
+      }
+      
+      if (translatedDrug.alternativeMedications && translatedDrug.alternativeMedications.length > 0) {
+        translatedDrug.alternativeMedications = await translateArray(translatedDrug.alternativeMedications, targetLang);
       }
       
       setIsTranslating(false);

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -139,6 +138,14 @@ const DrugPage = () => {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {drug.dosageAndAdmin}
               </p>
+              {drug.detailedDosage && (
+                <div className="mt-4 bg-pharma-50 dark:bg-pharma-900/20 p-4 rounded-md">
+                  <h4 className="text-sm font-semibold mb-2 text-pharma-700">Detailed Dosing Information:</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    {drug.detailedDosage}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="glass-card p-6 rounded-xl">
@@ -215,35 +222,71 @@ const DrugPage = () => {
           </TabsContent>
           
           <TabsContent value="alternatives" className="space-y-4">
+            {/* Brand Names */}
+            {drug.brandNames && drug.brandNames.length > 0 && (
+              <div className="glass-card p-6 rounded-xl">
+                <h3 className="font-medium text-lg mb-4">Brand Names</h3>
+                <div className="flex flex-wrap gap-2">
+                  {drug.brandNames.map((brand, index) => (
+                    <span key={index} className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Alternative Medications */}
+            {drug.alternativeMedications && drug.alternativeMedications.length > 0 && (
+              <div className="glass-card p-6 rounded-xl">
+                <h3 className="font-medium text-lg mb-4">Alternative Medications</h3>
+                <ul className="space-y-2">
+                  {drug.alternativeMedications.map((alternative, i) => (
+                    <li key={i} className="flex items-start">
+                      <Pill className="h-4 w-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">{alternative}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {/* Similar Drugs */}
             {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {drug.similarDrugs.map((similar) => (
-                  <div 
-                    key={similar.id} 
-                    className="glass-card p-4 hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/drug/${similar.id}`)}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
-                        <Pill className="h-4 w-4 text-pharma-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium">{similar.name}</h4>
-                        <button 
-                          className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
-                        >
-                          View details
-                        </button>
+              <div className="glass-card p-6 rounded-xl">
+                <h3 className="font-medium text-lg mb-4">Similar Medications</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {drug.similarDrugs.map((similar) => (
+                    <div 
+                      key={similar.id} 
+                      className="glass-card p-4 hover:shadow-md transition-shadow"
+                      onClick={() => navigate(`/drug/${similar.id}`)}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
+                          <Pill className="h-4 w-4 text-pharma-600" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium">{similar.name}</h4>
+                          <button 
+                            className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
+                          >
+                            View details
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="glass-card p-6 text-center rounded-xl">
-                <PanelLeftOpen className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
-              </div>
+              (!drug.brandNames || drug.brandNames.length === 0) && 
+              (!drug.alternativeMedications || drug.alternativeMedications.length === 0) && (
+                <div className="glass-card p-6 text-center rounded-xl">
+                  <PanelLeftOpen className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
+                </div>
+              )
             )}
           </TabsContent>
         </Tabs>
