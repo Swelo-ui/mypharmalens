@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   AlertCircle,
@@ -28,10 +29,11 @@ export interface DetailedDrugData {
   pregnancy: string;
   verified: boolean;
   image?: string;
+  packageImage?: string;
   drugClass: string;
   brandNames: string[];
   similarDrugs?: {id: string, name: string}[];
-  // New properties for multilingual support
+  // Multilingual support properties
   textLanguage?: string | null;
   translatedName?: string | null;
   imprint?: string | null;
