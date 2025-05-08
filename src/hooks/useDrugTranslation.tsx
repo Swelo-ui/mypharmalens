@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { DetailedDrugData } from '@/components/DrugDetails';
 
@@ -143,8 +143,5 @@ export const useDrugTranslation = () => {
     translateDrugObject
   };
 };
-
-// Missing import for useState, let's add it
-import { useState } from 'react';
 
 export default useDrugTranslation;
