@@ -21,9 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useDrugTranslation } from '@/hooks/useDrugTranslation';
-import TranslatedBottomNav from '@/components/TranslatedBottomNav';
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface IdentificationRecord {
   id: string;
@@ -62,8 +60,6 @@ const IdentificationHistory = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { translate } = useLanguage();
-  const { translateDrugText, translateDrugObject } = useDrugTranslation();
 
   const fetchIdentificationHistory = useCallback(async (forceRefresh = false) => {
     try {
@@ -260,9 +256,9 @@ const IdentificationHistory = () => {
       <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">{translate('history.title')}</h1>
+            <h1 className="text-3xl font-bold">Identification History</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
-              {translate('history.previousMedications')}
+              View your previous medication identifications
             </p>
           </div>
           
@@ -271,7 +267,7 @@ const IdentificationHistory = () => {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 type="search"
-                placeholder={translate('history.searchMedications')}
+                placeholder="Search medications..."
                 className="pl-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -310,12 +306,12 @@ const IdentificationHistory = () => {
                   <DrugCard
                     drug={{
                       id: extractDrugId(item.details) || item.id,
-                      name: translateDrugText(item.drug_name) || translateDrugText("Unknown Medication"),
-                      genericName: translateDrugText(item.details?.genericName || item.details?.generic_name || ""),
-                      manufacturer: translateDrugText(item.details?.manufacturer || ""),
-                      category: translateDrugText(item.details?.category || ""),
-                      description: translateDrugText(item.details?.description || ""),
-                      drugClass: translateDrugText(item.details?.drugClass || item.details?.drug_class || ""),
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
                       verified: item.details?.verified || false,
                       image: item.image_url || item.details?.image || "",
                     }}
@@ -340,32 +336,33 @@ const IdentificationHistory = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
               <AlertTriangle className="h-8 w-8 text-gray-500" />
             </div>
-            <h3 className="text-xl font-medium mb-2">{translate('history.empty')}</h3>
+            <h3 className="text-xl font-medium mb-2">No identification history found</h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
               {searchTerm ? 
-                translate('history.noResults') + ". " + translate('history.tryDifferentSearch') : 
-                "आपने अभी तक किसी भी दवा की पहचान नहीं की है। एक दवा की पहचान करके शुरू करें।"}
+                "No results match your search criteria. Try a different search term." : 
+                "You haven't identified any medications yet. Start by identifying a medication."}
             </p>
             {!searchTerm && (
               <Button onClick={() => navigate('/identify')}>
-                {translate('history.identifyMedication')}
+                Identify a Medication
               </Button>
             )}
           </div>
         )}
       </div>
-      <TranslatedBottomNav />
+      <BottomNavigation />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{translate('history.deleteConfirm')}</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              {translate('history.deleteConfirmMessage')}
+              This will permanently delete this medication record from your history.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>{translate('history.cancelDelete')}</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isDeleting}
@@ -373,11 +370,11 @@ const IdentificationHistory = () => {
             >
               {isDeleting ? (
                 <>
-                  <span className="mr-2">{translate('history.deleting')}</span>
+                  <span className="mr-2">Deleting</span>
                   <span className="animate-spin">●</span>
                 </>
               ) : (
-                translate('history.confirmDelete')
+                "Delete"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

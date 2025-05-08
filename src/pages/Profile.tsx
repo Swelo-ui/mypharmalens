@@ -7,17 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Key, User, Mail, Globe } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Loader2, Save, Key, User, Mail } from 'lucide-react';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
   const { toast } = useToast();
-  const { language, setLanguage, translate } = useLanguage();
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -101,15 +98,15 @@ const Profile = () => {
       if (error) throw error;
       
       toast({
-        title: translate('profile.updateSuccess'),
-        description: translate('profile.updateSuccess'),
+        title: "Profile updated",
+        description: "Your profile has been updated successfully",
         type: "success"
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
-        title: translate('profile.updateFailed'),
-        description: translate('profile.updateFailed'),
+        title: "Update failed",
+        description: "Failed to update your profile",
         type: "error"
       });
     } finally {
@@ -120,8 +117,8 @@ const Profile = () => {
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast({
-        title: translate('profile.passwordNotMatch'),
-        description: translate('profile.passwordNotMatch'),
+        title: "Passwords don't match",
+        description: "New passwords do not match",
         type: "error"
       });
       return;
@@ -129,8 +126,8 @@ const Profile = () => {
     
     if (newPassword.length < 6) {
       toast({
-        title: translate('profile.passwordTooShort'),
-        description: translate('profile.passwordTooShort'),
+        title: "Password too short",
+        description: "Password must be at least 6 characters",
         type: "error"
       });
       return;
@@ -148,8 +145,8 @@ const Profile = () => {
       if (error) throw error;
       
       toast({
-        title: translate('profile.passwordUpdated'),
-        description: translate('profile.passwordUpdated'),
+        title: "Password updated",
+        description: "Your password has been updated successfully",
         type: "success"
       });
       
@@ -159,17 +156,13 @@ const Profile = () => {
     } catch (error) {
       console.error('Error changing password:', error);
       toast({
-        title: translate('profile.updateFailed'),
-        description: translate('profile.updateFailed'),
+        title: "Update failed",
+        description: "Failed to change your password",
         type: "error"
       });
     } finally {
       setIsChangingPassword(false);
     }
-  };
-
-  const handleLanguageChange = (value: 'en' | 'hi') => {
-    setLanguage(value);
   };
 
   if (isLoading) {
@@ -187,9 +180,9 @@ const Profile = () => {
         <div className="flex-1 container mx-auto px-4 py-8 flex flex-col items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>{translate('error.authRequired')}</CardTitle>
+              <CardTitle>Not Authenticated</CardTitle>
               <CardDescription>
-                {translate('error.loginRequired')}
+                Please log in to view and manage your profile.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -198,7 +191,7 @@ const Profile = () => {
                 className="w-full"
                 onClick={() => window.location.href = '/auth'}
               >
-                {translate('error.goToLogin')}
+                Go to Login
               </Button>
             </CardContent>
           </Card>
@@ -213,20 +206,20 @@ const Profile = () => {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">{translate('profile.title')}</h1>
+        <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
         
         <Tabs defaultValue="profile" className="max-w-3xl mx-auto">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="profile">{translate('profile.profileInfo')}</TabsTrigger>
-            <TabsTrigger value="security">{translate('profile.security')}</TabsTrigger>
+            <TabsTrigger value="profile">Profile Information</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
           
           <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <CardTitle>{translate('profile.profileInfo')}</CardTitle>
+                <CardTitle>Profile Information</CardTitle>
                 <CardDescription>
-                  {translate('profile.settings')}
+                  Update your profile details
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -234,41 +227,20 @@ const Profile = () => {
                   <div className="mb-6">
                     <Label htmlFor="displayName" className="mb-2 block">
                       <User className="inline-block w-4 h-4 mr-2" />
-                      {translate('profile.displayName')}
+                      Display Name
                     </Label>
                     <Input
                       id="displayName"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder={translate('profile.displayName')}
+                      placeholder="Your display name"
                     />
-                  </div>
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="language" className="mb-2 block">
-                      <Globe className="inline-block w-4 h-4 mr-2" />
-                      {translate('profile.language')}
-                    </Label>
-                    <RadioGroup
-                      defaultValue={language}
-                      onValueChange={(value) => handleLanguageChange(value as 'en' | 'hi')}
-                      className="flex flex-col space-y-1 mt-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="en" id="en" />
-                        <Label htmlFor="en">{translate('profile.english')}</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="hi" id="hi" />
-                        <Label htmlFor="hi">{translate('profile.hindi')}</Label>
-                      </div>
-                    </RadioGroup>
                   </div>
                   
                   <div className="mb-6">
                     <Label htmlFor="email" className="mb-2 block">
                       <Mail className="inline-block w-4 h-4 mr-2" />
-                      {translate('common.email')}
+                      Email Address
                     </Label>
                     <Input
                       id="email"
@@ -278,7 +250,7 @@ const Profile = () => {
                       className="bg-gray-100 dark:bg-gray-800"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {translate('common.email')} {translate('common.cancel')}
+                      Email address cannot be changed
                     </p>
                   </div>
                 </div>
@@ -294,7 +266,7 @@ const Profile = () => {
                     ) : (
                       <Save className="mr-2 h-4 w-4" />
                     )}
-                    {translate('profile.saveChanges')}
+                    Save Changes
                   </Button>
                 </div>
               </CardContent>
@@ -304,9 +276,9 @@ const Profile = () => {
           <TabsContent value="security">
             <Card>
               <CardHeader>
-                <CardTitle>{translate('profile.securitySettings')}</CardTitle>
+                <CardTitle>Security Settings</CardTitle>
                 <CardDescription>
-                  {translate('profile.changePassword')}
+                  Change your password and manage account security
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -314,40 +286,40 @@ const Profile = () => {
                   <div>
                     <Label htmlFor="currentPassword" className="mb-2 block">
                       <Key className="inline-block w-4 h-4 mr-2" />
-                      {translate('profile.currentPassword')}
+                      Current Password
                     </Label>
                     <Input
                       id="currentPassword"
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder={translate('profile.currentPassword')}
+                      placeholder="Enter your current password"
                     />
                   </div>
                   
                   <div>
                     <Label htmlFor="newPassword" className="mb-2 block">
-                      {translate('profile.newPassword')}
+                      New Password
                     </Label>
                     <Input
                       id="newPassword"
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder={translate('profile.newPassword')}
+                      placeholder="Enter your new password"
                     />
                   </div>
                   
                   <div>
                     <Label htmlFor="confirmPassword" className="mb-2 block">
-                      {translate('profile.confirmPassword')}
+                      Confirm New Password
                     </Label>
                     <Input
                       id="confirmPassword"
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder={translate('profile.confirmPassword')}
+                      placeholder="Confirm your new password"
                     />
                   </div>
                   
@@ -363,7 +335,7 @@ const Profile = () => {
                       ) : (
                         <Key className="mr-2 h-4 w-4" />
                       )}
-                      {translate('profile.changePassword')}
+                      Change Password
                     </Button>
                   </div>
                 </div>

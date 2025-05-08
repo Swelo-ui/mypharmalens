@@ -3,10 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { Search, Camera, Pill, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const Hero = () => {
-  const { translate } = useLanguage();
   const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
   
   useEffect(() => {
@@ -40,23 +38,23 @@ const Hero = () => {
   const features = [
     {
       icon: <Pill className="h-6 w-6 text-pharma-600" />,
-      title: translate('hero.feature1Title'),
-      description: translate('hero.feature1Desc'),
+      title: 'Drug Information',
+      description: 'Access comprehensive drug data including uses, dosages, side effects, and precautions.',
     },
     {
       icon: <Camera className="h-6 w-6 text-pharma-600" />,
-      title: translate('hero.feature2Title'),
-      description: translate('hero.feature2Desc'),
+      title: 'Visual Identification',
+      description: 'Upload an image of any medication to identify it with our AI-powered recognition system.',
     },
     {
       icon: <Search className="h-6 w-6 text-pharma-600" />,
-      title: translate('hero.feature3Title'),
-      description: translate('hero.feature3Desc'),
+      title: 'Smart Search',
+      description: 'Find medications by name, category, manufacturer, or conditions they treat.',
     },
     {
       icon: <FileText className="h-6 w-6 text-pharma-600" />,
-      title: translate('hero.feature4Title'),
-      description: translate('hero.feature4Desc'),
+      title: 'Educational Resources',
+      description: 'Access medication guides and educational content to better understand your prescriptions.',
     },
   ];
 
@@ -74,19 +72,19 @@ const Hero = () => {
             </span>
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-            {translate('hero.title').split('Any Medication')[0]}
-            <span className="text-pharma-600"> {translate('hero.title').includes('Any Medication') ? 'Any Medication' : ''}</span>
+            Identify & Learn About
+            <span className="text-pharma-600"> Any Medication</span>
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-6">
-            {translate('hero.subtitle')}
+            PharmaLens combines AI technology with comprehensive drug databases to help you identify medications and access reliable information instantly.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/search" className="px-6 py-2.5 rounded-md bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-md w-full sm:w-auto">
-              {translate('hero.searchBtn')}
+              Search Medications
             </Link>
             <Link to="/identify" className="px-6 py-2.5 rounded-md bg-white text-pharma-800 font-medium border border-gray-200 hover:bg-gray-50 transition-all shadow-sm w-full sm:w-auto">
-              {translate('hero.identifyBtn')}
+              Identify with Camera
             </Link>
           </div>
         </div>
