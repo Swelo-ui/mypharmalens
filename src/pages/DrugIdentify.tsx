@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -80,7 +81,7 @@ const DrugIdentify = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [blurryMode, setBlurryMode] = useState(false);
   const [isImageLowRes, setIsImageLowRes] = useState(false);
-  const [enhancedMode, setEnhancedMode] = useState(false);
+  const [enhancedMode, setEnhancedMode] = useState(true);
   const [multilingualMode, setMultilingualMode] = useState(true);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
@@ -547,7 +548,7 @@ const DrugIdentify = () => {
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <Tabs defaultValue="standard" className="mb-4">
+              <Tabs defaultValue="enhanced" className="mb-4">
                 <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>

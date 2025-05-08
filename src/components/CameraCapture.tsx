@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, RotateCw, Camera as CameraIcon, Check, CameraOff } from 'lucide-react';
+import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
@@ -17,9 +16,6 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [cameraInitializing, setCameraInitializing] = useState(false);
-  const [initAttempts, setInitAttempts] = useState(0);
-  const maxInitAttempts = 3;
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,9 +24,6 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
 
   const initializeCamera = async () => {
     try {
-      setCameraInitializing(true);
-      setInitAttempts(prev => prev + 1);
-      
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         const facingMode = isFrontCamera ? 'user' : 'environment';
         const constraints = {
@@ -42,16 +35,8 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
         
-        // Get access to the camera with timeout
-        const streamPromise = navigator.mediaDevices.getUserMedia(constraints);
-        
-        // Add a timeout to handle slow camera initialization
-        const timeoutPromise = new Promise<MediaStream>((_, reject) => {
-          setTimeout(() => reject(new Error('Camera access timed out')), 10000);
-        });
-        
-        // Race between camera access and timeout
-        const stream = await Promise.race([streamPromise, timeoutPromise]);
+        // Get access to the camera
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         
         // Check if device has multiple cameras
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -61,57 +46,26 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
         // Set the stream as the video element's source
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          
-          // Add event listener for when video is ready
-          videoRef.current.onloadedmetadata = () => {
-            if (videoRef.current) {
-              videoRef.current.play()
-                .then(() => {
-                  setHasPermission(true);
-                  setCameraActive(true);
-                  setCameraInitializing(false);
-                })
-                .catch(error => {
-                  console.error('Error playing video:', error);
-                  setCameraInitializing(false);
-                  throw error;
-                });
-            }
-          };
         }
         
         // Store the stream reference for later cleanup
         streamRef.current = stream;
+        setHasPermission(true);
+        setCameraActive(true);
       } else {
         toast({
           message: "Camera not supported",
           description: "Your browser doesn't support camera access."
         });
         setHasPermission(false);
-        setCameraInitializing(false);
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      
-      // Check if we've reached max attempts
-      if (initAttempts < maxInitAttempts) {
-        toast({
-          message: "Camera initialization failed", 
-          description: "Retrying camera access..."
-        });
-        
-        // Wait a bit before retrying
-        setTimeout(() => {
-          initializeCamera();
-        }, 1500);
-      } else {
-        toast({
-          message: "Camera access denied", 
-          description: "Please grant permission to access your camera or try a different browser."
-        });
-        setHasPermission(false);
-        setCameraInitializing(false);
-      }
+      toast({
+        message: "Camera access denied", 
+        description: "Please grant permission to access your camera."
+      });
+      setHasPermission(false);
     }
   };
 
@@ -177,8 +131,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
   };
 
   const handleStartCamera = () => {
-    if (!cameraActive && !capturedImage && !cameraInitializing) {
-      setInitAttempts(0);
+    if (!cameraActive && !capturedImage) {
       initializeCamera();
     }
   };
@@ -213,25 +166,14 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
             <CameraIcon className="h-8 w-8 text-pharma-600" />
           </div>
           
-          {cameraInitializing ? (
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent border-pharma-600 mb-3"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-                Initializing camera...
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-4">
-                Click to activate your camera
-              </p>
-              
-              <Button onClick={handleStartCamera} className="bg-pharma-600 hover:bg-pharma-700">
-                <Camera className="h-4 w-4 mr-2" />
-                Open Camera
-              </Button>
-            </>
-          )}
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-4">
+            Click to activate your camera
+          </p>
+          
+          <Button onClick={handleStartCamera} className="bg-pharma-600 hover:bg-pharma-700">
+            <Camera className="h-4 w-4 mr-2" />
+            Open Camera
+          </Button>
         </div>
       ) : null}
 
