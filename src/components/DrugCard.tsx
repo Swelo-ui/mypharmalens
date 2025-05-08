@@ -15,6 +15,7 @@ export interface DrugData {
   verified?: boolean;
   image?: string;
   packageImage?: string;
+  brandNames?: string[]; // Add brandNames property to match what's used in mockDrugsData
 }
 
 interface DrugCardProps {
