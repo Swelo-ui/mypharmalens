@@ -1096,6 +1096,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
     image: drug.image,
     packageImage: drug.packageImage,
     drugClass: drug.drugClass || '',
+    brandNames: drug.brandNames || [], // Ensure brandNames is always defined
     dosageAndAdmin: `The standard dosage for ${drug.name} varies based on patient weight, age, and condition severity. Always follow your physician's instructions.`,
     sideEffects: [
       `Headache and dizziness`,
@@ -1129,7 +1130,12 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
     ],
     prescriptionStatus: drug.verified ? 'Prescription Only' : 'OTC',
     pregnancy: `Limited data available on use during pregnancy. Should only be used if potential benefit justifies potential risk to the fetus. Consult your healthcare provider.`,
-    similarDrugs: getSimilarDrugs(drug.category, drug.id)
+    similarDrugs: getSimilarDrugs(drug.category, drug.id),
+    // Optional multilingual properties
+    textLanguage: null,
+    translatedName: null,
+    imprint: null,
+    translatedImprint: null
   };
   
   return detailedDrug;
