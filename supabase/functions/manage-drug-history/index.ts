@@ -31,6 +31,7 @@ serve(async (req) => {
           throw new Error('Missing required field: userId is required');
         }
         
+        // Always save - no need for explicit save option anymore
         // Allow saving even if drugName is missing - use a fallback
         const drugName = data.drugName || "Unknown Medication";
         

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -105,8 +104,6 @@ const IdentificationHistory = () => {
       if (!response.data.success) {
         throw new Error(response.data.error || "Failed to fetch history");
       }
-
-      console.log("Fetched history data:", response.data.data);
       
       // Save data to cache and state
       const historyData = response.data.data || [];
@@ -115,18 +112,13 @@ const IdentificationHistory = () => {
       setFilteredHistory(historyData);
     } catch (error) {
       console.error('Error fetching identification history:', error);
-      toast({
-        title: "Failed to load history",
-        description: "Could not retrieve your identification history",
-        type: "error"
-      });
       // Set empty arrays to avoid undefined errors
       setHistory([]);
       setFilteredHistory([]);
     } finally {
       setIsLoading(false);
     }
-  }, [user, toast]);
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -189,18 +181,8 @@ const IdentificationHistory = () => {
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
       setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
-      toast({
-        title: "Record deleted",
-        description: "Record deleted successfully",
-        type: "success"
-      });
     } catch (error) {
       console.error('Error deleting record:', error);
-      toast({
-        title: "Deletion failed",
-        description: "Failed to delete record",
-        type: "error"
-      });
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -210,19 +192,12 @@ const IdentificationHistory = () => {
 
   const handleCardClick = (id: string) => {
     const record = history.find(item => item.id === id);
-    console.log("Clicked record:", record);
     
     if (record && record.details) {
       const drugId = extractDrugId(record.details);
       
       if (drugId) {
         navigate(`/drug/${drugId}`);
-      } else {
-        toast({
-          title: "Information unavailable",
-          description: "Detailed information for this medication is not available",
-          type: "info"
-        });
       }
     }
   };
