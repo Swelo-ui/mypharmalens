@@ -38,13 +38,15 @@ if ('serviceWorker' in navigator) {
           // Use background sync if available
           if ('SyncManager' in window) {
             navigator.serviceWorker.ready.then(reg => {
-              // Type assertion to allow sync registration
-              const swRegistration = reg as unknown as {sync: {register: (tag: string) => Promise<void>}};
-              
-              // Only attempt to register sync if the attribute exists
-              if (swRegistration.sync) {
-                swRegistration.sync.register('deferred-operations')
-                  .catch(err => console.error('Sync registration failed:', err));
+              // Check if sync registration is available
+              if ('sync' in reg) {
+                // Type assertion to allow sync registration
+                try {
+                  (reg as any).sync.register('deferred-operations')
+                    .catch((err: Error) => console.error('Sync registration failed:', err));
+                } catch (err) {
+                  console.error('Error registering sync:', err);
+                }
               } else {
                 console.log('SyncManager available but reg.sync is not');
               }
