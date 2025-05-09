@@ -144,6 +144,19 @@ export const useDrugTranslation = () => {
         translatedDrug.alternativeMedications = await translateArray(translatedDrug.alternativeMedications, targetLang);
       }
       
+      // Handle similarDrugs translation if available
+      if (translatedDrug.similarDrugs && translatedDrug.similarDrugs.length > 0) {
+        const translatedSimilarDrugs = await Promise.all(
+          translatedDrug.similarDrugs.map(async (drug) => {
+            return {
+              ...drug,
+              name: await translateText(drug.name, targetLang)
+            };
+          })
+        );
+        translatedDrug.similarDrugs = translatedSimilarDrugs;
+      }
+      
       setIsTranslating(false);
       return translatedDrug;
     } catch (error) {

@@ -1,10 +1,16 @@
+
 import React, { useState } from 'react';
-import { Pill, AlertTriangle, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  Pill, AlertTriangle, RotateCw, ChevronDown, ChevronUp, 
+  Shield, Clock, Package, ThumbsDown, AlertCircle, ThumbsUp, 
+  Tag, Search, History
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import LanguageBadge from './LanguageBadge';
+import { cn } from '@/lib/utils';
 
 export interface DetailedDrugData {
   id: string;
@@ -34,6 +40,7 @@ export interface DetailedDrugData {
   translatedName?: string;
   imprint?: string;
   translatedImprint?: string;
+  similarDrugs?: Array<{id: string; name: string}>; // Added this property to fix the type errors
 }
 
 interface DrugDetailsProps {
