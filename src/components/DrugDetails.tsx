@@ -1,39 +1,39 @@
 import React, { useState } from 'react';
-import { 
-  Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
-  Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
-  AlertTriangle, Package, Tag
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Pill, AlertTriangle, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import LanguageBadge from './LanguageBadge';
 
 export interface DetailedDrugData {
   id: string;
   name: string;
-  genericName: string;
-  manufacturer: string;
-  category: string;
-  description: string;
-  dosageAndAdmin: string;
-  detailedDosage?: string; // More comprehensive dosage information
-  sideEffects: string[];
-  warnings: string[];
-  interactions: string[];
-  storage: string;
-  mechanism: string;
-  indications: string[];
-  contraindications: string[];
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled';
-  pregnancy: string;
-  verified: boolean;
+  genericName?: string;
+  manufacturer?: string;
+  category?: string;
+  description?: string;
+  dosageAndAdmin?: string;
+  detailedDosage?: string;
+  sideEffects?: string[];
+  warnings?: string[];
+  interactions?: string[];
+  indications?: string[];
+  contraindications?: string[];
+  storage?: string;
+  mechanism?: string;
+  pregnancy?: string;
+  prescriptionStatus?: 'OTC' | 'Prescription Only' | 'Controlled';
+  verified?: boolean;
   image?: string;
   packageImage?: string;
   drugClass?: string;
   brandNames?: string[];
-  alternativeMedications?: string[]; // Additional alternatives
-  similarDrugs?: {
-    id: string;
-    name: string;
-  }[];
+  alternativeMedications?: string[];
+  textLanguage?: string;
+  translatedName?: string;
+  imprint?: string;
+  translatedImprint?: string;
 }
 
 interface DrugDetailsProps {

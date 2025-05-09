@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { DetailedDrugData } from '@/components/DrugDetails';
 
@@ -109,6 +109,11 @@ export const useDrugTranslation = () => {
       if (translatedDrug.detailedDosage) {
         translatedDrug.detailedDosage = await translateText(translatedDrug.detailedDosage, targetLang);
       }
+
+      // Translate imprint information if available
+      if (translatedDrug.imprint) {
+        translatedDrug.imprint = await translateText(translatedDrug.imprint, targetLang);
+      }
       
       // Translate array fields
       if (translatedDrug.sideEffects && translatedDrug.sideEffects.length > 0) {
@@ -156,8 +161,5 @@ export const useDrugTranslation = () => {
     translateDrugObject
   };
 };
-
-// Missing import for useState, let's add it
-import { useState } from 'react';
 
 export default useDrugTranslation;

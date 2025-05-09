@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -275,19 +274,21 @@ const DrugIdentify = () => {
       const { data, error } = await supabase.functions.invoke('identify-drug', {
         body: { 
           imageBase64: base64Image,
-          blurryMode: blurryMode || isImageLowRes || enhancedMode
+          blurryMode: blurryMode || isImageLowRes,
+          enhancedMode: enhancedMode, // Pass enhanced mode flag to the function
+          multilingualMode: multilingualMode // Pass multilingual mode flag to the function
         }
       });
-
-      setProcessingPhase(data?.textLanguage && data.textLanguage !== 'english' ? 
-        `Processing AI response (detected ${data.textLanguage})` : 
-        "Processing AI response");
-      setProcessingProgress(60);
 
       if (error) {
         console.error('Error calling identify-drug function:', error);
         throw new Error(error.message || 'Failed to identify medication');
       }
+
+      setProcessingPhase(data?.textLanguage && data.textLanguage !== 'english' ? 
+        `Processing AI response (detected ${data.textLanguage})` : 
+        "Processing AI response");
+      setProcessingProgress(60);
       
       setProcessingPhase("Finalizing results");
       setProcessingProgress(80);
@@ -506,6 +507,7 @@ const DrugIdentify = () => {
         
         {!identifiedDrug ? (
           <>
+            {/* Camera/Upload mode selection */}
             <div className="flex justify-center mb-6">
               <div className="inline-flex rounded-md shadow-sm" role="group">
                 <Button
@@ -525,6 +527,7 @@ const DrugIdentify = () => {
               </div>
             </div>
             
+            {/* Error display */}
             {errorDetails && capturedImage && (
               <Alert variant="destructive" className="mb-6">
                 <AlertTriangle className="h-4 w-4" />
@@ -541,6 +544,7 @@ const DrugIdentify = () => {
               </Alert>
             )}
             
+            {/* Main upload/camera card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8">
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
                 {identificationMode === 'upload' 
@@ -548,12 +552,13 @@ const DrugIdentify = () => {
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <Tabs defaultValue="enhanced" className="mb-4">
+              <Tabs defaultValue="standard" className="mb-4">
                 <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
                 </TabsList>
                 
+                {/* Standard Mode Tab */}
                 <TabsContent value="standard" className="space-y-4">
                   <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
                     <div className="flex items-center justify-between mb-2">
@@ -577,6 +582,7 @@ const DrugIdentify = () => {
                   </div>
                 </TabsContent>
                 
+                {/* Enhanced Mode Tab */}
                 <TabsContent value="enhanced" className="space-y-4">
                   <div className="rounded-lg border p-4 bg-pharma-50 dark:bg-pharma-900/20">
                     <div className="flex items-center justify-between mb-2">
@@ -591,7 +597,7 @@ const DrugIdentify = () => {
                       />
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-300">
-                      Enhanced mode uses multiple AI models to analyze the image from different angles, 
+                      Enhanced mode uses multiple data sources (Drugs.com and MedlinePlus) to analyze the image from different angles, 
                       improving accuracy for blurry or difficult-to-identify medications.
                     </p>
                   </div>
@@ -616,12 +622,14 @@ const DrugIdentify = () => {
                 </TabsContent>
               </Tabs>
               
+              {/* Camera/Upload components */}
               {identificationMode === 'upload' ? (
                 <ImageUpload onImageCapture={handleImageCapture} />
               ) : (
                 <CameraCapture onImageCapture={handleImageCapture} />
               )}
               
+              {/* Progress indicator */}
               {isIdentifying && (
                 <div className="mt-6 space-y-2">
                   <div className="flex items-center justify-between text-sm">
@@ -640,6 +648,7 @@ const DrugIdentify = () => {
               )}
             </div>
             
+            {/* Tips section */}
             <div className="bg-pharma-50 dark:bg-pharma-900/20 rounded-2xl p-6">
               <h3 className="font-medium text-lg mb-4">Tips for better identification:</h3>
               <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
