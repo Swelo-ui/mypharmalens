@@ -8,38 +8,71 @@ import { Toaster } from 'sonner'
 
 const root = createRoot(document.getElementById("root")!);
 
-// Register service worker for PWA support with better error handling
+// Enhanced service worker registration with better error handling and offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
         console.log('Service worker registered:', registration);
         
-        // Check for updates
+        // Setup update handling
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New content is available, reload to apply updates
+                // New content is available, prompt user for reload or auto-reload
                 console.info('New content is available, reloading...');
+                
+                // Automatically apply the update
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
                 window.location.reload();
               }
             });
           }
         });
+        
+        // Setup offline/online detection
+        window.addEventListener('online', () => {
+          console.log('Application is online. Syncing data...');
+          // Trigger sync event when connection is restored
+          if (registration.sync) {
+            registration.sync.register('deferred-operations')
+              .catch(err => console.error('Sync registration failed:', err));
+          }
+        });
+        
+        window.addEventListener('offline', () => {
+          console.log('Application is offline. Some features may be limited.');
+        });
       })
       .catch(error => {
         console.error('Service worker registration failed:', error);
       });
+      
+    // Check if app is being launched from installed PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('Application launched as PWA');
+      // You could set specific behaviors for PWA mode here
+    }
   });
 }
+
+// Capture errors to provide better user experience
+window.addEventListener('error', (event) => {
+  console.error('Global error caught:', event.error);
+  
+  // For API errors in production, we could log them to the server
+  if (event.error?.message?.includes('API') || event.error?.message?.includes('network')) {
+    console.log('API error detected, could be logged or handled specially');
+  }
+});
 
 root.render(
   <BrowserRouter>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
-      <Toaster position="bottom-center" />
+      <Toaster position="bottom-center" richColors />
     </ThemeProvider>
   </BrowserRouter>
 );

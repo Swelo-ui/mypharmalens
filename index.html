@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <title>PharmaLens - AI-Powered Medication Identification</title>
     <meta name="description" content="PharmaLens helps you identify medications, provides detailed drug information, and tracks your medication history using AI technology." />
     <meta name="keywords" content="medication identification, pill identifier, drug information, AI medication, pharma app, prescription drugs, drug database, healthcare app" />
@@ -32,21 +32,30 @@
     <meta name="revisit-after" content="7 days" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="HandheldFriendly" content="true" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
     <!-- Favicon - Using the uploaded image -->
-    <link rel="icon" href="public/lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png" type="image/png" />
-    <link rel="apple-touch-icon" href="public/lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png" />
+    <link rel="icon" href="lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png" type="image/png" />
+    <link rel="apple-touch-icon" href="lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png" />
     
     <!-- PWA Support -->
     <meta name="theme-color" content="#1e88e5" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="PharmaLens" />
     <link rel="manifest" href="/manifest.json" />
     
+    <!-- iOS PWA specific -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-startup-image" href="lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png" />
+    
     <!-- Canonical URL -->
     <link rel="canonical" href="https://pharmalens.com/" />
+    
+    <!-- Additional SEO -->
+    <meta name="application-name" content="PharmaLens">
+    <meta name="msapplication-TileColor" content="#1e88e5">
+    <meta name="msapplication-tooltip" content="Launch PharmaLens">
   </head>
 
   <body>
@@ -54,5 +63,11 @@
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <div style="padding: 20px; text-align: center;">
+        <h2>JavaScript is required</h2>
+        <p>PharmaLens requires JavaScript to be enabled in your browser to function properly.</p>
+      </div>
+    </noscript>
   </body>
 </html>

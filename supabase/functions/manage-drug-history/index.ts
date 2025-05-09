@@ -45,26 +45,12 @@ serve(async (req) => {
           details: data.details || null,
         };
         
-        // Add image_features only if the column exists in the schema and if data is provided
-        try {
-          // Check if image_features column exists in drug_identifications table
-          const { data: tableInfo, error: tableError } = await supabaseClient
-            .from('drug_identifications')
-            .select('*')
-            .limit(1);
-            
-          if (!tableError) {
-            // If column exists in the schema (we can check via introspection)
-            if (data.imageFeatures) {
-              identificationData.image_features = data.imageFeatures;
-            }
-          }
-        } catch (err) {
-          console.log('Error checking for image_features column:', err.message);
+        // Add image_features only if data is provided
+        if (data.imageFeatures) {
+          identificationData.image_features = data.imageFeatures;
         }
           
         // Use the service role key to bypass RLS policies for insertion
-        // This ensures that we can always save the identification regardless of RLS policies
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClient = createClient(supabaseUrl, supabaseServiceKey);
         
@@ -150,6 +136,7 @@ serve(async (req) => {
       error: null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200
     });
     
   } catch (error) {

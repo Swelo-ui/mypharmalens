@@ -26,6 +26,12 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -44,5 +50,22 @@
       "icons": [{ "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png", "sizes": "192x192" }]
     }
   ],
-  "categories": ["healthcare", "medical", "utilities"]
+  "categories": ["healthcare", "medical", "utilities"],
+  "screenshots": [
+    {
+      "src": "lovable-uploads/7f661aae-5eba-4e72-bd24-0e791d37ab5d.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "lovable-uploads/85cbd19d-4eb1-48a3-b5ea-053e257ddac5.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr"
 }

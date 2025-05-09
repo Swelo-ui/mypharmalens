@@ -273,6 +273,8 @@ const IdentificationHistory = () => {
               const drugName = item.drug_name || "Unknown Medication";
               const drugImageUrl = item.image_url || 
                 (item.details && typeof item.details === 'object' ? item.details.image : null);
+              const genericName = item.details?.genericName || 
+                item.details?.generic_name || "No details available";
               
               return (
                 <div 
@@ -285,7 +287,8 @@ const IdentificationHistory = () => {
                     {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
                   
-                  <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
+                  {/* A simplified image display */}
+                  <div className="relative h-40 bg-gray-100 dark:bg-gray-700">
                     {drugImageUrl ? (
                       <img 
                         src={drugImageUrl} 
@@ -302,10 +305,11 @@ const IdentificationHistory = () => {
                     )}
                   </div>
                   
+                  {/* Simplified display - just drug name and generic name */}
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-1 truncate">{drugName}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {item.details?.genericName || item.details?.generic_name || ""}
+                      {genericName}
                     </p>
                   </div>
                   
