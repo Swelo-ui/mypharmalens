@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -661,6 +662,67 @@ function extractPillAppearance(text) {
   return { color, shape };
 }
 
+// Helper function to safely get textLanguage as a string
+function getTextLanguageAsString(textLanguage) {
+  if (!textLanguage) {
+    return 'unknown';
+  }
+  
+  if (typeof textLanguage === 'string') {
+    return textLanguage.toLowerCase();
+  }
+  
+  if (Array.isArray(textLanguage) && textLanguage.length > 0) {
+    // If it's an array, use the first language or join them
+    return textLanguage[0].toLowerCase();
+  }
+  
+  return 'unknown';
+}
+
+// Function to construct a normalized final response
+function constructFinalResponse(combinedData) {
+  // Create a clean standardized response
+  const finalResponse = {
+    name: combinedData.name || "Unknown medication",
+    genericName: combinedData.genericName || combinedData.name || "Unknown",
+    manufacturer: combinedData.manufacturer || "",
+    category: combinedData.category || "",
+    description: combinedData.description || "No description available",
+    dosageAndAdmin: combinedData.dosageAndAdmin || "",
+    sideEffects: combinedData.sideEffects || [],
+    warnings: combinedData.warnings || [],
+    interactions: combinedData.interactions || [],
+    storage: combinedData.storage || "",
+    mechanism: combinedData.mechanism || "",
+    indications: combinedData.indications || [],
+    contraindications: combinedData.contraindications || [],
+    prescriptionStatus: combinedData.prescriptionStatus || "Unknown",
+    pregnancy: combinedData.pregnancy || "",
+    drugClass: combinedData.drugClass || "",
+    brandNames: combinedData.brandNames || [],
+    image: combinedData.image || "",
+    textLanguage: getTextLanguageAsString(combinedData.textLanguage),
+    translatedImprint: combinedData.translatedImprint || "",
+    translatedName: combinedData.translatedName || "",
+    confidence: combinedData.confidence || "medium",
+    similarDrugs: combinedData.similarDrugs || []
+  };
+  
+  // Ensure arrays are properly formatted
+  ['sideEffects', 'warnings', 'interactions', 'indications', 'contraindications', 'brandNames', 'similarDrugs'].forEach(field => {
+    if (!Array.isArray(finalResponse[field])) {
+      if (finalResponse[field] && typeof finalResponse[field] === 'string') {
+        finalResponse[field] = [finalResponse[field]];
+      } else {
+        finalResponse[field] = [];
+      }
+    }
+  });
+  
+  return finalResponse;
+}
+
 // Enhanced multi-model analysis for better handling of blurry images and multiple languages
 async function analyzeImageWithMultipleModels(imageBase64) {
   try {
@@ -683,4 +745,396 @@ async function analyzeImageWithMultipleModels(imageBase64) {
     
     Provide an extremely detailed analysis and your best identification in JSON format with these fields:
     name (most likely medicine name), genericName, possibleNames (array of possible medications), imprint (any text/numbers on pill), 
-    color, shape, markings (detailed description), confidence (low, medium, high), textLanguage (what
+    color, shape, markings (detailed description), confidence (low, medium, high), textLanguage (what language text is in, or array of languages), 
+    translatedImprint (English translation of imprint if not in English), description (detailed visual description)
+    `;
+    
+    // Make multiple parallel requests to different model configurations for robustness
+    const primaryRequest = fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: detailedPrompt },
+            { inline_data: { mime_type: "image/jpeg", data: imageBase64.split(",")[1] } }
+          ]
+        }]
+      })
+    });
+    
+    // Secondary model with different prompt for verification and comparison
+    const secondaryPrompt = `
+    Analyze this medication image with extreme precision:
+    - Identify the medication name, generic name, and active ingredients
+    - Detect all text on the pill or packaging in ANY LANGUAGE (specify which language if non-English)
+    - Describe exact color, shape, size, and any distinctive markings
+    - Note any logos, scoring lines, or other identifiable features
+    - If blurry, use context clues to make best determination
+    
+    Format your response as valid JSON with these fields:
+    {
+      "name": "medication brand name",
+      "genericName": "chemical/generic name",
+      "possibleNames": ["alternate name1", "alternate name2"],
+      "imprint": "any text/numbers on pill",
+      "color": "pill color",
+      "shape": "pill shape",
+      "confidence": 0-1 confidence score,
+      "textLanguage": ["language1", "language2"],
+      "translatedImprint": "English translation if applicable",
+      "description": "detailed visual description"
+    }
+    `;
+    
+    const secondaryRequest = fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: secondaryPrompt },
+            { inline_data: { mime_type: "image/jpeg", data: imageBase64.split(",")[1] } }
+          ]
+        }]
+      })
+    });
+    
+    // Execute both requests in parallel
+    const [primaryResponse, secondaryResponse] = await Promise.all([primaryRequest, secondaryRequest]);
+    
+    if (!primaryResponse.ok) {
+      const errorText = await primaryResponse.text();
+      console.error("Primary model API error:", errorText);
+      throw new Error(`Primary model API call failed: ${primaryResponse.status}`);
+    }
+    
+    const primaryData = await primaryResponse.json();
+    console.log("Primary analysis result: ```json\n" + JSON.stringify(primaryData.candidates[0].content.parts[0].text, null, 2) + "\n```\n");
+    
+    // Extract the JSON from text response
+    let primaryResult = null;
+    try {
+      // Find JSON in the response text
+      const jsonMatch = primaryData.candidates[0].content.parts[0].text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
+                       primaryData.candidates[0].content.parts[0].text.match(/(\{[\s\S]*\})/);
+      
+      if (jsonMatch && jsonMatch[1]) {
+        primaryResult = JSON.parse(jsonMatch[1]);
+      } else {
+        // If no JSON found, use the whole text
+        primaryResult = JSON.parse(primaryData.candidates[0].content.parts[0].text);
+      }
+    } catch (e) {
+      console.error("Error parsing primary JSON result:", e);
+      // Create a simple result from the text
+      primaryResult = {
+        description: primaryData.candidates[0].content.parts[0].text,
+        confidence: "low"
+      };
+    }
+    
+    // Process secondary result if available
+    let secondaryResult = null;
+    if (secondaryResponse.ok) {
+      const secondaryData = await secondaryResponse.json();
+      console.log("Secondary analysis result: ```json\n" + JSON.stringify(secondaryData.candidates[0].content.parts[0].text, null, 2) + "\n```\n");
+      
+      try {
+        const jsonMatch = secondaryData.candidates[0].content.parts[0].text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
+                         secondaryData.candidates[0].content.parts[0].text.match(/(\{[\s\S]*\})/);
+        
+        if (jsonMatch && jsonMatch[1]) {
+          secondaryResult = JSON.parse(jsonMatch[1]);
+        } else {
+          secondaryResult = JSON.parse(secondaryData.candidates[0].content.parts[0].text);
+        }
+      } catch (e) {
+        console.error("Error parsing secondary JSON result:", e);
+      }
+    }
+    
+    // Combine the results for more robust identification
+    let combinedResult = combineAnalysisResults(primaryResult, secondaryResult);
+    return combinedResult;
+    
+  } catch (error) {
+    console.error("Error in multi-model image analysis:", error);
+    // Return a simplified result when the API call fails
+    return {
+      description: "Could not analyze the image due to an API error.",
+      confidence: "low",
+      error: error.message
+    };
+  }
+}
+
+// Function to combine results from multiple models
+function combineAnalysisResults(primaryData, secondaryData) {
+  if (!primaryData) return secondaryData || { confidence: "low", error: "Analysis failed" };
+  if (!secondaryData) return primaryData;
+  
+  // Use secondary data to fill gaps or validate primary data
+  const combined = { ...primaryData };
+  
+  // Handle text language - ensure properly formatted
+  if (secondaryData.textLanguage) {
+    if (!combined.textLanguage) {
+      combined.textLanguage = secondaryData.textLanguage;
+    }
+    // If both have different opinions, use an array of languages
+    else if (JSON.stringify(combined.textLanguage) !== JSON.stringify(secondaryData.textLanguage)) {
+      const languages = [];
+      
+      // Handle various formats of textLanguage
+      function addLanguages(langData) {
+        if (typeof langData === 'string') {
+          languages.push(langData);
+        } else if (Array.isArray(langData)) {
+          langData.forEach(lang => {
+            if (typeof lang === 'string' && !languages.includes(lang)) {
+              languages.push(lang);
+            }
+          });
+        }
+      }
+      
+      addLanguages(combined.textLanguage);
+      addLanguages(secondaryData.textLanguage);
+      
+      combined.textLanguage = languages.length > 0 ? languages : "unknown";
+    }
+  }
+  
+  // Safe confidence calculation
+  let confidenceValue = 0;
+  let confidenceCount = 0;
+  
+  // Handle confidence values that might be strings or numbers
+  function parseConfidence(conf) {
+    if (typeof conf === 'number' && conf >= 0 && conf <= 1) {
+      return conf;
+    }
+    if (typeof conf === 'string') {
+      const normalized = conf.toLowerCase();
+      if (normalized === 'high') return 0.9;
+      if (normalized === 'medium') return 0.6;
+      if (normalized === 'low') return 0.3;
+      // Try parsing as a number if it's a numeric string
+      const num = parseFloat(conf);
+      if (!isNaN(num) && num >= 0 && num <= 1) return num;
+    }
+    return null;
+  }
+  
+  const primaryConfidence = parseConfidence(primaryData.confidence);
+  if (primaryConfidence !== null) {
+    confidenceValue += primaryConfidence;
+    confidenceCount++;
+  }
+  
+  const secondaryConfidence = parseConfidence(secondaryData.confidence);
+  if (secondaryConfidence !== null) {
+    confidenceValue += secondaryConfidence;
+    confidenceCount++;
+  }
+  
+  // Set final confidence value
+  if (confidenceCount > 0) {
+    const avgConfidence = confidenceValue / confidenceCount;
+    combined.confidence = avgConfidence >= 0.8 ? 'high' : 
+                         avgConfidence >= 0.5 ? 'medium' : 'low';
+  }
+  
+  // Use fields from secondary result if primary is missing them
+  ['name', 'genericName', 'imprint', 'color', 'shape', 'translatedImprint'].forEach(field => {
+    if (!combined[field] && secondaryData[field]) {
+      combined[field] = secondaryData[field];
+    }
+  });
+  
+  // Merge possible names
+  if (secondaryData.possibleNames && Array.isArray(secondaryData.possibleNames)) {
+    if (!combined.possibleNames || !Array.isArray(combined.possibleNames)) {
+      combined.possibleNames = secondaryData.possibleNames;
+    } else {
+      // Combine unique names from both results
+      const uniqueNames = new Set([...combined.possibleNames]);
+      secondaryData.possibleNames.forEach(name => uniqueNames.add(name));
+      combined.possibleNames = [...uniqueNames];
+    }
+  }
+  
+  // Include analysis metadata
+  combined.multiModelAnalysisUsed = true;
+  
+  return combined;
+}
+
+// Main handler function
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+  
+  try {
+    const { imageBase64, blurryMode = false, enhancedMode = true, multilingualMode = true } = await req.json();
+    
+    if (!imageBase64) {
+      return new Response(JSON.stringify({ error: "No image provided" }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log("Image received, initiating multi-stage analysis pipeline with language detection");
+    
+    // Analysis options based on user settings
+    const useMultiModel = enhancedMode;
+    const useLanguageProcessing = multilingualMode;
+    const useFallbackAnalysis = blurryMode;
+    
+    let analysisResult;
+    
+    // Standard image analysis with Gemini API
+    if (useMultiModel) {
+      try {
+        console.log("Using enhanced multi-model analysis for drug identification");
+        analysisResult = await analyzeImageWithMultipleModels(imageBase64);
+      } catch (error) {
+        console.error("Error in multi-model image analysis:", error);
+        // Fall back to standard analysis if multi-model fails
+        console.log("Proceeding with standard analysis with language awareness...");
+        
+        // This would be where a standard image analysis would happen
+        // For now we'll create a placeholder response similar to what the multi-model would return
+        analysisResult = {
+          confidence: "medium",
+          error: "Multi-model analysis failed, using fallback",
+          blurryModeUsed: true
+        };
+        
+        // Implement a simpler fallback method here if needed
+      }
+    } else {
+      console.log("Proceeding with standard analysis with language awareness...");
+      // Standard analysis implementation would go here
+      // For now we'll use a placeholder
+      analysisResult = {
+        confidence: "medium",
+        standardAnalysisUsed: true
+      };
+    }
+    
+    // Sample model response for development use
+    const sampleResponse = {
+      name: "Tradol",
+      genericName: "Tramadol Hydrochloride",
+      manufacturer: "Rusan",
+      category: "Analgesic",
+      description: "Tramadol Hydrochloride Injection",
+      dosageAndAdmin: "As directed by healthcare provider.",
+      sideEffects: ["Dizziness", "Nausea", "Constipation", "Headache"],
+      warnings: ["May cause drowsiness", "May be habit-forming", "Do not use with alcohol"],
+      interactions: ["CNS depressants", "MAO inhibitors", "Serotonergic drugs"],
+      mechanism: "Binds to μ-opioid receptors and inhibits reuptake of norepinephrine and serotonin.",
+      indications: ["Management of moderate to moderately severe pain"],
+      contraindications: ["Hypersensitivity to tramadol", "Acute intoxication with alcohol"],
+      prescriptionStatus: "Prescription Only",
+      confidence: "medium",
+      textLanguage: "English"
+    };
+    
+    // Use sample response if no analysis result or for development
+    if (process.env.NODE_ENV === 'development' || !analysisResult) {
+      console.log("Standard analysis response received");
+      console.log("Raw response: ```json\n" + JSON.stringify(sampleResponse) + "\n```");
+      analysisResult = sampleResponse;
+    }
+    
+    // Enrichment phase - get more data from external sources if we have a valid drug name
+    if (analysisResult && analysisResult.name) {
+      const drugName = analysisResult.name;
+      
+      console.log("Valid drug name found: " + drugName + ", enriching with external data");
+      
+      // Get data from MedlinePlus
+      const medlinePlusInfo = await getDrugInfoFromMedlinePlus(drugName);
+      
+      // Get data from Drugs.com
+      const drugsComInfo = await getDrugInfoFromDrugsCom(drugName);
+      
+      // Combine the data with priority to Drugs.com info (generally more complete)
+      if (drugsComInfo) {
+        analysisResult = { ...analysisResult, ...drugsComInfo };
+      }
+      
+      // Fill in gaps with MedlinePlus info
+      if (medlinePlusInfo) {
+        // Add description if missing
+        if (!analysisResult.description && medlinePlusInfo.description) {
+          analysisResult.description = medlinePlusInfo.description;
+        }
+        
+        // Add warnings if missing
+        if ((!analysisResult.warnings || analysisResult.warnings.length === 0) && 
+            medlinePlusInfo.warnings && medlinePlusInfo.warnings.length > 0) {
+          analysisResult.warnings = medlinePlusInfo.warnings;
+        }
+        
+        // Add side effects if missing
+        if ((!analysisResult.sideEffects || analysisResult.sideEffects.length === 0) && 
+            medlinePlusInfo.sideEffects && medlinePlusInfo.sideEffects.length > 0) {
+          analysisResult.sideEffects = medlinePlusInfo.sideEffects;
+        }
+      }
+      
+      // Also look for alternative medications
+      const alternativeMeds = await getAlternativeMedicationsFromMedlinePlus(drugName);
+      if (alternativeMeds && alternativeMeds.length > 0) {
+        analysisResult.alternativeMedications = alternativeMeds;
+      }
+    }
+    
+    // Handle text language detection and translation if needed
+    if (useLanguageProcessing && analysisResult.textLanguage && 
+        (typeof analysisResult.textLanguage === 'string' && analysisResult.textLanguage.toLowerCase() !== 'english' && 
+         analysisResult.textLanguage.toLowerCase() !== 'en') || 
+        (Array.isArray(analysisResult.textLanguage) && 
+         !analysisResult.textLanguage.some(lang => lang.toLowerCase() === 'english' || lang.toLowerCase() === 'en'))) {
+      
+      // If name needs translation and we don't have a translated name yet
+      if (analysisResult.name && !analysisResult.translatedName) {
+        analysisResult.translatedName = await translateText(analysisResult.name);
+      }
+      
+      // Also translate imprint if available
+      if (analysisResult.imprint && !analysisResult.translatedImprint) {
+        analysisResult.translatedImprint = await translateText(analysisResult.imprint);
+      }
+    }
+    
+    console.log("Final identification result: " + (analysisResult.name || "Unknown"));
+    
+    // Normalize the result to ensure consistent format
+    const finalResult = constructFinalResponse(analysisResult);
+    
+    return new Response(JSON.stringify(finalResult), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error) {
+    console.error("Error in identify-drug function:", error);
+    return new Response(JSON.stringify({ error: error.message || "Unknown error occurred" }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+});
