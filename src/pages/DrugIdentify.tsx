@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -235,20 +236,20 @@ const DrugIdentify = () => {
         "Sending image for analysis");
       setProcessingProgress(30);
       
-      // Add a timeout for long-running requests
+      // Modified fetchWithTimeout function that doesn't pass signal to supabase.functions.invoke
       const fetchWithTimeout = async (ms: number = 30000) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), ms);
         
         try {
+          // Remove the signal from the options object
           const response = await supabase.functions.invoke('identify-drug', {
             body: { 
               imageBase64: base64Image,
               blurryMode: blurryMode || isImageLowRes,
               enhancedMode: enhancedMode,
               multilingualMode: multilingualMode 
-            },
-            signal: controller.signal
+            }
           });
           
           clearTimeout(timeoutId);
