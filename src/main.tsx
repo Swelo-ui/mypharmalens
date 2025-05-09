@@ -35,10 +35,14 @@ if ('serviceWorker' in navigator) {
         // Setup offline/online detection
         window.addEventListener('online', () => {
           console.log('Application is online. Syncing data...');
-          // Trigger sync event when connection is restored
-          if (registration.sync) {
-            registration.sync.register('deferred-operations')
-              .catch(err => console.error('Sync registration failed:', err));
+          // Use background sync if available
+          if ('SyncManager' in window) {
+            navigator.serviceWorker.ready.then(reg => {
+              // Type assertion to allow sync registration (TypeScript doesn't recognize this API by default)
+              const swRegistration = reg as unknown as {sync: {register: (tag: string) => Promise<void>}};
+              swRegistration.sync.register('deferred-operations')
+                .catch(err => console.error('Sync registration failed:', err));
+            });
           }
         });
         
