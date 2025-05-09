@@ -40,12 +40,17 @@ const BottomNavigation = () => {
   }, [location.pathname]);
   
   const isActive = (path: string) => {
-    return location.pathname === path;
+    // More flexible path matching to handle sub-routes
+    if (path === '/') {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
   };
   
-  // Only render on mobile devices
+  // Always render on mobile devices, not based on route
   if (!isMobile) return null;
   
+  // This ensures the bottom navigation is shown regardless of the route
   return (
     <nav 
       className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-50 transition-transform duration-300 ${

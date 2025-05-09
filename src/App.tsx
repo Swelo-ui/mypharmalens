@@ -19,6 +19,7 @@ import Disclaimer from "./pages/Disclaimer";
 import Auth from "./pages/Auth";
 import IdentificationHistory from "./pages/IdentificationHistory";
 import Profile from "./pages/Profile";
+import BottomNavigation from "./components/BottomNavigation";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
         <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <BottomNavigation />
     </TooltipProvider>
   </QueryClientProvider>
 );
