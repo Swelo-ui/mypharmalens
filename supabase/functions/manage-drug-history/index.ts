@@ -41,14 +41,9 @@ serve(async (req) => {
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
-          image_url: data.imageUrl || null,
-          details: data.details || null,
+          // Don't store image_url anymore to save space
+          details: extractEssentialDetails(data.details || null),
         };
-        
-        // Add image_features only if data is provided
-        if (data.imageFeatures) {
-          identificationData.image_features = data.imageFeatures;
-        }
           
         // Use the service role key to bypass RLS policies for insertion
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -151,3 +146,34 @@ serve(async (req) => {
     });
   }
 });
+
+// Function to extract only essential details for storage
+function extractEssentialDetails(details: any) {
+  if (!details) return null;
+  
+  try {
+    // If it's a string, parse it
+    if (typeof details === 'string') {
+      try {
+        details = JSON.parse(details);
+      } catch (e) {
+        return details; // Return as is if can't parse
+      }
+    }
+    
+    // Extract only essential information to reduce storage
+    return {
+      id: details.id,
+      name: details.name,
+      genericName: details.genericName || details.generic_name,
+      category: details.category,
+      drugClass: details.drugClass,
+      indications: details.indications || [],
+      manufacturer: details.manufacturer,
+      prescriptionStatus: details.prescriptionStatus
+    };
+  } catch (error) {
+    console.error('Error extracting essential details:', error);
+    return details; // Return original if extraction fails
+  }
+}

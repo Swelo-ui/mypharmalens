@@ -6,7 +6,6 @@ import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
-import BottomNavigation from '@/components/BottomNavigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,10 +25,8 @@ interface IdentificationRecord {
   id: string;
   created_at: string;
   drug_name: string;
-  image_url?: string;
   details: any;
   user_id?: string;
-  image_features?: string;
 }
 
 // Create a cache mechanism for history data
@@ -181,8 +178,18 @@ const IdentificationHistory = () => {
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
       setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
+      
+      toast({
+        title: "Record deleted",
+        description: "The medication record has been removed from your history",
+      });
     } catch (error) {
       console.error('Error deleting record:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete record. Please try again.",
+      });
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -222,6 +229,10 @@ const IdentificationHistory = () => {
   const refreshHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory(true); // Force refresh
+      toast({
+        title: "Refreshing history",
+        description: "Getting your latest identification records"
+      });
     }
   };
 
@@ -271,10 +282,12 @@ const IdentificationHistory = () => {
             {filteredHistory.map((item) => {
               // Extract basic drug info
               const drugName = item.drug_name || "Unknown Medication";
-              const drugImageUrl = item.image_url || 
-                (item.details && typeof item.details === 'object' ? item.details.image : null);
               const genericName = item.details?.genericName || 
-                item.details?.generic_name || "No details available";
+                item.details?.generic_name || "";
+              const indication = Array.isArray(item.details?.indications) && item.details?.indications.length > 0 
+                ? item.details.indications[0] 
+                : "No indications available";
+              const category = item.details?.category || "";
               
               return (
                 <div 
@@ -287,29 +300,20 @@ const IdentificationHistory = () => {
                     {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
                   
-                  {/* A simplified image display */}
-                  <div className="relative h-40 bg-gray-100 dark:bg-gray-700">
-                    {drugImageUrl ? (
-                      <img 
-                        src={drugImageUrl} 
-                        alt={drugName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.svg';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700">
-                        <span className="text-gray-400">No image</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Simplified display - just drug name and generic name */}
-                  <div className="p-4">
+                  <div className="p-6">
                     <h3 className="text-lg font-semibold mb-1 truncate">{drugName}</h3>
+                    {genericName && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        <span className="font-medium">Generic name:</span> {genericName}
+                      </p>
+                    )}
+                    {category && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        <span className="font-medium">Category:</span> {category}
+                      </p>
+                    )}
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {genericName}
+                      <span className="font-medium">Use:</span> {indication}
                     </p>
                   </div>
                   
@@ -347,36 +351,6 @@ const IdentificationHistory = () => {
           </div>
         )}
       </div>
-      <BottomNavigation />
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this medication record from your history.
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {isDeleting ? (
-                <>
-                  <span className="mr-2">Deleting</span>
-                  <span className="animate-spin">●</span>
-                </>
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

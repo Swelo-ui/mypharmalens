@@ -47,7 +47,7 @@ const BottomNavigation = () => {
     return location.pathname.startsWith(path);
   };
   
-  // Always render on mobile devices, not based on route
+  // Only render on mobile devices
   if (!isMobile) return null;
   
   // This ensures the bottom navigation is shown regardless of the route
