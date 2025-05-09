@@ -166,44 +166,7 @@ const DrugIdentify = () => {
     }
   };
 
-  // Function to manually save drug identification to the database
-  const handleSaveToHistory = async () => {
-    try {
-      if (!identifiedDrug) return;
-      if (!isAuthenticated) {
-        toast.info("Please sign in to save to history", {
-          action: {
-            label: "Sign In",
-            onClick: () => navigate('/auth')
-          }
-        });
-        return;
-      }
-
-      setIsSaving(true);
-      const result = await saveDrugIdentification({
-        name: identifiedDrug.name,
-        drug_name: identifiedDrug.name,
-        image: identifiedDrug.image,
-        image_url: identifiedDrug.image,
-        details: identifiedDrug
-      });
-
-      if (result) {
-        toast.success("Added to your history");
-        setIsSaved(true);
-      } else {
-        toast.error("Failed to save to history");
-      }
-    } catch (error) {
-      console.error("Error saving to history:", error);
-      toast.error("Failed to save to history");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Function to save drug identification to the database
+  // Function to automatically save drug identification to the database
   const saveDrugIdentification = async (drugData: any) => {
     try {
       if (!isAuthenticated || !user) {
@@ -240,7 +203,8 @@ const DrugIdentify = () => {
       return response.data.data;
     } catch (error) {
       console.error("Error in saveDrugIdentification:", error);
-      throw error;
+      // Don't throw the error to prevent UI disruption
+      return null;
     }
   };
 
@@ -271,14 +235,32 @@ const DrugIdentify = () => {
         "Sending image for analysis");
       setProcessingProgress(30);
       
-      const { data, error } = await supabase.functions.invoke('identify-drug', {
-        body: { 
-          imageBase64: base64Image,
-          blurryMode: blurryMode || isImageLowRes,
-          enhancedMode: enhancedMode, // Pass enhanced mode flag to the function
-          multilingualMode: multilingualMode // Pass multilingual mode flag to the function
+      // Add a timeout for long-running requests
+      const fetchWithTimeout = async (ms: number = 30000) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), ms);
+        
+        try {
+          const response = await supabase.functions.invoke('identify-drug', {
+            body: { 
+              imageBase64: base64Image,
+              blurryMode: blurryMode || isImageLowRes,
+              enhancedMode: enhancedMode,
+              multilingualMode: multilingualMode 
+            },
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          throw error;
         }
-      });
+      };
+      
+      // Call the edge function with timeout
+      const { data, error } = await fetchWithTimeout();
 
       if (error) {
         console.error('Error calling identify-drug function:', error);
@@ -337,7 +319,6 @@ const DrugIdentify = () => {
       setErrorDetails(null);
       setProcessingProgress(0);
       setProcessingPhase("Preparing image");
-      toast.info("Processing your image...");
       
       // Check image quality
       await checkImageQuality(file);
@@ -386,11 +367,16 @@ const DrugIdentify = () => {
                 textLanguage: drugData.textLanguage || null,
                 translatedImprint: drugData.translatedImprint || null,
                 translatedName: drugData.translatedName || null,
+                similarDrugs: drugData.similarDrugs || []
               };
               
               setIdentifiedDrug(formattedDrugData);
-              setIsSaved(false);
               setProcessingProgress(100);
+              
+              // Automatically save to history if user is authenticated
+              if (isAuthenticated && user) {
+                saveDrugIdentification(formattedDrugData);
+              }
               
               // Show language detection info if applicable
               if (drugData.textLanguage && 
@@ -403,23 +389,14 @@ const DrugIdentify = () => {
               
               // Customize message based on whether this was from history or new identification
               if (drugData.fromHistory) {
-                toast.success(`Matched with previously identified ${drugData.name}!`, { 
-                  description: "Using your history helped identify this medication faster."
-                });
+                toast.success(`Matched with previously identified ${drugData.name}!`);
               } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
                 if (drugData.confidence === 'high') {
-                  toast.success(`Medication successfully identified as ${drugData.translatedName || drugData.name}!`, { 
-                    description: "Enhanced analysis provided high confidence results."
-                  });
+                  toast.success(`Medication successfully identified as ${drugData.translatedName || drugData.name}!`);
                 } else if (drugData.confidence === 'medium') {
-                  toast.success(`Medication identified as ${drugData.translatedName || drugData.name}`, { 
-                    description: "The identification has medium confidence. Consider the alternatives listed."
-                  });
+                  toast.success(`Medication identified as ${drugData.translatedName || drugData.name}`);
                 } else {
-                  toast.info(`Medication possibly identified as ${drugData.translatedName || drugData.name}`, { 
-                    description: "Low confidence identification. Consider consulting a healthcare professional.",
-                    duration: 5000
-                  });
+                  toast.info(`Medication possibly identified as ${drugData.translatedName || drugData.name}`);
                 }
               } else {
                 toast.success(`Medication successfully identified as ${drugData.translatedName || drugData.name}!`);
@@ -427,9 +404,7 @@ const DrugIdentify = () => {
               
               // Additional information about image quality if relevant
               if (isImageLowRes || drugData.blurryModeUsed) {
-                toast.info("For better accuracy, consider uploading a higher quality image.", { 
-                  duration: 5000 
-                });
+                toast.info("For better accuracy, consider uploading a higher quality image.");
               }
             } else {
               setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
@@ -467,14 +442,12 @@ const DrugIdentify = () => {
     setIsImageLowRes(false);
     setProcessingProgress(0);
     setProcessingPhase("");
-    setIsSaved(false);
   };
 
   // Function for manual search as fallback
   const handleManualSearch = () => {
     // For now, we'll just reset the state and let the user try again
     handleRetry();
-    toast.info("Please try uploading a clearer image or a different angle");
   };
 
   return (
@@ -701,41 +674,12 @@ const DrugIdentify = () => {
                   </span>
                 )}
               </div>
-              <div className="flex gap-3">
-                {isAuthenticated && !isSaved && (
-                  <Button 
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={handleSaveToHistory}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Saving...</span>
-                      </>
-                    ) : (
-                      <>
-                        <BookmarkPlus className="h-4 w-4" />
-                        <span>Save to History</span>
-                      </>
-                    )}
-                  </Button>
-                )}
+              <div>
                 <Button variant="outline" onClick={handleRetry}>
                   Identify Another
                 </Button>
               </div>
             </div>
-            
-            {isSaved && (
-              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                  <BookmarkPlus className="h-4 w-4" />
-                  <span>Saved to your identification history</span>
-                </div>
-              </Alert>
-            )}
             
             {/* Display original name and translated name if available */}
             {identifiedDrug.textLanguage && identifiedDrug.textLanguage.toLowerCase() !== 'english' && identifiedDrug.translatedName && (

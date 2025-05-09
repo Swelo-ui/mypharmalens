@@ -14,8 +14,8 @@ const BottomNavigation = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Set a threshold (20px) to avoid flickering due to small scroll changes
-      if (currentScrollY > lastScrollY + 20) {
+      // Only hide when scrolling down significantly
+      if (currentScrollY > lastScrollY + 40) {
         // Scrolling down - hide the navigation
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY - 10 || currentScrollY <= 10) {
@@ -32,6 +32,11 @@ const BottomNavigation = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [lastScrollY]);
+  
+  // Reset visibility when changing pages
+  useEffect(() => {
+    setIsVisible(true);
+  }, [location.pathname]);
   
   const isActive = (path: string) => {
     return location.pathname === path;

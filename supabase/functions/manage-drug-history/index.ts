@@ -47,23 +47,20 @@ serve(async (req) => {
         
         // Add image_features only if the column exists in the schema and if data is provided
         try {
-          // First attempt to check if the image_features column exists
-          const { data: columnsData, error: columnsError } = await supabaseClient
-            .from('information_schema.columns')
-            .select('column_name')
-            .eq('table_name', 'drug_identifications')
-            .eq('column_name', 'image_features');
+          // Check if image_features column exists in drug_identifications table
+          const { data: tableInfo, error: tableError } = await supabaseClient
+            .from('drug_identifications')
+            .select('*')
+            .limit(1);
             
-          if (!columnsError && columnsData && columnsData.length > 0) {
-            // Column exists, we can add the image_features field
+          if (!tableError) {
+            // If column exists in the schema (we can check via introspection)
             if (data.imageFeatures) {
               identificationData.image_features = data.imageFeatures;
             }
-          } else {
-            console.log('image_features column does not exist, skipping this field');
           }
         } catch (err) {
-          console.log('Error checking for image_features column, skipping this field:', err.message);
+          console.log('Error checking for image_features column:', err.message);
         }
           
         // Use the service role key to bypass RLS policies for insertion
@@ -71,12 +68,22 @@ serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClient = createClient(supabaseUrl, supabaseServiceKey);
         
-        result = await adminClient
-          .from('drug_identifications')
-          .insert([identificationData])
-          .select();
-          
-        console.log('Insert result:', result);
+        try {
+          result = await adminClient
+            .from('drug_identifications')
+            .insert([identificationData])
+            .select();
+            
+          if (result.error) {
+            console.error('Error inserting drug identification:', result.error);
+            throw new Error(result.error.message);
+          }
+            
+          console.log('Insert result:', result);
+        } catch (insertError) {
+          console.error('Database insert error:', insertError);
+          throw new Error(`Database operation failed: ${insertError.message}`);
+        }
         break;
         
       case 'removeIdentification':
@@ -89,11 +96,21 @@ serve(async (req) => {
         const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClientForDelete = createClient(supabaseUrl, serviceKey);
         
-        result = await adminClientForDelete
-          .from('drug_identifications')
-          .delete()
-          .eq('id', data.id)
-          .eq('user_id', data.userId);
+        try {
+          result = await adminClientForDelete
+            .from('drug_identifications')
+            .delete()
+            .eq('id', data.id)
+            .eq('user_id', data.userId);
+            
+          if (result.error) {
+            console.error('Error deleting drug identification:', result.error);
+            throw new Error(result.error.message);
+          }
+        } catch (deleteError) {
+          console.error('Database delete error:', deleteError);
+          throw new Error(`Database operation failed: ${deleteError.message}`);
+        }
         break;
         
       case 'getIdentificationHistory':
@@ -106,20 +123,25 @@ serve(async (req) => {
         const serviceKeyForGet = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClientForGet = createClient(supabaseUrl, serviceKeyForGet);
         
-        result = await adminClientForGet
-          .from('drug_identifications')
-          .select('*')
-          .eq('user_id', data.userId)
-          .order('created_at', { ascending: false });
+        try {
+          result = await adminClientForGet
+            .from('drug_identifications')
+            .select('*')
+            .eq('user_id', data.userId)
+            .order('created_at', { ascending: false });
+            
+          if (result.error) {
+            console.error('Error fetching drug identification history:', result.error);
+            throw new Error(result.error.message);
+          }
+        } catch (getError) {
+          console.error('Database query error:', getError);
+          throw new Error(`Database operation failed: ${getError.message}`);
+        }
         break;
         
       default:
         throw new Error(`Unknown action: ${action}`);
-    }
-
-    if (result?.error) {
-      console.error('Database operation error:', result.error);
-      throw new Error(`Database operation failed: ${result.error.message}`);
     }
 
     return new Response(JSON.stringify({ 

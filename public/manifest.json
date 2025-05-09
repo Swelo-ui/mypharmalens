@@ -10,19 +10,19 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "lovable-uploads/e3c9febb-ddff-482d-9287-435f9bd59b7a.png",
+      "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "lovable-uploads/e3c9febb-ddff-482d-9287-435f9bd59b7a.png",
+      "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "lovable-uploads/e3c9febb-ddff-482d-9287-435f9bd59b7a.png",
+      "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
@@ -34,14 +34,14 @@
       "short_name": "Identify",
       "description": "Identify a medication using your camera",
       "url": "/identify",
-      "icons": [{ "src": "lovable-uploads/e3c9febb-ddff-482d-9287-435f9bd59b7a.png", "sizes": "192x192" }]
+      "icons": [{ "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png", "sizes": "192x192" }]
     },
     {
       "name": "Medication History",
       "short_name": "History",
       "description": "View your medication identification history",
       "url": "/history",
-      "icons": [{ "src": "lovable-uploads/e3c9febb-ddff-482d-9287-435f9bd59b7a.png", "sizes": "192x192" }]
+      "icons": [{ "src": "lovable-uploads/6e65e0f7-dd9e-47c8-9513-000cc6c2c5cc.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["healthcare", "medical", "utilities"]

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -5,7 +6,7 @@ import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
-import DrugCard from '@/components/DrugCard';
+import BottomNavigation from '@/components/BottomNavigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,7 +21,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import BottomNavigation from '@/components/BottomNavigation';
 
 interface IdentificationRecord {
   id: string;
@@ -228,12 +228,12 @@ const IdentificationHistory = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-24">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Identification History</h1>
+            <h1 className="text-3xl font-bold">Medication History</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
-              View your previous medication identifications
+              Your previous medication identifications
             </p>
           </div>
           
@@ -268,43 +268,61 @@ const IdentificationHistory = () => {
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredHistory.map((item) => (
-              <div key={item.id} className="relative group">
+            {filteredHistory.map((item) => {
+              // Extract basic drug info
+              const drugName = item.drug_name || "Unknown Medication";
+              const drugImageUrl = item.image_url || 
+                (item.details && typeof item.details === 'object' ? item.details.image : null);
+              
+              return (
                 <div 
-                  className="cursor-pointer transition-transform hover:scale-105"
+                  key={item.id} 
+                  className="relative group cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:scale-105"
                   onClick={() => handleCardClick(item.id)}
                 >
                   <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
                     {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
-                  <DrugCard
-                    drug={{
-                      id: extractDrugId(item.details) || item.id,
-                      name: item.drug_name || "Unknown Medication",
-                      genericName: item.details?.genericName || item.details?.generic_name || "",
-                      manufacturer: item.details?.manufacturer || "",
-                      category: item.details?.category || "",
-                      description: item.details?.description || "",
-                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
-                      verified: item.details?.verified || false,
-                      image: item.image_url || item.details?.image || "",
+                  
+                  <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
+                    {drugImageUrl ? (
+                      <img 
+                        src={drugImageUrl} 
+                        alt={drugName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+                        <span className="text-gray-400">No image</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-1 truncate">{drugName}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {item.details?.genericName || item.details?.generic_name || ""}
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    variant="destructive"
+                    size="icon"
+                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteRecord(item.id);
                     }}
-                  />
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button 
-                  variant="destructive"
-                  size="icon"
-                  className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteRecord(item.id);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
