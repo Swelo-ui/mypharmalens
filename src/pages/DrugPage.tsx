@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, 
-  ThumbsDown, Clock, ArrowLeft, PanelLeftOpen
+  ThumbsDown, Clock, ArrowLeft, PanelLeftOpen,
+  ChevronUp, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +14,7 @@ import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
 import BottomNavigation from '@/components/BottomNavigation';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,43 +65,68 @@ const DrugPage = () => {
     );
   }
 
+  const Section = ({ title, children }: { title: string, children: React.ReactNode }) => (
+    <Accordion type="single" collapsible className="w-full mb-4">
+      <AccordionItem value={title} className="border-b-0">
+        <AccordionTrigger className="py-3 px-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-750 font-medium">
+          {title}
+        </AccordionTrigger>
+        <AccordionContent className="pt-2 px-4 pb-4 bg-white dark:bg-gray-800 rounded-b-lg -mt-2">
+          {children}
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+
   return (
     <>
       <Header />
-      <div className="container max-w-4xl mx-auto px-4 pt-24 pb-24 mb-16 sm:pb-12 sm:mb-0">
+      <div className="container max-w-4xl mx-auto px-4 pt-20 pb-28 sm:pb-12">
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)} 
-          className="mb-6"
+          className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to search
+          Back
         </Button>
 
-        <div className="glass-card rounded-2xl p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+          <div className="flex items-start gap-4">
+            {drug.image && (
+              <div className="hidden sm:block w-1/4 rounded-lg overflow-hidden">
+                <img 
+                  src={drug.image} 
+                  alt={drug.name} 
+                  className="w-full object-cover"
+                />
+              </div>
+            )}
+            
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
+                {drug.prescriptionStatus === 'Prescription Only' && (
+                  <div className="inline-flex items-center bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full">
+                    <Clock className="h-3 w-3 text-blue-600 mr-1" />
+                    <span className="text-xs font-medium text-blue-600">Prescription Only</span>
+                  </div>
+                )}
+                
                 {drug.verified && (
-                  <div className="flex items-center bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                  <div className="inline-flex items-center bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">
                     <Shield className="h-3 w-3 text-green-600 mr-1" />
                     <span className="text-xs font-medium text-green-600">Verified</span>
                   </div>
                 )}
-                
-                <div className="flex items-center bg-pharma-50 dark:bg-pharma-900/20 px-2 py-0.5 rounded-full">
-                  <Clock className="h-3 w-3 text-pharma-600 mr-1" />
-                  <span className="text-xs font-medium text-pharma-600">{drug.prescriptionStatus}</span>
-                </div>
               </div>
               
-              <h1 className="text-3xl font-bold mb-1">{drug.name}</h1>
+              <h1 className="text-2xl font-bold mb-2">{drug.name}</h1>
               
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-2">
                 <span className="font-medium">Generic Name:</span> {drug.genericName}
               </p>
               
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                   {drug.category}
                 </span>
@@ -108,157 +135,168 @@ const DrugPage = () => {
                   {drug.manufacturer}
                 </span>
               </div>
+              
+              {drug.image && (
+                <div className="sm:hidden mt-4 rounded-lg overflow-hidden">
+                  <img 
+                    src={drug.image} 
+                    alt={drug.name} 
+                    className="w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="font-semibold text-lg mb-2">Description</h2>
-            <p className="text-gray-700 dark:text-gray-300">
-              {drug.description}
-            </p>
           </div>
         </div>
 
-        <Tabs defaultValue="general" className="w-full mb-8">
-          {/* Updated tabs layout to prevent overlap on mobile */}
-          <TabsList className="flex w-full mb-6 overflow-x-auto">
-            <TabsTrigger value="general" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="w-full mb-2 flex bg-transparent p-0">
+            <TabsTrigger value="general" className="flex-1">
               General Information
             </TabsTrigger>
-            <TabsTrigger value="usage" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+            <TabsTrigger value="usage" className="flex-1">
               Usage & Precautions
             </TabsTrigger>
-            <TabsTrigger value="alternatives" className="flex-1 px-2 py-2 text-center font-medium text-sm sm:text-base whitespace-normal">
+            <TabsTrigger value="alternatives" className="flex-1">
               Alternatives & Brands
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Dosage & Administration</h3>
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+            <Section title="Description">
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                {drug.description}
+              </p>
+            </Section>
+
+            <Section title="Dosage & Administration">
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.dosageAndAdmin}
               </p>
-            </div>
+            </Section>
 
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Mechanism of Action</h3>
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+            <Section title="Mechanism of Action">
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.mechanism}
               </p>
-            </div>
+            </Section>
 
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Side Effects</h3>
+            <Section title="Side Effects">
               <ul className="space-y-2">
                 {drug.sideEffects.map((effect, i) => (
                   <li key={i} className="flex items-start">
-                    <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
+                    <div className="min-w-5 mt-0.5 mr-2">
+                      <div className="h-2 w-2 bg-amber-500 rounded-full"></div>
+                    </div>
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Section>
 
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Drug Interactions</h3>
+            <Section title="Drug Interactions">
               <ul className="space-y-2">
                 {drug.interactions.map((interaction, i) => (
                   <li key={i} className="flex items-start">
-                    <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
+                    <AlertCircle className="h-4 w-4 text-pharma-500 mt-0.5 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Section>
           </TabsContent>
           
           <TabsContent value="usage" className="space-y-4">
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Indications</h3>
+            <Section title="Indications">
               <ul className="space-y-2">
                 {drug.indications.map((indication, i) => (
                   <li key={i} className="flex items-start">
-                    <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
+                    <ThumbsUp className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Section>
             
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Contraindications</h3>
+            <Section title="Contraindications">
               <ul className="space-y-2">
                 {drug.contraindications.map((contraindication, i) => (
                   <li key={i} className="flex items-start">
-                    <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Section>
             
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Pregnancy & Lactation</h3>
+            <Section title="Pregnancy & Lactation">
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.pregnancy}
               </p>
-            </div>
+            </Section>
             
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-medium text-lg mb-4">Storage Information</h3>
+            <Section title="Storage Information">
               <div className="flex items-start">
-                <History className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
+                <History className="h-4 w-4 text-pharma-500 mt-0.5 mr-2 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 text-sm">{drug.storage}</span>
               </div>
-            </div>
+            </Section>
+            
+            <Section title="Warnings & Precautions">
+              <ul className="space-y-3">
+                {drug.warnings.map((warning, i) => (
+                  <li key={i} className="flex items-start p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                    <span className="text-gray-800 dark:text-gray-200 text-sm">{warning}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
           </TabsContent>
           
           <TabsContent value="alternatives" className="space-y-4">
+            {drug.brandNames && drug.brandNames.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+                <h3 className="text-sm font-medium mb-3">Brand Names</h3>
+                <div className="flex flex-wrap gap-2">
+                  {drug.brandNames.map((brand, index) => (
+                    <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
+                      {brand}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {drug.similarDrugs.map((similar) => (
-                  <div 
-                    key={similar.id} 
-                    className="glass-card p-4 hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/drug/${similar.id}`)}
-                  >
-                    <div className="flex items-center">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+                <h3 className="text-sm font-medium mb-3">Similar Medications</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {drug.similarDrugs.map((similar) => (
+                    <div 
+                      key={similar.id} 
+                      className="flex items-center p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/drug/${similar.id}`)}
+                    >
                       <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
                         <Pill className="h-4 w-4 text-pharma-600" />
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">{similar.name}</h4>
-                        <button 
-                          className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
-                        >
-                          View details
-                        </button>
+                        <span className="text-xs text-pharma-600">View details</span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="glass-card p-6 text-center rounded-xl">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
                 <PanelLeftOpen className="h-6 w-6 text-gray-400 mx-auto mb-2" />
                 <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
               </div>
             )}
           </TabsContent>
         </Tabs>
-
-        <div className="glass-card p-6 rounded-xl">
-          <h3 className="font-medium text-lg mb-4">Warnings & Precautions</h3>
-          <ul className="space-y-3">
-            {drug.warnings.map((warning, i) => (
-              <li key={i} className="flex items-start p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
-                <span className="text-gray-800 dark:text-gray-200">{warning}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
       <BottomNavigation />
       <Footer />
