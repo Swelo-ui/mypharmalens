@@ -4,13 +4,16 @@ import App from './App.tsx'
 import './index.css'
 import { ThemeProvider } from 'next-themes'
 import { BrowserRouter } from 'react-router-dom'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <BrowserRouter>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <App />
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
     </ThemeProvider>
   </BrowserRouter>
 );
