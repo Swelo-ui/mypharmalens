@@ -1,6 +1,6 @@
 
-import { createRoot } from 'react-dom/client'
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { ThemeProvider } from 'next-themes'
@@ -15,14 +15,14 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <TooltipProvider>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
             <App />
             <Toaster position="bottom-center" />
-          </QueryClientProvider>
-        </ThemeProvider>
-      </TooltipProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
