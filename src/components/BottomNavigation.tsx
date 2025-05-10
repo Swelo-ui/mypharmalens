@@ -14,8 +14,8 @@ const BottomNavigation = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Only hide when scrolling down significantly
-      if (currentScrollY > lastScrollY + 40) {
+      // Set a threshold (20px) to avoid flickering due to small scroll changes
+      if (currentScrollY > lastScrollY + 20) {
         // Scrolling down - hide the navigation
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY - 10 || currentScrollY <= 10) {
@@ -33,27 +33,16 @@ const BottomNavigation = () => {
     };
   }, [lastScrollY]);
   
-  // Always reset visibility when changing pages to ensure it's visible on new page loads
-  useEffect(() => {
-    setIsVisible(true);
-    setLastScrollY(0);
-  }, [location.pathname]);
-  
   const isActive = (path: string) => {
-    // More flexible path matching to handle sub-routes
-    if (path === '/') {
-      return location.pathname === path;
-    }
-    return location.pathname.startsWith(path);
+    return location.pathname === path;
   };
   
-  // Only render on mobile devices
+  // Don't render on desktop
   if (!isMobile) return null;
   
-  // This ensures the bottom navigation is shown regardless of the route
   return (
     <nav 
-      className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-50 transition-transform duration-300 ${
+      className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-40 transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >

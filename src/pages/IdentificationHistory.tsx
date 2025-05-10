@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -6,6 +5,7 @@ import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
+import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,11 +20,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface IdentificationRecord {
   id: string;
   created_at: string;
   drug_name: string;
+  image_url?: string;
   details: any;
   user_id?: string;
 }
@@ -101,6 +103,8 @@ const IdentificationHistory = () => {
       if (!response.data.success) {
         throw new Error(response.data.error || "Failed to fetch history");
       }
+
+      console.log("Fetched history data:", response.data.data);
       
       // Save data to cache and state
       const historyData = response.data.data || [];
@@ -109,13 +113,17 @@ const IdentificationHistory = () => {
       setFilteredHistory(historyData);
     } catch (error) {
       console.error('Error fetching identification history:', error);
+      toast({
+        title: "Failed to load history",
+        description: "Could not retrieve your identification history"
+      });
       // Set empty arrays to avoid undefined errors
       setHistory([]);
       setFilteredHistory([]);
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, toast]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -178,17 +186,15 @@ const IdentificationHistory = () => {
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
       setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
-      
       toast({
         title: "Record deleted",
-        description: "The medication record has been removed from your history",
+        description: "Record deleted successfully"
       });
     } catch (error) {
       console.error('Error deleting record:', error);
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete record. Please try again.",
+        title: "Deletion failed",
+        description: "Failed to delete record"
       });
     } finally {
       setIsDeleting(false);
@@ -197,15 +203,79 @@ const IdentificationHistory = () => {
     }
   };
 
-  const handleCardClick = (id: string) => {
+  const fetchDrugDetails = async (id: string) => {
+    try {
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
+      }
+      
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getDrugDetail',
+          data: { 
+            id: id,
+            userId: user.id 
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+      
+      if (!response.data?.success || !response.data?.data) {
+        throw new Error("Failed to retrieve drug details");
+      }
+      
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching drug details:', error);
+      toast({
+        title: "Error",
+        description: "Could not retrieve drug details"
+      });
+      return null;
+    }
+  };
+
+  const handleCardClick = async (id: string) => {
     const record = history.find(item => item.id === id);
     
+    // If we already have detailed information in the record
     if (record && record.details) {
-      const drugId = extractDrugId(record.details);
-      
-      if (drugId) {
-        navigate(`/drug/${drugId}`);
-      }
+      navigateToDrugDetail(record);
+      return;
+    }
+    
+    // Otherwise fetch the full details
+    const detailedRecord = await fetchDrugDetails(id);
+    if (detailedRecord) {
+      navigateToDrugDetail(detailedRecord);
+    } else {
+      toast({
+        title: "Information unavailable",
+        description: "Detailed information for this medication is not available"
+      });
+    }
+  };
+  
+  const navigateToDrugDetail = (record: IdentificationRecord) => {
+    const drugId = extractDrugId(record.details);
+    
+    if (drugId) {
+      navigate(`/drug/${drugId}`);
+    } else if (record.details && typeof record.details === 'object') {
+      // If we have the complete details but no specific ID, construct a URL with the record ID
+      navigate(`/drug/${record.id}`);
+    } else {
+      toast({
+        title: "Information unavailable",
+        description: "Detailed information for this medication is not available"
+      });
     }
   };
   
@@ -229,22 +299,18 @@ const IdentificationHistory = () => {
   const refreshHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory(true); // Force refresh
-      toast({
-        title: "Refreshing history",
-        description: "Getting your latest identification records"
-      });
     }
   };
 
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-24">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Medication History</h1>
+            <h1 className="text-3xl font-bold">Identification History</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
-              Your previous medication identifications
+              View your previous medication identifications
             </p>
           </div>
           
@@ -279,58 +345,43 @@ const IdentificationHistory = () => {
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredHistory.map((item) => {
-              // Extract basic drug info
-              const drugName = item.drug_name || "Unknown Medication";
-              const genericName = item.details?.genericName || 
-                item.details?.generic_name || "";
-              const indication = Array.isArray(item.details?.indications) && item.details?.indications.length > 0 
-                ? item.details.indications[0] 
-                : "No indications available";
-              const category = item.details?.category || "";
-              
-              return (
+            {filteredHistory.map((item) => (
+              <div key={item.id} className="relative group">
                 <div 
-                  key={item.id} 
-                  className="relative group cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:scale-105"
+                  className="cursor-pointer transition-transform hover:scale-105"
                   onClick={() => handleCardClick(item.id)}
                 >
                   <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
                     {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-1 truncate">{drugName}</h3>
-                    {genericName && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <span className="font-medium">Generic name:</span> {genericName}
-                      </p>
-                    )}
-                    {category && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <span className="font-medium">Category:</span> {category}
-                      </p>
-                    )}
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      <span className="font-medium">Use:</span> {indication}
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    variant="destructive"
-                    size="icon"
-                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteRecord(item.id);
+                  <DrugCard
+                    drug={{
+                      id: extractDrugId(item.details) || item.id,
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                      verified: item.details?.verified || false,
+                      image: item.image_url || item.details?.image || "",
                     }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  />
                 </div>
-              );
-            })}
+                <Button 
+                  variant="destructive"
+                  size="icon"
+                  className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteRecord(item.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
@@ -351,6 +402,36 @@ const IdentificationHistory = () => {
           </div>
         )}
       </div>
+      <BottomNavigation />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this medication record from your history.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? (
+                <>
+                  <span className="mr-2">Deleting</span>
+                  <span className="animate-spin">●</span>
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

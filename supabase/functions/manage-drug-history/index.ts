@@ -31,40 +31,30 @@ serve(async (req) => {
           throw new Error('Missing required field: userId is required');
         }
         
-        // Always save - no need for explicit save option anymore
         // Allow saving even if drugName is missing - use a fallback
         const drugName = data.drugName || "Unknown Medication";
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
-        // Ensure we store all available drug details to show in history
+        // Save full drug details to enable proper viewing in history
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
-          // Don't store image_url anymore to save space
-          details: extractEssentialDetails(data.details || null),
+          image_url: data.imageUrl || null,
+          details: data.details || null,
         };
-          
+        
         // Use the service role key to bypass RLS policies for insertion
+        // This ensures that we can always save the identification regardless of RLS policies
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClient = createClient(supabaseUrl, supabaseServiceKey);
         
-        try {
-          result = await adminClient
-            .from('drug_identifications')
-            .insert([identificationData])
-            .select();
-            
-          if (result.error) {
-            console.error('Error inserting drug identification:', result.error);
-            throw new Error(result.error.message);
-          }
-            
-          console.log('Insert result:', result);
-        } catch (insertError) {
-          console.error('Database insert error:', insertError);
-          throw new Error(`Database operation failed: ${insertError.message}`);
-        }
+        result = await adminClient
+          .from('drug_identifications')
+          .insert([identificationData])
+          .select();
+          
+        console.log('Insert result:', result);
         break;
         
       case 'removeIdentification':
@@ -77,21 +67,11 @@ serve(async (req) => {
         const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClientForDelete = createClient(supabaseUrl, serviceKey);
         
-        try {
-          result = await adminClientForDelete
-            .from('drug_identifications')
-            .delete()
-            .eq('id', data.id)
-            .eq('user_id', data.userId);
-            
-          if (result.error) {
-            console.error('Error deleting drug identification:', result.error);
-            throw new Error(result.error.message);
-          }
-        } catch (deleteError) {
-          console.error('Database delete error:', deleteError);
-          throw new Error(`Database operation failed: ${deleteError.message}`);
-        }
+        result = await adminClientForDelete
+          .from('drug_identifications')
+          .delete()
+          .eq('id', data.id)
+          .eq('user_id', data.userId);
         break;
         
       case 'getIdentificationHistory':
@@ -104,25 +84,37 @@ serve(async (req) => {
         const serviceKeyForGet = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
         const adminClientForGet = createClient(supabaseUrl, serviceKeyForGet);
         
-        try {
-          result = await adminClientForGet
-            .from('drug_identifications')
-            .select('*')
-            .eq('user_id', data.userId)
-            .order('created_at', { ascending: false });
-            
-          if (result.error) {
-            console.error('Error fetching drug identification history:', result.error);
-            throw new Error(result.error.message);
-          }
-        } catch (getError) {
-          console.error('Database query error:', getError);
-          throw new Error(`Database operation failed: ${getError.message}`);
+        result = await adminClientForGet
+          .from('drug_identifications')
+          .select('*')
+          .eq('user_id', data.userId)
+          .order('created_at', { ascending: false });
+        break;
+        
+      case 'getDrugDetail':
+        // Get detailed drug information from history
+        if (!data.id || !data.userId) {
+          throw new Error('Missing required fields: id and userId are required');
         }
+        
+        const serviceKeyForDetail = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+        const adminClientForDetail = createClient(supabaseUrl, serviceKeyForDetail);
+        
+        result = await adminClientForDetail
+          .from('drug_identifications')
+          .select('*')
+          .eq('id', data.id)
+          .eq('user_id', data.userId)
+          .single();
         break;
         
       default:
         throw new Error(`Unknown action: ${action}`);
+    }
+
+    if (result?.error) {
+      console.error('Database operation error:', result.error);
+      throw new Error(`Database operation failed: ${result.error.message}`);
     }
 
     return new Response(JSON.stringify({ 
@@ -131,7 +123,6 @@ serve(async (req) => {
       error: null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200
     });
     
   } catch (error) {
@@ -146,34 +137,3 @@ serve(async (req) => {
     });
   }
 });
-
-// Function to extract only essential details for storage
-function extractEssentialDetails(details: any) {
-  if (!details) return null;
-  
-  try {
-    // If it's a string, parse it
-    if (typeof details === 'string') {
-      try {
-        details = JSON.parse(details);
-      } catch (e) {
-        return details; // Return as is if can't parse
-      }
-    }
-    
-    // Extract only essential information to reduce storage
-    return {
-      id: details.id,
-      name: details.name,
-      genericName: details.genericName || details.generic_name,
-      category: details.category,
-      drugClass: details.drugClass,
-      indications: details.indications || [],
-      manufacturer: details.manufacturer,
-      prescriptionStatus: details.prescriptionStatus
-    };
-  } catch (error) {
-    console.error('Error extracting essential details:', error);
-    return details; // Return original if extraction fails
-  }
-}

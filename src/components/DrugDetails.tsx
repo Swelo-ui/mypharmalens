@@ -1,46 +1,38 @@
 
 import React, { useState } from 'react';
 import { 
-  Pill, AlertTriangle, RotateCw, ChevronDown, ChevronUp, 
-  Shield, Clock, Package, ThumbsDown, AlertCircle, ThumbsUp, 
-  Tag, Search, History
+  Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
+  Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
+  AlertTriangle, Package, Tag
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import LanguageBadge from './LanguageBadge';
 import { cn } from '@/lib/utils';
 
 export interface DetailedDrugData {
   id: string;
   name: string;
-  genericName?: string;
-  manufacturer?: string;
-  category?: string;
-  description?: string;
-  dosageAndAdmin?: string;
-  detailedDosage?: string;
-  sideEffects?: string[];
-  warnings?: string[];
-  interactions?: string[];
-  indications?: string[];
-  contraindications?: string[];
-  storage?: string;
-  mechanism?: string;
-  pregnancy?: string;
-  prescriptionStatus?: 'OTC' | 'Prescription Only' | 'Controlled';
-  verified?: boolean;
+  genericName: string;
+  manufacturer: string;
+  category: string;
+  description: string;
+  dosageAndAdmin: string;
+  sideEffects: string[];
+  warnings: string[];
+  interactions: string[];
+  storage: string;
+  mechanism: string;
+  indications: string[];
+  contraindications: string[];
+  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled';
+  pregnancy: string;
+  verified: boolean;
   image?: string;
   packageImage?: string;
   drugClass?: string;
   brandNames?: string[];
-  alternativeMedications?: string[];
-  textLanguage?: string;
-  translatedName?: string;
-  imprint?: string;
-  translatedImprint?: string;
-  similarDrugs?: Array<{id: string; name: string}>; // Added this property to fix the type errors
+  similarDrugs?: {
+    id: string;
+    name: string;
+  }[];
 }
 
 interface DrugDetailsProps {
@@ -87,19 +79,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               expanded={expandedSections.dosage}
               onToggle={() => toggleSection('dosage')}
               content={
-                <div className="space-y-3">
-                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                    {drug.dosageAndAdmin}
-                  </p>
-                  {drug.detailedDosage && (
-                    <div className="mt-3 bg-pharma-50 dark:bg-pharma-900/20 p-3 rounded-md">
-                      <h4 className="text-xs font-semibold mb-2 text-pharma-700">Detailed Dosing Information:</h4>
-                      <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        {drug.detailedDosage}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                  {drug.dosageAndAdmin}
+                </p>
               }
             />
             
@@ -219,20 +201,6 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                     <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
                       <Tag className="h-3 w-3 mr-1" />
                       {brand}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {drug.alternativeMedications && drug.alternativeMedications.length > 0 && (
-              <div className="glass-card p-4">
-                <h3 className="text-sm font-medium mb-3">Alternative Medications</h3>
-                <div className="flex flex-col space-y-2">
-                  {drug.alternativeMedications.map((alternative, index) => (
-                    <div key={index} className="flex items-start">
-                      <Pill className="h-4 w-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300 text-sm">{alternative}</span>
                     </div>
                   ))}
                 </div>

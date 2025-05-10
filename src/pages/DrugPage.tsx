@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -12,22 +13,98 @@ import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { cn } from '@/lib/utils';
 import BottomNavigation from '@/components/BottomNavigation';
+import { fetchDrugById } from '@/integrations/supabase/client';
+import { useDrugDetail } from '@/hooks/useDrugDetail';
+import { useToast } from '@/hooks/use-toast';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { fetchDrugDetail } = useDrugDetail();
 
   useEffect(() => {
-    if (id) {
-      const drugData = getDetailedDrugData(id);
-      if (drugData) {
-        setDrug(drugData);
-      }
+    if (!id) {
       setLoading(false);
+      return;
     }
-  }, [id]);
+
+    const fetchDrug = async () => {
+      try {
+        setLoading(true);
+
+        // First, try to fetch from the drug database
+        let drugData = await fetchDrugById(id);
+        
+        // If not found in the drugs table, it might be a history record
+        if (!drugData) {
+          // Try to fetch the drug from identification history
+          const historyRecord = await fetchDrugDetail(id);
+          
+          if (historyRecord && historyRecord.details) {
+            // Could be stored as a string (JSON)
+            if (typeof historyRecord.details === 'string') {
+              try {
+                drugData = JSON.parse(historyRecord.details);
+              } catch (e) {
+                console.error('Failed to parse drug details:', e);
+              }
+            } else if (typeof historyRecord.details === 'object') {
+              // Or directly as an object
+              drugData = historyRecord.details;
+            }
+          }
+        }
+
+        // If still not found, try mock data as a fallback (for development)
+        if (!drugData) {
+          drugData = getDetailedDrugData(id);
+        }
+        
+        if (drugData) {
+          // Transform to DetailedDrugData format if needed
+          const formattedDrug: DetailedDrugData = {
+            id: drugData.id || id,
+            name: drugData.name || drugData.drug_name || "Unknown Medication",
+            genericName: drugData.generic_name || drugData.genericName || "",
+            manufacturer: drugData.manufacturer || "",
+            category: drugData.category || "",
+            description: drugData.description || "No description available.",
+            dosageAndAdmin: drugData.dosage_and_admin || drugData.dosageAndAdmin || "Information not available.",
+            sideEffects: drugData.side_effects || drugData.sideEffects || ["Information not available."],
+            warnings: drugData.warnings || ["No specific warnings available."],
+            interactions: drugData.interactions || ["No known drug interactions."],
+            storage: drugData.storage || "Store at room temperature away from moisture, heat, and light.",
+            mechanism: drugData.mechanism || "Mechanism of action information not available.",
+            indications: drugData.indications || ["Information not available."],
+            contraindications: drugData.contraindications || ["Information not available."],
+            prescriptionStatus: drugData.prescription_status || drugData.prescriptionStatus || "OTC",
+            pregnancy: drugData.pregnancy || "Consult your doctor before use if pregnant or breastfeeding.",
+            verified: drugData.verified || false,
+            image: drugData.image_url || drugData.image || "",
+            packageImage: drugData.package_image_url || drugData.packageImage || "",
+            drugClass: drugData.drug_class || drugData.drugClass || "",
+            brandNames: drugData.brand_names || drugData.brandNames || [],
+            similarDrugs: drugData.similarDrugs || []
+          };
+          
+          setDrug(formattedDrug);
+        }
+      } catch (error) {
+        console.error('Error fetching drug data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load drug information"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDrug();
+  }, [id, fetchDrugDetail, toast]);
 
   if (loading) {
     return (
@@ -138,14 +215,6 @@ const DrugPage = () => {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {drug.dosageAndAdmin}
               </p>
-              {drug.detailedDosage && (
-                <div className="mt-4 bg-pharma-50 dark:bg-pharma-900/20 p-4 rounded-md">
-                  <h4 className="text-sm font-semibold mb-2 text-pharma-700">Detailed Dosing Information:</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                    {drug.detailedDosage}
-                  </p>
-                </div>
-              )}
             </div>
 
             <div className="glass-card p-6 rounded-xl">
@@ -222,71 +291,35 @@ const DrugPage = () => {
           </TabsContent>
           
           <TabsContent value="alternatives" className="space-y-4">
-            {/* Brand Names */}
-            {drug.brandNames && drug.brandNames.length > 0 && (
-              <div className="glass-card p-6 rounded-xl">
-                <h3 className="font-medium text-lg mb-4">Brand Names</h3>
-                <div className="flex flex-wrap gap-2">
-                  {drug.brandNames.map((brand, index) => (
-                    <span key={index} className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600">
-                      {brand}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Alternative Medications */}
-            {drug.alternativeMedications && drug.alternativeMedications.length > 0 && (
-              <div className="glass-card p-6 rounded-xl">
-                <h3 className="font-medium text-lg mb-4">Alternative Medications</h3>
-                <ul className="space-y-2">
-                  {drug.alternativeMedications.map((alternative, i) => (
-                    <li key={i} className="flex items-start">
-                      <Pill className="h-4 w-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{alternative}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            {/* Similar Drugs */}
             {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
-              <div className="glass-card p-6 rounded-xl">
-                <h3 className="font-medium text-lg mb-4">Similar Medications</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {drug.similarDrugs.map((similar) => (
-                    <div 
-                      key={similar.id} 
-                      className="glass-card p-4 hover:shadow-md transition-shadow"
-                      onClick={() => navigate(`/drug/${similar.id}`)}
-                    >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
-                          <Pill className="h-4 w-4 text-pharma-600" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">{similar.name}</h4>
-                          <button 
-                            className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
-                          >
-                            View details
-                          </button>
-                        </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {drug.similarDrugs.map((similar) => (
+                  <div 
+                    key={similar.id} 
+                    className="glass-card p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/drug/${similar.id}`)}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
+                        <Pill className="h-4 w-4 text-pharma-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium">{similar.name}</h4>
+                        <span 
+                          className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
+                        >
+                          View details
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             ) : (
-              (!drug.brandNames || drug.brandNames.length === 0) && 
-              (!drug.alternativeMedications || drug.alternativeMedications.length === 0) && (
-                <div className="glass-card p-6 text-center rounded-xl">
-                  <PanelLeftOpen className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
-                </div>
-              )
+              <div className="glass-card p-6 text-center rounded-xl">
+                <PanelLeftOpen className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
+              </div>
             )}
           </TabsContent>
         </Tabs>

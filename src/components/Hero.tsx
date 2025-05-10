@@ -59,23 +59,23 @@ const Hero = () => {
   ];
 
   return (
-    <div className="relative pt-24 pb-12 md:pt-32 md:pb-16 overflow-hidden">
+    <div className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-pharma-50/50 to-transparent -z-10"></div>
       
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Main Hero Content */}
-        <div className="text-center mb-12 md:mb-16 animate-fade-up">
-          <div className="inline-block mb-3">
+        <div className="text-center mb-16 md:mb-20 animate-fade-up">
+          <div className="inline-block mb-4">
             <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800">
               AI-Powered Drug Identification
             </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">
             Identify & Learn About
             <span className="text-pharma-600"> Any Medication</span>
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-6">
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-8">
             PharmaLens combines AI technology with comprehensive drug databases to help you identify medications and access reliable information instantly.
           </p>
           
