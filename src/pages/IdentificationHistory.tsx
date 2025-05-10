@@ -1,15 +1,16 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
+import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,22 +32,6 @@ interface IdentificationRecord {
   image_features?: string;
 }
 
-// Create a cache mechanism for history data
-const historyCache = {
-  data: null as IdentificationRecord[] | null,
-  timestamp: 0,
-  // Cache validity is 5 minutes
-  isValid: () => (Date.now() - historyCache.timestamp) < 300000,
-  set: (data: IdentificationRecord[]) => {
-    historyCache.data = data;
-    historyCache.timestamp = Date.now();
-  },
-  clear: () => {
-    historyCache.data = null;
-    historyCache.timestamp = 0;
-  }
-};
-
 const IdentificationHistory = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStatus();
   const [history, setHistory] = useState<IdentificationRecord[]>([]);
@@ -56,75 +41,7 @@ const IdentificationHistory = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
-
-  const fetchIdentificationHistory = useCallback(async (forceRefresh = false) => {
-    try {
-      setIsLoading(true);
-      
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      
-      // Check if we have valid cached data and not forcing refresh
-      if (!forceRefresh && historyCache.isValid() && historyCache.data) {
-        setHistory(historyCache.data);
-        setFilteredHistory(historyCache.data);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        throw new Error("No active session");
-      }
-
-      // Use direct function invocation with service key in the function itself
-      const response = await supabase.functions.invoke('manage-drug-history', {
-        body: { 
-          action: 'getIdentificationHistory',
-          data: { userId: user.id }
-        },
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`
-        }
-      });
-      
-      // Handle empty response
-      if (!response?.data) {
-        console.log("Empty response from function");
-        setHistory([]);
-        setFilteredHistory([]);
-        setIsLoading(false);
-        return;
-      }
-
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to fetch history");
-      }
-
-      console.log("Fetched history data:", response.data.data);
-      
-      // Save data to cache and state
-      const historyData = response.data.data || [];
-      historyCache.set(historyData);
-      setHistory(historyData);
-      setFilteredHistory(historyData);
-    } catch (error) {
-      console.error('Error fetching identification history:', error);
-      toast({
-        title: "Failed to load history",
-        description: "Could not retrieve your identification history",
-        type: "error"
-      });
-      // Set empty arrays to avoid undefined errors
-      setHistory([]);
-      setFilteredHistory([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, toast]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -135,7 +52,7 @@ const IdentificationHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory();
     }
-  }, [isAuthenticated, authLoading, user, navigate, fetchIdentificationHistory]);
+  }, [isAuthenticated, authLoading, user]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -147,6 +64,44 @@ const IdentificationHistory = () => {
       setFilteredHistory(filtered);
     }
   }, [searchTerm, history]);
+
+  const fetchIdentificationHistory = async () => {
+    try {
+      setIsLoading(true);
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("No active session");
+      }
+
+      const response = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getIdentificationHistory',
+          data: { userId: user.id }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to fetch history");
+      }
+
+      console.log("Fetched history data:", response.data.data);
+      setHistory(response.data.data || []);
+      setFilteredHistory(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching identification history:', error);
+      toast.error("Failed to load your identification history");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDeleteRecord = async (id: string) => {
     setItemToDelete(id);
@@ -177,28 +132,16 @@ const IdentificationHistory = () => {
         }
       });
 
-      if (!response.data?.success) {
-        throw new Error(response.data?.error || "Failed to delete record");
+      if (!response.data.success) {
+        throw new Error(response.data.error || "Failed to delete record");
       }
 
-      // Clear cache on successful deletion
-      historyCache.clear();
-      
       // Update local state to remove the deleted item
       setHistory(prev => prev.filter(item => item.id !== itemToDelete));
-      setFilteredHistory(prev => prev.filter(item => item.id !== itemToDelete));
-      toast({
-        title: "Record deleted",
-        description: "Record deleted successfully",
-        type: "success"
-      });
+      toast.success("Record deleted successfully");
     } catch (error) {
       console.error('Error deleting record:', error);
-      toast({
-        title: "Deletion failed",
-        description: "Failed to delete record",
-        type: "error"
-      });
+      toast.error("Failed to delete record");
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -216,11 +159,7 @@ const IdentificationHistory = () => {
       if (drugId) {
         navigate(`/drug/${drugId}`);
       } else {
-        toast({
-          title: "Information unavailable",
-          description: "Detailed information for this medication is not available",
-          type: "info"
-        });
+        toast.info("Detailed information for this medication is not available");
       }
     }
   };
@@ -244,7 +183,7 @@ const IdentificationHistory = () => {
 
   const refreshHistory = () => {
     if (isAuthenticated && user) {
-      fetchIdentificationHistory(true); // Force refresh
+      fetchIdentificationHistory();
     }
   };
 
@@ -292,55 +231,29 @@ const IdentificationHistory = () => {
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map((item) => (
-              <div key={item.id} className="relative group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm cursor-pointer transition-transform hover:scale-105" onClick={() => handleCardClick(item.id)}>
-                <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {format(new Date(item.created_at), 'MMM d, yyyy')}
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  {/* Medication icon/image */}
-                  <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    {item.image_url ? (
-                      <img 
-                        src={item.image_url} 
-                        alt={item.drug_name} 
-                        className="w-10 h-10 object-contain rounded-full"
-                      />
-                    ) : (
-                      <div className="text-2xl text-blue-500">💊</div>
-                    )}
+              <div key={item.id} className="relative group">
+                <div 
+                  className="cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => handleCardClick(item.id)}
+                >
+                  <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
-                  
-                  {/* Basic medication information */}
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{item.drug_name || "Unknown Medication"}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 italic mb-2">
-                      {item.details?.genericName || item.details?.generic_name || ""}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {item.details?.category && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                          {item.details.category}
-                        </span>
-                      )}
-                      
-                      {(item.details?.drugClass || item.details?.drug_class) && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300">
-                          {item.details?.drugClass || item.details?.drug_class}
-                        </span>
-                      )}
-                      
-                      {item.details?.manufacturer && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
-                          {item.details.manufacturer}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  <DrugCard
+                    drug={{
+                      id: extractDrugId(item.details) || item.id,
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                      verified: item.details?.verified || false,
+                      image: item.image_url || item.details?.image || "",
+                    }}
+                  />
                 </div>
-                
                 <Button 
                   variant="destructive"
                   size="icon"

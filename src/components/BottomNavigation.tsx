@@ -14,12 +14,11 @@ const BottomNavigation = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Set a threshold (20px) to avoid flickering due to small scroll changes
-      if (currentScrollY > lastScrollY + 20) {
-        // Scrolling down - hide the navigation
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down
         setIsVisible(false);
-      } else if (currentScrollY < lastScrollY - 10 || currentScrollY <= 10) {
-        // Scrolling up or near top - show the navigation
+      } else {
+        // Scrolling up
         setIsVisible(true);
       }
       
@@ -48,30 +47,30 @@ const BottomNavigation = () => {
     >
       <div className="flex justify-around items-center h-16 px-4 max-w-md mx-auto">
         <Link to="/" className="flex flex-col items-center space-y-1">
-          <Home className={`h-5 w-5 ${isActive('/') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Home</span>
+          <Home className={`h-5 w-5 ${isActive('/') ? 'text-[#0269a1]' : 'text-gray-600 dark:text-gray-500'}`} />
+          <span className={`text-xs ${isActive('/') ? 'text-[#0269a1] font-medium' : 'text-gray-600 dark:text-gray-500'}`}>Home</span>
         </Link>
         
         <Link to="/search" className="flex flex-col items-center space-y-1">
-          <Search className={`h-5 w-5 ${isActive('/search') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/search') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Search</span>
+          <Search className={`h-5 w-5 ${isActive('/search') ? 'text-[#0269a1]' : 'text-gray-600 dark:text-gray-500'}`} />
+          <span className={`text-xs ${isActive('/search') ? 'text-[#0269a1] font-medium' : 'text-gray-600 dark:text-gray-500'}`}>Search</span>
         </Link>
         
         <Link to="/identify" className="flex flex-col items-center -mt-8">
           <div className="bg-[#0384c6] p-4 rounded-full shadow-lg">
             <Scan className="h-6 w-6 text-white" />
           </div>
-          <span className="text-xs text-gray-700 dark:text-gray-400 mt-1 font-medium">Identify</span>
+          <span className="text-xs text-gray-600 dark:text-gray-500 mt-1 font-medium">Identify</span>
         </Link>
         
         <Link to="/history" className="flex flex-col items-center space-y-1">
-          <History className={`h-5 w-5 ${isActive('/history') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/history') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>History</span>
+          <History className={`h-5 w-5 ${isActive('/history') ? 'text-[#0269a1]' : 'text-gray-600 dark:text-gray-500'}`} />
+          <span className={`text-xs ${isActive('/history') ? 'text-[#0269a1] font-medium' : 'text-gray-600 dark:text-gray-500'}`}>History</span>
         </Link>
         
         <Link to="/profile" className="flex flex-col items-center space-y-1">
-          <User className={`h-5 w-5 ${isActive('/profile') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/profile') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Profile</span>
+          <User className={`h-5 w-5 ${isActive('/profile') ? 'text-[#0269a1]' : 'text-gray-600 dark:text-gray-500'}`} />
+          <span className={`text-xs ${isActive('/profile') ? 'text-[#0269a1] font-medium' : 'text-gray-600 dark:text-gray-500'}`}>Profile</span>
         </Link>
       </div>
     </nav>

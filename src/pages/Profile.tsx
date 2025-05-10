@@ -9,12 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader2, Save, Key, User, Mail } from 'lucide-react';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
-  const { toast } = useToast();
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -30,11 +29,6 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       if (user?.id) {
         try {
-          // Set email from auth user first
-          if (user.email) {
-            setEmail(user.email);
-          }
-          
           // Fetch user profile from profiles table
           const { data, error } = await supabase
             .from('profiles')
@@ -43,36 +37,18 @@ const Profile = () => {
             .single();
             
           if (error) {
-            // If no profile exists, create one
-            if (error.code === 'PGRST116') {
-              console.log('No profile found, creating one...');
-              
-              const { error: insertError } = await supabase
-                .from('profiles')
-                .insert({
-                  id: user.id,
-                  display_name: user.user_metadata?.full_name || '',
-                  updated_at: new Date().toISOString()
-                });
-                
-              if (insertError) {
-                console.error('Error creating profile:', insertError);
-                return;
-              }
-              
-              // Set display name from user metadata if available
-              setDisplayName(user.user_metadata?.full_name || '');
-            } else {
-              console.error('Error fetching profile:', error);
-            }
+            console.error('Error fetching profile:', error);
             return;
           }
           
           if (data) {
             setDisplayName(data.display_name || '');
           }
+          
+          // Set email from auth user
+          setEmail(user.email || '');
         } catch (error) {
-          console.error('Error fetching profile:', error);
+          console.error('Error:', error);
         }
       }
     };
@@ -97,18 +73,10 @@ const Profile = () => {
       
       if (error) throw error;
       
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-        type: "success"
-      });
+      toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Update failed",
-        description: "Failed to update your profile",
-        type: "error"
-      });
+      toast.error('Failed to update profile');
     } finally {
       setIsUpdating(false);
     }
@@ -116,50 +84,44 @@ const Profile = () => {
   
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "New passwords do not match",
-        type: "error"
-      });
+      toast.error('New passwords do not match');
       return;
     }
     
     if (newPassword.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters",
-        type: "error"
-      });
+      toast.error('Password must be at least 6 characters');
       return;
     }
     
     setIsChangingPassword(true);
     
     try {
-      // First verify the current password - this is no longer needed as Supabase will handle this
-      // We can directly update the password if the user is authenticated
+      // First verify the current password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      });
+      
+      if (signInError) {
+        toast.error('Current password is incorrect');
+        setIsChangingPassword(false);
+        return;
+      }
+      
+      // Then update the password
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
       
       if (error) throw error;
       
-      toast({
-        title: "Password updated",
-        description: "Your password has been updated successfully",
-        type: "success"
-      });
-      
+      toast.success('Password updated successfully');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error) {
       console.error('Error changing password:', error);
-      toast({
-        title: "Update failed",
-        description: "Failed to change your password",
-        type: "error"
-      });
+      toast.error('Failed to change password');
     } finally {
       setIsChangingPassword(false);
     }
@@ -344,8 +306,6 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
       </main>
-      
-      <Footer />
     </div>
   );
 };

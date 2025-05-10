@@ -19,41 +19,50 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
     
+    // Get the JWT token from the request
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing Authorization header');
+    }
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Set the auth token in the Supabase client
+    supabaseClient.auth.setSession({
+      access_token: token,
+      refresh_token: '',
+    });
+
     // Parse request body
     const { action, data } = await req.json();
     console.log(`Received action: ${action} with data:`, data);
-    
+
     let result;
     switch (action) {
       case 'addIdentification':
         // Validate required fields
-        if (!data.userId) {
-          throw new Error('Missing required field: userId is required');
+        if (!data.userId || !data.drugName) {
+          throw new Error('Missing required fields: userId and drugName are required');
         }
         
-        // Allow saving even if drugName is missing - use a fallback
-        const drugName = data.drugName || "Unknown Medication";
+        console.log(`Adding identification for user ${data.userId}, drug ${data.drugName}`);
         
-        console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
-        
-        // Ensure we store all available drug details to show in history
+        // Create object with only fields that exist in the database table
         const identificationData = {
           user_id: data.userId,
-          drug_name: drugName,
+          drug_name: data.drugName,
           image_url: data.imageUrl || null,
           details: data.details || null,
         };
         
-        // Add image_features only if the column exists in the schema and if data is provided
+        // Add image_features only if the column exists in the schema
         try {
-          // First attempt to check if the image_features column exists
-          const { data: columnsData, error: columnsError } = await supabaseClient
-            .from('information_schema.columns')
-            .select('column_name')
-            .eq('table_name', 'drug_identifications')
-            .eq('column_name', 'image_features');
-            
-          if (!columnsError && columnsData && columnsData.length > 0) {
+          // First attempt to check if we can query the table with the image_features column
+          const { error: columnCheckError } = await supabaseClient
+            .from('drug_identifications')
+            .select('image_features')
+            .limit(1);
+          
+          if (!columnCheckError) {
             // Column exists, we can add the image_features field
             if (data.imageFeatures) {
               identificationData.image_features = data.imageFeatures;
@@ -65,12 +74,7 @@ serve(async (req) => {
           console.log('Error checking for image_features column, skipping this field:', err.message);
         }
           
-        // Use the service role key to bypass RLS policies for insertion
-        // This ensures that we can always save the identification regardless of RLS policies
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-        const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-        
-        result = await adminClient
+        result = await supabaseClient
           .from('drug_identifications')
           .insert([identificationData])
           .select();
@@ -80,15 +84,7 @@ serve(async (req) => {
         
       case 'removeIdentification':
         // Remove a drug identification from history
-        if (!data.id || !data.userId) {
-          throw new Error('Missing required fields: id and userId are required for deletion');
-        }
-        
-        // Use service role key to ensure deletion works regardless of session state
-        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-        const adminClientForDelete = createClient(supabaseUrl, serviceKey);
-        
-        result = await adminClientForDelete
+        result = await supabaseClient
           .from('drug_identifications')
           .delete()
           .eq('id', data.id)
@@ -97,15 +93,7 @@ serve(async (req) => {
         
       case 'getIdentificationHistory':
         // Get user's identification history
-        if (!data.userId) {
-          throw new Error('Missing required field: userId is required');
-        }
-        
-        // Use service role key to ensure queries work regardless of session state
-        const serviceKeyForGet = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-        const adminClientForGet = createClient(supabaseUrl, serviceKeyForGet);
-        
-        result = await adminClientForGet
+        result = await supabaseClient
           .from('drug_identifications')
           .select('*')
           .eq('user_id', data.userId)
@@ -116,14 +104,13 @@ serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
-    if (result?.error) {
-      console.error('Database operation error:', result.error);
+    if (result.error) {
       throw new Error(`Database operation failed: ${result.error.message}`);
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
-      data: result?.data || [], 
+      data: result.data, 
       error: null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
