@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useToast } from '@/components/ui/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
   onImageCapture?: (file: File) => void;
@@ -15,6 +15,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageQualityWarning, setImageQualityWarning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -48,14 +49,20 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const handleFile = (file: File) => {
     // Check if file is an image
     if (!file.type.match('image.*')) {
-      toast.error("Invalid file type. Please upload an image file (JPEG, PNG, etc.)");
+      toast({
+        message: "Invalid file type",
+        description: "Please upload an image file (JPEG, PNG, etc.)"
+      });
       return;
     }
     
     // Check if file is too small (might be too low quality)
     if (file.size < 50 * 1024) {
       setImageQualityWarning(true);
-      toast.warning("This image may be too small for accurate identification. Consider using a higher resolution image.");
+      toast({
+        message: "Low quality image",
+        description: "This image may be too small for accurate identification. Consider using a higher resolution image."
+      });
     } else {
       setImageQualityWarning(false);
     }
@@ -147,16 +154,18 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
         <div className="w-full relative rounded-xl overflow-hidden shadow-lg transition-all animate-scale-in">
           <div className="absolute top-2 right-2 z-10 flex gap-2">
             {imageQualityWarning && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="p-2 rounded-full bg-yellow-500/80 text-white">
-                    <Info className="h-4 w-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>This image may be too low quality for accurate identification</p>
-                </TooltipContent>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="p-2 rounded-full bg-yellow-500/80 text-white">
+                      <Info className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>This image may be too low quality for accurate identification</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             <button 
               onClick={clearImage}

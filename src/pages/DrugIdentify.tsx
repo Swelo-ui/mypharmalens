@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -378,36 +379,25 @@ const DrugIdentify = () => {
               setIsSaved(false);
               setProcessingProgress(100);
               
-              // Automatically save to history if user is authenticated
-              if (isAuthenticated && user) {
-                saveDrugIdentification({
-                  name: formattedDrugData.name,
-                  drug_name: formattedDrugData.name,
-                  image: formattedDrugData.image,
-                  image_url: formattedDrugData.image,
-                  details: formattedDrugData
-                });
-              } else if (!authLoading) {
-                // If not authenticated, prompt to sign in to save history
-                toast.info("Sign in to automatically save identifications to your history", {
-                  action: {
-                    label: "Sign In",
-                    onClick: () => navigate('/auth')
-                  },
-                  duration: 5000
-                });
-              }
-              
               // Customize message based on whether this was from history or new identification
               if (drugData.fromHistory) {
-                toast.success(`Matched with previously identified ${drugData.name}!`);
+                toast.success(`Matched with previously identified ${drugData.name}!`, { 
+                  description: "Using your history helped identify this medication faster."
+                });
               } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
                 if (drugData.confidence === 'high') {
-                  toast.success(`Medication successfully identified as ${drugData.name}!`);
+                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                    description: "Enhanced analysis provided high confidence results."
+                  });
                 } else if (drugData.confidence === 'medium') {
-                  toast.info(`Medication identified as ${drugData.name} with medium confidence`);
+                  toast.success(`Medication identified as ${drugData.name}`, { 
+                    description: "The identification has medium confidence. Consider the alternatives listed."
+                  });
                 } else {
-                  toast.info(`Medication possibly identified as ${drugData.name} with low confidence`);
+                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                    description: "Low confidence identification. Consider consulting a healthcare professional.",
+                    duration: 5000
+                  });
                 }
               } else {
                 toast.success(`Medication successfully identified as ${drugData.name}!`);
@@ -468,7 +458,7 @@ const DrugIdentify = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-28">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-24">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold">Identify Medication</h1>
           
@@ -643,10 +633,40 @@ const DrugIdentify = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center flex-wrap gap-3">
               <h2 className="text-2xl font-semibold">Identification Result</h2>
-              <Button variant="outline" onClick={handleRetry}>
-                Identify Another
-              </Button>
+              <div className="flex gap-3">
+                {isAuthenticated && !isSaved && (
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleSaveToHistory}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="h-4 w-4" />
+                        <span>Save to History</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+                <Button variant="outline" onClick={handleRetry}>
+                  Identify Another
+                </Button>
+              </div>
             </div>
+            {isSaved && (
+              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <BookmarkPlus className="h-4 w-4" />
+                  <span>Saved to your identification history</span>
+                </div>
+              </Alert>
+            )}
             <DrugDetails drug={identifiedDrug} />
           </div>
         )}

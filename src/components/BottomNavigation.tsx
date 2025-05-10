@@ -10,23 +10,11 @@ const BottomNavigation = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   
-  // Critical routes where the bottom navigation must always be visible
-  const criticalRoutes = ['/identify', '/drug'];
-  
   useEffect(() => {
-    // Always display the navigation for critical routes
-    const isCriticalRoute = criticalRoutes.some(route => location.pathname.startsWith(route));
-    
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      if (isCriticalRoute) {
-        // Always show navigation on critical routes
-        setIsVisible(true);
-        return;
-      }
-      
-      // Set a threshold to avoid flickering due to small scroll changes
+      // Set a threshold (e.g., 10px) to avoid flickering due to small scroll changes
       if (currentScrollY > lastScrollY + 10) {
         // Scrolling down
         setIsVisible(false);
@@ -38,15 +26,12 @@ const BottomNavigation = () => {
       setLastScrollY(currentScrollY);
     };
     
-    // Make navigation visible on initial page load
-    setIsVisible(true);
-    
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [lastScrollY, location.pathname, criticalRoutes]);
+  }, [lastScrollY]);
   
   const isActive = (path: string) => {
     return location.pathname === path;
