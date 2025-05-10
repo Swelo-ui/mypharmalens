@@ -36,7 +36,7 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
-        // Save full drug details to enable proper viewing in history
+        // Ensure we store all available drug details to show in history
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
@@ -44,6 +44,27 @@ serve(async (req) => {
           details: data.details || null,
         };
         
+        // Add image_features only if the column exists in the schema and if data is provided
+        try {
+          // First attempt to check if the image_features column exists
+          const { data: columnsData, error: columnsError } = await supabaseClient
+            .from('information_schema.columns')
+            .select('column_name')
+            .eq('table_name', 'drug_identifications')
+            .eq('column_name', 'image_features');
+            
+          if (!columnsError && columnsData && columnsData.length > 0) {
+            // Column exists, we can add the image_features field
+            if (data.imageFeatures) {
+              identificationData.image_features = data.imageFeatures;
+            }
+          } else {
+            console.log('image_features column does not exist, skipping this field');
+          }
+        } catch (err) {
+          console.log('Error checking for image_features column, skipping this field:', err.message);
+        }
+          
         // Use the service role key to bypass RLS policies for insertion
         // This ensures that we can always save the identification regardless of RLS policies
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -89,23 +110,6 @@ serve(async (req) => {
           .select('*')
           .eq('user_id', data.userId)
           .order('created_at', { ascending: false });
-        break;
-        
-      case 'getDrugDetail':
-        // Get detailed drug information from history
-        if (!data.id || !data.userId) {
-          throw new Error('Missing required fields: id and userId are required');
-        }
-        
-        const serviceKeyForDetail = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-        const adminClientForDetail = createClient(supabaseUrl, serviceKeyForDetail);
-        
-        result = await adminClientForDetail
-          .from('drug_identifications')
-          .select('*')
-          .eq('id', data.id)
-          .eq('user_id', data.userId)
-          .single();
         break;
         
       default:

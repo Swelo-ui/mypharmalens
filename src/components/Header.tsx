@@ -24,9 +24,6 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
-  
-  // Logo URL
-  const logoUrl = "/lovable-uploads/02fa3a90-3ed4-453f-b79a-2f9bd40d5bbd.png";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -88,7 +85,10 @@ const Header = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-8" />
+              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-sm">PL</span>
+              </div>
+              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
             </Link>
 
             {/* Right Side Actions */}
@@ -114,7 +114,10 @@ const Header = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logoUrl} alt="PharmaLens" className="h-8" />
+              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-sm">PL</span>
+              </div>
+              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
             </Link>
 
             {/* Desktop Navigation */}
