@@ -14,7 +14,20 @@ root.render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
       <BottomNavigation />
-      <Toaster position="bottom-center" />
+      <Toaster position="bottom-center" toastOptions={{ duration: 3000 }} />
     </ThemeProvider>
   </BrowserRouter>
 );
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed: ', error);
+      });
+  });
+}

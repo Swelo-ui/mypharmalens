@@ -34,27 +34,27 @@ const Hero = () => {
     };
   }, []);
   
-  // Updated features to only include those actually implemented in PharmaLens
+  // Updated features to emphasize PWA capabilities
   const features = [
     {
       icon: <Pill className="h-6 w-6 text-pharma-600" />,
       title: 'Drug Information',
-      description: 'Access comprehensive drug data including uses, dosages, side effects, and precautions.',
+      description: 'Access comprehensive drug data including uses, dosages, side effects, and precautions instantly.',
     },
     {
       icon: <Camera className="h-6 w-6 text-pharma-600" />,
-      title: 'Visual Identification',
-      description: 'Upload an image of any medication to identify it with our AI-powered recognition system.',
+      title: 'AI-Powered Visual Identification',
+      description: 'Upload an image of any medication to identify it with our advanced AI-powered recognition system.',
     },
     {
       icon: <Search className="h-6 w-6 text-pharma-600" />,
       title: 'Smart Search',
-      description: 'Find medications by name, category, manufacturer, or conditions they treat.',
+      description: 'Find medications by name, category, manufacturer, or conditions they treat with our optimized search.',
     },
     {
       icon: <FileText className="h-6 w-6 text-pharma-600" />,
-      title: 'Educational Resources',
-      description: 'Access medication guides and educational content to better understand your prescriptions.',
+      title: 'Install & Use Offline',
+      description: 'Install PharmaLens as a mobile app on your device and access your medication history even offline.',
     },
   ];
 
@@ -68,7 +68,7 @@ const Hero = () => {
         <div className="text-center mb-12 md:mb-16 animate-fade-up">
           <div className="inline-block mb-3">
             <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800">
-              AI-Powered Drug Identification
+              Install as Mobile App
             </span>
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
@@ -76,7 +76,7 @@ const Hero = () => {
             <span className="text-pharma-600"> Any Medication</span>
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-6">
-            PharmaLens combines AI technology with comprehensive drug databases to help you identify medications and access reliable information instantly.
+            PharmaLens combines advanced AI technology with comprehensive drug databases to help you identify medications and access reliable information instantly.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

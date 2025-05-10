@@ -37,10 +37,11 @@ serve(async (req) => {
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
         // Ensure we store all available drug details to show in history
+        // But don't store image data (as requested)
         const identificationData = {
           user_id: data.userId,
           drug_name: drugName,
-          image_url: data.imageUrl || null,
+          image_url: null, // Don't store image URL as requested
           details: data.details || null,
         };
         
