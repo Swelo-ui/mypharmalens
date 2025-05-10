@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { toast } from 'sonner';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -19,7 +20,8 @@ import { Progress } from "@/components/ui/progress";
 // Helper function to extract image features for similarity comparison
 const extractImageFeatures = (base64Image: string): Promise<string> => {
   return new Promise((resolve) => {
-    // Simplified feature extraction
+    // This is a simplified feature extraction
+    // In a real implementation, this would use more advanced image processing
     const img = new Image();
     img.onload = () => {
       // Create a small thumbnail to use as a feature vector
@@ -81,6 +83,8 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user's previous identifications when component loads
@@ -159,7 +163,44 @@ const DrugIdentify = () => {
     }
   };
 
-  // Function to automatically save drug identification to the database
+  // Function to manually save drug identification to the database
+  const handleSaveToHistory = async () => {
+    try {
+      if (!identifiedDrug) return;
+      if (!isAuthenticated) {
+        toast.info("Please sign in to save to history", {
+          action: {
+            label: "Sign In",
+            onClick: () => navigate('/auth')
+          }
+        });
+        return;
+      }
+
+      setIsSaving(true);
+      const result = await saveDrugIdentification({
+        name: identifiedDrug.name,
+        drug_name: identifiedDrug.name,
+        image: identifiedDrug.image,
+        image_url: identifiedDrug.image,
+        details: identifiedDrug
+      });
+
+      if (result) {
+        toast.success("Added to your history");
+        setIsSaved(true);
+      } else {
+        toast.error("Failed to save to history");
+      }
+    } catch (error) {
+      console.error("Error saving to history:", error);
+      toast.error("Failed to save to history");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Function to save drug identification to the database
   const saveDrugIdentification = async (drugData: any) => {
     try {
       if (!isAuthenticated || !user) {
@@ -178,7 +219,7 @@ const DrugIdentify = () => {
           data: {
             userId: user.id,
             drugName: drugData.drug_name || drugData.name,
-            imageUrl: null, // Don't store image as requested
+            imageUrl: drugData.image_url || drugData.image,
             details: drugData,
             imageFeatures: imageFeatures
           }
@@ -287,6 +328,7 @@ const DrugIdentify = () => {
       setErrorDetails(null);
       setProcessingProgress(0);
       setProcessingPhase("Preparing image");
+      toast.info("Processing your image...");
       
       // Check image quality
       await checkImageQuality(file);
@@ -334,23 +376,47 @@ const DrugIdentify = () => {
               };
               
               setIdentifiedDrug(formattedDrugData);
+              setIsSaved(false);
               setProcessingProgress(100);
               
-              // Automatically save to history without showing toast
-              if (isAuthenticated && user) {
-                try {
-                  await saveDrugIdentification(formattedDrugData);
-                  console.log("Drug automatically saved to history");
-                } catch (err) {
-                  console.error("Failed to automatically save to history:", err);
+              // Customize message based on whether this was from history or new identification
+              if (drugData.fromHistory) {
+                toast.success(`Matched with previously identified ${drugData.name}!`, { 
+                  description: "Using your history helped identify this medication faster."
+                });
+              } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
+                if (drugData.confidence === 'high') {
+                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                    description: "Enhanced analysis provided high confidence results."
+                  });
+                } else if (drugData.confidence === 'medium') {
+                  toast.success(`Medication identified as ${drugData.name}`, { 
+                    description: "The identification has medium confidence. Consider the alternatives listed."
+                  });
+                } else {
+                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                    description: "Low confidence identification. Consider consulting a healthcare professional.",
+                    duration: 5000
+                  });
                 }
+              } else {
+                toast.success(`Medication successfully identified as ${drugData.name}!`);
+              }
+              
+              // Additional information about image quality if relevant
+              if (isImageLowRes || drugData.blurryModeUsed) {
+                toast.info("For better accuracy, consider uploading a higher quality image.", { 
+                  duration: 5000 
+                });
               }
             } else {
               setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
+              toast.error("Could not identify the medication. Please try again with a clearer image.");
             }
           } catch (error: any) {
             console.error('Error processing image:', error);
             setErrorDetails(`Error: ${error.message || "Unknown error"}`);
+            toast.error("Failed to process the image. Please try another image.");
           } finally {
             setIsIdentifying(false);
           }
@@ -358,6 +424,7 @@ const DrugIdentify = () => {
       };
       
       reader.onerror = () => {
+        toast.error("Failed to read the image file. Please try another image.");
         setIsIdentifying(false);
       };
       
@@ -366,6 +433,7 @@ const DrugIdentify = () => {
     } catch (error: any) {
       console.error("Error identifying medication:", error);
       setErrorDetails(`Unexpected Error: ${error.message || "Unknown error"}`);
+      toast.error("An unexpected error occurred. Please try again.");
       setIsIdentifying(false);
     }
   };
@@ -377,12 +445,14 @@ const DrugIdentify = () => {
     setIsImageLowRes(false);
     setProcessingProgress(0);
     setProcessingPhase("");
+    setIsSaved(false);
   };
 
   // Function for manual search as fallback
   const handleManualSearch = () => {
     // For now, we'll just reset the state and let the user try again
     handleRetry();
+    toast.info("Please try uploading a clearer image or a different angle");
   };
 
   return (
@@ -564,12 +634,40 @@ const DrugIdentify = () => {
             <div className="flex justify-between items-center flex-wrap gap-3">
               <h2 className="text-2xl font-semibold">Identification Result</h2>
               <div className="flex gap-3">
+                {isAuthenticated && !isSaved && (
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleSaveToHistory}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="h-4 w-4" />
+                        <span>Save to History</span>
+                      </>
+                    )}
+                  </Button>
+                )}
                 <Button variant="outline" onClick={handleRetry}>
                   Identify Another
                 </Button>
               </div>
             </div>
-            <DrugDetails drug={identifiedDrug} showFullDetails={true} />
+            {isSaved && (
+              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <BookmarkPlus className="h-4 w-4" />
+                  <span>Saved to your identification history</span>
+                </div>
+              </Alert>
+            )}
+            <DrugDetails drug={identifiedDrug} />
           </div>
         )}
       </div>

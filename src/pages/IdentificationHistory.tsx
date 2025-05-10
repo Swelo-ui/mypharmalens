@@ -6,6 +6,7 @@ import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
+import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -207,6 +208,42 @@ const IdentificationHistory = () => {
     }
   };
 
+  const handleCardClick = (id: string) => {
+    const record = history.find(item => item.id === id);
+    console.log("Clicked record:", record);
+    
+    if (record && record.details) {
+      const drugId = extractDrugId(record.details);
+      
+      if (drugId) {
+        navigate(`/drug/${drugId}`);
+      } else {
+        toast({
+          title: "Information unavailable",
+          description: "Detailed information for this medication is not available",
+          type: "info"
+        });
+      }
+    }
+  };
+  
+  const extractDrugId = (details: any): string | null => {
+    if (!details) return null;
+    
+    if (details.id) return details.id;
+    
+    if (typeof details === 'string') {
+      try {
+        const parsedDetails = JSON.parse(details);
+        if (parsedDetails.id) return parsedDetails.id;
+      } catch (e) {
+        console.error("Error parsing details:", e);
+      }
+    }
+    
+    return null;
+  };
+
   const refreshHistory = () => {
     if (isAuthenticated && user) {
       fetchIdentificationHistory(true); // Force refresh
@@ -216,7 +253,7 @@ const IdentificationHistory = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-28">
+      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">Identification History</h1>
@@ -244,8 +281,8 @@ const IdentificationHistory = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-6">
-            {[1, 2, 3].map((item) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
               <div key={item} className="p-6 border rounded-xl">
                 <Skeleton className="h-8 w-3/4 mb-2" />
                 <Skeleton className="h-4 w-1/2 mb-4" />
@@ -255,100 +292,42 @@ const IdentificationHistory = () => {
             ))}
           </div>
         ) : filteredHistory.length > 0 ? (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map((item) => (
-              <div key={item.id} className="relative group bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
-                {/* Header with name, date and delete button */}
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold">{item.drug_name || "Unknown Medication"}</h2>
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {format(new Date(item.created_at), 'MMM d, yyyy')}
-                    </div>
+              <div key={item.id} className="relative group">
+                <div 
+                  className="cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => handleCardClick(item.id)}
+                >
+                  <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
-                  <Button 
-                    variant="destructive"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleDeleteRecord(item.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <DrugCard
+                    drug={{
+                      id: extractDrugId(item.details) || item.id,
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                      verified: item.details?.verified || false,
+                      image: item.image_url || item.details?.image || "",
+                    }}
+                  />
                 </div>
-
-                {/* Drug information directly displayed */}
-                {item.details && (
-                  <div className="mt-4 space-y-4">
-                    {/* Generic name if available */}
-                    {(item.details.genericName || item.details.generic_name) && (
-                      <div>
-                        <span className="font-medium text-sm">Generic Name:</span>
-                        <p className="text-gray-700 dark:text-gray-300">{item.details.genericName || item.details.generic_name}</p>
-                      </div>
-                    )}
-                    
-                    {/* Manufacturer */}
-                    {item.details.manufacturer && (
-                      <div>
-                        <span className="font-medium text-sm">Manufacturer:</span>
-                        <p className="text-gray-700 dark:text-gray-300">{item.details.manufacturer}</p>
-                      </div>
-                    )}
-                    
-                    {/* Category and drug class */}
-                    <div className="flex flex-wrap gap-2">
-                      {item.details.category && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
-                          {item.details.category}
-                        </span>
-                      )}
-                      
-                      {(item.details.drugClass || item.details.drug_class) && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300">
-                          {item.details.drugClass || item.details.drug_class}
-                        </span>
-                      )}
-                      
-                      {item.details.prescriptionStatus && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 border border-pharma-200 dark:border-pharma-800 text-pharma-700 dark:text-pharma-300">
-                          {item.details.prescriptionStatus}
-                        </span>
-                      )}
-                    </div>
-                    
-                    {/* Description */}
-                    {item.details.description && (
-                      <div>
-                        <span className="font-medium text-sm">Description:</span>
-                        <p className="text-gray-700 dark:text-gray-300 text-sm">{item.details.description}</p>
-                      </div>
-                    )}
-                    
-                    {/* Uses/Indications */}
-                    {item.details.indications && item.details.indications.length > 0 && (
-                      <div>
-                        <span className="font-medium text-sm">Uses:</span>
-                        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 pl-2">
-                          {item.details.indications.slice(0, 3).map((indication: string, idx: number) => (
-                            <li key={idx}>{indication}</li>
-                          ))}
-                          {item.details.indications.length > 3 && <li>...</li>}
-                        </ul>
-                      </div>
-                    )}
-
-                    <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700">
-                      <Button 
-                        variant="link" 
-                        className="p-0 h-auto text-pharma-600"
-                        onClick={() => navigate(`/drug/${item.details.id}`)}
-                      >
-                        View complete details
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                <Button 
+                  variant="destructive"
+                  size="icon"
+                  className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteRecord(item.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
           </div>
