@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ImageUploadProps {
@@ -15,7 +16,6 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageQualityWarning, setImageQualityWarning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
   
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -50,7 +50,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     // Check if file is an image
     if (!file.type.match('image.*')) {
       toast({
-        message: "Invalid file type",
+        title: "Invalid file type",
         description: "Please upload an image file (JPEG, PNG, etc.)"
       });
       return;
@@ -60,7 +60,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
     if (file.size < 50 * 1024) {
       setImageQualityWarning(true);
       toast({
-        message: "Low quality image",
+        title: "Low quality image",
         description: "This image may be too small for accurate identification. Consider using a higher resolution image."
       });
     } else {
