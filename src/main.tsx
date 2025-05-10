@@ -4,7 +4,6 @@ import App from './App.tsx'
 import './index.css'
 import { ThemeProvider } from 'next-themes'
 import { BrowserRouter } from 'react-router-dom'
-import { Toaster } from '@/components/ui/toaster'
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -12,7 +11,6 @@ root.render(
   <BrowserRouter>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
-      <Toaster />
     </ThemeProvider>
   </BrowserRouter>
 );
