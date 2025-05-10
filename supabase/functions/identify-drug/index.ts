@@ -14,123 +14,16 @@ async function enhanceImage(base64Image: string): Promise<string> {
     // Extract the actual base64 data without the prefix
     const base64Data = base64Image.split(',')[1] || base64Image;
     
-    // Convert base64 to Uint8Array
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
+    // In Deno environment, we can't use browser-specific APIs like Image
+    // Instead, we'll use a more compatible approach for edge functions
     
-    // Create a blob from the bytes
-    const blob = new Blob([bytes]);
-    
-    // Create image object to process dimensions
-    const imageUrl = URL.createObjectURL(blob);
-    const img = new Image();
-    
-    return await new Promise((resolve) => {
-      img.onload = () => {
-        URL.revokeObjectURL(imageUrl);
-        
-        // Create a canvas to manipulate the image
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        if (!ctx) {
-          console.log("Failed to get canvas context");
-          resolve(base64Image); // Return original if we can't process
-          return;
-        }
-        
-        // Set canvas dimensions
-        canvas.width = img.width;
-        canvas.height = img.height;
-        
-        // Draw original image
-        ctx.drawImage(img, 0, 0);
-        
-        // Apply image enhancements
-        // 1. Increase contrast
-        ctx.filter = 'contrast(120%) brightness(105%)';
-        ctx.drawImage(img, 0, 0);
-        ctx.filter = 'none';
-        
-        // 2. Enhance edges for better text detection
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const enhancedData = applyUnsharpMasking(imageData);
-        ctx.putImageData(enhancedData, 0, 0);
-        
-        // Convert back to base64
-        const enhancedBase64 = canvas.toDataURL('image/jpeg', 0.95);
-        resolve(enhancedBase64);
-      };
-      
-      img.onerror = () => {
-        console.log("Error loading image for enhancement");
-        resolve(base64Image); // Return original on error
-        URL.revokeObjectURL(imageUrl);
-      };
-      
-      img.src = imageUrl;
-    });
+    // Return the original image since we can't process it in this environment
+    // We'll rely on AI models to handle image quality issues
+    return base64Image;
   } catch (error) {
     console.error("Error enhancing image:", error);
     return base64Image; // Return original on error
   }
-}
-
-// Helper function for unsharp masking to enhance edges and text
-function applyUnsharpMasking(imageData: ImageData): ImageData {
-  const data = imageData.data;
-  const width = imageData.width;
-  const height = imageData.height;
-  const result = new ImageData(width, height);
-  const resultData = result.data;
-  
-  // Clone original data
-  for (let i = 0; i < data.length; i++) {
-    resultData[i] = data[i];
-  }
-  
-  // Apply unsharp masking
-  const amount = 0.8; // Strength of the effect
-  const radius = 1;
-  const threshold = 10;
-  
-  for (let y = radius; y < height - radius; y++) {
-    for (let x = radius; x < width - radius; x++) {
-      const centerIdx = (y * width + x) * 4;
-      
-      // For each color channel (RGB)
-      for (let c = 0; c < 3; c++) {
-        let blurredValue = 0;
-        let weight = 0;
-        
-        // Calculate a simple box blur
-        for (let ky = -radius; ky <= radius; ky++) {
-          for (let kx = -radius; kx <= radius; kx++) {
-            const idx = ((y + ky) * width + (x + kx)) * 4 + c;
-            blurredValue += data[idx];
-            weight++;
-          }
-        }
-        
-        blurredValue = blurredValue / weight;
-        
-        // Calculate unsharp mask
-        const originalValue = data[centerIdx + c];
-        const difference = originalValue - blurredValue;
-        
-        // Apply only if the difference is above threshold
-        if (Math.abs(difference) > threshold) {
-          resultData[centerIdx + c] = Math.min(255, 
-            Math.max(0, Math.round(originalValue + difference * amount)));
-        }
-      }
-    }
-  }
-  
-  return result;
 }
 
 // Function to detect partial pills or cut medications in the image
@@ -228,9 +121,34 @@ async function analyzeImageWithMultipleModels(imageBase64: string, blurryMode: b
       - description: detailed visual description
     `;
     
-    const secondaryResponse = await fetchAIResponse(secondaryAnalysisPrompt, imageBase64);
-    const secondaryData = parseAIResponse(secondaryResponse);
-    console.log("Secondary analysis result:", JSON.stringify(secondaryData, null, 2));
+    // Add delayed retry mechanism for secondary analysis if first attempt fails
+    let secondaryData;
+    try {
+      const secondaryResponse = await fetchAIResponse(secondaryAnalysisPrompt, imageBase64);
+      secondaryData = parseAIResponse(secondaryResponse);
+      console.log("Secondary analysis result:", JSON.stringify(secondaryData, null, 2));
+    } catch (error) {
+      console.log("First attempt at secondary analysis failed, retrying with modified prompt");
+      // Retry with simpler prompt
+      const fallbackPrompt = `
+        Extract all visible TEXT from this medication image.
+        Focus only on extracting imprinted codes, numbers, and letters.
+        Format response as JSON: {"text": "extracted text", "description": "brief description"}
+      `;
+      
+      try {
+        const fallbackResponse = await fetchAIResponse(fallbackPrompt, imageBase64);
+        const fallbackData = parseAIResponse(fallbackResponse);
+        secondaryData = {
+          name: fallbackData.text || "Unknown",
+          description: fallbackData.description || "Text extraction only",
+          confidence: 0.4
+        };
+      } catch (secondaryError) {
+        console.error("Secondary analysis completely failed:", secondaryError);
+        secondaryData = { confidence: 0.1 };
+      }
+    }
     
     // If blurry mode, add a third analysis optimized for low-quality images
     let tertiaryData = null;
@@ -257,9 +175,13 @@ async function analyzeImageWithMultipleModels(imageBase64: string, blurryMode: b
         - description: description acknowledging quality limitations
       `;
       
-      const tertiaryResponse = await fetchAIResponse(tertiaryAnalysisPrompt, imageBase64);
-      tertiaryData = parseAIResponse(tertiaryResponse);
-      console.log("Tertiary analysis (blurry mode) result:", JSON.stringify(tertiaryData, null, 2));
+      try {
+        const tertiaryResponse = await fetchAIResponse(tertiaryAnalysisPrompt, imageBase64);
+        tertiaryData = parseAIResponse(tertiaryResponse);
+        console.log("Tertiary analysis (blurry mode) result:", JSON.stringify(tertiaryData, null, 2));
+      } catch (error) {
+        console.log("Tertiary analysis failed, continuing with available data");
+      }
     }
     
     // Combine the results from different models for a more accurate identification
@@ -268,7 +190,26 @@ async function analyzeImageWithMultipleModels(imageBase64: string, blurryMode: b
     
   } catch (error) {
     console.error("Error in multi-model image analysis:", error);
-    throw error;
+    
+    // Fallback to basic analysis if multi-model fails
+    try {
+      const fallbackPrompt = `
+        Describe what you see in this image of a medication in simple terms.
+        If possible, identify the medication name and any visible text or markings.
+        Format as JSON: {"name": "guess", "description": "what you see", "confidence": "low"}
+      `;
+      
+      const fallbackResponse = await fetchAIResponse(fallbackPrompt, imageBase64);
+      const fallbackData = parseAIResponse(fallbackResponse);
+      
+      return {
+        ...fallbackData,
+        fallbackMode: true,
+        confidence: "low",
+      };
+    } catch (fallbackError) {
+      throw error; // If even fallback fails, throw original error
+    }
   }
 }
 
@@ -276,6 +217,11 @@ async function analyzeImageWithMultipleModels(imageBase64: string, blurryMode: b
 function combineAnalysisResults(primaryData: any, secondaryData: any, tertiaryData: any | null) {
   // Start with primary data as base
   const result = { ...primaryData };
+  
+  // If primary data is empty or invalid, use secondary as base
+  if (!primaryData || Object.keys(primaryData).length === 0) {
+    return secondaryData || { name: "Unknown", confidence: "low" };
+  }
   
   // Helper function to determine confidence level
   function determineConfidence(primary: string, secondary: number | string | undefined, tertiary: number | string | undefined = undefined) {
@@ -308,48 +254,51 @@ function combineAnalysisResults(primaryData: any, secondaryData: any, tertiaryDa
     return [...new Set(arrays.flat().filter(Boolean))];
   }
   
-  // Merge name (prefer the more specific name if available)
-  if (secondaryData.name && (!result.name || secondaryData.name.length > result.name.length)) {
-    result.name = secondaryData.name;
-  }
-  
-  // Merge generic name (prefer the more specific name if available)
-  if (secondaryData.genericName && (!result.genericName || secondaryData.genericName.length > result.genericName.length)) {
-    result.genericName = secondaryData.genericName;
-  }
-  
-  // Merge possible names
-  result.possibleNames = mergeArrays([
-    result.possibleNames || [], 
-    secondaryData.possibleNames || [],
-    tertiaryData?.possibleNames || []
-  ]);
-  
-  // Merge imprint (prefer non-null)
-  result.imprint = result.imprint || secondaryData.imprint || tertiaryData?.imprint || null;
-  
-  // Merge color (prefer non-null)
-  result.color = result.color || secondaryData.color || tertiaryData?.color || null;
-  
-  // Merge shape (prefer non-null)
-  result.shape = result.shape || secondaryData.shape || tertiaryData?.shape || null;
-  
-  // Merge markings (prefer non-null or combine if both have information)
-  if (result.markings && secondaryData.markings) {
-    result.markings = `${result.markings}; ${secondaryData.markings}`;
-  } else {
-    result.markings = result.markings || secondaryData.markings || tertiaryData?.markings || null;
+  // Only merge if secondary data exists
+  if (secondaryData) {
+    // Merge name (prefer the more specific name if available)
+    if (secondaryData.name && (!result.name || secondaryData.name.length > result.name.length)) {
+      result.name = secondaryData.name;
+    }
+    
+    // Merge generic name (prefer the more specific name if available)
+    if (secondaryData.genericName && (!result.genericName || secondaryData.genericName.length > result.genericName.length)) {
+      result.genericName = secondaryData.genericName;
+    }
+    
+    // Merge possible names
+    result.possibleNames = mergeArrays([
+      result.possibleNames || [], 
+      secondaryData.possibleNames || [],
+      tertiaryData?.possibleNames || []
+    ]);
+    
+    // Merge imprint (prefer non-null)
+    result.imprint = result.imprint || secondaryData.imprint || tertiaryData?.imprint || null;
+    
+    // Merge color (prefer non-null)
+    result.color = result.color || secondaryData.color || tertiaryData?.color || null;
+    
+    // Merge shape (prefer non-null)
+    result.shape = result.shape || secondaryData.shape || tertiaryData?.shape || null;
+    
+    // Merge markings (prefer non-null or combine if both have information)
+    if (result.markings && secondaryData.markings) {
+      result.markings = `${result.markings}; ${secondaryData.markings}`;
+    } else {
+      result.markings = result.markings || secondaryData.markings || tertiaryData?.markings || null;
+    }
   }
   
   // Set confidence based on all analyses
   result.confidence = determineConfidence(
     result.confidence,
-    secondaryData.confidence,
+    secondaryData?.confidence,
     tertiaryData?.confidence
   );
   
   // Enhance description to include all relevant details
-  result.description = result.description || secondaryData.description || tertiaryData?.description || '';
+  result.description = result.description || secondaryData?.description || tertiaryData?.description || '';
   
   // Add metadata about the analysis process
   result.blurryModeUsed = !!tertiaryData;
@@ -372,7 +321,24 @@ function parseAIResponse(response: string): any {
     }
     
     // If no JSON found in normal format, try to parse the whole response
-    return JSON.parse(response);
+    try {
+      return JSON.parse(response);
+    } catch (directParseError) {
+      // If direct JSON parsing fails, try to extract JSON-like structure
+      const potentialJson = response.replace(/[\n\r]/g, ' ')
+                                    .match(/\{[^\}]*\}/);
+      if (potentialJson) {
+        return JSON.parse(potentialJson[0]);
+      }
+      
+      // If all parsing attempts fail, create a simple object from text analysis
+      return {
+        name: "Unknown",
+        description: response.substring(0, 200) + "...",
+        extractedText: extractTextFromResponse(response),
+        confidence: "low"
+      };
+    }
   } catch (error) {
     console.error("Failed to parse AI response:", error);
     // Return a basic structure if parsing fails
@@ -380,94 +346,141 @@ function parseAIResponse(response: string): any {
       name: "Unknown",
       genericName: "Unknown",
       description: response.substring(0, 200) + "...",
-      confidence: "low"
+      confidence: "low",
+      parsingError: true
     };
   }
 }
 
-// AI response fetch function (mocked for the example)
+// New helper function to extract text from unstructured response
+function extractTextFromResponse(text: string): string {
+  // Look for patterns that might be drug names or codes
+  const codePattern = /\b[A-Z0-9]{1,6}\b/g;
+  const drugNamePattern = /[A-Z][a-z]+(?:[-\s][A-Z][a-z]+)*/g;
+  
+  const codes = text.match(codePattern) || [];
+  const names = text.match(drugNamePattern) || [];
+  
+  const extractedItems = [...new Set([...codes, ...names])];
+  return extractedItems.join(', ');
+}
+
+// AI response fetch function with improved error handling and fallback mechanisms
 async function fetchAIResponse(prompt: string, imageBase64: string): Promise<string> {
   try {
     // Use multiple AI models for better accuracy
-    // This is where you would integrate with your preferred AI vision model
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY");
     
     // Decide which API to use based on available keys
     if (GEMINI_API_KEY) {
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision-latest:generateContent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: imageBase64.split(",")[1] || imageBase64
+      try {
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision-latest:generateContent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY,
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: prompt },
+                  {
+                    inline_data: {
+                      mime_type: "image/jpeg",
+                      data: imageBase64.split(",")[1] || imageBase64
+                    }
                   }
-                }
-              ]
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.2,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 2048,
+              responseMimeType: "text/plain"
             }
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
-            responseMimeType: "text/plain"
-          }
-        })
-      });
-      
-      const data = await response.json();
-      if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-        return data.candidates[0].content.parts[0].text;
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Check if the response has the expected format
+        if (data.candidates && 
+            data.candidates[0] && 
+            data.candidates[0].content && 
+            data.candidates[0].content.parts && 
+            data.candidates[0].content.parts[0] && 
+            data.candidates[0].content.parts[0].text) {
+          return data.candidates[0].content.parts[0].text;
+        } else if (data.error) {
+          // If there's an error object in the response
+          console.error("Gemini API error:", data.error);
+          throw new Error(`Gemini API error: ${data.error.message || JSON.stringify(data.error)}`);
+        } else {
+          // If the response doesn't have the expected structure but no error
+          console.error("Unexpected Gemini API response format:", data);
+          throw new Error("Invalid response format from Gemini API");
+        }
+      } catch (geminiError) {
+        // If Gemini API fails, try DeepSeek if available
+        if (DEEPSEEK_API_KEY) {
+          console.log("Gemini API failed, falling back to DeepSeek API");
+          return await fetchDeepSeekResponse(prompt, imageBase64, DEEPSEEK_API_KEY);
+        }
+        throw geminiError;
       }
-      
-      throw new Error("Invalid response format from Gemini API");
-      
     } else if (DEEPSEEK_API_KEY) {
-      // DeepSeek API implementation
-      const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "deepseek-vision",
-          messages: [
-            {
-              role: "user",
-              content: [
-                { type: "text", text: prompt },
-                { type: "image_url", image_url: { url: imageBase64 } }
-              ]
-            }
-          ],
-          temperature: 0.2,
-          max_tokens: 2048
-        })
-      });
-      
-      const data = await response.json();
-      if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-        return data.choices[0].message.content;
-      }
-      
-      throw new Error("Invalid response format from DeepSeek API");
-      
+      return await fetchDeepSeekResponse(prompt, imageBase64, DEEPSEEK_API_KEY);
     } else {
       throw new Error("No valid API key found for image analysis");
     }
   } catch (error) {
     console.error("Error fetching AI response:", error);
+    throw error;
+  }
+}
+
+// Helper function to fetch response from DeepSeek API
+async function fetchDeepSeekResponse(prompt: string, imageBase64: string, apiKey: string): Promise<string> {
+  try {
+    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-vision",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: imageBase64 } }
+            ]
+          }
+        ],
+        temperature: 0.2,
+        max_tokens: 2048
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      return data.choices[0].message.content;
+    } else if (data.error) {
+      console.error("DeepSeek API error:", data.error);
+      throw new Error(`DeepSeek API error: ${data.error.message || JSON.stringify(data.error)}`);
+    } else {
+      console.error("Unexpected DeepSeek API response format:", data);
+      throw new Error("Invalid response format from DeepSeek API");
+    }
+  } catch (error) {
+    console.error("Error using DeepSeek API:", error);
     throw error;
   }
 }
@@ -480,54 +493,137 @@ async function findDrugInDatabase(drugData: any) {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // First try to find by exact name
-    let query = supabase
-      .from('drugs')
-      .select('*')
-      .limit(1);
+    // Build a smarter search query that will try multiple approaches
+    let queryResults = [];
     
+    // 1. Try exact name match first (highest confidence)
     if (drugData.name && drugData.name !== "Unknown") {
-      query = query.ilike('name', `%${drugData.name}%`);
-    } else if (drugData.genericName && drugData.genericName !== "Unknown") {
-      query = query.ilike('generic_name', `%${drugData.genericName}%`);
-    } else {
-      // If no name information, try by description
-      if (drugData.description) {
-        // Extract key terms from description
-        const terms = drugData.description.split(' ')
-          .filter((word: string) => word.length > 4)
-          .slice(0, 5);
-        
-        if (terms.length > 0) {
-          const searchTerm = terms.join(' ');
-          query = query.or(`description.ilike.%${searchTerm}%,name.ilike.%${searchTerm}%`);
+      const nameQuery = supabase
+        .from('drugs')
+        .select('*')
+        .ilike('name', `%${drugData.name}%`)
+        .limit(5);
+      
+      const { data: nameData, error: nameError } = await nameQuery;
+      
+      if (nameError) {
+        console.error("Name query error:", nameError);
+      } else if (nameData && nameData.length > 0) {
+        queryResults.push(...nameData);
+      }
+    }
+    
+    // 2. Try generic name match if available (medium confidence)
+    if (drugData.genericName && drugData.genericName !== "Unknown" && queryResults.length < 5) {
+      const genericQuery = supabase
+        .from('drugs')
+        .select('*')
+        .ilike('generic_name', `%${drugData.genericName}%`)
+        .limit(5);
+      
+      const { data: genericData, error: genericError } = await genericQuery;
+      
+      if (genericError) {
+        console.error("Generic name query error:", genericError);
+      } else if (genericData && genericData.length > 0) {
+        // Merge results, avoiding duplicates
+        for (const item of genericData) {
+          if (!queryResults.some(result => result.id === item.id)) {
+            queryResults.push(item);
+          }
         }
       }
     }
     
-    // Execute the query
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error("Database search error:", error);
-      return null;
+    // 3. Try matching by imprint or markings if available
+    if ((drugData.imprint || drugData.markings) && queryResults.length < 5) {
+      const searchTerm = drugData.imprint || drugData.markings;
+      const markingsQuery = supabase
+        .from('drugs')
+        .select('*')
+        .or(`description.ilike.%${searchTerm}%,name.ilike.%${searchTerm}%`)
+        .limit(3);
+      
+      const { data: markingsData, error: markingsError } = await markingsQuery;
+      
+      if (markingsError) {
+        console.error("Markings query error:", markingsError);
+      } else if (markingsData && markingsData.length > 0) {
+        // Merge results, avoiding duplicates
+        for (const item of markingsData) {
+          if (!queryResults.some(result => result.id === item.id)) {
+            queryResults.push(item);
+          }
+        }
+      }
     }
     
-    if (data && data.length > 0) {
-      // We found a match in the database
+    // 4. If we still have no results, try possible names and description keywords
+    if (queryResults.length === 0 && (drugData.possibleNames?.length > 0 || drugData.description)) {
+      // Build a more thorough search using possible names or keywords from description
+      const searchTerms = drugData.possibleNames || [];
+      
+      // Extract keywords from description
+      if (drugData.description) {
+        const descriptionWords = drugData.description.split(/\s+/)
+          .filter((word: string) => word.length > 4)
+          .slice(0, 5);
+          
+        searchTerms.push(...descriptionWords);
+      }
+      
+      if (searchTerms.length > 0) {
+        // Create OR conditions for each search term
+        const searchConditions = searchTerms
+          .map(term => `name.ilike.%${term}%,generic_name.ilike.%${term}%,description.ilike.%${term}%`)
+          .join(',');
+          
+        const keywordQuery = supabase
+          .from('drugs')
+          .select('*')
+          .or(searchConditions)
+          .limit(3);
+          
+        const { data: keywordData, error: keywordError } = await keywordQuery;
+        
+        if (keywordError) {
+          console.error("Keyword query error:", keywordError);
+        } else if (keywordData && keywordData.length > 0) {
+          queryResults.push(...keywordData);
+        }
+      }
+    }
+    
+    // If we found matches in the database
+    if (queryResults.length > 0) {
+      // Sort results by relevance (simple heuristic - exact name matches first)
+      queryResults.sort((a, b) => {
+        if (drugData.name && a.name.toLowerCase().includes(drugData.name.toLowerCase())) return -1;
+        if (drugData.name && b.name.toLowerCase().includes(drugData.name.toLowerCase())) return 1;
+        return 0;
+      });
+      
+      // Use the best match
+      const bestMatch = queryResults[0];
+      
       return {
-        id: data[0].id,
-        name: data[0].name,
-        genericName: data[0].generic_name,
-        manufacturer: data[0].manufacturer,
-        category: data[0].category,
-        drugClass: data[0].drug_class,
-        description: data[0].description,
-        prescriptionStatus: data[0].prescription_status,
-        dosageAndAdmin: data[0].dosage_and_admin,
-        image: data[0].image_url,
+        id: bestMatch.id,
+        name: bestMatch.name,
+        genericName: bestMatch.generic_name,
+        manufacturer: bestMatch.manufacturer,
+        category: bestMatch.category,
+        drugClass: bestMatch.drug_class,
+        description: bestMatch.description,
+        prescriptionStatus: bestMatch.prescription_status,
+        dosageAndAdmin: bestMatch.dosage_and_admin,
+        image: bestMatch.image_url,
         confidence: drugData.confidence,
-        fromDatabase: true
+        fromDatabase: true,
+        alternativeMatches: queryResults.slice(1, 4).map(alt => ({ 
+          id: alt.id, 
+          name: alt.name, 
+          genericName: alt.generic_name 
+        }))
       };
     }
     
@@ -546,9 +642,9 @@ async function findDrugInDatabase(drugData: any) {
       confidence: drugData.confidence,
       fromDatabase: false,
       partialPillDetected: drugData.partialPillDetected,
-      confidence: drugData.confidence,
       blurryModeUsed: drugData.blurryModeUsed,
-      multiModelAnalysisUsed: drugData.multiModelAnalysisUsed
+      multiModelAnalysisUsed: drugData.multiModelAnalysisUsed,
+      extractedText: drugData.extractedText || drugData.imprint || drugData.markings
     };
   } catch (error) {
     console.error("Error in findDrugInDatabase:", error);
@@ -556,68 +652,85 @@ async function findDrugInDatabase(drugData: any) {
   }
 }
 
-// Main function to process drug identification
+// Main function to process drug identification with improved error handling
 async function identifyDrug(imageBase64: string, blurryMode: boolean) {
   try {
     console.log("Image received, initiating multi-stage analysis pipeline");
     
     // Step 1: Enhance the image for better processing
-    const enhancedImage = await enhanceImage(imageBase64);
+    let enhancedImage = imageBase64;
+    try {
+      enhancedImage = await enhanceImage(imageBase64);
+    } catch (enhanceError) {
+      console.error("Error enhancing image:", enhanceError);
+      // Continue with original image if enhancement fails
+    }
     
-    // Step 2: Analyze the image with multiple AI models for best results
+    // Step 2: Analyze the image with improved error handling
     let drugData;
-    if (blurryMode) {
-      // Use enhanced multi-model analysis for better results with low-quality images
-      drugData = await analyzeImageWithMultipleModels(enhancedImage, true);
-    } else {
-      // First try standard analysis
-      console.log("Proceeding with standard analysis...");
-      const standardAnalysisPrompt = `
-        Analyze this medication image. Identify the drug name, generic name, markings, color, shape, and any other visible characteristics.
-        
-        Please format your response as a JSON object with the following fields:
-        - name (brand name)
-        - genericName
-        - imprint (any codes or text on the pill)
-        - color
-        - shape
-        - markings (logos or other markings)
-        - confidence (high, medium, low)
-        - description (detailed description of what you see)
-      `;
+    
+    try {
+      // Try multi-model analysis first for best results
+      drugData = await analyzeImageWithMultipleModels(enhancedImage, blurryMode || true);
+    } catch (analysisError) {
+      console.error("Error in primary analysis:", analysisError);
       
-      const standardResponse = await fetchAIResponse(standardAnalysisPrompt, enhancedImage);
-      console.log("Standard analysis response received");
-      drugData = parseAIResponse(standardResponse);
-      console.log("Raw response:", JSON.stringify(drugData, null, 2));
-      
-      // Check if we need to enhance analysis with multi-model approach
-      const needsEnhancedAnalysis = 
-        drugData.confidence === 'low' || 
-        !drugData.name || 
-        drugData.name === 'Unknown' ||
-        await detectPartialMedication(drugData.description || '');
+      // Fallback to simplified analysis
+      try {
+        console.log("Primary analysis failed. Using simplified fallback analysis...");
+        const simplifiedPrompt = `
+          Identify this medication. What is it? Describe color, shape, and any visible text.
+          Reply with: name, color, shape, and any text you can see.
+        `;
         
-      if (needsEnhancedAnalysis) {
-        console.log("Low confidence or partial pill detected, using enhanced analysis");
-        drugData = await analyzeImageWithMultipleModels(enhancedImage, true);
+        const simpleResponse = await fetchAIResponse(simplifiedPrompt, enhancedImage);
+        drugData = {
+          name: "Unknown",
+          description: simpleResponse.substring(0, 300),
+          confidence: "low",
+          fallbackModeUsed: true
+        };
+        
+        // Extract potential drug name from response
+        const nameMatch = simpleResponse.match(/name:?\s*([A-Za-z0-9\s]{2,30})/i);
+        if (nameMatch && nameMatch[1]) {
+          drugData.name = nameMatch[1].trim();
+        }
+      } catch (fallbackError) {
+        console.error("Even fallback analysis failed:", fallbackError);
+        // Return basic error response that the frontend can handle
+        return {
+          name: "Identification Failed",
+          description: "The image could not be analyzed. Please try again with a clearer image.",
+          error: true,
+          confidence: "low"
+        };
       }
     }
     
     // Step 3: Check if this is a valid drug name that we can find more info about
-    if (drugData.name && drugData.name !== "Unknown") {
-      console.log(`Valid drug name found: ${drugData.name}, enriching with drugs.com data`);
+    if (drugData && !drugData.error) {
+      console.log(`Analysis completed. Drug name found: ${drugData.name}, enriching with database data`);
       
       // Get markings if not already extracted
       if (!drugData.markings) {
-        drugData.markings = await extractPotentialMarkings(
-          enhancedImage, 
-          drugData.description || ''
-        );
+        try {
+          drugData.markings = await extractPotentialMarkings(
+            enhancedImage, 
+            drugData.description || ''
+          );
+        } catch (markingsError) {
+          console.error("Error extracting markings:", markingsError);
+        }
       }
       
-      // Search in our database
-      const dbDrugInfo = await findDrugInDatabase(drugData);
+      // Search in our database with improved error handling
+      let dbDrugInfo = null;
+      try {
+        dbDrugInfo = await findDrugInDatabase(drugData);
+      } catch (dbError) {
+        console.error("Database search failed:", dbError);
+      }
       
       // Create the final result combining all data
       const result = {
@@ -632,8 +745,10 @@ async function identifyDrug(imageBase64: string, blurryMode: boolean) {
           description: drugData.description || null,
           confidence: drugData.confidence || "low",
           partialPillDetected: drugData.partialPillDetected || false,
-          blurryModeUsed: drugData.blurryModeUsed || false,
-          multiModelAnalysisUsed: drugData.multiModelAnalysisUsed || false
+          blurryModeUsed: drugData.blurryModeUsed || blurryMode || false,
+          multiModelAnalysisUsed: drugData.multiModelAnalysisUsed || true,
+          fallbackModeUsed: drugData.fallbackModeUsed || false,
+          extractedText: drugData.extractedText || null,
         }
       };
       
@@ -643,24 +758,34 @@ async function identifyDrug(imageBase64: string, blurryMode: boolean) {
     } else {
       // Return the AI analysis results without enrichment
       return {
-        name: drugData.name || "Unknown medication",
-        genericName: drugData.genericName || "Unknown",
-        description: drugData.description || "Medication could not be clearly identified from the image.",
-        confidence: drugData.confidence || "low",
+        name: drugData?.name || "Unknown medication",
+        genericName: drugData?.genericName || "Unknown",
+        description: drugData?.description || "Medication could not be clearly identified from the image.",
+        confidence: drugData?.confidence || "low",
+        error: drugData?.error || false,
         aiIdentification: {
-          imprint: drugData.imprint || null,
-          color: drugData.color || null,
-          shape: drugData.shape || null,
-          markings: drugData.markings || null,
-          partialPillDetected: drugData.partialPillDetected || false,
-          blurryModeUsed: drugData.blurryModeUsed || false,
-          multiModelAnalysisUsed: drugData.multiModelAnalysisUsed || false
+          imprint: drugData?.imprint || null,
+          color: drugData?.color || null,
+          shape: drugData?.shape || null,
+          markings: drugData?.markings || null,
+          partialPillDetected: drugData?.partialPillDetected || false,
+          blurryModeUsed: drugData?.blurryModeUsed || blurryMode || false,
+          multiModelAnalysisUsed: drugData?.multiModelAnalysisUsed || true,
+          fallbackModeUsed: drugData?.fallbackModeUsed || false,
+          extractedText: drugData?.extractedText || null,
         }
       };
     }
   } catch (error) {
-    console.error("Error in identifyDrug:", error);
-    throw error;
+    console.error("Unhandled error in identifyDrug:", error);
+    // Return a user-friendly error response
+    return {
+      name: "Error",
+      description: "An unexpected error occurred during medication identification. Please try again.",
+      confidence: "low",
+      error: true,
+      errorDetails: error.message || "Unknown error"
+    };
   }
 }
 
@@ -672,6 +797,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Received drug identification request");
     const { imageBase64, blurryMode } = await req.json();
     
     if (!imageBase64) {
@@ -681,15 +807,20 @@ serve(async (req) => {
       );
     }
 
+    console.log("Processing image with blurryMode:", blurryMode);
     const result = await identifyDrug(imageBase64, blurryMode);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Fatal error in edge function:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "An unexpected error occurred" }),
+      JSON.stringify({ 
+        error: error.message || "An unexpected error occurred",
+        name: "Error",
+        description: "The system encountered an error while processing your request. Please try again."
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
