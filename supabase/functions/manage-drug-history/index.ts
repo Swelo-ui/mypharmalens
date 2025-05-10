@@ -40,21 +40,24 @@ serve(async (req) => {
     switch (action) {
       case 'addIdentification':
         // Validate required fields
-        if (!data.userId || !data.drugName) {
-          throw new Error('Missing required fields: userId and drugName are required');
+        if (!data.userId) {
+          throw new Error('Missing required field: userId is required');
         }
         
-        console.log(`Adding identification for user ${data.userId}, drug ${data.drugName}`);
+        // Allow saving even if drugName is missing - use a fallback
+        const drugName = data.drugName || "Unknown Medication";
+        
+        console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
         // Create object with only fields that exist in the database table
         const identificationData = {
           user_id: data.userId,
-          drug_name: data.drugName,
+          drug_name: drugName,
           image_url: data.imageUrl || null,
           details: data.details || null,
         };
         
-        // Add image_features only if the column exists in the schema
+        // Add image_features only if the column exists in the schema and if data is provided
         try {
           // First attempt to check if we can query the table with the image_features column
           const { error: columnCheckError } = await supabaseClient
@@ -84,6 +87,10 @@ serve(async (req) => {
         
       case 'removeIdentification':
         // Remove a drug identification from history
+        if (!data.id || !data.userId) {
+          throw new Error('Missing required fields: id and userId are required for deletion');
+        }
+        
         result = await supabaseClient
           .from('drug_identifications')
           .delete()
@@ -93,6 +100,10 @@ serve(async (req) => {
         
       case 'getIdentificationHistory':
         // Get user's identification history
+        if (!data.userId) {
+          throw new Error('Missing required field: userId is required');
+        }
+        
         result = await supabaseClient
           .from('drug_identifications')
           .select('*')
@@ -105,6 +116,7 @@ serve(async (req) => {
     }
 
     if (result.error) {
+      console.error('Database operation error:', result.error);
       throw new Error(`Database operation failed: ${result.error.message}`);
     }
 
