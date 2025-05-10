@@ -30,3 +30,6 @@ enabled = true
 [functions]
 [functions.manage-drug-history]
 verify_jwt = true
+
+[functions.identify-drug]
+verify_jwt = false

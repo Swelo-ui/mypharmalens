@@ -12,7 +12,7 @@ root.render(
   <BrowserRouter>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
-      <Toaster position="bottom-center" />
+      <Toaster position="top-right" />
     </ThemeProvider>
   </BrowserRouter>
 );
