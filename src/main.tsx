@@ -6,7 +6,7 @@ import './index.css'
 import { ThemeProvider } from 'next-themes'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import { TooltipProvider } from "@radix-ui/react-tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 const root = createRoot(document.getElementById("root")!);
 
