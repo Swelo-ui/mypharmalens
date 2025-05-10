@@ -150,15 +150,15 @@ const DrugPage = () => {
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="w-full mb-2 flex bg-transparent p-0">
-            <TabsTrigger value="general" className="flex-1">
-              General Information
+          <TabsList className="w-full mb-2 flex overflow-x-auto bg-transparent p-0 no-scrollbar">
+            <TabsTrigger value="general" className="flex-1 text-center">
+              <span className="block text-[13px] sm:text-sm">General Information</span>
             </TabsTrigger>
-            <TabsTrigger value="usage" className="flex-1">
-              Usage & Precautions
+            <TabsTrigger value="usage" className="flex-1 text-center">
+              <span className="block text-[13px] sm:text-sm">Usage & Precautions</span>
             </TabsTrigger>
-            <TabsTrigger value="alternatives" className="flex-1">
-              Alternatives & Brands
+            <TabsTrigger value="alternatives" className="flex-1 text-center">
+              <span className="block text-[13px] sm:text-sm">Alternatives & Brands</span>
             </TabsTrigger>
           </TabsList>
           
