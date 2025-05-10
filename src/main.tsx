@@ -17,10 +17,8 @@ root.render(
     <BrowserRouter>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <App />
-            <Toaster position="bottom-center" />
-          </TooltipProvider>
+          <App />
+          <Toaster position="bottom-center" />
         </QueryClientProvider>
       </ThemeProvider>
     </BrowserRouter>
