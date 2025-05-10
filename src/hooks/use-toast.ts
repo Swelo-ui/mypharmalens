@@ -20,9 +20,6 @@ const getToastKey = (content: string, type: string): string => {
   return `${content}-${type}`;
 };
 
-// Track all active toast IDs to prevent duplicates
-const activeToastIds = new Set<string>();
-
 export const useToast = () => {
   const toast = (options: ToastOptions | string) => {
     if (typeof options === "string") {
@@ -55,7 +52,7 @@ export const useToast = () => {
     const toastKey = getToastKey(content, type);
     
     // Check if this toast was recently shown
-    if (recentToasts.has(toastKey) || content === "") {
+    if (recentToasts.has(toastKey)) {
       return;
     }
     
@@ -64,48 +61,40 @@ export const useToast = () => {
     setTimeout(() => recentToasts.delete(toastKey), TOAST_DEBOUNCE_TIME);
     
     // Ensure each toast has a unique ID by adding a timestamp
-    const uniqueId = `${content}-${type}-${Date.now()}`;
-    
-    // Prevent duplicate toast IDs
-    if (activeToastIds.has(uniqueId)) {
-      return;
-    }
-    
-    activeToastIds.add(uniqueId);
-    setTimeout(() => activeToastIds.delete(uniqueId), 500);
+    const uniqueId = Date.now().toString();
     
     switch (type) {
       case "success":
         return sonnerToast.success(content, {
-          id: uniqueId,
+          id: `${content}-success-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "error":
         return sonnerToast.error(content, {
-          id: uniqueId,
+          id: `${content}-error-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "warning":
         return sonnerToast.warning(content, {
-          id: uniqueId,
+          id: `${content}-warning-${uniqueId}`,
           description,
           duration,
           action,
         });
       case "info":
         return sonnerToast.info(content, {
-          id: uniqueId,
+          id: `${content}-info-${uniqueId}`,
           description,
           duration,
           action,
         });
       default:
         return sonnerToast(content, {
-          id: uniqueId,
+          id: `${content}-default-${uniqueId}`,
           description,
           duration,
           action,
