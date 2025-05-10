@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -49,20 +48,14 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const handleFile = (file: File) => {
     // Check if file is an image
     if (!file.type.match('image.*')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, etc.)"
-      });
+      toast.error("Invalid file type. Please upload an image file (JPEG, PNG, etc.)");
       return;
     }
     
     // Check if file is too small (might be too low quality)
     if (file.size < 50 * 1024) {
       setImageQualityWarning(true);
-      toast({
-        title: "Low quality image",
-        description: "This image may be too small for accurate identification. Consider using a higher resolution image."
-      });
+      toast.warning("This image may be too small for accurate identification. Consider using a higher resolution image.");
     } else {
       setImageQualityWarning(false);
     }
