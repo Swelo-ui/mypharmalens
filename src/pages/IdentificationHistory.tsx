@@ -6,6 +6,7 @@ import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
+import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface IdentificationRecord {
   id: string;
@@ -292,55 +294,29 @@ const IdentificationHistory = () => {
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map((item) => (
-              <div key={item.id} className="relative group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm cursor-pointer transition-transform hover:scale-105" onClick={() => handleCardClick(item.id)}>
-                <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {format(new Date(item.created_at), 'MMM d, yyyy')}
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  {/* Medication icon/image */}
-                  <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    {item.image_url ? (
-                      <img 
-                        src={item.image_url} 
-                        alt={item.drug_name} 
-                        className="w-10 h-10 object-contain rounded-full"
-                      />
-                    ) : (
-                      <div className="text-2xl text-blue-500">💊</div>
-                    )}
+              <div key={item.id} className="relative group">
+                <div 
+                  className="cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => handleCardClick(item.id)}
+                >
+                  <div className="absolute top-4 right-4 z-10 bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded-full flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(new Date(item.created_at), 'MMM d, yyyy')}
                   </div>
-                  
-                  {/* Basic medication information */}
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{item.drug_name || "Unknown Medication"}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 italic mb-2">
-                      {item.details?.genericName || item.details?.generic_name || ""}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {item.details?.category && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                          {item.details.category}
-                        </span>
-                      )}
-                      
-                      {(item.details?.drugClass || item.details?.drug_class) && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300">
-                          {item.details?.drugClass || item.details?.drug_class}
-                        </span>
-                      )}
-                      
-                      {item.details?.manufacturer && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
-                          {item.details.manufacturer}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  <DrugCard
+                    drug={{
+                      id: extractDrugId(item.details) || item.id,
+                      name: item.drug_name || "Unknown Medication",
+                      genericName: item.details?.genericName || item.details?.generic_name || "",
+                      manufacturer: item.details?.manufacturer || "",
+                      category: item.details?.category || "",
+                      description: item.details?.description || "",
+                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
+                      verified: item.details?.verified || false,
+                      image: item.image_url || item.details?.image || "",
+                    }}
+                  />
                 </div>
-                
                 <Button 
                   variant="destructive"
                   size="icon"
@@ -374,6 +350,7 @@ const IdentificationHistory = () => {
           </div>
         )}
       </div>
+      <BottomNavigation />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

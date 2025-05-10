@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -82,6 +83,8 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user's previous identifications when component loads
@@ -157,6 +160,43 @@ const DrugIdentify = () => {
     } catch (err) {
       console.error('Error in findMatchInHistory:', err);
       return null;
+    }
+  };
+
+  // Function to manually save drug identification to the database
+  const handleSaveToHistory = async () => {
+    try {
+      if (!identifiedDrug) return;
+      if (!isAuthenticated) {
+        toast.info("Please sign in to save to history", {
+          action: {
+            label: "Sign In",
+            onClick: () => navigate('/auth')
+          }
+        });
+        return;
+      }
+
+      setIsSaving(true);
+      const result = await saveDrugIdentification({
+        name: identifiedDrug.name,
+        drug_name: identifiedDrug.name,
+        image: identifiedDrug.image,
+        image_url: identifiedDrug.image,
+        details: identifiedDrug
+      });
+
+      if (result) {
+        toast.success("Added to your history");
+        setIsSaved(true);
+      } else {
+        toast.error("Failed to save to history");
+      }
+    } catch (error) {
+      console.error("Error saving to history:", error);
+      toast.error("Failed to save to history");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -336,27 +376,8 @@ const DrugIdentify = () => {
               };
               
               setIdentifiedDrug(formattedDrugData);
+              setIsSaved(false);
               setProcessingProgress(100);
-              
-              // Automatically save to history if authenticated
-              if (isAuthenticated && user) {
-                try {
-                  await saveDrugIdentification(formattedDrugData);
-                  console.log("Drug automatically saved to history");
-                } catch (saveError) {
-                  console.error("Failed to save to history:", saveError);
-                  // We don't show an error toast here since it's automatic and shouldn't disturb the user
-                }
-              } else {
-                // If not authenticated, show a toast suggesting login to save history
-                toast.info("Sign in to save identification history", {
-                  action: {
-                    label: "Sign In",
-                    onClick: () => navigate('/auth')
-                  },
-                  duration: 5000
-                });
-              }
               
               // Customize message based on whether this was from history or new identification
               if (drugData.fromHistory) {
@@ -424,6 +445,7 @@ const DrugIdentify = () => {
     setIsImageLowRes(false);
     setProcessingProgress(0);
     setProcessingPhase("");
+    setIsSaved(false);
   };
 
   // Function for manual search as fallback
@@ -611,58 +633,41 @@ const DrugIdentify = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center flex-wrap gap-3">
               <h2 className="text-2xl font-semibold">Identification Result</h2>
-              <Button variant="outline" onClick={handleRetry}>
-                Identify Another
-              </Button>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* Medication icon/image */}
-                <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mx-auto md:mx-0">
-                  {identifiedDrug.image ? (
-                    <img 
-                      src={identifiedDrug.image} 
-                      alt={identifiedDrug.name} 
-                      className="w-16 h-16 object-contain rounded-full"
-                    />
-                  ) : (
-                    <div className="text-4xl text-blue-500">💊</div>
-                  )}
-                </div>
-                
-                {/* Basic medication information */}
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold">{identifiedDrug.name}</h3>
-                  <p className="text-lg text-gray-600 dark:text-gray-300 italic mb-2">
-                    {identifiedDrug.genericName}
-                  </p>
-                  <p className="mb-4">{identifiedDrug.description}</p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                      {identifiedDrug.category}
-                    </span>
-                    
-                    {identifiedDrug.drugClass && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300">
-                        {identifiedDrug.drugClass}
-                      </span>
+              <div className="flex gap-3">
+                {isAuthenticated && !isSaved && (
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleSaveToHistory}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="h-4 w-4" />
+                        <span>Save to History</span>
+                      </>
                     )}
-                    
-                    {identifiedDrug.manufacturer && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
-                        {identifiedDrug.manufacturer}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <Button variant="outline" onClick={() => navigate(`/drug/${identifiedDrug.id}`)}>
-                    View detailed information
                   </Button>
-                </div>
+                )}
+                <Button variant="outline" onClick={handleRetry}>
+                  Identify Another
+                </Button>
               </div>
             </div>
+            {isSaved && (
+              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <BookmarkPlus className="h-4 w-4" />
+                  <span>Saved to your identification history</span>
+                </div>
+              </Alert>
+            )}
+            <DrugDetails drug={identifiedDrug} />
           </div>
         )}
       </div>

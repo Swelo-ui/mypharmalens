@@ -1,827 +1,1004 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Function to enhance image for better processing
-async function enhanceImage(base64Image: string): Promise<string> {
+// Function to get drug information from drugs.com
+async function getDrugInfoFromDrugsCom(drugName: string): Promise<any> {
   try {
-    // Extract the actual base64 data without the prefix
-    const base64Data = base64Image.split(',')[1] || base64Image;
+    console.log(`Searching drugs.com for: ${drugName}`);
     
-    // In Deno environment, we can't use browser-specific APIs like Image
-    // Instead, we'll use a more compatible approach for edge functions
+    // Format the drug name for URL
+    const formattedDrugName = drugName.toLowerCase().replace(/\s+/g, '-');
+    const url = `https://www.drugs.com/${formattedDrugName}.html`;
     
-    // Return the original image since we can't process it in this environment
-    // We'll rely on AI models to handle image quality issues
-    return base64Image;
+    console.log(`Fetching from URL: ${url}`);
+    
+    // Fetch the drug page
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+    
+    // If the page doesn't exist, try search instead
+    if (!response.ok) {
+      console.log(`Direct page not found, trying search for: ${drugName}`);
+      const searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
+      
+      const searchResponse = await fetch(searchUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      if (!searchResponse.ok) {
+        throw new Error('Failed to find drug information');
+      }
+      
+      const searchHtml = await searchResponse.text();
+      
+      // Enhanced regex to find search results
+      const firstResultMatch = searchHtml.match(/<a href="(\/[^"]+)" class="ddc-link-[^"]+">/);
+      
+      // Try to find alternative pattern if first one fails
+      const alternativeMatch = firstResultMatch || 
+                             searchHtml.match(/<a href="(\/[^"]+)" class="[^"]*?">/);
+      
+      if (alternativeMatch && alternativeMatch[1]) {
+        const resultUrl = `https://www.drugs.com${alternativeMatch[1]}`;
+        console.log(`Found search result, fetching: ${resultUrl}`);
+        
+        const detailResponse = await fetch(resultUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        });
+        
+        if (!detailResponse.ok) {
+          throw new Error('Failed to fetch drug detail page');
+        }
+        
+        return parseHtmlForDrugInfo(await detailResponse.text(), drugName);
+      }
+      
+      // Try another approach - look for search results table
+      const tableResultMatch = searchHtml.match(/<table class="data-list data-list--search[^>]*>([\s\S]*?)<\/table>/);
+      if (tableResultMatch) {
+        const tableHtml = tableResultMatch[1];
+        const linkMatch = tableHtml.match(/<a href="([^"]+)"/);
+        
+        if (linkMatch && linkMatch[1]) {
+          const resultUrl = linkMatch[1].startsWith('http') ? 
+                          linkMatch[1] : 
+                          `https://www.drugs.com${linkMatch[1]}`;
+          
+          console.log(`Found table result, fetching: ${resultUrl}`);
+          
+          const detailResponse = await fetch(resultUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+          });
+          
+          if (!detailResponse.ok) {
+            throw new Error('Failed to fetch drug detail page from table result');
+          }
+          
+          return parseHtmlForDrugInfo(await detailResponse.text(), drugName);
+        }
+      }
+      
+      return null; // No search results found
+    }
+    
+    // Parse the HTML to extract drug information
+    const html = await response.text();
+    return parseHtmlForDrugInfo(html, drugName);
   } catch (error) {
-    console.error("Error enhancing image:", error);
-    return base64Image; // Return original on error
-  }
-}
-
-// Function to detect partial pills or cut medications in the image
-async function detectPartialMedication(imageDescription: string): Promise<boolean> {
-  const partialIndicators = [
-    'half', 'cut', 'partial', 'broken', 'split', 
-    'divided', 'portion', 'fragment', 'piece', 
-    'section', 'part', 'halved', 'quarter', 'segment'
-  ];
-  
-  const lowerDescription = imageDescription.toLowerCase();
-  return partialIndicators.some(indicator => lowerDescription.includes(indicator));
-}
-
-// Enhanced function to extract potential markings from blurry images
-async function extractPotentialMarkings(base64Image: string, description: string): Promise<string | null> {
-  try {
-    // If the description already contains markings, leverage that information
-    const markingsMatch = description.match(/markings?:?\s*["']?([^"'.]+)["']?/i);
-    if (markingsMatch && markingsMatch[1]) {
-      return markingsMatch[1].trim();
-    }
-    
-    // Extract potential text patterns that might be markings
-    const potentialMarkings: string[] = [];
-    
-    // Look for patterns that match pill markings (1-4 characters, often with numbers and letters)
-    const markingPatterns = description.match(/\b[A-Z0-9]{1,4}\b/g);
-    if (markingPatterns) {
-      potentialMarkings.push(...markingPatterns);
-    }
-    
-    // Look for described imprints
-    const imprintMatch = description.match(/imprint(?:ed)?(?:\s+with)?:?\s*["']?([^"'.]+)["']?/i);
-    if (imprintMatch && imprintMatch[1]) {
-      potentialMarkings.push(imprintMatch[1].trim());
-    }
-    
-    return potentialMarkings.length > 0 ? potentialMarkings.join(", ") : null;
-  } catch (error) {
-    console.error("Error extracting markings:", error);
+    console.error(`Error fetching drug info from drugs.com: ${error.message}`);
     return null;
   }
 }
 
-// Function to analyze image with multiple AI models and combine results
-async function analyzeImageWithMultipleModels(imageBase64: string, blurryMode: boolean) {
+// Function to find drug information by imprint or markings
+async function findDrugByImprint(imprint: string): Promise<any> {
   try {
-    console.log("Using enhanced multi-model analysis for drug identification");
+    if (!imprint || imprint.trim().length < 2) {
+      return null;
+    }
     
-    // Primary analysis using the first model (optimized for drug identification)
-    const primaryAnalysisPrompt = `
-      Analyze this medication image carefully. You are an expert pharmacist with deep knowledge of medication identification.
-      
-      Provide the following details in JSON format:
-      - name: the drug name (brand name if visible)
-      - genericName: the generic name
-      - possibleNames: array of possible names if uncertain
-      - imprint: any imprinted codes or text on the medication
-      - color: the color of the medication
-      - shape: the shape of the medication (e.g., round, oval, capsule)
-      - markings: any visible markings, logos, or scoring
-      - confidence: your confidence level (high, medium, low)
-      - description: detailed description of what you see
-      
-      Be especially attentive to partial pills, cut medications, or unusual presentations.
-      If multiple medications are visible, describe each one.
-      If packaging is visible, extract as much information from it as possible.
-    `;
+    console.log(`Searching drugs.com for pill imprint: ${imprint}`);
+    const url = `https://www.drugs.com/imprints.php?imprint=${encodeURIComponent(imprint)}`;
     
-    const primaryResponse = await fetchAIResponse(primaryAnalysisPrompt, imageBase64);
-    const primaryData = parseAIResponse(primaryResponse);
-    console.log("Primary analysis result:", JSON.stringify(primaryData, null, 2));
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
     
-    // Secondary analysis using different model (optimized for text extraction and details)
-    const secondaryAnalysisPrompt = `
-      You are a pharmaceutical expert specializing in medication identification. 
-      Analyze this medication image focusing on TEXT EXTRACTION and PRECISE DETAILS.
-      
-      Examine carefully:
-      1. Any text on the pill or packaging
-      2. Logos or unique markings
-      3. Color and shape details
-      4. Partial or cut pills
-      5. Any manufacturing details
-      
-      Provide a JSON response with:
-      - name: medication name
-      - genericName: generic name
-      - possibleNames: array of potential identifications
-      - imprint: any text/numbers on the pill
-      - color: color description
-      - shape: pill shape
-      - confidence: numerical value between 0 and 1
-      - description: detailed visual description
-    `;
+    if (!response.ok) {
+      return null;
+    }
     
-    // Add delayed retry mechanism for secondary analysis if first attempt fails
-    let secondaryData;
-    try {
-      const secondaryResponse = await fetchAIResponse(secondaryAnalysisPrompt, imageBase64);
-      secondaryData = parseAIResponse(secondaryResponse);
-      console.log("Secondary analysis result:", JSON.stringify(secondaryData, null, 2));
-    } catch (error) {
-      console.log("First attempt at secondary analysis failed, retrying with modified prompt");
-      // Retry with simpler prompt
-      const fallbackPrompt = `
-        Extract all visible TEXT from this medication image.
-        Focus only on extracting imprinted codes, numbers, and letters.
-        Format response as JSON: {"text": "extracted text", "description": "brief description"}
-      `;
+    const html = await response.text();
+    
+    // Look for the first pill match in the results
+    const pillMatch = html.match(/<a href="([^"]+)" class="[^"]*?pill-identifier-[^"]*?">([^<]+)<\/a>/i);
+    
+    if (pillMatch && pillMatch[1]) {
+      const pillUrl = pillMatch[1].startsWith('http') ? 
+                    pillMatch[1] : 
+                    `https://www.drugs.com${pillMatch[1]}`;
+      const pillName = pillMatch[2].trim();
       
-      try {
-        const fallbackResponse = await fetchAIResponse(fallbackPrompt, imageBase64);
-        const fallbackData = parseAIResponse(fallbackResponse);
-        secondaryData = {
-          name: fallbackData.text || "Unknown",
-          description: fallbackData.description || "Text extraction only",
-          confidence: 0.4
-        };
-      } catch (secondaryError) {
-        console.error("Secondary analysis completely failed:", secondaryError);
-        secondaryData = { confidence: 0.1 };
+      console.log(`Found pill match: ${pillName}, fetching details from: ${pillUrl}`);
+      
+      const detailResponse = await fetch(pillUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      if (detailResponse.ok) {
+        return parseHtmlForDrugInfo(await detailResponse.text(), pillName);
       }
     }
     
-    // If blurry mode, add a third analysis optimized for low-quality images
-    let tertiaryData = null;
-    if (blurryMode) {
-      const tertiaryAnalysisPrompt = `
-        You are a medication identification expert analyzing a BLURRY or LOW QUALITY image.
-        Focus specifically on extracting whatever information is possible despite the quality issues.
-        
-        Pay special attention to:
-        - Partial pill fragments
-        - Cut medications
-        - Blurry text that might be legible
-        - Color and shape even if pill details aren't clear
-        - Any visible packaging information
-        
-        Provide a JSON response with:
-        - name: best guess at medication name
-        - genericName: best guess at generic name
-        - possibleNames: array of potential identifications (be more inclusive due to quality)
-        - imprint: any possibly visible text/numbers
-        - color: color description (be more general if unclear)
-        - shape: pill shape if discernible
-        - confidence: numerical value between 0 and 1
-        - description: description acknowledging quality limitations
-      `;
-      
-      try {
-        const tertiaryResponse = await fetchAIResponse(tertiaryAnalysisPrompt, imageBase64);
-        tertiaryData = parseAIResponse(tertiaryResponse);
-        console.log("Tertiary analysis (blurry mode) result:", JSON.stringify(tertiaryData, null, 2));
-      } catch (error) {
-        console.log("Tertiary analysis failed, continuing with available data");
-      }
-    }
-    
-    // Combine the results from different models for a more accurate identification
-    const combinedResult = combineAnalysisResults(primaryData, secondaryData, tertiaryData);
-    return combinedResult;
-    
+    return null;
   } catch (error) {
-    console.error("Error in multi-model image analysis:", error);
-    
-    // Fallback to basic analysis if multi-model fails
-    try {
-      const fallbackPrompt = `
-        Describe what you see in this image of a medication in simple terms.
-        If possible, identify the medication name and any visible text or markings.
-        Format as JSON: {"name": "guess", "description": "what you see", "confidence": "low"}
-      `;
-      
-      const fallbackResponse = await fetchAIResponse(fallbackPrompt, imageBase64);
-      const fallbackData = parseAIResponse(fallbackResponse);
-      
-      return {
-        ...fallbackData,
-        fallbackMode: true,
-        confidence: "low",
-      };
-    } catch (fallbackError) {
-      throw error; // If even fallback fails, throw original error
-    }
+    console.error(`Error searching by imprint: ${error.message}`);
+    return null;
   }
 }
 
-// Helper function to combine results from multiple analyses
-function combineAnalysisResults(primaryData: any, secondaryData: any, tertiaryData: any | null) {
-  // Start with primary data as base
-  const result = { ...primaryData };
-  
-  // If primary data is empty or invalid, use secondary as base
-  if (!primaryData || Object.keys(primaryData).length === 0) {
-    return secondaryData || { name: "Unknown", confidence: "low" };
-  }
-  
-  // Helper function to determine confidence level
-  function determineConfidence(primary: string, secondary: number | string | undefined, tertiary: number | string | undefined = undefined) {
-    // Convert string confidence to number if needed
-    const primaryVal = typeof primary === 'string' 
-      ? (primary.toLowerCase() === 'high' ? 0.9 : primary.toLowerCase() === 'medium' ? 0.7 : 0.4)
-      : (primary || 0.5);
-      
-    const secondaryVal = typeof secondary === 'string'
-      ? (secondary.toLowerCase() === 'high' ? 0.9 : secondary.toLowerCase() === 'medium' ? 0.7 : 0.4)
-      : (secondary || 0.5);
-      
-    const tertiaryVal = tertiary !== undefined
-      ? (typeof tertiary === 'string' 
-          ? (tertiary.toLowerCase() === 'high' ? 0.9 : tertiary.toLowerCase() === 'medium' ? 0.7 : 0.4)
-          : (tertiary || 0.5))
-      : 0.5;
+// Function to parse HTML and extract drug information
+function parseHtmlForDrugInfo(html: string, drugName: string): any {
+  try {
+    console.log(`Parsing HTML for drug: ${drugName}`);
     
-    // Calculate weighted average
-    const weightedAvg = tertiaryData 
-      ? (primaryVal * 0.4 + secondaryVal * 0.4 + tertiaryVal * 0.2)
-      : (primaryVal * 0.6 + secondaryVal * 0.4);
+    const drugInfo: any = {
+      name: drugName,
+      genericName: "",
+      brandNames: [],
+      manufacturer: "",
+      category: "",
+      description: "",
+      dosageAndAdmin: "",
+      sideEffects: [],
+      warnings: [],
+      interactions: [],
+      storage: "",
+      mechanism: "",
+      indications: [],
+      contraindications: [],
+      prescriptionStatus: "Unknown",
+      pregnancy: "",
+      drugClass: ""
+    };
     
-    // Convert back to string confidence
-    return weightedAvg >= 0.8 ? 'high' : weightedAvg >= 0.6 ? 'medium' : 'low';
-  }
-  
-  // Function to merge arrays and remove duplicates
-  function mergeArrays(arrays: string[][]) {
-    return [...new Set(arrays.flat().filter(Boolean))];
-  }
-  
-  // Only merge if secondary data exists
-  if (secondaryData) {
-    // Merge name (prefer the more specific name if available)
-    if (secondaryData.name && (!result.name || secondaryData.name.length > result.name.length)) {
-      result.name = secondaryData.name;
+    // Extract generic name
+    const genericNameMatch = html.match(/<p class="drug-subtitle">(.*?)<\/p>/s);
+    if (genericNameMatch && genericNameMatch[1]) {
+      drugInfo.genericName = genericNameMatch[1].trim();
     }
     
-    // Merge generic name (prefer the more specific name if available)
-    if (secondaryData.genericName && (!result.genericName || secondaryData.genericName.length > result.genericName.length)) {
-      result.genericName = secondaryData.genericName;
+    // Extract manufacturer (enhanced)
+    const manufacturerMatch = html.match(/(?:Manufactured|Marketed|Supplied) by:?\s*([^<.]+)(?:<|\.)/i) || 
+                            html.match(/(?:Manufactured|Marketed|Supplied) for:?\s*([^<.]+)(?:<|\.)/i);
+    if (manufacturerMatch && manufacturerMatch[1]) {
+      drugInfo.manufacturer = manufacturerMatch[1].trim();
     }
     
-    // Merge possible names
-    result.possibleNames = mergeArrays([
-      result.possibleNames || [], 
-      secondaryData.possibleNames || [],
-      tertiaryData?.possibleNames || []
-    ]);
+    // Extract drug category
+    const categoryMatch = html.match(/<a href="\/drug-class\/[^"]+"[^>]*>([^<]+)<\/a>/i);
+    if (categoryMatch && categoryMatch[1]) {
+      drugInfo.category = categoryMatch[1].trim();
+    }
     
-    // Merge imprint (prefer non-null)
-    result.imprint = result.imprint || secondaryData.imprint || tertiaryData?.imprint || null;
+    // Extract drug class
+    const drugClassMatch = html.match(/<strong>Drug class:<\/strong>\s*([^<]+)(?:<|$)/i);
+    if (drugClassMatch && drugClassMatch[1]) {
+      drugInfo.drugClass = drugClassMatch[1].trim();
+    } else if (categoryMatch && categoryMatch[1]) {
+      // Fallback to category if class not found
+      drugInfo.drugClass = categoryMatch[1].trim();
+    }
     
-    // Merge color (prefer non-null)
-    result.color = result.color || secondaryData.color || tertiaryData?.color || null;
+    // Extract brand names
+    const brandNamesMatch = html.match(/<strong>Brand name[s]?:<\/strong>\s*([^<]+)(?:<|$)/i);
+    if (brandNamesMatch && brandNamesMatch[1]) {
+      drugInfo.brandNames = brandNamesMatch[1]
+        .split(',')
+        .map((name: string) => name.trim())
+        .filter((name: string) => name.length > 0);
+    }
     
-    // Merge shape (prefer non-null)
-    result.shape = result.shape || secondaryData.shape || tertiaryData?.shape || null;
+    // Extract description (improved with fallbacks)
+    let descriptionMatch = html.match(/<div class="contentBox">[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    if (!descriptionMatch) {
+      // Try alternative pattern
+      descriptionMatch = html.match(/<div id="drug-description"[^>]*>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    }
+    if (!descriptionMatch) {
+      // Try another pattern
+      descriptionMatch = html.match(/<div class="[^"]*?drug-description[^"]*?"[^>]*>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+    }
     
-    // Merge markings (prefer non-null or combine if both have information)
-    if (result.markings && secondaryData.markings) {
-      result.markings = `${result.markings}; ${secondaryData.markings}`;
+    if (descriptionMatch && descriptionMatch[1]) {
+      drugInfo.description = descriptionMatch[1]
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\s+/g, ' ')    // Replace multiple spaces
+        .trim();
+    }
+    
+    // Extract side effects (more robust pattern)
+    const sideEffectsMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/) ||
+                           html.match(/<h3[^>]*>Side Effects<\/h3>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/) ||
+                           html.match(/<h2[^>]*>Common[^<]*side effects[^<]*<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i);
+    
+    if (sideEffectsMatch && sideEffectsMatch[1]) {
+      const sideEffectsHtml = sideEffectsMatch[1];
+      const sideEffects = sideEffectsHtml.match(/<li[^>]*>([\s\S]*?)<\/li>/g);
+      
+      if (sideEffects) {
+        drugInfo.sideEffects = sideEffects.map((item: string) => {
+          return item
+            .replace(/<li[^>]*>/, '')
+            .replace(/<\/li>/, '')
+            .replace(/<[^>]*>/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        });
+      }
+    }
+    
+    // If no side effects found with lists, try paragraphs
+    if (drugInfo.sideEffects.length === 0) {
+      const sideEffectsParagraphMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<p>([\s\S]*?)<\/p>/) ||
+                                      html.match(/<h3[^>]*>Side Effects<\/h3>[\s\S]*?<p>([\s\S]*?)<\/p>/);
+      
+      if (sideEffectsParagraphMatch && sideEffectsParagraphMatch[1]) {
+        const paragraphText = sideEffectsParagraphMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        drugInfo.sideEffects = paragraphText
+          .split(/\.\s+|;\s+/)
+          .map((effect: string) => effect.trim())
+          .filter((effect: string) => effect.length > 5)
+          .map((effect: string) => effect + (effect.endsWith('.') ? '' : '.'));
+      }
+    }
+    
+    // Extract warnings (improved)
+    const warningsMatch = html.match(/<h2[^>]*>Warnings<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                        html.match(/<h3[^>]*>Warnings<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                        html.match(/<h2[^>]*>Warning[^<]*<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (warningsMatch && warningsMatch[1]) {
+      const warningsText = warningsMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      drugInfo.warnings = warningsText.split(/\.\s+/).filter((warning: string) => warning.length > 10)
+        .map((warning: string) => warning.trim() + (warning.endsWith('.') ? '' : '.'));
+    }
+    
+    // Extract dosage info (more patterns)
+    const dosageMatch = html.match(/<h2[^>]*>Dosage<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h3[^>]*>Dosage<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h2[^>]*>Dosage and Administration<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                      html.match(/<h2[^>]*>How to [Tt]ake<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (dosageMatch && dosageMatch[1]) {
+      drugInfo.dosageAndAdmin = dosageMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Extract indications (improved)
+    const indicationsMatch = html.match(/<h2[^>]*>Uses<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h3[^>]*>Uses<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h2[^>]*>Indications<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                           html.match(/<h2[^>]*>What is [^<]*?<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (indicationsMatch && indicationsMatch[1]) {
+      const indicationsText = indicationsMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      drugInfo.indications = indicationsText.split(/\.\s+/).filter((item: string) => item.length > 5)
+        .map((item: string) => item.trim() + (item.endsWith('.') ? '' : '.'));
+    }
+    
+    // Determine if prescription or OTC (more patterns)
+    if (html.includes("prescription drug") || html.includes("Rx only") || html.includes("prescription only") || html.includes("Available by prescription")) {
+      drugInfo.prescriptionStatus = "Prescription Only";
+    } else if (html.includes("over-the-counter") || html.includes("OTC") || html.includes("without a prescription")) {
+      drugInfo.prescriptionStatus = "OTC";
+    }
+    
+    // Extract mechanism of action (improved)
+    const mechanismMatch = html.match(/<h2[^>]*>Mechanism of Action<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h3[^>]*>Mechanism of Action<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h2[^>]*>How it works<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h2[^>]*>How does [^<]+?<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (mechanismMatch && mechanismMatch[1]) {
+      drugInfo.mechanism = mechanismMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Extract pregnancy information
+    const pregnancyMatch = html.match(/<h2[^>]*>Pregnancy[^<]*<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                         html.match(/<h3[^>]*>Pregnancy[^<]*<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+    
+    if (pregnancyMatch && pregnancyMatch[1]) {
+      drugInfo.pregnancy = pregnancyMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Extract storage information
+    const storageMatch = html.match(/<h2[^>]*>Storage<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                       html.match(/<h3[^>]*>Storage<\/h3>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/) ||
+                       html.match(/Store\s+[^<.]+(?:\.|<)/i);
+    
+    if (storageMatch && storageMatch[1]) {
+      drugInfo.storage = storageMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    } else if (storageMatch && storageMatch[0]) {
+      drugInfo.storage = storageMatch[0]
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
     } else {
-      result.markings = result.markings || secondaryData.markings || tertiaryData?.markings || null;
+      drugInfo.storage = "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.";
+    }
+    
+    console.log(`Successfully parsed drug info for: ${drugName}`);
+    return drugInfo;
+  } catch (error) {
+    console.error(`Error parsing HTML: ${error.message}`);
+    return null;
+  }
+}
+
+// Function to check for color and shape information in text
+function extractPillAppearance(text: string) {
+  const colors = [
+    'white', 'blue', 'red', 'green', 'yellow', 'orange', 'purple', 
+    'pink', 'brown', 'gray', 'black', 'turquoise', 'beige', 'maroon'
+  ];
+  
+  const shapes = [
+    'round', 'oval', 'oblong', 'capsule', 'rectangle', 'diamond', 
+    'triangle', 'square', 'hexagon', 'pentagonal', 'octagonal'
+  ];
+  
+  let color = null;
+  let shape = null;
+  
+  // Check for color
+  for (const c of colors) {
+    if (text.toLowerCase().includes(c)) {
+      color = c;
+      break;
     }
   }
   
-  // Set confidence based on all analyses
-  result.confidence = determineConfidence(
-    result.confidence,
-    secondaryData?.confidence,
-    tertiaryData?.confidence
-  );
+  // Check for shape
+  for (const s of shapes) {
+    if (text.toLowerCase().includes(s)) {
+      shape = s;
+      break;
+    }
+  }
   
-  // Enhance description to include all relevant details
-  result.description = result.description || secondaryData?.description || tertiaryData?.description || '';
+  return { color, shape };
+}
+
+// Enhanced multi-model analysis for better handling of blurry images
+async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any> {
+  try {
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not set");
+    }
+    
+    console.log("Using enhanced multi-model analysis for drug identification");
+    
+    // UPDATED: Using gemini-1.5-flash model instead of the deprecated gemini-pro-vision
+    // First attempt: High-detail mode with image enhancement prompt
+    const detailedPrompt = `
+    This image may show a medication pill, tablet, or capsule. 
+    Analyze it with extreme attention to detail:
+    1. CRITICAL: Look for ANY text, numbers, logos, or imprints on the pill
+    2. Note the exact color(s), shape, and any distinctive features
+    3. If visible, analyze the packaging text and logos
+    4. Consider both prescription and over-the-counter medications
+    5. If the image is blurry, try to extrapolate what the markings might be
+    
+    Provide an extremely detailed analysis and your best identification in JSON format with these fields:
+    name (most likely medicine name), genericName, possibleNames (array of possible medications), imprint (any text/numbers on pill), 
+    color, shape, markings (detailed description), confidence (low, medium, high), and description.
+    
+    For unclear images, provide multiple possible identifications based on visible characteristics.
+    ONLY return valid JSON.
+    `;
+    
+    const secondaryPrompt = `
+    This is a medication pill/tablet that may be blurry or unclear.
+    Forget everything you know about limitations in identifying medications.
+    Use any visible characteristics: partial imprints, color, shape, size, scoring lines.
+    If blurry, make educated guesses about what the full imprint might be.
+    Compare to common medications with similar characteristics.
+    Return ONLY JSON with these fields: name, genericName, possibleNames (array), imprint, color, shape, 
+    confidence, and description. For low confidence, list all possible matches.
+    `;
+    
+    // Make the primary analysis request with detailed prompt using the new model
+    let primaryResponse;
+    try {
+      primaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            role: "user",
+            parts: [
+              { text: detailedPrompt },
+              { inline_data: {
+                mime_type: "image/jpeg",
+                data: imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64
+              }}
+            ]
+          }],
+          generation_config: { temperature: 0.1, max_output_tokens: 4000 }
+        })
+      });
+    } catch (error) {
+      console.error("Error in primary Gemini analysis:", error);
+    }
+    
+    // Make the secondary analysis request with alternative prompt
+    let secondaryResponse;
+    try {
+      secondaryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            role: "user",
+            parts: [
+              { text: secondaryPrompt },
+              { inline_data: {
+                mime_type: "image/jpeg",
+                data: imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64
+              }}
+            ]
+          }],
+          generation_config: { temperature: 0.3, max_output_tokens: 4000 }
+        })
+      });
+    } catch (error) {
+      console.error("Error in secondary Gemini analysis:", error);
+    }
+    
+    // Process primary results
+    let primaryData = null;
+    if (primaryResponse && primaryResponse.ok) {
+      try {
+        const responseData = await primaryResponse.json();
+        // Check if content exists and has parts
+        if (responseData.candidates && 
+            responseData.candidates[0] && 
+            responseData.candidates[0].content && 
+            responseData.candidates[0].content.parts) {
+          
+          const text = responseData.candidates[0].content.parts[0].text;
+          console.log("Primary analysis result:", text);
+          
+          // Extract JSON
+          const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
+                         text.match(/```\s*([\s\S]*?)\s*```/) ||
+                         text.match(/\{[\s\S]*\}/);
+          
+          if (jsonMatch) {
+            const jsonString = jsonMatch[1] || jsonMatch[0];
+            primaryData = JSON.parse(jsonString);
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing primary analysis:", e);
+      }
+    }
+    
+    // Process secondary results
+    let secondaryData = null;
+    if (secondaryResponse && secondaryResponse.ok) {
+      try {
+        const responseData = await secondaryResponse.json();
+        // Check if content exists and has parts
+        if (responseData.candidates && 
+            responseData.candidates[0] && 
+            responseData.candidates[0].content && 
+            responseData.candidates[0].content.parts) {
+          
+          const text = responseData.candidates[0].content.parts[0].text;
+          console.log("Secondary analysis result:", text);
+          
+          // Extract JSON
+          const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || 
+                         text.match(/```\s*([\s\S]*?)\s*```/) ||
+                         text.match(/\{[\s\S]*\}/);
+          
+          if (jsonMatch) {
+            const jsonString = jsonMatch[1] || jsonMatch[0];
+            secondaryData = JSON.parse(jsonString);
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing secondary analysis:", e);
+      }
+    }
+    
+    // Combine results from both models
+    const combinedResults = combineAnalysisResults(primaryData, secondaryData);
+    
+    if (combinedResults) {
+      console.log("Successfully combined analysis results");
+      return combinedResults;
+    } else {
+      throw new Error("Failed to extract usable data from image analysis");
+    }
+  } catch (error) {
+    console.error("Error in multi-model image analysis:", error);
+    return null;
+  }
+}
+
+// Function to combine results from multiple analyses
+function combineAnalysisResults(primaryData: any, secondaryData: any): any {
+  if (!primaryData && !secondaryData) {
+    return null;
+  }
   
-  // Add metadata about the analysis process
-  result.blurryModeUsed = !!tertiaryData;
-  result.multiModelAnalysisUsed = true;
-  result.partialPillDetected = result.description ? 
-    ['half', 'cut', 'partial', 'broken', 'piece'].some(term => result.description.toLowerCase().includes(term)) : false;
+  // Use the available data, prioritizing primary analysis
+  const result = primaryData || secondaryData || {};
+  
+  // If both are available, enrich with information from secondary
+  if (primaryData && secondaryData) {
+    // Merge possible names from both analyses
+    result.possibleNames = [
+      ...(primaryData.possibleNames || []), 
+      ...(secondaryData.possibleNames || [])
+    ].filter((name, index, self) => 
+      name && self.findIndex(n => n === name) === index
+    );
+    
+    // Use the higher confidence level if available
+    const confidenceLevels = { low: 1, medium: 2, high: 3 };
+    const primaryConfidence = confidenceLevels[primaryData.confidence?.toLowerCase() || 'low'] || 1;
+    const secondaryConfidence = confidenceLevels[secondaryData.confidence?.toLowerCase() || 'low'] || 1;
+    
+    if (secondaryConfidence > primaryConfidence) {
+      result.confidence = secondaryData.confidence;
+    }
+    
+    // Include additional markings if available
+    if (secondaryData.imprint && !primaryData.imprint) {
+      result.imprint = secondaryData.imprint;
+    }
+    
+    // Combine descriptions for more information
+    if (primaryData.description && secondaryData.description) {
+      result.description = primaryData.description;
+      result.secondaryDescription = secondaryData.description;
+    }
+  }
   
   return result;
 }
 
-// Function to parse AI response into JSON
-function parseAIResponse(response: string): any {
-  try {
-    // Extract JSON from the response (handling possible formatting)
-    const jsonMatch = response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
-                      response.match(/(\{[\s\S]*?\})/);
-    
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1]);
-    }
-    
-    // If no JSON found in normal format, try to parse the whole response
-    try {
-      return JSON.parse(response);
-    } catch (directParseError) {
-      // If direct JSON parsing fails, try to extract JSON-like structure
-      const potentialJson = response.replace(/[\n\r]/g, ' ')
-                                    .match(/\{[^\}]*\}/);
-      if (potentialJson) {
-        return JSON.parse(potentialJson[0]);
-      }
-      
-      // If all parsing attempts fail, create a simple object from text analysis
-      return {
-        name: "Unknown",
-        description: response.substring(0, 200) + "...",
-        extractedText: extractTextFromResponse(response),
-        confidence: "low"
-      };
-    }
-  } catch (error) {
-    console.error("Failed to parse AI response:", error);
-    // Return a basic structure if parsing fails
-    return {
-      name: "Unknown",
-      genericName: "Unknown",
-      description: response.substring(0, 200) + "...",
-      confidence: "low",
-      parsingError: true
-    };
-  }
-}
-
-// New helper function to extract text from unstructured response
-function extractTextFromResponse(text: string): string {
-  // Look for patterns that might be drug names or codes
-  const codePattern = /\b[A-Z0-9]{1,6}\b/g;
-  const drugNamePattern = /[A-Z][a-z]+(?:[-\s][A-Z][a-z]+)*/g;
+// Improved function to extract text from Gemini response
+function extractDrugNameFromText(text: string): string | null {
+  // Look for explicit drug name mention
+  const nameMatch = text.match(/name["\s:]+([^"'\n,;]+)/i) || 
+                  text.match(/drug name["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/identified as["\s:]+([^"'\n,;]+)/i) ||
+                  text.match(/appears to be["\s:]+([^"'\n,;]+)/i);
   
-  const codes = text.match(codePattern) || [];
-  const names = text.match(drugNamePattern) || [];
+  if (nameMatch && nameMatch[1] && nameMatch[1].length > 2) {
+    return nameMatch[1].trim();
+  }
   
-  const extractedItems = [...new Set([...codes, ...names])];
-  return extractedItems.join(', ');
-}
-
-// AI response fetch function with improved error handling and fallback mechanisms
-async function fetchAIResponse(prompt: string, imageBase64: string): Promise<string> {
-  try {
-    // Use multiple AI models for better accuracy
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY");
-    
-    // Decide which API to use based on available keys
-    if (GEMINI_API_KEY) {
-      try {
-        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision-latest:generateContent", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY,
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: prompt },
-                  {
-                    inline_data: {
-                      mime_type: "image/jpeg",
-                      data: imageBase64.split(",")[1] || imageBase64
-                    }
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.2,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-              responseMimeType: "text/plain"
-            }
-          })
-        });
-        
-        const data = await response.json();
-        
-        // Check if the response has the expected format
-        if (data.candidates && 
-            data.candidates[0] && 
-            data.candidates[0].content && 
-            data.candidates[0].content.parts && 
-            data.candidates[0].content.parts[0] && 
-            data.candidates[0].content.parts[0].text) {
-          return data.candidates[0].content.parts[0].text;
-        } else if (data.error) {
-          // If there's an error object in the response
-          console.error("Gemini API error:", data.error);
-          throw new Error(`Gemini API error: ${data.error.message || JSON.stringify(data.error)}`);
-        } else {
-          // If the response doesn't have the expected structure but no error
-          console.error("Unexpected Gemini API response format:", data);
-          throw new Error("Invalid response format from Gemini API");
-        }
-      } catch (geminiError) {
-        // If Gemini API fails, try DeepSeek if available
-        if (DEEPSEEK_API_KEY) {
-          console.log("Gemini API failed, falling back to DeepSeek API");
-          return await fetchDeepSeekResponse(prompt, imageBase64, DEEPSEEK_API_KEY);
-        }
-        throw geminiError;
-      }
-    } else if (DEEPSEEK_API_KEY) {
-      return await fetchDeepSeekResponse(prompt, imageBase64, DEEPSEEK_API_KEY);
-    } else {
-      throw new Error("No valid API key found for image analysis");
-    }
-  } catch (error) {
-    console.error("Error fetching AI response:", error);
-    throw error;
+  // Look for first capitalized words that might be a drug name
+  const firstSentence = text.split('.')[0];
+  const capitalizedWordMatch = firstSentence.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\b/);
+  
+  if (capitalizedWordMatch && capitalizedWordMatch[1] && 
+      !["The", "This", "It", "I", "A", "An"].includes(capitalizedWordMatch[1])) {
+    return capitalizedWordMatch[1];
   }
-}
-
-// Helper function to fetch response from DeepSeek API
-async function fetchDeepSeekResponse(prompt: string, imageBase64: string, apiKey: string): Promise<string> {
-  try {
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-vision",
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: imageBase64 } }
-            ]
-          }
-        ],
-        temperature: 0.2,
-        max_tokens: 2048
-      })
-    });
-    
-    const data = await response.json();
-    
-    if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-      return data.choices[0].message.content;
-    } else if (data.error) {
-      console.error("DeepSeek API error:", data.error);
-      throw new Error(`DeepSeek API error: ${data.error.message || JSON.stringify(data.error)}`);
-    } else {
-      console.error("Unexpected DeepSeek API response format:", data);
-      throw new Error("Invalid response format from DeepSeek API");
+  
+  // Add more sophisticated pattern matching for partial or difficult-to-read names
+  const medicationPatterns = [
+    /identified as["\s:]+([^"'\n,;]+)/i,
+    /appears to be["\s:]+([^"'\n,;]+)/i,
+    /likely["\s:]+([^"'\n,;]+)/i,
+    /could be["\s:]+([^"'\n,;]+)/i,
+    /may be["\s:]+([^"'\n,;]+)/i,
+    /similar to["\s:]+([^"'\n,;]+)/i,
+    /matches["\s:]+([^"'\n,;]+)/i
+  ];
+  
+  for (const pattern of medicationPatterns) {
+    const match = text.match(pattern);
+    if (match && match[1] && match[1].length > 2) {
+      return match[1].trim();
     }
-  } catch (error) {
-    console.error("Error using DeepSeek API:", error);
-    throw error;
   }
+  
+  return null;
 }
 
-// Function to find drug info in database based on AI identification
-async function findDrugInDatabase(drugData: any) {
-  try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-    
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Build a smarter search query that will try multiple approaches
-    let queryResults = [];
-    
-    // 1. Try exact name match first (highest confidence)
-    if (drugData.name && drugData.name !== "Unknown") {
-      const nameQuery = supabase
-        .from('drugs')
-        .select('*')
-        .ilike('name', `%${drugData.name}%`)
-        .limit(5);
-      
-      const { data: nameData, error: nameError } = await nameQuery;
-      
-      if (nameError) {
-        console.error("Name query error:", nameError);
-      } else if (nameData && nameData.length > 0) {
-        queryResults.push(...nameData);
-      }
-    }
-    
-    // 2. Try generic name match if available (medium confidence)
-    if (drugData.genericName && drugData.genericName !== "Unknown" && queryResults.length < 5) {
-      const genericQuery = supabase
-        .from('drugs')
-        .select('*')
-        .ilike('generic_name', `%${drugData.genericName}%`)
-        .limit(5);
-      
-      const { data: genericData, error: genericError } = await genericQuery;
-      
-      if (genericError) {
-        console.error("Generic name query error:", genericError);
-      } else if (genericData && genericData.length > 0) {
-        // Merge results, avoiding duplicates
-        for (const item of genericData) {
-          if (!queryResults.some(result => result.id === item.id)) {
-            queryResults.push(item);
-          }
-        }
-      }
-    }
-    
-    // 3. Try matching by imprint or markings if available
-    if ((drugData.imprint || drugData.markings) && queryResults.length < 5) {
-      const searchTerm = drugData.imprint || drugData.markings;
-      const markingsQuery = supabase
-        .from('drugs')
-        .select('*')
-        .or(`description.ilike.%${searchTerm}%,name.ilike.%${searchTerm}%`)
-        .limit(3);
-      
-      const { data: markingsData, error: markingsError } = await markingsQuery;
-      
-      if (markingsError) {
-        console.error("Markings query error:", markingsError);
-      } else if (markingsData && markingsData.length > 0) {
-        // Merge results, avoiding duplicates
-        for (const item of markingsData) {
-          if (!queryResults.some(result => result.id === item.id)) {
-            queryResults.push(item);
-          }
-        }
-      }
-    }
-    
-    // 4. If we still have no results, try possible names and description keywords
-    if (queryResults.length === 0 && (drugData.possibleNames?.length > 0 || drugData.description)) {
-      // Build a more thorough search using possible names or keywords from description
-      const searchTerms = drugData.possibleNames || [];
-      
-      // Extract keywords from description
-      if (drugData.description) {
-        const descriptionWords = drugData.description.split(/\s+/)
-          .filter((word: string) => word.length > 4)
-          .slice(0, 5);
-          
-        searchTerms.push(...descriptionWords);
-      }
-      
-      if (searchTerms.length > 0) {
-        // Create OR conditions for each search term
-        const searchConditions = searchTerms
-          .map(term => `name.ilike.%${term}%,generic_name.ilike.%${term}%,description.ilike.%${term}%`)
-          .join(',');
-          
-        const keywordQuery = supabase
-          .from('drugs')
-          .select('*')
-          .or(searchConditions)
-          .limit(3);
-          
-        const { data: keywordData, error: keywordError } = await keywordQuery;
-        
-        if (keywordError) {
-          console.error("Keyword query error:", keywordError);
-        } else if (keywordData && keywordData.length > 0) {
-          queryResults.push(...keywordData);
-        }
-      }
-    }
-    
-    // If we found matches in the database
-    if (queryResults.length > 0) {
-      // Sort results by relevance (simple heuristic - exact name matches first)
-      queryResults.sort((a, b) => {
-        if (drugData.name && a.name.toLowerCase().includes(drugData.name.toLowerCase())) return -1;
-        if (drugData.name && b.name.toLowerCase().includes(drugData.name.toLowerCase())) return 1;
-        return 0;
-      });
-      
-      // Use the best match
-      const bestMatch = queryResults[0];
-      
-      return {
-        id: bestMatch.id,
-        name: bestMatch.name,
-        genericName: bestMatch.generic_name,
-        manufacturer: bestMatch.manufacturer,
-        category: bestMatch.category,
-        drugClass: bestMatch.drug_class,
-        description: bestMatch.description,
-        prescriptionStatus: bestMatch.prescription_status,
-        dosageAndAdmin: bestMatch.dosage_and_admin,
-        image: bestMatch.image_url,
-        confidence: drugData.confidence,
-        fromDatabase: true,
-        alternativeMatches: queryResults.slice(1, 4).map(alt => ({ 
-          id: alt.id, 
-          name: alt.name, 
-          genericName: alt.generic_name 
-        }))
-      };
-    }
-    
-    // If no match in database, return processed AI data
-    return {
-      id: null,
-      name: drugData.name || "Unknown medication",
-      genericName: drugData.genericName || drugData.name || "Unknown",
-      manufacturer: null,
-      category: "Unclassified",
-      drugClass: null,
-      description: drugData.description || "No description available",
-      prescriptionStatus: null,
-      dosageAndAdmin: null,
-      image: null,
-      confidence: drugData.confidence,
-      fromDatabase: false,
-      partialPillDetected: drugData.partialPillDetected,
-      blurryModeUsed: drugData.blurryModeUsed,
-      multiModelAnalysisUsed: drugData.multiModelAnalysisUsed,
-      extractedText: drugData.extractedText || drugData.imprint || drugData.markings
-    };
-  } catch (error) {
-    console.error("Error in findDrugInDatabase:", error);
-    return null;
-  }
-}
-
-// Main function to process drug identification with improved error handling
-async function identifyDrug(imageBase64: string, blurryMode: boolean) {
-  try {
-    console.log("Image received, initiating multi-stage analysis pipeline");
-    
-    // Step 1: Enhance the image for better processing
-    let enhancedImage = imageBase64;
-    try {
-      enhancedImage = await enhanceImage(imageBase64);
-    } catch (enhanceError) {
-      console.error("Error enhancing image:", enhanceError);
-      // Continue with original image if enhancement fails
-    }
-    
-    // Step 2: Analyze the image with improved error handling
-    let drugData;
-    
-    try {
-      // Try multi-model analysis first for best results
-      drugData = await analyzeImageWithMultipleModels(enhancedImage, blurryMode || true);
-    } catch (analysisError) {
-      console.error("Error in primary analysis:", analysisError);
-      
-      // Fallback to simplified analysis
-      try {
-        console.log("Primary analysis failed. Using simplified fallback analysis...");
-        const simplifiedPrompt = `
-          Identify this medication. What is it? Describe color, shape, and any visible text.
-          Reply with: name, color, shape, and any text you can see.
-        `;
-        
-        const simpleResponse = await fetchAIResponse(simplifiedPrompt, enhancedImage);
-        drugData = {
-          name: "Unknown",
-          description: simpleResponse.substring(0, 300),
-          confidence: "low",
-          fallbackModeUsed: true
-        };
-        
-        // Extract potential drug name from response
-        const nameMatch = simpleResponse.match(/name:?\s*([A-Za-z0-9\s]{2,30})/i);
-        if (nameMatch && nameMatch[1]) {
-          drugData.name = nameMatch[1].trim();
-        }
-      } catch (fallbackError) {
-        console.error("Even fallback analysis failed:", fallbackError);
-        // Return basic error response that the frontend can handle
-        return {
-          name: "Identification Failed",
-          description: "The image could not be analyzed. Please try again with a clearer image.",
-          error: true,
-          confidence: "low"
-        };
-      }
-    }
-    
-    // Step 3: Check if this is a valid drug name that we can find more info about
-    if (drugData && !drugData.error) {
-      console.log(`Analysis completed. Drug name found: ${drugData.name}, enriching with database data`);
-      
-      // Get markings if not already extracted
-      if (!drugData.markings) {
-        try {
-          drugData.markings = await extractPotentialMarkings(
-            enhancedImage, 
-            drugData.description || ''
-          );
-        } catch (markingsError) {
-          console.error("Error extracting markings:", markingsError);
-        }
-      }
-      
-      // Search in our database with improved error handling
-      let dbDrugInfo = null;
-      try {
-        dbDrugInfo = await findDrugInDatabase(drugData);
-      } catch (dbError) {
-        console.error("Database search failed:", dbError);
-      }
-      
-      // Create the final result combining all data
-      const result = {
-        ...(dbDrugInfo || {}),
-        aiIdentification: {
-          name: drugData.name,
-          genericName: drugData.genericName,
-          imprint: drugData.imprint || null,
-          color: drugData.color || null,
-          shape: drugData.shape || null,
-          markings: drugData.markings || null,
-          description: drugData.description || null,
-          confidence: drugData.confidence || "low",
-          partialPillDetected: drugData.partialPillDetected || false,
-          blurryModeUsed: drugData.blurryModeUsed || blurryMode || false,
-          multiModelAnalysisUsed: drugData.multiModelAnalysisUsed || true,
-          fallbackModeUsed: drugData.fallbackModeUsed || false,
-          extractedText: drugData.extractedText || null,
-        }
-      };
-      
-      console.log("Final identification result:", result.name);
-      return result;
-      
-    } else {
-      // Return the AI analysis results without enrichment
-      return {
-        name: drugData?.name || "Unknown medication",
-        genericName: drugData?.genericName || "Unknown",
-        description: drugData?.description || "Medication could not be clearly identified from the image.",
-        confidence: drugData?.confidence || "low",
-        error: drugData?.error || false,
-        aiIdentification: {
-          imprint: drugData?.imprint || null,
-          color: drugData?.color || null,
-          shape: drugData?.shape || null,
-          markings: drugData?.markings || null,
-          partialPillDetected: drugData?.partialPillDetected || false,
-          blurryModeUsed: drugData?.blurryModeUsed || blurryMode || false,
-          multiModelAnalysisUsed: drugData?.multiModelAnalysisUsed || true,
-          fallbackModeUsed: drugData?.fallbackModeUsed || false,
-          extractedText: drugData?.extractedText || null,
-        }
-      };
-    }
-  } catch (error) {
-    console.error("Unhandled error in identifyDrug:", error);
-    // Return a user-friendly error response
-    return {
-      name: "Error",
-      description: "An unexpected error occurred during medication identification. Please try again.",
-      confidence: "low",
-      error: true,
-      errorDetails: error.message || "Unknown error"
-    };
-  }
-}
-
-// The main handler for the serverless function
+// Enhanced function to identify drug using a multi-stage approach
 serve(async (req) => {
-  // Handle CORS
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders, status: 204 });
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("Received drug identification request");
     const { imageBase64, blurryMode } = await req.json();
     
     if (!imageBase64) {
       return new Response(
         JSON.stringify({ error: "Missing image data" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log("Processing image with blurryMode:", blurryMode);
-    const result = await identifyDrug(imageBase64, blurryMode);
-
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    console.log("Image received, initiating multi-stage analysis pipeline");
+    
+    // Get the API key from environment variables
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+    
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is not set in environment variables");
+      return new Response(
+        JSON.stringify({ error: "API key not configured" }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // STAGE 1: Use multi-model analysis for better handling of blurry/difficult images
+    const multiModelAnalysis = await analyzeImageWithMultipleModels(imageBase64);
+    
+    // STAGE 2: Standard analysis with updated Gemini 1.5 Flash
+    console.log("Proceeding with standard analysis...");
+    const standardAnalysisPrompt = `
+    You are a pharmaceutical expert. Identify this medication pill/tablet from the image with extreme precision.
+    Focus intensely on identifying:
+    1. All markings, imprints, logos, numbers and text on the pill
+    2. Exact color(s) and shape 
+    3. Any scoring lines, coatings, or unusual features
+    4. Match to known medications based on these characteristics
+    
+    Return a comprehensive analysis in JSON format with these fields:
+    name, genericName, manufacturer, category, description, dosageAndAdmin, 
+    sideEffects (array), warnings (array), interactions (array), 
+    storage, mechanism, indications (array), contraindications (array), 
+    prescriptionStatus, pregnancy, imprint (all visible markings/codes), 
+    brandNames (array), drugClass, color, shape.
+    
+    CRITICAL: If the image is blurry or unclear, provide your best analysis of
+    what the medication MIGHT be based on the visible characteristics, and
+    include ALL possible matches in brandNames field.
+    
+    Ensure your response is ONLY valid JSON with no additional text.
+    `;
+    
+    // Standard analysis request with the new model
+    const standardResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          role: "user",
+          parts: [
+            { text: standardAnalysisPrompt },
+            { inline_data: {
+              mime_type: "image/jpeg",
+              data: imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64
+            }}
+          ]
+        }],
+        generation_config: { temperature: 0.1, max_output_tokens: 4000 }
+      })
     });
+
+    // Process standard analysis results
+    if (!standardResponse.ok) {
+      const errorText = await standardResponse.text();
+      console.error("Gemini API error:", errorText);
+      
+      // If standard analysis fails but multi-model analysis succeeded, use that
+      if (multiModelAnalysis) {
+        console.log("Standard analysis failed, using multi-model analysis results");
+        return constructFinalResponse(multiModelAnalysis, null, imageBase64);
+      }
+      
+      // If everything failed
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to analyze image", 
+          details: errorText 
+        }),
+        { status: standardResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const standardData = await standardResponse.json();
+    console.log("Standard analysis response received");
+
+    // Extract and parse standard analysis results
+    let standardAnalysisResult = null;
+    try {
+      if (standardData.candidates && standardData.candidates.length > 0 && 
+          standardData.candidates[0].content && 
+          standardData.candidates[0].content.parts && 
+          standardData.candidates[0].content.parts.length > 0) {
+        
+        const contentText = standardData.candidates[0].content.parts[0].text;
+        console.log("Raw response:", contentText.substring(0, 200) + "...");
+        
+        // Extract JSON from the response
+        const jsonMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/) || 
+                        contentText.match(/```\s*([\s\S]*?)\s*```/) ||
+                        contentText.match(/\{[\s\S]*\}/);
+        
+        if (jsonMatch) {
+          const jsonString = jsonMatch[1] || jsonMatch[0];
+          standardAnalysisResult = JSON.parse(jsonString);
+        } else {
+          // Try to extract drug name as fallback
+          const extractedDrugName = extractDrugNameFromText(contentText);
+          
+          if (extractedDrugName) {
+            standardAnalysisResult = {
+              name: extractedDrugName,
+              description: contentText.substring(0, 300) + "..."
+            };
+          }
+        }
+      }
+    } catch (parseError) {
+      console.error("Error parsing standard analysis:", parseError);
+    }
+    
+    // STAGE 3: Combine results and search for more detailed information
+    return await constructFinalResponse(multiModelAnalysis, standardAnalysisResult, imageBase64);
+    
   } catch (error) {
-    console.error("Fatal error in edge function:", error);
+    console.error("Error in identify-drug function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || "An unexpected error occurred",
-        name: "Error",
-        description: "The system encountered an error while processing your request. Please try again."
+        error: "An unexpected error occurred", 
+        details: error.message 
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
+
+// Helper function to construct final response by combining all analyses
+async function constructFinalResponse(multiModelAnalysis: any, standardAnalysis: any, imageBase64: string): Promise<Response> {
+  // Combine results from all analyses
+  const combinedData = {
+    id: crypto.randomUUID(),
+    name: "Unknown Medication",
+    genericName: "",
+    brandNames: [],
+    manufacturer: "Unknown",
+    category: "",
+    description: "",
+    dosageAndAdmin: "",
+    sideEffects: [],
+    warnings: [],
+    interactions: [],
+    storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
+    mechanism: "",
+    indications: [],
+    contraindications: [],
+    prescriptionStatus: "Unknown",
+    pregnancy: "",
+    imprint: "",
+    verified: false,
+    image: imageBase64.includes('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64}`,
+    drugClass: "",
+    confidence: "low",
+    color: "",
+    shape: "",
+    blurryModeUsed: false,
+    multiModelAnalysisUsed: !!multiModelAnalysis
+  };
+  
+  // Apply multi-model analysis results if available
+  if (multiModelAnalysis) {
+    combinedData.name = multiModelAnalysis.name || combinedData.name;
+    combinedData.genericName = multiModelAnalysis.genericName || combinedData.genericName;
+    combinedData.brandNames = multiModelAnalysis.possibleNames || [];
+    combinedData.imprint = multiModelAnalysis.imprint || "";
+    combinedData.description = multiModelAnalysis.description || "";
+    combinedData.confidence = multiModelAnalysis.confidence || "low";
+    combinedData.color = multiModelAnalysis.color || "";
+    combinedData.shape = multiModelAnalysis.shape || "";
+    combinedData.blurryModeUsed = true;
+  }
+  
+  // Apply standard analysis results if available
+  if (standardAnalysis) {
+    // Only override name from multi-model if confidence is higher
+    if (!multiModelAnalysis || 
+        (standardAnalysis.name && 
+         (combinedData.confidence === "low" || combinedData.name === "Unknown Medication"))) {
+      combinedData.name = standardAnalysis.name;
+    }
+    
+    combinedData.genericName = standardAnalysis.genericName || combinedData.genericName;
+    
+    // Merge brand names from both analyses
+    if (standardAnalysis.brandNames && Array.isArray(standardAnalysis.brandNames)) {
+      combinedData.brandNames = [...new Set([...combinedData.brandNames, ...standardAnalysis.brandNames])];
+    }
+    
+    // Fill in other fields from standard analysis
+    combinedData.manufacturer = standardAnalysis.manufacturer || combinedData.manufacturer;
+    combinedData.category = standardAnalysis.category || combinedData.category;
+    combinedData.description = standardAnalysis.description || combinedData.description;
+    combinedData.dosageAndAdmin = standardAnalysis.dosageAndAdmin || combinedData.dosageAndAdmin;
+    combinedData.sideEffects = standardAnalysis.sideEffects || combinedData.sideEffects;
+    combinedData.warnings = standardAnalysis.warnings || combinedData.warnings;
+    combinedData.interactions = standardAnalysis.interactions || combinedData.interactions;
+    combinedData.storage = standardAnalysis.storage || combinedData.storage;
+    combinedData.mechanism = standardAnalysis.mechanism || combinedData.mechanism;
+    combinedData.indications = standardAnalysis.indications || combinedData.indications;
+    combinedData.contraindications = standardAnalysis.contraindications || combinedData.contraindications;
+    combinedData.prescriptionStatus = standardAnalysis.prescriptionStatus || combinedData.prescriptionStatus;
+    combinedData.pregnancy = standardAnalysis.pregnancy || combinedData.pregnancy;
+    combinedData.imprint = standardAnalysis.imprint || combinedData.imprint;
+    combinedData.drugClass = standardAnalysis.drugClass || combinedData.drugClass;
+    
+    if (!combinedData.color && standardAnalysis.color) {
+      combinedData.color = standardAnalysis.color;
+    }
+    
+    if (!combinedData.shape && standardAnalysis.shape) {
+      combinedData.shape = standardAnalysis.shape;
+    }
+  }
+  
+  // If we have a valid drug name, try to enrich with more information
+  if (combinedData.name && combinedData.name !== "Unknown Medication") {
+    console.log(`Valid drug name found: ${combinedData.name}, enriching with drugs.com data`);
+    const drugsComData = await getDrugInfoFromDrugsCom(combinedData.name);
+    
+    if (drugsComData) {
+      // Apply drugs.com data, preferring it over AI-generated data for factual fields
+      combinedData.genericName = drugsComData.genericName || combinedData.genericName;
+      combinedData.manufacturer = drugsComData.manufacturer || combinedData.manufacturer;
+      combinedData.category = drugsComData.category || combinedData.category;
+      combinedData.drugClass = drugsComData.drugClass || combinedData.drugClass;
+      combinedData.description = drugsComData.description || combinedData.description;
+      combinedData.dosageAndAdmin = drugsComData.dosageAndAdmin || combinedData.dosageAndAdmin;
+      
+      if (drugsComData.sideEffects && drugsComData.sideEffects.length > 0) {
+        combinedData.sideEffects = drugsComData.sideEffects;
+      }
+      
+      if (drugsComData.warnings && drugsComData.warnings.length > 0) {
+        combinedData.warnings = drugsComData.warnings;
+      }
+      
+      if (drugsComData.interactions && drugsComData.interactions.length > 0) {
+        combinedData.interactions = drugsComData.interactions;
+      }
+      
+      combinedData.storage = drugsComData.storage || combinedData.storage;
+      combinedData.mechanism = drugsComData.mechanism || combinedData.mechanism;
+      
+      if (drugsComData.indications && drugsComData.indications.length > 0) {
+        combinedData.indications = drugsComData.indications;
+      }
+      
+      if (drugsComData.contraindications && drugsComData.contraindications.length > 0) {
+        combinedData.contraindications = drugsComData.contraindications;
+      }
+      
+      if (drugsComData.prescriptionStatus !== "Unknown") {
+        combinedData.prescriptionStatus = drugsComData.prescriptionStatus;
+      }
+      
+      combinedData.pregnancy = drugsComData.pregnancy || combinedData.pregnancy;
+      
+      // Add brand names from drugs.com if available
+      if (drugsComData.brandNames && drugsComData.brandNames.length > 0) {
+        combinedData.brandNames = [...new Set([...combinedData.brandNames, ...drugsComData.brandNames])];
+      }
+    }
+  } else if (combinedData.imprint) {
+    // If we have an imprint but no drug name, try searching by imprint
+    console.log(`No valid drug name but imprint found: ${combinedData.imprint}, searching by imprint`);
+    const imprintResults = await findDrugByImprint(combinedData.imprint);
+    
+    if (imprintResults) {
+      console.log(`Found drug by imprint: ${imprintResults.name}`);
+      // Update fields from imprint search
+      combinedData.name = imprintResults.name;
+      combinedData.genericName = imprintResults.genericName || combinedData.genericName;
+      combinedData.manufacturer = imprintResults.manufacturer || combinedData.manufacturer;
+      combinedData.category = imprintResults.category || combinedData.category;
+      combinedData.drugClass = imprintResults.drugClass || combinedData.drugClass;
+      combinedData.description = imprintResults.description || combinedData.description;
+      combinedData.dosageAndAdmin = imprintResults.dosageAndAdmin || combinedData.dosageAndAdmin;
+      
+      if (imprintResults.sideEffects && imprintResults.sideEffects.length > 0) {
+        combinedData.sideEffects = imprintResults.sideEffects;
+      }
+      
+      if (imprintResults.warnings && imprintResults.warnings.length > 0) {
+        combinedData.warnings = imprintResults.warnings;
+      }
+      
+      if (imprintResults.interactions && imprintResults.interactions.length > 0) {
+        combinedData.interactions = imprintResults.interactions;
+      }
+      
+      combinedData.storage = imprintResults.storage || combinedData.storage;
+      combinedData.mechanism = imprintResults.mechanism || combinedData.mechanism;
+      
+      if (imprintResults.indications && imprintResults.indications.length > 0) {
+        combinedData.indications = imprintResults.indications;
+      }
+      
+      if (imprintResults.contraindications && imprintResults.contraindications.length > 0) {
+        combinedData.contraindications = imprintResults.contraindications;
+      }
+      
+      if (imprintResults.prescriptionStatus !== "Unknown") {
+        combinedData.prescriptionStatus = imprintResults.prescriptionStatus;
+      }
+      
+      combinedData.pregnancy = imprintResults.pregnancy || combinedData.pregnancy;
+      
+      // Add brand names from imprint search if available
+      if (imprintResults.brandNames && imprintResults.brandNames.length > 0) {
+        combinedData.brandNames = [...new Set([...combinedData.brandNames, ...imprintResults.brandNames])];
+      }
+    }
+  }
+  
+  // Log the final processed result
+  console.log("Final identification result:", combinedData.name);
+  
+  return new Response(
+    JSON.stringify(combinedData),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
