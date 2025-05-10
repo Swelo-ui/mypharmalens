@@ -1,4 +1,5 @@
 
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -10,12 +11,14 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <BrowserRouter>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <App />
-        <Toaster position="bottom-center" />
-      </TooltipProvider>
-    </ThemeProvider>
-  </BrowserRouter>
+  <React.StrictMode>
+    <BrowserRouter>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <TooltipProvider>
+          <App />
+          <Toaster position="bottom-center" />
+        </TooltipProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );
