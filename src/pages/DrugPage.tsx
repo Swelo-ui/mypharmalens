@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, 
-  ThumbsDown, Clock, ArrowLeft, PanelLeftOpen,
-  ChevronUp, ChevronDown
+  ThumbsDown, Clock, ArrowLeft, PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,15 +11,13 @@ import { getDetailedDrugData } from '@/data/mockDrugsData';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
-import { cn } from '@/lib/utils';
-import BottomNavigation from '@/components/BottomNavigation';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     if (id) {
@@ -65,19 +62,6 @@ const DrugPage = () => {
     );
   }
 
-  const Section = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <Accordion type="single" collapsible className="w-full mb-4">
-      <AccordionItem value={title} className="border-b-0">
-        <AccordionTrigger className="py-3 px-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-750 font-medium">
-          {title}
-        </AccordionTrigger>
-        <AccordionContent className="pt-2 px-4 pb-4 bg-white dark:bg-gray-800 rounded-b-lg -mt-2">
-          {children}
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-
   return (
     <>
       <Header />
@@ -91,7 +75,7 @@ const DrugPage = () => {
           Back
         </Button>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
           <div className="flex items-start gap-4">
             {drug.image && (
               <div className="hidden sm:block w-1/4 rounded-lg overflow-hidden">
@@ -163,25 +147,29 @@ const DrugPage = () => {
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
-            <Section title="Description">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Description</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.description}
               </p>
-            </Section>
+            </div>
 
-            <Section title="Dosage & Administration">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Dosage & Administration</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.dosageAndAdmin}
               </p>
-            </Section>
+            </div>
 
-            <Section title="Mechanism of Action">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Mechanism of Action</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.mechanism}
               </p>
-            </Section>
+            </div>
 
-            <Section title="Side Effects">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Side Effects</h3>
               <ul className="space-y-2">
                 {drug.sideEffects.map((effect, i) => (
                   <li key={i} className="flex items-start">
@@ -192,9 +180,10 @@ const DrugPage = () => {
                   </li>
                 ))}
               </ul>
-            </Section>
+            </div>
 
-            <Section title="Drug Interactions">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Drug Interactions</h3>
               <ul className="space-y-2">
                 {drug.interactions.map((interaction, i) => (
                   <li key={i} className="flex items-start">
@@ -203,11 +192,12 @@ const DrugPage = () => {
                   </li>
                 ))}
               </ul>
-            </Section>
+            </div>
           </TabsContent>
           
           <TabsContent value="usage" className="space-y-4">
-            <Section title="Indications">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Indications</h3>
               <ul className="space-y-2">
                 {drug.indications.map((indication, i) => (
                   <li key={i} className="flex items-start">
@@ -216,9 +206,10 @@ const DrugPage = () => {
                   </li>
                 ))}
               </ul>
-            </Section>
+            </div>
             
-            <Section title="Contraindications">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Contraindications</h3>
               <ul className="space-y-2">
                 {drug.contraindications.map((contraindication, i) => (
                   <li key={i} className="flex items-start">
@@ -227,22 +218,25 @@ const DrugPage = () => {
                   </li>
                 ))}
               </ul>
-            </Section>
+            </div>
             
-            <Section title="Pregnancy & Lactation">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Pregnancy & Lactation</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {drug.pregnancy}
               </p>
-            </Section>
+            </div>
             
-            <Section title="Storage Information">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Storage Information</h3>
               <div className="flex items-start">
                 <History className="h-4 w-4 text-pharma-500 mt-0.5 mr-2 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 text-sm">{drug.storage}</span>
               </div>
-            </Section>
+            </div>
             
-            <Section title="Warnings & Precautions">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+              <h3 className="font-medium mb-3">Warnings & Precautions</h3>
               <ul className="space-y-3">
                 {drug.warnings.map((warning, i) => (
                   <li key={i} className="flex items-start p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
@@ -251,7 +245,7 @@ const DrugPage = () => {
                   </li>
                 ))}
               </ul>
-            </Section>
+            </div>
           </TabsContent>
           
           <TabsContent value="alternatives" className="space-y-4">
@@ -298,7 +292,6 @@ const DrugPage = () => {
           </TabsContent>
         </Tabs>
       </div>
-      <BottomNavigation />
       <Footer />
     </>
   );

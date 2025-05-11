@@ -33,7 +33,7 @@ const SearchBar = ({
       setTimeout(() => {
         onSearch(query);
         setIsLoading(false);
-      }, 800);
+      }, 300);
     } else {
       navigate(`/search?q=${encodeURIComponent(query)}`);
     }
@@ -50,15 +50,15 @@ const SearchBar = ({
         "relative transition-all duration-300 group",
         fullWidth ? "w-full" : "max-w-xl mx-auto",
         isFocused 
-          ? "scale-[1.01] shadow-lg" 
-          : "shadow-md hover:shadow-lg",
+          ? "scale-[1.01] shadow-md" 
+          : "shadow-sm hover:shadow-md",
         className
       )}
     >
       <div className={cn(
         "flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 rounded-full border",
         isFocused 
-          ? "border-pharma-400 ring-2 ring-pharma-100" 
+          ? "border-pharma-400 ring-1 ring-pharma-100" 
           : "border-gray-200 dark:border-gray-700"
       )}>
         <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
@@ -88,7 +88,7 @@ const SearchBar = ({
           disabled={isLoading || !query.trim()} 
           className={cn(
             "px-4 py-1.5 rounded-full text-sm font-medium transition-all",
-            "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500",
+            "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-pharma-500",
             query.trim() 
               ? "bg-pharma-600 text-white hover:bg-pharma-700" 
               : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800"
