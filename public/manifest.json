@@ -1,8 +1,8 @@
 
 {
-  "name": "PharmaLens",
+  "name": "PharmaLens - AI-Powered Medication Identification App",
   "short_name": "PharmaLens",
-  "description": "AI-Powered Medication Identification App",
+  "description": "AI-Powered Medication Identification and Information App",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -22,7 +22,41 @@
       "purpose": "any maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+      "sizes": "320x568",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
   "categories": ["healthcare", "medical", "utilities", "pill identifier", "medication reference"],
-  "screenshots": [],
-  "related_applications": []
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Identify Medication",
+      "short_name": "Identify",
+      "description": "Identify a medication with your camera",
+      "url": "/identify",
+      "icons": [
+        {
+          "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Search Medications",
+      "short_name": "Search",
+      "description": "Search for medication information",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

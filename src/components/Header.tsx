@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Home, Pill, HelpCircle, Info, Mail, Coffee } from 'lucide-react';
@@ -88,7 +87,7 @@ const Header = () => {
               <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
                 <span className="font-bold text-sm">PL</span>
               </div>
-              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
+              <span className="font-bold text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
             </Link>
 
             {/* Right Side Actions */}
@@ -117,7 +116,7 @@ const Header = () => {
               <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
                 <span className="font-bold text-sm">PL</span>
               </div>
-              <span className="font-bold text-xl text-pharma-600 dark:text-pharma-400">PharmaLens</span>
+              <span className="font-bold text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
             </Link>
 
             {/* Desktop Navigation */}

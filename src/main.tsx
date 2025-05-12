@@ -8,20 +8,47 @@ import { Toaster } from 'sonner'
 
 const root = createRoot(document.getElementById("root")!);
 
-// Register service worker
+// Register service worker with improved error handling
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        
+        // Set up auto update checking
+        setInterval(() => {
+          registration.update();
+          console.log('Checking for service worker updates');
+        }, 60 * 60 * 1000); // Check every hour
       })
       .catch(error => {
-        console.log('ServiceWorker registration failed: ', error);
+        console.error('ServiceWorker registration failed: ', error);
       });
+      
+    // Listen for controller change to refresh the page
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      console.log('New service worker activated');
+      // Use a custom UI to inform the user about new content and offer a refresh
+      // For now, we'll just log it
+    });
+  });
+  
+  // Handle offline/online events
+  window.addEventListener('online', () => {
+    console.log('App is online');
+    // Trigger any pending background syncs
+    navigator.serviceWorker.ready.then(registration => {
+      registration.sync.register('sync-data');
+    });
+  });
+  
+  window.addEventListener('offline', () => {
+    console.log('App is offline');
+    // Show offline notification if needed
   });
 }
 
-// Add meta tags for healthcare SEO
+// Add meta tags for healthcare SEO and PWA support
 const addMetaTags = () => {
   const metaTags = [
     { name: 'description', content: 'PharmaLens - AI-powered medication identification and information app' },
@@ -36,7 +63,14 @@ const addMetaTags = () => {
     { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
     { name: 'apple-mobile-web-app-title', content: 'PharmaLens' },
     { name: 'application-name', content: 'PharmaLens' },
-    { name: 'theme-color', content: '#0384c6' }
+    { name: 'theme-color', content: '#0289C8' },
+    { name: 'msapplication-TileColor', content: '#0289C8' },
+    { name: 'msapplication-tap-highlight', content: 'no' },
+    { name: 'mobile-web-app-capable', content: 'yes' },
+    // Performance optimization meta tags
+    { name: 'viewport', content: 'width=device-width, initial-scale=1.0, viewport-fit=cover' },
+    { name: 'referrer', content: 'no-referrer-when-downgrade' },
+    { 'http-equiv': 'Cache-Control', content: 'public, max-age=31536000' }
   ];
 
   metaTags.forEach(tag => {
@@ -58,6 +92,12 @@ const addMetaTags = () => {
   appleIcon.rel = 'apple-touch-icon';
   appleIcon.href = '/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png';
   document.head.appendChild(appleIcon);
+  
+  // Add manifest
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = '/manifest.json';
+  document.head.appendChild(manifestLink);
 };
 
 // Run the meta tag addition

@@ -20,13 +20,15 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         premium: "bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:brightness-110",
-        primary: "bg-[#0384c6] text-white hover:bg-[#026e9e]",
+        primary: "bg-[#0289C8] text-white hover:bg-[#026e9e]",
+        pharmaButton: "bg-[#0289C8] text-white hover:bg-[#026e9e] rounded-full shadow-md",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        xl: "h-12 rounded-full px-10 text-lg",
       },
     },
     defaultVariants: {
