@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Scan, History, User } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
@@ -7,16 +7,45 @@ import { useMediaQuery } from '@/hooks/use-mobile';
 const BottomNavigation = () => {
   const location = useLocation();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  // Scroll handler to show/hide navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < lastScrollY || currentScrollY < 50) {
+        setVisible(true);
+      } else if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+        setVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+  
+  // Reset visibility on route change
+  useEffect(() => {
+    setVisible(true);
+  }, [location.pathname]);
   
   // Don't render on desktop
   if (!isMobile) return null;
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-40">
+    <nav 
+      className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-40 transition-transform duration-300 ${
+        visible ? 'nav-visible' : 'nav-hidden'
+      }`}
+    >
       <div className="flex justify-around items-center h-16 px-4 max-w-md mx-auto">
         <Link to="/" className="flex flex-col items-center space-y-1">
           <Home className={`h-5 w-5 ${isActive('/') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />

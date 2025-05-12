@@ -8,7 +8,7 @@ import { Toaster } from 'sonner'
 
 const root = createRoot(document.getElementById("root")!);
 
-// Register service worker
+// Register service worker with improved event listeners
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
@@ -19,13 +19,22 @@ if ('serviceWorker' in navigator) {
         console.log('ServiceWorker registration failed: ', error);
       });
   });
+  
+  // Handle service worker updates
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 }
 
 // Add meta tags for healthcare SEO
 const addMetaTags = () => {
   const metaTags = [
     { name: 'description', content: 'PharmaLens - AI-powered medication identification and information app' },
-    { name: 'keywords', content: 'medication identifier, pill identifier, drug reference, healthcare app, medicine information' },
+    { name: 'keywords', content: 'medication identifier, pill identifier, drug reference, healthcare app, medicine information, pill scanner' },
     { property: 'og:title', content: 'PharmaLens - Medication Identifier' },
     { property: 'og:description', content: 'Identify medications and get detailed information about prescription and over-the-counter drugs' },
     { property: 'og:type', content: 'website' },
@@ -36,7 +45,9 @@ const addMetaTags = () => {
     { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
     { name: 'apple-mobile-web-app-title', content: 'PharmaLens' },
     { name: 'application-name', content: 'PharmaLens' },
-    { name: 'theme-color', content: '#0384c6' }
+    { name: 'theme-color', content: '#0384c6' },
+    { name: 'mobile-web-app-capable', content: 'yes' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover' }
   ];
 
   metaTags.forEach(tag => {
@@ -62,6 +73,32 @@ const addMetaTags = () => {
 
 // Run the meta tag addition
 addMetaTags();
+
+// Fix bottom navigation display with CSS
+const fixBottomNavigation = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 70px;
+      }
+      
+      .nav-visible {
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+      }
+      
+      .nav-hidden {
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+};
+
+// Apply the bottom navigation fix
+fixBottomNavigation();
 
 root.render(
   <BrowserRouter>
