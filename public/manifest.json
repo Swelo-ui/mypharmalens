@@ -10,19 +10,19 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/lovable-uploads/03d50fc4-2036-4230-9ec1-d3b8fb1e84a2.png",
+      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/lovable-uploads/03d50fc4-2036-4230-9ec1-d3b8fb1e84a2.png",
+      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["healthcare", "medical", "utilities"],
+  "categories": ["healthcare", "medical", "utilities", "pill identifier", "medication reference"],
   "screenshots": [],
   "related_applications": []
 }

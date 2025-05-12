@@ -76,17 +76,7 @@ const DrugPage = () => {
         </Button>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-          <div className="flex items-start gap-4">
-            {drug.image && (
-              <div className="hidden sm:block w-1/4 rounded-lg overflow-hidden">
-                <img 
-                  src={drug.image} 
-                  alt={drug.name} 
-                  className="w-full object-cover"
-                />
-              </div>
-            )}
-            
+          <div className="flex items-start">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 {drug.prescriptionStatus === 'Prescription Only' && (
@@ -119,34 +109,24 @@ const DrugPage = () => {
                   {drug.manufacturer}
                 </span>
               </div>
-              
-              {drug.image && (
-                <div className="sm:hidden mt-4 rounded-lg overflow-hidden">
-                  <img 
-                    src={drug.image} 
-                    alt={drug.name} 
-                    className="w-full object-cover"
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="w-full mb-2 flex overflow-x-auto bg-transparent p-0 no-scrollbar">
-            <TabsTrigger value="general" className="flex-1 text-center">
-              <span className="block text-[13px] sm:text-sm">General Information</span>
+          <TabsList className="w-full border-b border-gray-200 dark:border-gray-700 p-0 mb-0 flex overflow-x-auto bg-transparent">
+            <TabsTrigger value="general" className="flex-1 text-center text-lg font-medium py-3">
+              General Information
             </TabsTrigger>
-            <TabsTrigger value="usage" className="flex-1 text-center">
-              <span className="block text-[13px] sm:text-sm">Usage & Precautions</span>
+            <TabsTrigger value="usage" className="flex-1 text-center text-lg font-medium py-3">
+              Usage & Precautions
             </TabsTrigger>
-            <TabsTrigger value="alternatives" className="flex-1 text-center">
-              <span className="block text-[13px] sm:text-sm">Alternatives & Brands</span>
+            <TabsTrigger value="alternatives" className="flex-1 text-center text-lg font-medium py-3">
+              Alternatives & Brands
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="general" className="space-y-4">
+          <TabsContent value="general" className="space-y-4 mt-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
               <h3 className="font-medium mb-3">Description</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
@@ -195,7 +175,7 @@ const DrugPage = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="usage" className="space-y-4">
+          <TabsContent value="usage" className="space-y-4 mt-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
               <h3 className="font-medium mb-3">Indications</h3>
               <ul className="space-y-2">
@@ -248,7 +228,7 @@ const DrugPage = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="alternatives" className="space-y-4">
+          <TabsContent value="alternatives" className="space-y-4 mt-4">
             {drug.brandNames && drug.brandNames.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                 <h3 className="text-sm font-medium mb-3">Brand Names</h3>
