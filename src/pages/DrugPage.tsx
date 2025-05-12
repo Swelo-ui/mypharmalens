@@ -115,14 +115,14 @@ const DrugPage = () => {
 
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="w-full border-b border-gray-200 dark:border-gray-700 p-0 mb-0 flex overflow-x-auto bg-transparent">
-            <TabsTrigger value="general" className="flex-1 text-center text-lg font-medium py-3">
-              General Information
+            <TabsTrigger value="general" className="flex-1 text-center font-medium py-3 px-2 min-h-[3.5rem] flex items-center">
+              <span className="mx-auto leading-tight text-sm">General Information</span>
             </TabsTrigger>
-            <TabsTrigger value="usage" className="flex-1 text-center text-lg font-medium py-3">
-              Usage & Precautions
+            <TabsTrigger value="usage" className="flex-1 text-center font-medium py-3 px-2 min-h-[3.5rem] flex items-center">
+              <span className="mx-auto leading-tight text-sm">Usage & Precautions</span>
             </TabsTrigger>
-            <TabsTrigger value="alternatives" className="flex-1 text-center text-lg font-medium py-3">
-              Alternatives & Brands
+            <TabsTrigger value="alternatives" className="flex-1 text-center font-medium py-3 px-2 min-h-[3.5rem] flex items-center">
+              <span className="mx-auto leading-tight text-sm">Alternatives & Brands</span>
             </TabsTrigger>
           </TabsList>
           
