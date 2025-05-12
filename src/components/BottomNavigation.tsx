@@ -40,33 +40,33 @@ const BottomNavigation = () => {
   if (!isMobile) return null;
   
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-t-3xl z-40 transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+    <nav className={`fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-3xl z-40 transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
       <div className="flex justify-around items-center h-16 px-4 max-w-md mx-auto">
         <Link to="/" className="flex flex-col items-center space-y-1">
-          <Home className={`h-5 w-5 ${isActive('/') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Home</span>
+          <Home className={`h-5 w-5 ${isActive('/') ? 'text-[#0384c6]' : 'text-gray-700'}`} />
+          <span className={`text-xs ${isActive('/') ? 'text-[#0384c6] font-medium' : 'text-gray-700'}`}>Home</span>
         </Link>
         
         <Link to="/search" className="flex flex-col items-center space-y-1">
-          <Search className={`h-5 w-5 ${isActive('/search') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/search') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Search</span>
+          <Search className={`h-5 w-5 ${isActive('/search') ? 'text-[#0384c6]' : 'text-gray-700'}`} />
+          <span className={`text-xs ${isActive('/search') ? 'text-[#0384c6] font-medium' : 'text-gray-700'}`}>Search</span>
         </Link>
         
         <Link to="/identify" className="flex flex-col items-center -mt-8">
           <div className="bg-[#0384c6] p-4 rounded-full shadow-lg">
             <Scan className="h-6 w-6 text-white" />
           </div>
-          <span className="text-xs text-gray-700 dark:text-gray-400 mt-1 font-medium">Identify</span>
+          <span className="text-xs text-gray-700 mt-1 font-medium">Identify</span>
         </Link>
         
         <Link to="/history" className="flex flex-col items-center space-y-1">
-          <History className={`h-5 w-5 ${isActive('/history') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/history') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>History</span>
+          <History className={`h-5 w-5 ${isActive('/history') ? 'text-[#0384c6]' : 'text-gray-700'}`} />
+          <span className={`text-xs ${isActive('/history') ? 'text-[#0384c6] font-medium' : 'text-gray-700'}`}>History</span>
         </Link>
         
         <Link to="/profile" className="flex flex-col items-center space-y-1">
-          <User className={`h-5 w-5 ${isActive('/profile') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-xs ${isActive('/profile') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Profile</span>
+          <User className={`h-5 w-5 ${isActive('/profile') ? 'text-[#0384c6]' : 'text-gray-700'}`} />
+          <span className={`text-xs ${isActive('/profile') ? 'text-[#0384c6] font-medium' : 'text-gray-700'}`}>Profile</span>
         </Link>
       </div>
     </nav>
