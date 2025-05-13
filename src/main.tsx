@@ -36,10 +36,18 @@ if ('serviceWorker' in navigator) {
   // Handle offline/online events
   window.addEventListener('online', () => {
     console.log('App is online');
-    // Trigger any pending background syncs
-    navigator.serviceWorker.ready.then(registration => {
-      registration.sync.register('sync-data');
-    });
+    // Modified to check for background sync support before using it
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then(registration => {
+        // TypeScript safe way to handle sync registration
+        if ('sync' in registration) {
+          // @ts-ignore - TypeScript doesn't recognize the sync API yet
+          registration.sync.register('sync-data').catch(err => {
+            console.error('Background sync registration failed:', err);
+          });
+        }
+      });
+    }
   });
   
   window.addEventListener('offline', () => {
