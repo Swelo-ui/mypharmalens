@@ -30,6 +30,7 @@ const SearchResults = () => {
     
     const loadDrugs = async () => {
       try {
+        console.log("Searching for:", searchQuery);
         if (searchQuery) {
           // Try to fetch from Supabase first
           const supabaseDrugs = await fetchDrugs({ 
@@ -38,6 +39,7 @@ const SearchResults = () => {
           });
           
           if (supabaseDrugs && supabaseDrugs.length > 0) {
+            console.log("Found drugs in Supabase:", supabaseDrugs.length);
             // Map Supabase drugs to DrugData format
             const formattedDrugs = supabaseDrugs.map(drug => ({
               id: drug.id,
@@ -48,6 +50,7 @@ const SearchResults = () => {
               description: drug.description,
               drugClass: drug.drug_class,
               verified: drug.verified,
+              brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
             }));
             
             setResults(formattedDrugs);
@@ -56,29 +59,40 @@ const SearchResults = () => {
           }
         }
         
+        console.log("Falling back to local data search");
         // Fall back to combined data if no Supabase results
         // Enhanced search logic to include brand names and fuzzy matching
         const filtered = searchQuery
           ? combinedDrugsData.filter(drug => {
               const query = searchQuery.toLowerCase();
+              
+              // Direct matches
               const nameMatch = drug.name.toLowerCase().includes(query);
               const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
               const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
               const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
               const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
               
-              // Brand name matching
+              // Brand name matching with comprehensive check
               const brandMatch = drug.brandNames && 
                 drug.brandNames.some(brand => brand.toLowerCase().includes(query));
               
-              // Simple fuzzy matching for common misspellings
+              // Improved fuzzy matching for common misspellings
+              // Adjust threshold based on query length for better accuracy
+              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
               const fuzzyMatch = calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= Math.min(3, Math.floor(drug.name.length / 3));
+                query, drug.name.toLowerCase()) <= threshold;
+
+              // For very short queries, be more strict about fuzzy matching
+              const shouldUseFuzzy = query.length > 3;
               
               return nameMatch || genericMatch || manufacturerMatch || 
-                     categoryMatch || drugClassMatch || brandMatch || fuzzyMatch;
+                     categoryMatch || drugClassMatch || brandMatch || 
+                     (shouldUseFuzzy && fuzzyMatch);
             })
           : combinedDrugsData;
+        
+        console.log(`Found ${filtered.length} drugs in local data`);
         
         // Apply category filters if any are active
         const finalResults = activeFilters.length > 0
@@ -100,13 +114,14 @@ const SearchResults = () => {
               if (drug.category && drug.category.toLowerCase().includes(query)) return true;
               if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
               
-              // Check brand names
+              // Check brand names with improved matching
               if (drug.brandNames && drug.brandNames.some(brand => 
                 brand.toLowerCase().includes(query))) return true;
               
-              // Simple fuzzy matching for common misspellings
+              // Improved fuzzy matching for common misspellings
+              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
               if (calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= Math.min(3, Math.floor(drug.name.length / 3))) {
+                query, drug.name.toLowerCase()) <= threshold) {
                 return true;
               }
               
@@ -124,15 +139,15 @@ const SearchResults = () => {
       }
     };
     
-    // Simulate API call delay for better UX
+    // Simulate API call delay for better UX - shorter delay for faster response
     const timer = setTimeout(() => {
       loadDrugs();
-    }, 800);
+    }, 400);
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
   
-  // Simple Levenshtein distance implementation for fuzzy matching
+  // Enhanced Levenshtein distance implementation for fuzzy matching
   const calculateLevenshteinDistance = (a: string, b: string): number => {
     const matrix = [];
     

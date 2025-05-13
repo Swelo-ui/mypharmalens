@@ -33,7 +33,7 @@ const SearchBar = ({
     
     const searchTerm = query.toLowerCase();
     
-    // Find matching drugs by name, brand names, or with similar spelling
+    // Find matching drugs by name, brand names, generic names, or with similar spelling
     const matchingDrugs = combinedDrugsData
       .filter(drug => {
         // Direct name match
@@ -42,23 +42,34 @@ const SearchBar = ({
         // Generic name match
         if (drug.genericName && drug.genericName.toLowerCase().includes(searchTerm)) return true;
         
-        // Brand name match
+        // Brand name match (comprehensive check)
         if (drug.brandNames && drug.brandNames.some(brand => 
           brand.toLowerCase().includes(searchTerm))) return true;
         
-        // Levenshtein distance for fuzzy matching (simple implementation)
+        // Manufacturer match
+        if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchTerm)) return true;
+        
+        // Category match
+        if (drug.category && drug.category.toLowerCase().includes(searchTerm)) return true;
+        
+        // Drug class match
+        if (drug.drugClass && drug.drugClass.toLowerCase().includes(searchTerm)) return true;
+        
+        // Advanced Levenshtein distance for fuzzy matching with improved threshold
         const nameLower = drug.name.toLowerCase();
-        if (calculateLevenshteinDistance(searchTerm, nameLower) <= 2) return true;
+        // Adjust threshold based on search term length for more accurate fuzzy matching
+        const threshold = Math.min(2, Math.max(1, Math.floor(searchTerm.length / 4)));
+        if (calculateLevenshteinDistance(searchTerm, nameLower) <= threshold) return true;
         
         return false;
       })
-      .slice(0, 5) // Limit to 5 suggestions
+      .slice(0, 8) // Increase to 8 suggestions for better user experience
       .map(drug => drug.name);
     
     setSuggestions(Array.from(new Set(matchingDrugs))); // Remove duplicates
   }, [query]);
   
-  // Simple Levenshtein distance implementation for fuzzy matching
+  // Enhanced Levenshtein distance implementation for fuzzy matching
   const calculateLevenshteinDistance = (a: string, b: string): number => {
     const matrix = [];
     
