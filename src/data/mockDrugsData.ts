@@ -933,7 +933,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   // Create detailed drug data by adding additional fields needed for the detailed view
   const detailedDrug: DetailedDrugData = {
     ...baseDrug,
-    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'Over-the-Counter',
+    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'OTC',
     dosageAndAdmin: `Adults: Initially ${Math.floor(Math.random() * 500)}mg daily. May be increased based on response. Children: Dosage must be determined by a physician.`,
     mechanism: `${baseDrug.name} works by ${baseDrug.drugClass === 'NSAID' ? 'inhibiting prostaglandin synthesis' : 'specific biological interactions related to its drug class'} to produce its therapeutic effects.`,
     sideEffects: [
