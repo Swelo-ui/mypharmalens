@@ -1,6 +1,7 @@
 
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
+import { additionalDrugsData } from './additionalDrugsData';
 
 export const mockDrugsData: DrugData[] = [
   {
@@ -1077,10 +1078,13 @@ export const mockDrugsData: DrugData[] = [
   }
 ];
 
+// Combine the original drug data with the additional drug data
+export const combinedDrugsData: DrugData[] = [...mockDrugsData, ...additionalDrugsData];
+
 // Function to get detailed drug data by ID
 export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
-  // First, find the basic drug information in the mockDrugsData array
-  const drug = mockDrugsData.find(drug => drug.id === id);
+  // First, find the basic drug information in the combined drugs data array
+  const drug = combinedDrugsData.find(drug => drug.id === id);
   
   if (!drug) return null;
   
@@ -1129,7 +1133,8 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
     ],
     prescriptionStatus: drug.verified ? 'Prescription Only' : 'OTC',
     pregnancy: `Limited data available on use during pregnancy. Should only be used if potential benefit justifies potential risk to the fetus. Consult your healthcare provider.`,
-    similarDrugs: getSimilarDrugs(drug.category, drug.id)
+    similarDrugs: getSimilarDrugs(drug.category, drug.id),
+    brandNames: drug.brandNames || []
   };
   
   return detailedDrug;
@@ -1137,8 +1142,11 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
 
 // Helper function to get similar drugs based on category
 const getSimilarDrugs = (category: string, excludeId: string): { id: string; name: string }[] => {
-  return mockDrugsData
+  return combinedDrugsData
     .filter(drug => drug.category === category && drug.id !== excludeId)
     .slice(0, 4)  // Limit to 4 similar drugs
     .map(drug => ({ id: drug.id, name: drug.name }));
 };
+
+// Export the combined drugs data as the default export
+export default combinedDrugsData;

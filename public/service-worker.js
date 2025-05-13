@@ -1,13 +1,13 @@
 
 // Service worker for PharmaLens PWA
-const CACHE_NAME = 'pharmalens-cache-v2';
+const CACHE_NAME = 'pharmalens-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/src/main.tsx',
   '/src/index.css',
   '/manifest.json',
-  '/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png',
+  '/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png',
   // Add more assets to cache
   '/src/App.tsx',
   '/src/components/Header.tsx',

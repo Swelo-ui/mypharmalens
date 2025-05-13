@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+      "src": "/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+      "src": "/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -24,7 +24,7 @@
   ],
   "screenshots": [
     {
-      "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+      "src": "/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png",
       "sizes": "320x568",
       "type": "image/png",
       "purpose": "any"
@@ -41,7 +41,7 @@
       "url": "/identify",
       "icons": [
         {
-          "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+          "src": "/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png",
           "sizes": "192x192"
         }
       ]
@@ -53,7 +53,7 @@
       "url": "/search",
       "icons": [
         {
-          "src": "/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png",
+          "src": "/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png",
           "sizes": "192x192"
         }
       ]

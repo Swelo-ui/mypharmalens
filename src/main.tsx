@@ -92,13 +92,13 @@ const addMetaTags = () => {
   // Add favicon link
   const link = document.createElement('link');
   link.rel = 'icon';
-  link.href = '/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png';
+  link.href = '/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png';
   document.head.appendChild(link);
 
   // Add apple touch icon
   const appleIcon = document.createElement('link');
   appleIcon.rel = 'apple-touch-icon';
-  appleIcon.href = '/lovable-uploads/35c191a2-c0d3-435c-980d-755f39e5b1c7.png';
+  appleIcon.href = '/lovable-uploads/9e5c4a76-3c90-4e76-a135-a1189527aa61.png';
   document.head.appendChild(appleIcon);
   
   // Add manifest
