@@ -15,6 +15,7 @@ export interface DrugData {
   verified?: boolean;
   image?: string;
   packageImage?: string;
+  brandNames?: string[]; // Add the brandNames property
 }
 
 interface DrugCardProps {
