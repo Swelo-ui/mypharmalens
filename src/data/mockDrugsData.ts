@@ -903,3 +903,13 @@ export const mockDrugsData: DrugData[] = [
     name: 'Carbamazepine',
     genericName: 'Carbamazepine',
     manufacturer: 'Various',
+    category: 'Anticonvulsant',
+    description: 'Medication used to treat epilepsy, trigeminal neuralgia, and bipolar disorder.',
+    drugClass: 'Anticonvulsant',
+    verified: true,
+    brandNames: ['Tegretol', 'Carbatrol', 'Epitol']
+  }
+];
+
+// Combine mock drugs data with additional drugs data
+export const combinedDrugsData = [...mockDrugsData, ...additionalDrugsData];
