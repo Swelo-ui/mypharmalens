@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, ChevronRight, Shield } from 'lucide-react';
+import { Pill, ChevronRight, Shield, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface DrugData {
@@ -15,7 +15,7 @@ export interface DrugData {
   verified?: boolean;
   image?: string;
   packageImage?: string;
-  brandNames?: string[]; // Add the brandNames property
+  brandNames?: string[]; // Brand names property
 }
 
 interface DrugCardProps {
@@ -85,6 +85,26 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
           </span>
         )}
       </div>
+      
+      {/* Brand names section */}
+      {drug.brandNames && drug.brandNames.length > 0 && (
+        <div className="mt-3">
+          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
+            <Tag className="h-3 w-3 mr-1" />
+            <span>Brand Names:</span>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {drug.brandNames.map((brand, index) => (
+              <span 
+                key={index}
+                className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
+              >
+                {brand}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
         {!onClick && (

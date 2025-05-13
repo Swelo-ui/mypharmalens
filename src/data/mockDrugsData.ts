@@ -1,4 +1,3 @@
-
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 import { additionalDrugsData } from './additionalDrugsData';
@@ -13,8 +12,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Used to treat pain and fever. It\'s often used for headaches, toothaches, and minor aches and pains.',
     drugClass: 'Non-opioid analgesic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006035601.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/HU/QW/HX/102217022/paracetamol-tablet-500x500.jpg'
+    brandNames: ['Tylenol', 'Panadol', 'Calpol']
   },
   {
     id: '2',
@@ -25,8 +23,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Non-steroidal anti-inflammatory drug used for relieving pain, fever, and inflammation.',
     drugClass: 'NSAID',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/167140352.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/1/LO/OO/AG/96624470/ibuprofen-tablets-ip-400-mg-500x500.jpg'
+    brandNames: ['Advil', 'Motrin', 'Nurofen']
   },
   {
     id: '3',
@@ -37,8 +34,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Penicillin antibiotic used to treat bacterial infections of the ear, nose, throat, respiratory tract, urinary tract, and skin.',
     drugClass: 'Penicillin antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930111.jpg',
-    packageImage: 'https://4.imimg.com/data4/OY/VC/MY-11753354/amoxicillin-capsules-ip-500x500.jpg'
+    brandNames: ['Amoxil', 'Trimox', 'Moxatag']
   },
   {
     id: '4',
@@ -49,8 +45,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to improve survival after a heart attack.',
     drugClass: 'ACE inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/311550147.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/1/RV/KF/BQ/13085548/lisinopril-tablets-250x250.jpg'
+    brandNames: ['Prinivil', 'Zestril']
   },
   {
     id: '5',
@@ -61,8 +56,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antihistamine used to temporarily relieve symptoms of hay fever and other allergies.',
     drugClass: 'Second-generation antihistamine',
     verified: false,
-    image: 'https://www.drugs.com/images/pills/nlm/007810258.jpg',
-    packageImage: 'https://4.imimg.com/data4/GI/GX/MY-15064706/loratadine-tablets-usp-500x500.jpg'
+    brandNames: ['Claritin', 'Alavert']
   },
   {
     id: '6',
@@ -73,8 +67,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Oral medication used to treat type 2 diabetes by improving how the body handles insulin.',
     drugClass: 'Biguanide',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930748.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/2/DT/DP/EG/41799276/metformin-tablets-ip-500mg-500x500.jpg'
+    brandNames: ['Glucophage', 'Fortamet', 'Riomet']
   },
   {
     id: '7',
@@ -85,8 +78,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Used to lower cholesterol and triglycerides in the blood and reduce the risk of heart attack and stroke.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/007810401.jpg',
-    packageImage: 'https://5.imimg.com/data5/ANDROID/Default/2022/11/RY/AV/OE/69583844/product-jpeg-500x500.jpg'
+    brandNames: ['Lipitor']
   },
   {
     id: '8',
@@ -97,8 +89,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor that decreases the amount of acid produced in the stomach. Used to treat conditions like gastroesophageal reflux disease (GERD).',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/550110467.jpg',
-    packageImage: 'https://4.imimg.com/data4/QF/JN/MY-11514615/omeprazole-capsules-500x500.jpg'
+    brandNames: ['Prilosec', 'Prilosec OTC', 'Losec']
   },
   {
     id: '9',
@@ -109,8 +100,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Calcium channel blocker used to treat high blood pressure and angina (chest pain).',
     drugClass: 'Calcium channel blocker',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/003780159.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2020/10/AO/LC/RQ/14766358/amlodipine-tablets-ip-500x500.jpg'
+    brandNames: ['Norvasc', 'Katerzia']
   },
   {
     id: '10',
@@ -121,8 +111,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, obsessive-compulsive disorder, panic attacks, and anxiety disorders.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/493450068.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/5/YF/ER/RA/73956040/sertraline-tablets-250x250.jpg'
+    brandNames: ['Zoloft']
   },
   {
     id: '11',
@@ -133,8 +122,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, panic attacks, obsessive-compulsive disorder, and bulimia nervosa.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930172.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/1/DG/XI/SE/43723005/prozac-capsules-500x500.jpg'
+    brandNames: ['Prozac']
   },
   {
     id: '12',
@@ -145,8 +133,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Angiotensin II receptor blocker used to treat high blood pressure and to help protect the kidneys from damage due to diabetes.',
     drugClass: 'Angiotensin II receptor antagonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mmx/t113505f/losartan-potassium.jpg',
-    packageImage: '/lovable-uploads/357d2940-cfa0-43c8-bbaf-29cd6665eb03.png'
+    brandNames: ['Cozaar']
   },
   {
     id: '13',
@@ -157,8 +144,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Bronchodilator that relaxes muscles in the airways and increases air flow to the lungs. Used to treat asthma and COPD.',
     drugClass: 'Beta2-adrenergic agonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Albuterol%20Sulfate%202%20mg-MYL.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/10/QI/HN/UB/138404772/albuterol-sulfate-100ml-solution-500x500.jpg'
+    brandNames: ['Ventolin', 'ProAir']
   },
   {
     id: '14',
@@ -169,8 +155,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Synthetic form of the thyroid hormone thyroxine used to treat hypothyroidism and to prevent goiter.',
     drugClass: 'Thyroid hormone',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/003786860.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/1/ZH/OP/LM/69583844/levothyroxine-sodium-tablets-500x500.jpg'
+    brandNames: ['Synthroid']
   },
   {
     id: '15',
@@ -181,8 +166,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Used to lower cholesterol and triglycerides in the blood and reduce the risk of heart attack and stroke.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/003786980.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/1/UA/US/QL/13085548/simvastatin-tablets-ip-500x500.jpg'
+    brandNames: ['Zocor']
   },
   {
     id: '16',
@@ -193,8 +177,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Anticonvulsant and analgesic used to treat seizures and neuropathic pain.',
     drugClass: 'Anticonvulsant',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/180880101.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/YX/XN/JM/13085548/gabapentin-tablets-ip-500x500.jpg'
+    brandNames: ['Neurontin']
   },
   {
     id: '17',
@@ -205,8 +188,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Thiazide diuretic used to treat high blood pressure and fluid retention.',
     drugClass: 'Thiazide diuretic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/008910371.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/GF/VM/KN/13085548/hydrochlorothiazide-tablets-ip-500x500.jpg'
+    brandNames: ['Microzide']
   },
   {
     id: '18',
@@ -217,8 +199,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Beta-blocker used to treat high blood pressure, chest pain, and heart failure.',
     drugClass: 'Beta blocker',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930748.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/XG/WI/IZ/13085548/metoprolol-tablets-ip-500x500.jpg'
+    brandNames: ['Lopressor']
   },
   {
     id: '19',
@@ -229,8 +210,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Anticoagulant used to prevent blood clots from forming or growing larger.',
     drugClass: 'Vitamin K antagonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/551110588.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/GM/KN/OX/13085548/warfarin-tablets-ip-500x500.jpg'
+    brandNames: ['Coumadin']
   },
   {
     id: '20',
@@ -241,8 +221,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Corticosteroid used to reduce inflammation and suppress the immune system.',
     drugClass: 'Corticosteroid',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/003782608.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Deltasone']
   },
   {
     id: '21',
@@ -253,8 +232,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Benzodiazepine used to treat anxiety disorders and panic disorders.',
     drugClass: 'Benzodiazepine',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/003780032.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Xanax']
   },
   {
     id: '22',
@@ -265,8 +243,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/167140270.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Celexa']
   },
   {
     id: '23',
@@ -277,8 +254,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Loop diuretic used to treat fluid retention (edema) and high blood pressure.',
     drugClass: 'Loop diuretic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/493450085.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Lasix']
   },
   {
     id: '24',
@@ -289,8 +265,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression and anxiety disorders.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/597810288.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Lexapro']
   },
   {
     id: '25',
@@ -301,8 +276,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor used to treat certain stomach and esophagus problems such as acid reflux.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Pantoprazole%20Sodium%2040%20mg-TEV.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Protonix']
   },
   {
     id: '26',
@@ -313,8 +287,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for atorvastatin, used to lower cholesterol and reduce the risk of heart disease.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/594150770.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Lipitor']
   },
   {
     id: '27',
@@ -325,8 +298,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for amlodipine, used to treat high blood pressure and chest pain (angina).',
     drugClass: 'Calcium channel blocker',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Amlodipine%20Besylate%205%20mg-MYL.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Norvasc']
   },
   {
     id: '28',
@@ -337,8 +309,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for lisinopril, used to treat high blood pressure and heart failure.',
     drugClass: 'ACE inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000060111.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Prinivil']
   },
   {
     id: '29',
@@ -349,8 +320,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for esomeprazole, used to treat gastroesophageal reflux disease (GERD) and other conditions caused by excess stomach acid.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/001860756.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Nexium']
   },
   {
     id: '30',
@@ -361,8 +331,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for sertraline, used to treat depression, panic attacks, obsessive compulsive disorder, and anxiety disorders.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000690365.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Zoloft']
   },
   {
     id: '31',
@@ -373,8 +342,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for fluoxetine, used to treat depression, panic attacks, and obsessive-compulsive disorder.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/005190079.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Prozac']
   },
   {
     id: '32',
@@ -385,8 +353,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for losartan, used to treat high blood pressure and to help protect the kidneys from damage due to diabetes.',
     drugClass: 'Angiotensin II receptor antagonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000060552.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Cozaar']
   },
   {
     id: '33',
@@ -397,8 +364,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Combination medication containing a corticosteroid and a long-acting bronchodilator, used to treat asthma and COPD.',
     drugClass: 'Corticosteroid/Long-acting beta agonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Advair%20Diskus%20250-50-GLA.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Advair']
   },
   {
     id: '34',
@@ -409,8 +375,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for levothyroxine, used to treat hypothyroidism.',
     drugClass: 'Thyroid hormone',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000741525.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Synthroid']
   },
   {
     id: '35',
@@ -421,8 +386,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for alprazolam, used to treat anxiety and panic disorders.',
     drugClass: 'Benzodiazepine',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000090029.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Xanax']
   },
   {
     id: '36',
@@ -433,8 +397,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for celecoxib, used to treat pain and inflammation caused by arthritis, ankylosing spondylitis, and menstrual cramps.',
     drugClass: 'COX-2 inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006035477.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Celebrex']
   },
   {
     id: '37',
@@ -445,8 +408,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for simvastatin, used to lower cholesterol and reduce the risk of heart disease.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006035789.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Zocor']
   },
   {
     id: '38',
@@ -457,8 +419,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for escitalopram, used to treat anxiety and depression.',
     drugClass: 'SSRI',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006035453.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Lexapro']
   },
   {
     id: '39',
@@ -469,8 +430,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for pantoprazole, used to treat erosive esophagitis and other conditions involving excess stomach acid.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000080715.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Protonix']
   },
   {
     id: '40',
@@ -481,8 +441,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Brand name for cetirizine, used to relieve allergy symptoms such as watery eyes, runny nose, itching, sneezing, and hives.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/501070177.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OX/ER/JM/13085548/prednisolone-tablets-ip-500x500.jpg'
+    brandNames: ['Zyrtec']
   },
   
   // Additional drugs to ensure at least 15 per category
@@ -496,8 +455,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Macrolide antibiotic used to treat a wide variety of bacterial infections including respiratory infections, skin infections, ear infections, and sexually transmitted diseases.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mmx/t109508f/azithromycin.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/11/VT/JO/VM/28186990/azithromycin-tablet-500x500.jpg'
+    brandNames: ['Zithromax', 'Azithral']
   },
   {
     id: '42',
@@ -508,8 +466,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including infections of the skin, bone, joint, respiratory tract, and urinary tract.',
     drugClass: 'Fluoroquinolone antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/167140115.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/BO/HT/SY/28186990/ciprofloxacin-tablets-500x500.jpg'
+    brandNames: ['Cipro', 'Ciloxan']
   },
   {
     id: '43',
@@ -520,8 +477,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Tetracycline antibiotic used to treat a wide variety of bacterial infections, including respiratory tract infections, urinary tract infections, and severe acne.',
     drugClass: 'Tetracycline antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006035430.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/8/IY/LB/AR/88223930/doxycycline-tablet-500x500.jpg'
+    brandNames: ['Vibramycin', 'Doryx']
   },
   {
     id: '44',
@@ -532,8 +488,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Third-generation cephalosporin antibiotic used to treat a variety of bacterial infections including meningitis, pneumonia, and gonorrhea.',
     drugClass: 'Cephalosporin antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mmx/t110014f/ceftriaxone-sodium.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/ZR/KW/MI/28186990/ceftriaxone-injection-500x500.jpg'
+    brandNames: ['Rocephin']
   },
   // Adding WHO Essential Medicines
   {
@@ -545,8 +500,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Hormone used to control blood sugar levels in diabetes mellitus.',
     drugClass: 'Antidiabetic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/604990246.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/YC/OS/PA/14782956/insulin-500x500.jpg'
+    brandNames: ['Humulin', 'Novolin']
   },
   {
     id: '46',
@@ -557,8 +511,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Opioid medication used to treat moderate to severe pain.',
     drugClass: 'Opioid analgesic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/005551030.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/3/HD/BX/VT/147421795/morphine-sulphate-tablets-500x500.jpg'
+    brandNames: ['MS Contin', 'Oramorph']
   },
   {
     id: '47',
@@ -569,8 +522,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat pain, fever, or inflammation.',
     drugClass: 'NSAID',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930079.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/GN/KA/LD/164265141/aspirin-tablets-500x500.jpg'
+    brandNames: ['Bayer', 'Ecotrin']
   },
   {
     id: '48',
@@ -581,8 +533,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antimetabolite used to treat certain types of cancer and autoimmune diseases.',
     drugClass: 'Antimetabolite',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930945.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/MI/HF/HD/23022707/methotrexate-tablets-500x500.jpg'
+    brandNames: ['Trexall', 'Rheumatrex']
   },
   {
     id: '49',
@@ -593,8 +544,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Benzodiazepine used to treat anxiety, alcohol withdrawal, and seizures.',
     drugClass: 'Benzodiazepine',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930233.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/XZ/EE/KJ/14168860/diazepam-tablets-500x500.jpg'
+    brandNames: ['Valium']
   },
   {
     id: '50',
@@ -605,8 +555,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Anticonvulsant used to control seizures.',
     drugClass: 'Hydantoin anticonvulsant',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006034561.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/6/LF/KP/SN/36064965/phenytoin-tablets-500x500.jpeg'
+    brandNames: ['Dilantin']
   },
   {
     id: '51',
@@ -617,8 +566,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat epilepsy and bipolar disorder.',
     drugClass: 'Anticonvulsant',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/008910106.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/6/GQ/UL/SF/13085548/valproic-acid-tablets-500x500.jpg'
+    brandNames: ['Depakote']
   },
   {
     id: '52',
@@ -629,8 +577,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Cardiac glycoside used to treat various heart conditions.',
     drugClass: 'Cardiac glycoside',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930791.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/3/SQ/CW/CS/11708676/digoxin-tablets-500x500.jpg'
+    brandNames: ['Lanoxin']
   },
   {
     id: '53',
@@ -641,8 +588,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used for the treatment of tuberculosis.',
     drugClass: 'Antimycobacterial',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Isoniazid%20300%20mg-HLK.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/GJ/HC/YF/29443452/isoniazid-tablets-500x500.jpg'
+    brandNames: ['INH']
   },
   {
     id: '54',
@@ -653,8 +599,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antibiotic used to treat several types of bacterial infections, particularly tuberculosis.',
     drugClass: 'Rifamycin antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Rifampin%20300%20mg-MYL.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/NU/KS/LO/2539532/rifampicin-capsules-500x500.jpg'
+    brandNames: ['Rifadin']
   },
   {
     id: '55',
@@ -665,8 +610,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat tuberculosis.',
     drugClass: 'Antimycobacterial',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Ethambutol%20HCl%20400%20mg-LUP.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/2/BC/DA/QG/138404772/ethambutol-tablets-500x500.jpg'
+    brandNames: ['Myambutol']
   },
   {
     id: '56',
@@ -677,8 +621,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Broad-spectrum antibiotic used to treat serious infections.',
     drugClass: 'Amphenicol antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill22498-1/chloramphenicol.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/5/XG/WN/DW/119909680/chloramphenicol-capsules-500x500.jpg'
+    brandNames: ['Chloromycetin']
   },
   {
     id: '57',
@@ -689,8 +632,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Aminoglycoside antibiotic used to treat many bacterial infections.',
     drugClass: 'Aminoglycoside antibiotic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill20582-1/gentamicin-sulfate.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/FV/IJ/ZL/10195624/gentamicin-injection-500x500.jpg'
+    brandNames: ['Garamycin']
   },
   {
     id: '58',
@@ -701,8 +643,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat parasitic worm infestations.',
     drugClass: 'Anthelmintic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill19208-1/mebendazole.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/KO/LM/PL/13085548/mebendazole-tablets-ip-500x500.jpg'
+    brandNames: ['Vermox']
   },
   {
     id: '59',
@@ -713,8 +654,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat parasitic worm infestations.',
     drugClass: 'Anthelmintic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill19753-1/albendazole.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/MA/RL/SV/123042231/albendazole-tablets-500x500.jpg'
+    brandNames: ['Albenza']
   },
   {
     id: '60',
@@ -725,8 +665,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used primarily to prevent and treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/493450003.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/MO/UM/VP/13085548/chloroquine-phosphate-tablets-ip-500x500.jpg'
+    brandNames: ['Aralen']
   },
   {
     id: '61',
@@ -737,8 +676,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill23547-1/artemether-lumefantrine.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/PC/LN/RV/88833515/artemether-lumefantrine-tablets-500x500.jpg'
+    brandNames: ['Coartem']
   },
   {
     id: '62',
@@ -749,8 +687,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antiviral medication used to treat herpes simplex virus infections.',
     drugClass: 'Antiviral',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930060.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/3/RS/LB/XF/40030407/acyclovir-tablets-500x500.jpg'
+    brandNames: ['Zovirax']
   },
   {
     id: '63',
@@ -761,8 +698,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antiretroviral medication used to prevent and treat HIV/AIDS.',
     drugClass: 'Nucleoside reverse transcriptase inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Zidovudine%20300%20mg-CIP.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/8/AR/TI/CL/111317514/zidovudine-tablets-500x500.jpg'
+    brandNames: ['Retrovir']
   },
   {
     id: '64',
@@ -773,8 +709,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antiviral medication used to treat HIV/AIDS and hepatitis B virus infections.',
     drugClass: 'Nucleoside reverse transcriptase inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Lamivudine%20150%20mg-CIP.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/QA/PS/ML/13085548/lamivudine-tablets-500x500.jpg'
+    brandNames: ['Epivir']
   },
   {
     id: '65',
@@ -785,8 +720,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Antiretroviral medication used to treat and prevent HIV/AIDS.',
     drugClass: 'Non-nucleoside reverse transcriptase inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Nevirapine%20200%20mg-MYL.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/PF/XR/HU/13085548/nevirapine-tablets-500x500.jpg'
+    brandNames: ['Viramune']
   },
   {
     id: '66',
@@ -797,8 +731,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to prevent and treat stomach ulcers, induce labor, cause an abortion, and treat postpartum bleeding.',
     drugClass: 'Prostaglandin',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Misoprostol%20200%20mcg-GRE.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/TI/HU/JQ/13085548/misoprostol-tablets-ip-200-mcg-500x500.jpg'
+    brandNames: ['Cytotec']
   },
   {
     id: '67',
@@ -809,8 +742,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication and hormone that causes contraction of the uterus and is used to induce labor, control bleeding after delivery, and help with abortion.',
     drugClass: 'Hormone',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill26570-1/oxytocin.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/OW/LI/UG/28186990/oxytocin-injection-500x500.jpg'
+    brandNames: ['Pitocin']
   },
   {
     id: '68',
@@ -821,8 +753,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat and prevent low blood magnesium and seizures in women with eclampsia.',
     drugClass: 'Mineral supplement',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill27036-1/magnesium-sulfate.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/3/JK/ZN/BW/28186990/magnesium-sulphate-injection-500x500.jpg'
+    brandNames: ['Epsom Salt']
   },
   {
     id: '69',
@@ -833,8 +764,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Form of vitamin B used to treat folate deficiency and prevent neural tube defects during pregnancy.',
     drugClass: 'Vitamin',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930127.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/6/OT/DI/BD/14766358/folic-acid-tablets-500x500.jpg'
+    brandNames: ['Folacin']
   },
   {
     id: '70',
@@ -845,8 +775,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Dietary supplement used to treat or prevent low blood iron and iron deficiency anemia.',
     drugClass: 'Mineral supplement',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006034013.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/CV/DR/YW/112526333/ferrous-ascorbate-folic-acid-tablets-500x500.jpg'
+    brandNames: ['Feosol']
   },
   {
     id: '71',
@@ -857,8 +786,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Dietary supplement used to prevent or treat low blood calcium levels.',
     drugClass: 'Mineral supplement',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/005514046.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OK/SU/WC/88223930/calcium-carbonate-tablets-500x500.jpg'
+    brandNames: ['Tums']
   },
   {
     id: '72',
@@ -869,8 +797,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Dietary supplement used to prevent or treat zinc deficiency.',
     drugClass: 'Mineral supplement',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill28725-1/zinc-sulfate.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/MH/HN/LZ/28872057/zinc-sulphate-tablets-500x500.jpg'
+    brandNames: ['Orazinc']
   },
   {
     id: '73',
@@ -881,8 +808,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Dietary supplement used to prevent and treat vitamin A deficiency.',
     drugClass: 'Vitamin',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill29904-1/vitamin-a.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2021/12/GA/SU/KJ/2539532/vitamin-a-capsules-500x500.jpg'
+    brandNames: ['Aquasol A']
   },
   {
     id: '74',
@@ -893,8 +819,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Dietary supplement used to prevent and treat vitamin D deficiency.',
     drugClass: 'Vitamin',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930013.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/CS/VY/OE/88223930/vitamin-d3-tablets-500x500.jpg'
+    brandNames: ['Drisdol']
   },
   {
     id: '75',
@@ -905,8 +830,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Oral electrolyte mixture used for the treatment of dehydration.',
     drugClass: 'Electrolyte replacement',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill30658-1/oral-rehydration-salts.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/JY/EO/XD/88223930/oral-rehydration-salts-powder-500x500.jpg'
+    brandNames: ['Pedialyte']
   },
   {
     id: '76',
@@ -917,8 +841,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat glaucoma, epilepsy, altitude sickness, and heart failure.',
     drugClass: 'Carbonic anhydrase inhibitor',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/004060561.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/1/WZ/VH/OA/136557487/acetazolamide-tablets-500x500.jpg'
+    brandNames: ['Diamox']
   },
   {
     id: '77',
@@ -929,8 +852,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat heart failure, high blood pressure, edema, and low blood potassium levels.',
     drugClass: 'Potassium-sparing diuretic',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/551110437.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/2/ZD/GZ/XA/13085548/spironolactone-tablets-ip-500x500.jpg'
+    brandNames: ['Aldactone']
   },
   {
     id: '78',
@@ -941,8 +863,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat asthma, bronchitis, and COPD.',
     drugClass: 'Beta2-adrenergic agonist',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill31827-1/salbutamol.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/11/PG/RF/UU/78990223/salbutamol-tablets-500x500.jpg'
+    brandNames: ['Ventolin']
   },
   {
     id: '79',
@@ -953,8 +874,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Corticosteroid used to treat asthma, allergic rhinitis, and other respiratory conditions.',
     drugClass: 'Corticosteroid',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill32481-1/beclomethasone-dipropionate.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/7/IR/VP/UL/11708676/beclometasone-dipropionate-inhaler-500x500.jpg'
+    brandNames: ['Qvar']
   },
   {
     id: '80',
@@ -965,8 +885,7 @@ export const mockDrugsData: DrugData[] = [
     description: 'Corticosteroid used to treat asthma, allergic rhinitis, and inflammatory bowel disease.',
     drugClass: 'Corticosteroid',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000080578.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/1/DO/MY/JZ/69583844/budesonide-nebuliser-suspension-500x500.jpg'
+    brandNames: ['Pulmicort']
   },
   {
     id: '81',
@@ -977,176 +896,10 @@ export const mockDrugsData: DrugData[] = [
     description: 'Medication used to treat open-angle glaucoma and high blood pressure.',
     drugClass: 'Beta blocker',
     verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/500880473.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2023/2/OM/QD/FR/13085548/timolol-eye-drops-500x500.jpg'
+    brandNames: ['Blocadren']
   },
   {
     id: '82',
     name: 'Carbamazepine',
     genericName: 'Carbamazepine',
     manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Medication used primarily for the treatment of epilepsy and neuropathic pain.',
-    drugClass: 'Anticonvulsant',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930261.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/10/TR/KP/VH/28186990/carbamazepine-tablets-ip-500x500.png'
-  },
-  {
-    id: '83',
-    name: 'Haloperidol',
-    genericName: 'Haloperidol',
-    manufacturer: 'Various',
-    category: 'Antipsychotic',
-    description: 'Antipsychotic medication used to treat schizophrenia, tics, and acute psychosis.',
-    drugClass: 'Typical antipsychotic',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/009040363.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/10/NF/ZN/JY/32519668/haloperidol-tablets-500x500.jpg'
-  },
-  {
-    id: '84',
-    name: 'Risperidone',
-    genericName: 'Risperidone',
-    manufacturer: 'Various',
-    category: 'Antipsychotic',
-    description: 'Antipsychotic medication used to treat schizophrenia and bipolar disorder.',
-    drugClass: 'Atypical antipsychotic',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/605050678.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/MA/NR/GZ/13085548/risperidone-tablets-ip-500x500.jpg'
-  },
-  {
-    id: '85',
-    name: 'Amitriptyline',
-    genericName: 'Amitriptyline',
-    manufacturer: 'Various',
-    category: 'Antidepressant',
-    description: 'Tricyclic antidepressant used to treat depression, anxiety disorders, and certain chronic pain conditions.',
-    drugClass: 'Tricyclic antidepressant',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/000930060.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/ZU/SE/JL/13085548/amitriptyline-tablets-ip-500x500.jpg'
-  },
-  {
-    id: '86',
-    name: 'Clofazimine',
-    genericName: 'Clofazimine',
-    manufacturer: 'Various',
-    category: 'Antimycobacterial',
-    description: 'Medication used to treat leprosy and other mycobacterial infections.',
-    drugClass: 'Antimycobacterial',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill33924-1/clofazimine.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/KU/ZD/GH/13085548/clofazimine-capsules-500x500.jpg'
-  },
-  {
-    id: '87',
-    name: 'Amphotericin B',
-    genericName: 'Amphotericin B',
-    manufacturer: 'Various',
-    category: 'Antifungal',
-    description: 'Antifungal medication used for serious fungal infections.',
-    drugClass: 'Polyene antifungal',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/custom/pill34651-1/amphotericin-b.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/12/BU/QT/DO/28186990/amphotericin-b-injection-500x500.jpg'
-  },
-  {
-    id: '88',
-    name: 'Metronidazole',
-    genericName: 'Metronidazole',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Antibiotic and antiprotozoal medication used to treat bacterial infections and certain parasitic infections.',
-    drugClass: 'Nitroimidazole antibiotic',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/nlm/006034094.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/LE/DI/OA/28186990/metronidazole-tablets-ip-500x500.png'
-  },
-  {
-    id: '89',
-    name: 'Ivermectin',
-    genericName: 'Ivermectin',
-    manufacturer: 'Various',
-    category: 'Anthelmintic',
-    description: 'Medication used to treat many types of parasite infestations, including head lice, scabies, river blindness, and others.',
-    drugClass: 'Anthelmintic',
-    verified: true,
-    image: 'https://www.drugs.com/images/pills/mtm/Ivermectin%203%20mg-TEV.jpg',
-    packageImage: 'https://5.imimg.com/data5/SELLER/Default/2022/9/TN/WI/XC/13085548/ivermectin-tablets-500x500.jpg'
-  }
-];
-
-// Combine the original drug data with the additional drug data
-export const combinedDrugsData: DrugData[] = [...mockDrugsData, ...additionalDrugsData];
-
-// Function to get detailed drug data by ID
-export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
-  // First, find the basic drug information in the combined drugs data array
-  const drug = combinedDrugsData.find(drug => drug.id === id);
-  
-  if (!drug) return null;
-  
-  // Create a detailed drug data object with additional information
-  const detailedDrug: DetailedDrugData = {
-    id: drug.id,
-    name: drug.name,
-    genericName: drug.genericName,
-    manufacturer: drug.manufacturer,
-    category: drug.category,
-    description: drug.description,
-    verified: drug.verified,
-    image: drug.image,
-    packageImage: drug.packageImage,
-    drugClass: drug.drugClass || '',
-    dosageAndAdmin: `The standard dosage for ${drug.name} varies based on patient weight, age, and condition severity. Always follow your physician's instructions.`,
-    sideEffects: [
-      `Headache and dizziness`,
-      `Nausea or upset stomach`,
-      `Fatigue or drowsiness`,
-      `Mild allergic reactions in sensitive individuals`
-    ],
-    warnings: [
-      `Do not take if you have a known allergy to ${drug.genericName} or related compounds.`,
-      `Consult your doctor before use if you have liver or kidney problems.`,
-      `Not recommended during pregnancy unless benefits outweigh risks.`,
-      `May cause drowsiness; avoid driving or operating machinery until effects are known.`
-    ],
-    interactions: [
-      `May interact with other medications that affect liver enzymes.`,
-      `Avoid alcohol consumption while taking this medication.`,
-      `May have reduced effectiveness when taken with antacids.`,
-      `Tell your doctor about all other medications you are currently taking.`
-    ],
-    storage: `Store at room temperature (59-86°F or 15-30°C) away from light and moisture. Keep out of reach of children.`,
-    mechanism: `${drug.name} works by ${drug.drugClass === 'NSAID' ? 'inhibiting the production of prostaglandins, chemicals involved in inflammation and pain signaling.' : 'targeting specific receptors to produce its therapeutic effect.'}`,
-    indications: [
-      `Treatment of ${drug.category.toLowerCase()} conditions as prescribed by your physician.`,
-      `Relief of symptoms associated with the condition it's prescribed for.`,
-      `May be used as part of combination therapy for certain conditions.`
-    ],
-    contraindications: [
-      `Known hypersensitivity to ${drug.name} or any component of the formulation.`,
-      `Severe liver or kidney impairment may require dosage adjustment.`,
-      `Certain pre-existing medical conditions may preclude use.`
-    ],
-    prescriptionStatus: drug.verified ? 'Prescription Only' : 'OTC',
-    pregnancy: `Limited data available on use during pregnancy. Should only be used if potential benefit justifies potential risk to the fetus. Consult your healthcare provider.`,
-    similarDrugs: getSimilarDrugs(drug.category, drug.id),
-    brandNames: drug.brandNames || []
-  };
-  
-  return detailedDrug;
-};
-
-// Helper function to get similar drugs based on category
-const getSimilarDrugs = (category: string, excludeId: string): { id: string; name: string }[] => {
-  return combinedDrugsData
-    .filter(drug => drug.category === category && drug.id !== excludeId)
-    .slice(0, 4)  // Limit to 4 similar drugs
-    .map(drug => ({ id: drug.id, name: drug.name }));
-};
-
-// Export the combined drugs data as the default export
-export default combinedDrugsData;

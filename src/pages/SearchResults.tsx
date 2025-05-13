@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -5,7 +6,7 @@ import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
-import { mockDrugsData } from '@/data/mockDrugsData';
+import { combinedDrugsData } from '@/data/mockDrugsData';
 import { fetchDrugs } from '@/integrations/supabase/client';
 
 const SearchResults = () => {
@@ -19,8 +20,8 @@ const SearchResults = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   
-  // Extract unique categories from mockDrugsData
-  const categories = Array.from(new Set(mockDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
+  // Extract unique categories from combinedDrugsData
+  const categories = Array.from(new Set(combinedDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
 
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
@@ -47,8 +48,6 @@ const SearchResults = () => {
               description: drug.description,
               drugClass: drug.drug_class,
               verified: drug.verified,
-              image: drug.image_url,
-              packageImage: drug.package_image_url
             }));
             
             setResults(formattedDrugs);
@@ -57,17 +56,29 @@ const SearchResults = () => {
           }
         }
         
-        // Fall back to mock data if no Supabase results
-        // Filter based on search query
+        // Fall back to combined data if no Supabase results
+        // Enhanced search logic to include brand names and fuzzy matching
         const filtered = searchQuery
-          ? mockDrugsData.filter(drug => 
-              drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (drug.category && drug.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (drug.drugClass && drug.drugClass.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
-          : mockDrugsData;
+          ? combinedDrugsData.filter(drug => {
+              const query = searchQuery.toLowerCase();
+              const nameMatch = drug.name.toLowerCase().includes(query);
+              const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
+              const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
+              const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
+              const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
+              
+              // Brand name matching
+              const brandMatch = drug.brandNames && 
+                drug.brandNames.some(brand => brand.toLowerCase().includes(query));
+              
+              // Simple fuzzy matching for common misspellings
+              const fuzzyMatch = calculateLevenshteinDistance(
+                query, drug.name.toLowerCase()) <= Math.min(3, Math.floor(drug.name.length / 3));
+              
+              return nameMatch || genericMatch || manufacturerMatch || 
+                     categoryMatch || drugClassMatch || brandMatch || fuzzyMatch;
+            })
+          : combinedDrugsData;
         
         // Apply category filters if any are active
         const finalResults = activeFilters.length > 0
@@ -77,13 +88,31 @@ const SearchResults = () => {
         setResults(finalResults);
       } catch (error) {
         console.error("Error fetching drugs:", error);
-        // Fall back to mock data on error
+        // Fall back to local data on error with same enhanced search
         const filtered = searchQuery
-          ? mockDrugsData.filter(drug => 
-              drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (drug.genericName && drug.genericName.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
-          : mockDrugsData;
+          ? combinedDrugsData.filter(drug => {
+              const query = searchQuery.toLowerCase();
+              
+              // Check main properties
+              if (drug.name.toLowerCase().includes(query)) return true;
+              if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
+              if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
+              if (drug.category && drug.category.toLowerCase().includes(query)) return true;
+              if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
+              
+              // Check brand names
+              if (drug.brandNames && drug.brandNames.some(brand => 
+                brand.toLowerCase().includes(query))) return true;
+              
+              // Simple fuzzy matching for common misspellings
+              if (calculateLevenshteinDistance(
+                query, drug.name.toLowerCase()) <= Math.min(3, Math.floor(drug.name.length / 3))) {
+                return true;
+              }
+              
+              return false;
+            })
+          : combinedDrugsData;
           
         const finalResults = activeFilters.length > 0
           ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
@@ -102,6 +131,34 @@ const SearchResults = () => {
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
+  
+  // Simple Levenshtein distance implementation for fuzzy matching
+  const calculateLevenshteinDistance = (a: string, b: string): number => {
+    const matrix = [];
+    
+    // Initialize matrix
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    
+    // Fill matrix
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i-1][j] + 1,      // deletion
+          matrix[i][j-1] + 1,      // insertion
+          matrix[i-1][j-1] + cost  // substitution
+        );
+      }
+    }
+    
+    return matrix[b.length][a.length];
+  };
   
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
