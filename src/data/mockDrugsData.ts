@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
 import { additionalDrugsData } from './additionalDrugsData';
@@ -913,3 +914,77 @@ export const mockDrugsData: DrugData[] = [
 
 // Combine mock drugs data with additional drugs data
 export const combinedDrugsData = [...mockDrugsData, ...additionalDrugsData];
+
+// Function to get detailed drug data by ID
+export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+  // First check in mockDrugsData
+  const drugFromMock = mockDrugsData.find(drug => drug.id === id);
+  
+  // If not found, check in additionalDrugsData
+  const drugFromAdditional = !drugFromMock ? additionalDrugsData.find(drug => drug.id === id) : null;
+  
+  // Get the base drug data from either source
+  const baseDrug = drugFromMock || drugFromAdditional;
+  
+  if (!baseDrug) {
+    return null;
+  }
+  
+  // Create detailed drug data by adding additional fields needed for the detailed view
+  const detailedDrug: DetailedDrugData = {
+    ...baseDrug,
+    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'Over-the-Counter',
+    dosageAndAdmin: `Adults: Initially ${Math.floor(Math.random() * 500)}mg daily. May be increased based on response. Children: Dosage must be determined by a physician.`,
+    mechanism: `${baseDrug.name} works by ${baseDrug.drugClass === 'NSAID' ? 'inhibiting prostaglandin synthesis' : 'specific biological interactions related to its drug class'} to produce its therapeutic effects.`,
+    sideEffects: [
+      'Nausea or vomiting',
+      'Headache',
+      'Dizziness',
+      'Fatigue',
+      baseDrug.category === 'Antibiotic' ? 'Diarrhea' : 'Insomnia'
+    ],
+    interactions: [
+      'May interact with alcohol causing increased drowsiness',
+      'May interact with other medications metabolized by the liver',
+      'Use caution when combined with blood thinners'
+    ],
+    indications: [
+      `Treatment of ${baseDrug.category.toLowerCase()} related conditions`,
+      'Short-term management of acute symptoms',
+      baseDrug.category === 'Analgesic' ? 'Relief of mild to moderate pain' : 'As prescribed by healthcare provider'
+    ],
+    contraindications: [
+      'Hypersensitivity to the active ingredient or any component of the formulation',
+      'Severe liver or kidney impairment',
+      'Pregnancy (consult physician)',
+      'Lactation (consult physician)'
+    ],
+    pregnancy: 'This medication should be used during pregnancy only if the potential benefit justifies the potential risk to the fetus. Consult your doctor before use.',
+    storage: 'Store at room temperature between 68-77°F (20-25°C). Keep away from moisture, heat, and light. Keep out of reach of children.',
+    warnings: [
+      'Do not exceed recommended dose',
+      'Discontinue use and consult physician if symptoms persist or worsen',
+      'May cause drowsiness; use caution when driving or operating machinery'
+    ],
+    similarDrugs: getSimilarDrugs(baseDrug.category, baseDrug.id)
+  };
+  
+  return detailedDrug;
+};
+
+// Helper function to get similar drugs in the same category
+const getSimilarDrugs = (category: string, currentDrugId: string): Array<{ id: string, name: string }> => {
+  // Combine both data sources
+  const allDrugs = [...mockDrugsData, ...additionalDrugsData];
+  
+  // Find drugs in the same category, excluding the current drug
+  const similarDrugs = allDrugs
+    .filter(drug => drug.category === category && drug.id !== currentDrugId)
+    .slice(0, 4); // Limit to 4 similar drugs
+  
+  // Return simplified version with just id and name
+  return similarDrugs.map(drug => ({
+    id: drug.id,
+    name: drug.name
+  }));
+};
