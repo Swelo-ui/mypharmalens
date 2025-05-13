@@ -21,38 +21,30 @@ export interface FetchDrugsParams {
 export const fetchDrugs = async ({ 
   searchTerm, 
   category,
-  limit = 100 // Increased limit to show more results
+  limit = 50 
 }: FetchDrugsParams) => {
-  console.log("Fetching drugs from Supabase with params:", { searchTerm, category, limit });
+  let query = supabase
+    .from('drugs')
+    .select('*')
+    .limit(limit);
   
-  try {
-    let query = supabase
-      .from('drugs')
-      .select('*')
-      .limit(limit);
-    
-    if (searchTerm) {
-      // Search in name, generic_name, drug_class, manufacturer, and description
-      query = query.or(
-        `name.ilike.%${searchTerm}%,generic_name.ilike.%${searchTerm}%,drug_class.ilike.%${searchTerm}%,manufacturer.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
-      );
-    }
-    
-    if (category) {
-      query = query.eq('category', category);
-    }
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error('Error fetching drugs:', error);
-      return [];
-    }
-    
-    console.log(`Retrieved ${data?.length || 0} drugs from Supabase`);
-    return data;
-  } catch (e) {
-    console.error("Exception fetching from Supabase:", e);
+  if (searchTerm) {
+    // Search in name, generic_name, drug_class, manufacturer, and description
+    query = query.or(
+      `name.ilike.%${searchTerm}%,generic_name.ilike.%${searchTerm}%,drug_class.ilike.%${searchTerm}%,manufacturer.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+    );
+  }
+  
+  if (category) {
+    query = query.eq('category', category);
+  }
+  
+  const { data, error } = await query;
+  
+  if (error) {
+    console.error('Error fetching drugs:', error);
     return [];
   }
+  
+  return data;
 };

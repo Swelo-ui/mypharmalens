@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,8 +32,6 @@ const SearchBar = ({
     }
     
     const searchTerm = query.toLowerCase();
-    console.log("Searching for:", searchTerm);
-    console.log("Total drugs in data:", combinedDrugsData.length);
     
     // Find matching drugs by name, brand names, generic names, or with similar spelling
     const matchingDrugs = combinedDrugsData
@@ -64,10 +63,9 @@ const SearchBar = ({
         
         return false;
       })
-      .slice(0, 10) // Increase to 10 suggestions for better user experience
+      .slice(0, 8) // Increase to 8 suggestions for better user experience
       .map(drug => drug.name);
     
-    console.log("Found matching drugs:", matchingDrugs.length);
     setSuggestions(Array.from(new Set(matchingDrugs))); // Remove duplicates
   }, [query]);
   
@@ -113,7 +111,6 @@ const SearchBar = ({
         setSuggestions([]);
       }, 300);
     } else {
-      console.log("Navigating to search with query:", query);
       navigate(`/search?q=${encodeURIComponent(query)}`);
       setSuggestions([]);
     }
@@ -130,7 +127,6 @@ const SearchBar = ({
         setIsLoading(false);
       }, 300);
     } else {
-      console.log("Selected suggestion:", suggestion);
       navigate(`/search?q=${encodeURIComponent(suggestion)}`);
     }
   };

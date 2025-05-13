@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -19,13 +20,8 @@ const SearchResults = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   
-  console.log("SearchResults component initialized");
-  console.log("Search query:", searchQuery);
-  console.log("Total drugs in combinedDrugsData:", combinedDrugsData.length);
-  
   // Extract unique categories from combinedDrugsData
   const categories = Array.from(new Set(combinedDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
-  console.log("Available categories:", categories);
 
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
@@ -35,14 +31,11 @@ const SearchResults = () => {
     const loadDrugs = async () => {
       try {
         console.log("Searching for:", searchQuery);
-        console.log("Active filters:", activeFilters);
-        
         if (searchQuery) {
           // Try to fetch from Supabase first
           const supabaseDrugs = await fetchDrugs({ 
             searchTerm: searchQuery,
-            category: activeFilters.length > 0 ? activeFilters[0] : undefined,
-            limit: 150 // Increase limit to get more results
+            category: activeFilters.length > 0 ? activeFilters[0] : undefined
           });
           
           if (supabaseDrugs && supabaseDrugs.length > 0) {
@@ -63,12 +56,10 @@ const SearchResults = () => {
             setResults(formattedDrugs);
             setIsLoading(false);
             return;
-          } else {
-            console.log("No results found in Supabase, falling back to local data");
           }
         }
         
-        console.log("Searching local data");
+        console.log("Falling back to local data search");
         // Fall back to combined data if no Supabase results
         // Enhanced search logic to include brand names and fuzzy matching
         const filtered = searchQuery
@@ -108,7 +99,6 @@ const SearchResults = () => {
           ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
           : filtered;
         
-        console.log(`After filtering: ${finalResults.length} drugs`);
         setResults(finalResults);
       } catch (error) {
         console.error("Error fetching drugs:", error);
@@ -139,8 +129,6 @@ const SearchResults = () => {
             })
           : combinedDrugsData;
           
-        console.log(`Found ${filtered.length} drugs in local data after error`);
-        
         const finalResults = activeFilters.length > 0
           ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
           : filtered;
@@ -154,7 +142,7 @@ const SearchResults = () => {
     // Simulate API call delay for better UX - shorter delay for faster response
     const timer = setTimeout(() => {
       loadDrugs();
-    }, 300);
+    }, 400);
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
