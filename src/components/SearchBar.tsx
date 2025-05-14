@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { combinedDrugsData } from '@/data/mockDrugsData';
+import { searchDrugs } from '@/data/combinedDrugsData';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { DrugData } from '@/components/DrugCard';
 
 interface SearchBarProps {
   fullWidth?: boolean;
@@ -26,81 +27,24 @@ const SearchBar = ({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Generate suggestions based on query
+  // Generate suggestions based on query using the optimized searchDrugs function
   useEffect(() => {
     if (query.trim().length < 2) {
       setSuggestions([]);
       return;
     }
     
-    const searchTerm = query.toLowerCase();
-    console.log("Searching for:", searchTerm);
-    console.log("Total drugs in data:", combinedDrugsData.length);
+    console.log("Searching for:", query);
     
-    // Find matching drugs by name, brand names, generic names, or with similar spelling
-    const matchingDrugs = combinedDrugsData
-      .filter(drug => {
-        // Direct name match
-        if (drug.name.toLowerCase().includes(searchTerm)) return true;
-        
-        // Generic name match
-        if (drug.genericName && drug.genericName.toLowerCase().includes(searchTerm)) return true;
-        
-        // Brand name match (comprehensive check)
-        if (drug.brandNames && drug.brandNames.some(brand => 
-          brand.toLowerCase().includes(searchTerm))) return true;
-        
-        // Manufacturer match
-        if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchTerm)) return true;
-        
-        // Category match
-        if (drug.category && drug.category.toLowerCase().includes(searchTerm)) return true;
-        
-        // Drug class match
-        if (drug.drugClass && drug.drugClass.toLowerCase().includes(searchTerm)) return true;
-        
-        // Advanced Levenshtein distance for fuzzy matching with improved threshold
-        const nameLower = drug.name.toLowerCase();
-        // Adjust threshold based on search term length for more accurate fuzzy matching
-        const threshold = Math.min(2, Math.max(1, Math.floor(searchTerm.length / 4)));
-        if (calculateLevenshteinDistance(searchTerm, nameLower) <= threshold) return true;
-        
-        return false;
-      })
-      .slice(0, 10) // Increase to 10 suggestions for better user experience
-      .map(drug => drug.name);
+    // Find matching drugs using the optimized search function
+    const matchingDrugs = searchDrugs(query);
     
     console.log("Found matching drugs:", matchingDrugs.length);
-    setSuggestions(Array.from(new Set(matchingDrugs))); // Remove duplicates
+    
+    // Extract drug names from the matched drugs
+    const drugNames = matchingDrugs.map(drug => drug.name);
+    setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
   }, [query]);
-  
-  // Enhanced Levenshtein distance implementation for fuzzy matching
-  const calculateLevenshteinDistance = (a: string, b: string): number => {
-    const matrix = [];
-    
-    // Initialize matrix
-    for (let i = 0; i <= b.length; i++) {
-      matrix[i] = [i];
-    }
-    
-    for (let j = 0; j <= a.length; j++) {
-      matrix[0][j] = j;
-    }
-    
-    // Fill matrix
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i-1][j] + 1,      // deletion
-          matrix[i][j-1] + 1,      // insertion
-          matrix[i-1][j-1] + cost  // substitution
-        );
-      }
-    }
-    
-    return matrix[b.length][a.length];
-  };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
