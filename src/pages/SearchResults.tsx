@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -5,7 +6,7 @@ import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
-import { combinedDrugsData } from '@/data/mockDrugsData';
+import { combinedDrugsData, searchDrugs } from '@/data/combinedDrugsData';
 import { fetchDrugs } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 

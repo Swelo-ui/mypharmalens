@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -7,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getDetailedDrugData } from '@/data/mockDrugsData';
+import { getDrugDetails } from '@/data/combinedDrugsData';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
@@ -25,19 +24,16 @@ const DrugPage = () => {
       // Add a small delay to ensure data is loaded properly
       const timer = setTimeout(() => {
         // Pass both id and a callback function as the second argument
-        const drugData = getDetailedDrugData(id, (error) => {
-          if (error) {
-            toast({
-              title: "Error",
-              description: "Failed to load medication data.",
-              type: "error"
-            });
-          }
-        });
+        const drugData = getDrugDetails(id);
         
         console.log("Drug data retrieved:", drugData?.name);
         if (drugData) {
           setDrug(drugData);
+        } else {
+          toast({
+            description: "Failed to load medication data.",
+            variant: "destructive"
+          });
         }
         setLoading(false);
       }, 100);
