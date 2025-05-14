@@ -1,4 +1,3 @@
-
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetails";
 import { additionalDrugsData } from "./additionalDrugsData";
@@ -8,22 +7,22 @@ import { generateUniqueId } from "@/lib/utils";
 export interface DetailedDrugData {
   id: string;
   name: string;
-  genericName: string; // Changed from optional to required to match DrugDetails.tsx
+  genericName: string; 
   manufacturer: string;
   category: string;
   description: string;
   drugClass?: string;
   verified?: boolean;
-  prescriptionStatus?: string;
-  dosageAndAdmin: string; // Changed from optional to required to match DrugDetails.tsx
-  mechanism: string; // Changed from optional to required to match DrugDetails.tsx
-  indications: string[]; // Changed from optional to required to match DrugDetails.tsx
-  contraindications: string[]; // Changed from optional to required to match DrugDetails.tsx
-  warnings: string[]; // Changed from optional to required to match DrugDetails.tsx
-  sideEffects: string[]; // Changed from optional to required to match DrugDetails.tsx
-  interactions: string[]; // Changed from optional to required to match DrugDetails.tsx
-  pregnancy: string; // Changed from optional to required to match DrugDetails.tsx
-  storage: string; // Changed from optional to required to match DrugDetails.tsx
+  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled'; // Changed from string to union type to match DrugDetails.tsx
+  dosageAndAdmin: string;
+  mechanism: string;
+  indications: string[];
+  contraindications: string[];
+  warnings: string[];
+  sideEffects: string[];
+  interactions: string[];
+  pregnancy: string;
+  storage: string;
   image?: string;
   packageImage?: string;
   brandNames?: string[];
@@ -1128,7 +1127,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
       description: basicDrugData.description || 'No description available.',
       drugClass: basicDrugData.drugClass,
       verified: basicDrugData.verified,
-      prescriptionStatus: 'Prescription Only', // Default value
+      prescriptionStatus: 'Prescription Only' as 'Prescription Only', // Use as const to ensure type safety
       dosageAndAdmin: 'Consult your healthcare provider for proper dosage information.',
       mechanism: 'Mechanism of action information not available.',
       indications: ['Consult your healthcare provider for information on approved uses.'],
@@ -1145,4 +1144,3 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   
   return null;
 };
-
