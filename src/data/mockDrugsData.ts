@@ -4,14 +4,14 @@ import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetai
 import { additionalDrugsData } from "./additionalDrugsData";
 import { generateUniqueId } from "@/lib/utils";
 
-// Define the DetailedDrugData interface
+// Define the DetailedDrugData interface to match the one from DrugDetails.tsx
 export interface DetailedDrugData {
   id: string;
   name: string;
-  genericName?: string;
-  manufacturer?: string;
-  category?: string;
-  description?: string;
+  genericName: string; // Changed from optional to required to match DrugDetails.tsx
+  manufacturer: string;
+  category: string;
+  description: string;
   drugClass?: string;
   verified?: boolean;
   prescriptionStatus?: string;
@@ -1024,7 +1024,7 @@ export const mockDrugsData: DrugData[] = [
   }
 ];
 
-// Combine the original drug data with the additional drugs data
+// Make sure combinedDrugsData is properly exported
 export const combinedDrugsData = [...mockDrugsData, ...additionalDrugsData];
 
 // Sample detailed drug data for drug page
@@ -1118,13 +1118,14 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   
   if (basicDrugData) {
     // Create a minimum viable DetailedDrugData object from the basic drug data
+    // Ensure all required fields are provided
     return {
       id: basicDrugData.id,
       name: basicDrugData.name,
-      genericName: basicDrugData.genericName,
-      manufacturer: basicDrugData.manufacturer,
-      category: basicDrugData.category,
-      description: basicDrugData.description,
+      genericName: basicDrugData.genericName || basicDrugData.name, // Fallback to name if genericName is missing
+      manufacturer: basicDrugData.manufacturer || 'Various',
+      category: basicDrugData.category || 'Unknown',
+      description: basicDrugData.description || 'No description available.',
       drugClass: basicDrugData.drugClass,
       verified: basicDrugData.verified,
       prescriptionStatus: 'Prescription Only', // Default value
