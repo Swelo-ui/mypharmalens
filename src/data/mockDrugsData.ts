@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetails";
 import { additionalDrugsData } from "./additionalDrugsData";
@@ -12,8 +13,8 @@ export interface DetailedDrugData {
   category: string;
   description: string;
   drugClass?: string;
-  verified?: boolean;
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled'; // Changed from string to union type to match DrugDetails.tsx
+  verified: boolean; // Changed from optional to required to match DrugDetails.tsx
+  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled'; // Union type to match DrugDetails.tsx
   dosageAndAdmin: string;
   mechanism: string;
   indications: string[];
@@ -1126,7 +1127,7 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
       category: basicDrugData.category || 'Unknown',
       description: basicDrugData.description || 'No description available.',
       drugClass: basicDrugData.drugClass,
-      verified: basicDrugData.verified,
+      verified: basicDrugData.verified || false, // Provide default false if not present
       prescriptionStatus: 'Prescription Only' as 'Prescription Only', // Use as const to ensure type safety
       dosageAndAdmin: 'Consult your healthcare provider for proper dosage information.',
       mechanism: 'Mechanism of action information not available.',
