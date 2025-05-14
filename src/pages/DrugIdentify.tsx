@@ -82,6 +82,8 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user's previous identifications when component loads
