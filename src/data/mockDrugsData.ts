@@ -1,998 +1,1012 @@
-
-import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData } from "@/components/DrugDetails";
-import { additionalDrugsData } from './additionalDrugsData';
+import { DrugData } from "@/components/DrugCard";
+import { additionalDrugsData } from "./additionalDrugsData";
 
+// Original drug data
 export const mockDrugsData: DrugData[] = [
   {
     id: '1',
-    name: 'Paracetamol',
-    genericName: 'Acetaminophen',
-    manufacturer: 'Generic',
-    category: 'Analgesic',
-    description: 'Used to treat pain and fever. It\'s often used for headaches, toothaches, and minor aches and pains.',
-    drugClass: 'Non-opioid analgesic',
-    verified: true,
-    brandNames: ['Tylenol', 'Panadol', 'Calpol']
-  },
-  {
-    id: '2',
-    name: 'Ibuprofen',
-    genericName: 'Ibuprofen',
-    manufacturer: 'Various',
-    category: 'Anti-inflammatory',
-    description: 'Non-steroidal anti-inflammatory drug used for relieving pain, fever, and inflammation.',
-    drugClass: 'NSAID',
-    verified: true,
-    brandNames: ['Advil', 'Motrin', 'Nurofen']
-  },
-  {
-    id: '3',
-    name: 'Amoxicillin',
-    genericName: 'Amoxicillin',
-    manufacturer: 'Generic',
-    category: 'Antibiotic',
-    description: 'Penicillin antibiotic used to treat bacterial infections of the ear, nose, throat, respiratory tract, urinary tract, and skin.',
-    drugClass: 'Penicillin antibiotic',
-    verified: true,
-    brandNames: ['Amoxil', 'Trimox', 'Moxatag']
-  },
-  {
-    id: '4',
     name: 'Lisinopril',
     genericName: 'Lisinopril',
     manufacturer: 'Various',
     category: 'Antihypertensive',
-    description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to improve survival after a heart attack.',
+    description: 'ACE inhibitor used to treat high blood pressure and heart failure',
     drugClass: 'ACE inhibitor',
     verified: true,
     brandNames: ['Prinivil', 'Zestril']
   },
   {
-    id: '5',
-    name: 'Loratadine',
-    genericName: 'Loratadine',
+    id: '2',
+    name: 'Enalapril',
+    genericName: 'Enalapril',
     manufacturer: 'Various',
-    category: 'Antihistamine',
-    description: 'Antihistamine used to temporarily relieve symptoms of hay fever and other allergies.',
-    drugClass: 'Second-generation antihistamine',
-    verified: false,
-    brandNames: ['Claritin', 'Alavert']
-  },
-  {
-    id: '6',
-    name: 'Metformin',
-    genericName: 'Metformin hydrochloride',
-    manufacturer: 'Various',
-    category: 'Antidiabetic',
-    description: 'Oral medication used to treat type 2 diabetes by improving how the body handles insulin.',
-    drugClass: 'Biguanide',
+    category: 'Antihypertensive',
+    description: 'ACE inhibitor used to treat high blood pressure and heart failure',
+    drugClass: 'ACE inhibitor',
     verified: true,
-    brandNames: ['Glucophage', 'Fortamet', 'Riomet']
+    brandNames: ['Vasotec']
   },
   {
-    id: '7',
-    name: 'Atorvastatin',
-    genericName: 'Atorvastatin calcium',
-    manufacturer: 'Various',
-    category: 'Antilipemic',
-    description: 'Used to lower cholesterol and triglycerides in the blood and reduce the risk of heart attack and stroke.',
-    drugClass: 'HMG-CoA reductase inhibitor (statin)',
-    verified: true,
-    brandNames: ['Lipitor']
-  },
-  {
-    id: '8',
-    name: 'Omeprazole',
-    genericName: 'Omeprazole',
-    manufacturer: 'Various',
-    category: 'Gastrointestinal',
-    description: 'Proton pump inhibitor that decreases the amount of acid produced in the stomach. Used to treat conditions like gastroesophageal reflux disease (GERD).',
-    drugClass: 'Proton pump inhibitor',
-    verified: true,
-    brandNames: ['Prilosec', 'Prilosec OTC', 'Losec']
-  },
-  {
-    id: '9',
+    id: '3',
     name: 'Amlodipine',
-    genericName: 'Amlodipine besylate',
-    manufacturer: 'Various',
-    category: 'Antihypertensive',
-    description: 'Calcium channel blocker used to treat high blood pressure and angina (chest pain).',
-    drugClass: 'Calcium channel blocker',
-    verified: true,
-    brandNames: ['Norvasc', 'Katerzia']
-  },
-  {
-    id: '10',
-    name: 'Sertraline',
-    genericName: 'Sertraline hydrochloride',
-    manufacturer: 'Various',
-    category: 'Antidepressant',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, obsessive-compulsive disorder, panic attacks, and anxiety disorders.',
-    drugClass: 'SSRI',
-    verified: true,
-    brandNames: ['Zoloft']
-  },
-  {
-    id: '11',
-    name: 'Fluoxetine',
-    genericName: 'Fluoxetine hydrochloride',
-    manufacturer: 'Various',
-    category: 'Antidepressant',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, panic attacks, obsessive-compulsive disorder, and bulimia nervosa.',
-    drugClass: 'SSRI',
-    verified: true,
-    brandNames: ['Prozac']
-  },
-  {
-    id: '12',
-    name: 'Losartan',
-    genericName: 'Losartan potassium',
-    manufacturer: 'Various',
-    category: 'Antihypertensive',
-    description: 'Angiotensin II receptor blocker used to treat high blood pressure and to help protect the kidneys from damage due to diabetes.',
-    drugClass: 'Angiotensin II receptor antagonist',
-    verified: true,
-    brandNames: ['Cozaar']
-  },
-  {
-    id: '13',
-    name: 'Albuterol',
-    genericName: 'Albuterol sulfate',
-    manufacturer: 'Various',
-    category: 'Bronchodilator',
-    description: 'Bronchodilator that relaxes muscles in the airways and increases air flow to the lungs. Used to treat asthma and COPD.',
-    drugClass: 'Beta2-adrenergic agonist',
-    verified: true,
-    brandNames: ['Ventolin', 'ProAir']
-  },
-  {
-    id: '14',
-    name: 'Levothyroxine',
-    genericName: 'Levothyroxine sodium',
-    manufacturer: 'Various',
-    category: 'Hormone',
-    description: 'Synthetic form of the thyroid hormone thyroxine used to treat hypothyroidism and to prevent goiter.',
-    drugClass: 'Thyroid hormone',
-    verified: true,
-    brandNames: ['Synthroid']
-  },
-  {
-    id: '15',
-    name: 'Simvastatin',
-    genericName: 'Simvastatin',
-    manufacturer: 'Various',
-    category: 'Antilipemic',
-    description: 'Used to lower cholesterol and triglycerides in the blood and reduce the risk of heart attack and stroke.',
-    drugClass: 'HMG-CoA reductase inhibitor (statin)',
-    verified: true,
-    brandNames: ['Zocor']
-  },
-  {
-    id: '16',
-    name: 'Gabapentin',
-    genericName: 'Gabapentin',
-    manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Anticonvulsant and analgesic used to treat seizures and neuropathic pain.',
-    drugClass: 'Anticonvulsant',
-    verified: true,
-    brandNames: ['Neurontin']
-  },
-  {
-    id: '17',
-    name: 'Hydrochlorothiazide',
-    genericName: 'Hydrochlorothiazide',
-    manufacturer: 'Various',
-    category: 'Diuretic',
-    description: 'Thiazide diuretic used to treat high blood pressure and fluid retention.',
-    drugClass: 'Thiazide diuretic',
-    verified: true,
-    brandNames: ['Microzide']
-  },
-  {
-    id: '18',
-    name: 'Metoprolol',
-    genericName: 'Metoprolol tartrate',
-    manufacturer: 'Various',
-    category: 'Antihypertensive',
-    description: 'Beta-blocker used to treat high blood pressure, chest pain, and heart failure.',
-    drugClass: 'Beta blocker',
-    verified: true,
-    brandNames: ['Lopressor']
-  },
-  {
-    id: '19',
-    name: 'Warfarin',
-    genericName: 'Warfarin sodium',
-    manufacturer: 'Various',
-    category: 'Anticoagulant',
-    description: 'Anticoagulant used to prevent blood clots from forming or growing larger.',
-    drugClass: 'Vitamin K antagonist',
-    verified: true,
-    brandNames: ['Coumadin']
-  },
-  {
-    id: '20',
-    name: 'Prednisone',
-    genericName: 'Prednisone',
-    manufacturer: 'Various',
-    category: 'Corticosteroid',
-    description: 'Corticosteroid used to reduce inflammation and suppress the immune system.',
-    drugClass: 'Corticosteroid',
-    verified: true,
-    brandNames: ['Deltasone']
-  },
-  {
-    id: '21',
-    name: 'Alprazolam',
-    genericName: 'Alprazolam',
-    manufacturer: 'Various',
-    category: 'Anxiolytic',
-    description: 'Benzodiazepine used to treat anxiety disorders and panic disorders.',
-    drugClass: 'Benzodiazepine',
-    verified: true,
-    brandNames: ['Xanax']
-  },
-  {
-    id: '22',
-    name: 'Citalopram',
-    genericName: 'Citalopram hydrobromide',
-    manufacturer: 'Various',
-    category: 'Antidepressant',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression.',
-    drugClass: 'SSRI',
-    verified: true,
-    brandNames: ['Celexa']
-  },
-  {
-    id: '23',
-    name: 'Furosemide',
-    genericName: 'Furosemide',
-    manufacturer: 'Various',
-    category: 'Diuretic',
-    description: 'Loop diuretic used to treat fluid retention (edema) and high blood pressure.',
-    drugClass: 'Loop diuretic',
-    verified: true,
-    brandNames: ['Lasix']
-  },
-  {
-    id: '24',
-    name: 'Escitalopram',
-    genericName: 'Escitalopram oxalate',
-    manufacturer: 'Various',
-    category: 'Antidepressant',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression and anxiety disorders.',
-    drugClass: 'SSRI',
-    verified: true,
-    brandNames: ['Lexapro']
-  },
-  {
-    id: '25',
-    name: 'Pantoprazole',
-    genericName: 'Pantoprazole sodium',
-    manufacturer: 'Various',
-    category: 'Gastrointestinal',
-    description: 'Proton pump inhibitor used to treat certain stomach and esophagus problems such as acid reflux.',
-    drugClass: 'Proton pump inhibitor',
-    verified: true,
-    brandNames: ['Protonix']
-  },
-  {
-    id: '26',
-    name: 'Lipitor',
-    genericName: 'Atorvastatin',
-    manufacturer: 'Pfizer',
-    category: 'Antilipemic',
-    description: 'Brand name for atorvastatin, used to lower cholesterol and reduce the risk of heart disease.',
-    drugClass: 'HMG-CoA reductase inhibitor (statin)',
-    verified: true,
-    brandNames: ['Lipitor']
-  },
-  {
-    id: '27',
-    name: 'Norvasc',
     genericName: 'Amlodipine',
-    manufacturer: 'Pfizer',
+    manufacturer: 'Various',
     category: 'Antihypertensive',
-    description: 'Brand name for amlodipine, used to treat high blood pressure and chest pain (angina).',
+    description: 'Calcium channel blocker used to treat high blood pressure and angina',
     drugClass: 'Calcium channel blocker',
     verified: true,
     brandNames: ['Norvasc']
   },
   {
-    id: '28',
-    name: 'Prinivil',
-    genericName: 'Lisinopril',
-    manufacturer: 'Merck',
+    id: '4',
+    name: 'Metoprolol',
+    genericName: 'Metoprolol',
+    manufacturer: 'Various',
     category: 'Antihypertensive',
-    description: 'Brand name for lisinopril, used to treat high blood pressure and heart failure.',
-    drugClass: 'ACE inhibitor',
+    description: 'Beta-blocker used to treat high blood pressure, angina, and heart failure',
+    drugClass: 'Beta Blocker',
     verified: true,
-    brandNames: ['Prinivil']
+    brandNames: ['Lopressor', 'Toprol XL']
   },
   {
-    id: '29',
-    name: 'Nexium',
-    genericName: 'Esomeprazole',
-    manufacturer: 'AstraZeneca',
+    id: '5',
+    name: 'Losartan',
+    genericName: 'Losartan',
+    manufacturer: 'Various',
+    category: 'Antihypertensive',
+    description: 'Angiotensin receptor blocker used to treat high blood pressure and reduce the risk of stroke',
+    drugClass: 'Angiotensin Receptor Blocker',
+    verified: true,
+    brandNames: ['Cozaar']
+  },
+  {
+    id: '6',
+    name: 'Atorvastatin',
+    genericName: 'Atorvastatin',
+    manufacturer: 'Various',
+    category: 'Antilipemic',
+    description: 'Statin used to lower cholesterol and reduce the risk of heart disease',
+    drugClass: 'Statin',
+    verified: true,
+    brandNames: ['Lipitor']
+  },
+  {
+    id: '7',
+    name: 'Simvastatin',
+    genericName: 'Simvastatin',
+    manufacturer: 'Various',
+    category: 'Antilipemic',
+    description: 'Statin used to lower cholesterol and reduce the risk of heart disease',
+    drugClass: 'Statin',
+    verified: true,
+    brandNames: ['Zocor']
+  },
+  {
+    id: '8',
+    name: 'Levothyroxine',
+    genericName: 'Levothyroxine',
+    manufacturer: 'Various',
+    category: 'Hormone Replacement',
+    description: 'Thyroid hormone used to treat hypothyroidism',
+    drugClass: 'Thyroid Hormone',
+    verified: true,
+    brandNames: ['Synthroid', 'Levoxyl']
+  },
+  {
+    id: '9',
+    name: 'Omeprazole',
+    genericName: 'Omeprazole',
+    manufacturer: 'Various',
     category: 'Gastrointestinal',
-    description: 'Brand name for esomeprazole, used to treat gastroesophageal reflux disease (GERD) and other conditions caused by excess stomach acid.',
-    drugClass: 'Proton pump inhibitor',
+    description: 'Proton pump inhibitor used to reduce stomach acid',
+    drugClass: 'Proton Pump Inhibitor',
     verified: true,
-    brandNames: ['Nexium']
+    brandNames: ['Prilosec']
   },
   {
-    id: '30',
-    name: 'Zoloft',
-    genericName: 'Sertraline',
-    manufacturer: 'Pfizer',
+    id: '10',
+    name: 'Pantoprazole',
+    genericName: 'Pantoprazole',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'Proton pump inhibitor used to reduce stomach acid',
+    drugClass: 'Proton Pump Inhibitor',
+    verified: true,
+    brandNames: ['Protonix']
+  },
+  {
+    id: '11',
+    name: 'Metformin',
+    genericName: 'Metformin',
+    manufacturer: 'Various',
+    category: 'Antidiabetic',
+    description: 'Biguanide used to treat type 2 diabetes',
+    drugClass: 'Biguanide',
+    verified: true,
+    brandNames: ['Glucophage']
+  },
+  {
+    id: '12',
+    name: 'Insulin Glargine',
+    genericName: 'Insulin Glargine',
+    manufacturer: 'Various',
+    category: 'Antidiabetic',
+    description: 'Long-acting insulin used to treat diabetes',
+    drugClass: 'Insulin',
+    verified: true,
+    brandNames: ['Lantus', 'Toujeo']
+  },
+  {
+    id: '13',
+    name: 'Albuterol',
+    genericName: 'Albuterol',
+    manufacturer: 'Various',
+    category: 'Respiratory',
+    description: 'Bronchodilator used to treat asthma and COPD',
+    drugClass: 'Bronchodilator',
+    verified: true,
+    brandNames: ['Ventolin', 'ProAir']
+  },
+  {
+    id: '14',
+    name: 'Prednisone',
+    genericName: 'Prednisone',
+    manufacturer: 'Various',
+    category: 'Anti-inflammatory',
+    description: 'Corticosteroid used to treat inflammation and suppress the immune system',
+    drugClass: 'Corticosteroid',
+    verified: true,
+    brandNames: ['Deltasone']
+  },
+  {
+    id: '15',
+    name: 'Amoxicillin',
+    genericName: 'Amoxicillin',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Penicillin antibiotic used to treat bacterial infections',
+    drugClass: 'Penicillin',
+    verified: true,
+    brandNames: ['Amoxil']
+  },
+  {
+    id: '16',
+    name: 'Azithromycin',
+    genericName: 'Azithromycin',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Macrolide antibiotic used to treat bacterial infections',
+    drugClass: 'Macrolide',
+    verified: true,
+    brandNames: ['Zithromax']
+  },
+  {
+    id: '17',
+    name: 'Citalopram',
+    genericName: 'Citalopram',
+    manufacturer: 'Various',
     category: 'Antidepressant',
-    description: 'Brand name for sertraline, used to treat depression, panic attacks, obsessive compulsive disorder, and anxiety disorders.',
+    description: 'SSRI antidepressant used to treat depression',
+    drugClass: 'SSRI',
+    verified: true,
+    brandNames: ['Celexa']
+  },
+  {
+    id: '18',
+    name: 'Sertraline',
+    genericName: 'Sertraline',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'SSRI antidepressant used to treat depression, OCD, and anxiety',
     drugClass: 'SSRI',
     verified: true,
     brandNames: ['Zoloft']
   },
   {
-    id: '31',
-    name: 'Prozac',
+    id: '19',
+    name: 'Ibuprofen',
+    genericName: 'Ibuprofen',
+    manufacturer: 'Various',
+    category: 'Anti-inflammatory',
+    description: 'NSAID used to treat pain, fever, and inflammation',
+    drugClass: 'NSAID',
+    verified: true,
+    brandNames: ['Advil', 'Motrin']
+  },
+  {
+    id: '20',
+    name: 'Acetaminophen',
+    genericName: 'Acetaminophen',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Analgesic and antipyretic used to treat pain and fever',
+    drugClass: 'Analgesic',
+    verified: true,
+    brandNames: ['Tylenol']
+  },
+  {
+    id: '21',
+    name: 'Hydrocodone/Acetaminophen',
+    genericName: 'Hydrocodone/Acetaminophen',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Opioid analgesic used to treat moderate to severe pain',
+    drugClass: 'Opioid Analgesic',
+    verified: true,
+    brandNames: ['Vicodin', 'Norco']
+  },
+  {
+    id: '22',
+    name: 'Tramadol',
+    genericName: 'Tramadol',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Opioid analgesic used to treat moderate to severe pain',
+    drugClass: 'Opioid Analgesic',
+    verified: true,
+    brandNames: ['Ultram']
+  },
+  {
+    id: '23',
+    name: 'Warfarin',
+    genericName: 'Warfarin',
+    manufacturer: 'Various',
+    category: 'Anticoagulant',
+    description: 'Anticoagulant used to prevent blood clots',
+    drugClass: 'Anticoagulant',
+    verified: true,
+    brandNames: ['Coumadin']
+  },
+  {
+    id: '24',
+    name: 'Clopidogrel',
+    genericName: 'Clopidogrel',
+    manufacturer: 'Various',
+    category: 'Antiplatelet',
+    description: 'Antiplatelet drug used to prevent blood clots',
+    drugClass: 'Antiplatelet',
+    verified: true,
+    brandNames: ['Plavix']
+  },
+  {
+    id: '25',
+    name: 'Aspirin',
+    genericName: 'Aspirin',
+    manufacturer: 'Various',
+    category: 'Antiplatelet',
+    description: 'Antiplatelet drug used to prevent blood clots and reduce the risk of heart attack and stroke',
+    drugClass: 'Antiplatelet',
+    verified: true,
+    brandNames: ['Bayer', 'Ecotrin']
+  },
+  {
+    id: '26',
+    name: 'Diphenhydramine',
+    genericName: 'Diphenhydramine',
+    manufacturer: 'Various',
+    category: 'Antihistamine',
+    description: 'Antihistamine used to treat allergies and insomnia',
+    drugClass: 'Antihistamine',
+    verified: true,
+    brandNames: ['Benadryl']
+  },
+  {
+    id: '27',
+    name: 'Loratadine',
+    genericName: 'Loratadine',
+    manufacturer: 'Various',
+    category: 'Antihistamine',
+    description: 'Antihistamine used to treat allergies',
+    drugClass: 'Antihistamine',
+    verified: true,
+    brandNames: ['Claritin']
+  },
+  {
+    id: '28',
+    name: 'Cetirizine',
+    genericName: 'Cetirizine',
+    manufacturer: 'Various',
+    category: 'Antihistamine',
+    description: 'Antihistamine used to treat allergies',
+    drugClass: 'Antihistamine',
+    verified: true,
+    brandNames: ['Zyrtec']
+  },
+  {
+    id: '29',
+    name: 'Fluoxetine',
     genericName: 'Fluoxetine',
-    manufacturer: 'Eli Lilly',
+    manufacturer: 'Various',
     category: 'Antidepressant',
-    description: 'Brand name for fluoxetine, used to treat depression, panic attacks, and obsessive-compulsive disorder.',
+    description: 'SSRI antidepressant used to treat depression, OCD, and bulimia',
     drugClass: 'SSRI',
     verified: true,
     brandNames: ['Prozac']
   },
   {
-    id: '32',
-    name: 'Cozaar',
-    genericName: 'Losartan',
-    manufacturer: 'Merck',
-    category: 'Antihypertensive',
-    description: 'Brand name for losartan, used to treat high blood pressure and to help protect the kidneys from damage due to diabetes.',
-    drugClass: 'Angiotensin II receptor antagonist',
+    id: '30',
+    name: 'Trazodone',
+    genericName: 'Trazodone',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'Antidepressant and sedative used to treat depression and insomnia',
+    drugClass: 'Antidepressant',
     verified: true,
-    brandNames: ['Cozaar']
+    brandNames: ['Desyrel']
   },
   {
-    id: '33',
-    name: 'Advair',
-    genericName: 'Fluticasone/Salmeterol',
-    manufacturer: 'GlaxoSmithKline',
-    category: 'Respiratory',
-    description: 'Combination medication containing a corticosteroid and a long-acting bronchodilator, used to treat asthma and COPD.',
-    drugClass: 'Corticosteroid/Long-acting beta agonist',
-    verified: true,
-    brandNames: ['Advair']
-  },
-  {
-    id: '34',
-    name: 'Synthroid',
-    genericName: 'Levothyroxine',
-    manufacturer: 'AbbVie',
-    category: 'Hormone',
-    description: 'Brand name for levothyroxine, used to treat hypothyroidism.',
-    drugClass: 'Thyroid hormone',
-    verified: true,
-    brandNames: ['Synthroid']
-  },
-  {
-    id: '35',
-    name: 'Xanax',
-    genericName: 'Alprazolam',
-    manufacturer: 'Pfizer',
+    id: '31',
+    name: 'Clonazepam',
+    genericName: 'Clonazepam',
+    manufacturer: 'Various',
     category: 'Anxiolytic',
-    description: 'Brand name for alprazolam, used to treat anxiety and panic disorders.',
+    description: 'Benzodiazepine used to treat anxiety and seizures',
+    drugClass: 'Benzodiazepine',
+    verified: true,
+    brandNames: ['Klonopin']
+  },
+  {
+    id: '32',
+    name: 'Alprazolam',
+    genericName: 'Alprazolam',
+    manufacturer: 'Various',
+    category: 'Anxiolytic',
+    description: 'Benzodiazepine used to treat anxiety and panic disorder',
     drugClass: 'Benzodiazepine',
     verified: true,
     brandNames: ['Xanax']
   },
   {
-    id: '36',
-    name: 'Celebrex',
-    genericName: 'Celecoxib',
-    manufacturer: 'Pfizer',
-    category: 'Anti-inflammatory',
-    description: 'Brand name for celecoxib, used to treat pain and inflammation caused by arthritis, ankylosing spondylitis, and menstrual cramps.',
-    drugClass: 'COX-2 inhibitor',
+    id: '33',
+    name: 'Zolpidem',
+    genericName: 'Zolpidem',
+    manufacturer: 'Various',
+    category: 'Sedative',
+    description: 'Sedative used to treat insomnia',
+    drugClass: 'Sedative',
     verified: true,
-    brandNames: ['Celebrex']
+    brandNames: ['Ambien']
+  },
+  {
+    id: '34',
+    name: 'Melatonin',
+    genericName: 'Melatonin',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Hormone used to treat insomnia and jet lag',
+    drugClass: 'Hormone',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '35',
+    name: 'Vitamin D',
+    genericName: 'Vitamin D',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin used to treat vitamin D deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '36',
+    name: 'Vitamin B12',
+    genericName: 'Vitamin B12',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin used to treat vitamin B12 deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
   },
   {
     id: '37',
-    name: 'Zocor',
-    genericName: 'Simvastatin',
-    manufacturer: 'Merck',
-    category: 'Antilipemic',
-    description: 'Brand name for simvastatin, used to lower cholesterol and reduce the risk of heart disease.',
-    drugClass: 'HMG-CoA reductase inhibitor (statin)',
+    name: 'Furosemide',
+    genericName: 'Furosemide',
+    manufacturer: 'Various',
+    category: 'Diuretic',
+    description: 'Loop diuretic used to treat edema and high blood pressure',
+    drugClass: 'Diuretic',
     verified: true,
-    brandNames: ['Zocor']
+    brandNames: ['Lasix']
   },
   {
     id: '38',
-    name: 'Lexapro',
-    genericName: 'Escitalopram',
-    manufacturer: 'Forest Laboratories',
-    category: 'Antidepressant',
-    description: 'Brand name for escitalopram, used to treat anxiety and depression.',
-    drugClass: 'SSRI',
+    name: 'Hydrochlorothiazide',
+    genericName: 'Hydrochlorothiazide',
+    manufacturer: 'Various',
+    category: 'Diuretic',
+    description: 'Thiazide diuretic used to treat edema and high blood pressure',
+    drugClass: 'Diuretic',
     verified: true,
-    brandNames: ['Lexapro']
+    brandNames: ['Microzide']
   },
   {
     id: '39',
-    name: 'Protonix',
-    genericName: 'Pantoprazole',
-    manufacturer: 'Pfizer',
-    category: 'Gastrointestinal',
-    description: 'Brand name for pantoprazole, used to treat erosive esophagitis and other conditions involving excess stomach acid.',
-    drugClass: 'Proton pump inhibitor',
+    name: 'Potassium Chloride',
+    genericName: 'Potassium Chloride',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Electrolyte supplement used to treat potassium deficiency',
+    drugClass: 'Electrolyte',
     verified: true,
-    brandNames: ['Protonix']
+    brandNames: ['Various']
   },
   {
     id: '40',
-    name: 'Zyrtec',
-    genericName: 'Cetirizine',
-    manufacturer: 'Johnson & Johnson',
-    category: 'Antihistamine',
-    description: 'Brand name for cetirizine, used to relieve allergy symptoms such as watery eyes, runny nose, itching, sneezing, and hives.',
-    drugClass: 'Second-generation antihistamine',
-    verified: true,
-    brandNames: ['Zyrtec']
-  },
-  
-  // Additional drugs to ensure at least 15 per category
-  // Adding Essential Antibiotics
-  {
-    id: '41',
-    name: 'Azithromycin',
-    genericName: 'Azithromycin',
+    name: 'Calcium Carbonate',
+    genericName: 'Calcium Carbonate',
     manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Macrolide antibiotic used to treat a wide variety of bacterial infections including respiratory infections, skin infections, ear infections, and sexually transmitted diseases.',
-    drugClass: 'Macrolide antibiotic',
-    verified: true,
-    brandNames: ['Zithromax', 'Azithral']
-  },
-  {
-    id: '42',
-    name: 'Ciprofloxacin',
-    genericName: 'Ciprofloxacin',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including infections of the skin, bone, joint, respiratory tract, and urinary tract.',
-    drugClass: 'Fluoroquinolone antibiotic',
-    verified: true,
-    brandNames: ['Cipro', 'Ciloxan']
-  },
-  {
-    id: '43',
-    name: 'Doxycycline',
-    genericName: 'Doxycycline',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Tetracycline antibiotic used to treat a wide variety of bacterial infections, including respiratory tract infections, urinary tract infections, and severe acne.',
-    drugClass: 'Tetracycline antibiotic',
-    verified: true,
-    brandNames: ['Vibramycin', 'Doryx']
-  },
-  {
-    id: '44',
-    name: 'Ceftriaxone',
-    genericName: 'Ceftriaxone',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Third-generation cephalosporin antibiotic used to treat a variety of bacterial infections including meningitis, pneumonia, and gonorrhea.',
-    drugClass: 'Cephalosporin antibiotic',
-    verified: true,
-    brandNames: ['Rocephin']
-  },
-  // Adding WHO Essential Medicines
-  {
-    id: '45',
-    name: 'Insulin',
-    genericName: 'Insulin',
-    manufacturer: 'Various',
-    category: 'Hormone',
-    description: 'Hormone used to control blood sugar levels in diabetes mellitus.',
-    drugClass: 'Antidiabetic',
-    verified: true,
-    brandNames: ['Humulin', 'Novolin']
-  },
-  {
-    id: '46',
-    name: 'Morphine',
-    genericName: 'Morphine sulfate',
-    manufacturer: 'Various',
-    category: 'Analgesic',
-    description: 'Opioid medication used to treat moderate to severe pain.',
-    drugClass: 'Opioid analgesic',
-    verified: true,
-    brandNames: ['MS Contin', 'Oramorph']
-  },
-  {
-    id: '47',
-    name: 'Aspirin',
-    genericName: 'Acetylsalicylic acid',
-    manufacturer: 'Various',
-    category: 'Analgesic',
-    description: 'Medication used to treat pain, fever, or inflammation.',
-    drugClass: 'NSAID',
-    verified: true,
-    brandNames: ['Bayer', 'Ecotrin']
-  },
-  {
-    id: '48',
-    name: 'Methotrexate',
-    genericName: 'Methotrexate',
-    manufacturer: 'Various',
-    category: 'Antineoplastic',
-    description: 'Antimetabolite used to treat certain types of cancer and autoimmune diseases.',
-    drugClass: 'Antimetabolite',
-    verified: true,
-    brandNames: ['Trexall', 'Rheumatrex']
-  },
-  {
-    id: '49',
-    name: 'Diazepam',
-    genericName: 'Diazepam',
-    manufacturer: 'Various',
-    category: 'Anxiolytic',
-    description: 'Benzodiazepine used to treat anxiety, alcohol withdrawal, and seizures.',
-    drugClass: 'Benzodiazepine',
-    verified: true,
-    brandNames: ['Valium']
-  },
-  {
-    id: '50',
-    name: 'Phenytoin',
-    genericName: 'Phenytoin',
-    manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Anticonvulsant used to control seizures.',
-    drugClass: 'Hydantoin anticonvulsant',
-    verified: true,
-    brandNames: ['Dilantin']
-  },
-  {
-    id: '51',
-    name: 'Valproic Acid',
-    genericName: 'Valproic acid',
-    manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Medication used to treat epilepsy and bipolar disorder.',
-    drugClass: 'Anticonvulsant',
-    verified: true,
-    brandNames: ['Depakote']
-  },
-  {
-    id: '52',
-    name: 'Digoxin',
-    genericName: 'Digoxin',
-    manufacturer: 'Various',
-    category: 'Cardiac glycoside',
-    description: 'Cardiac glycoside used to treat various heart conditions.',
-    drugClass: 'Cardiac glycoside',
-    verified: true,
-    brandNames: ['Lanoxin']
-  },
-  {
-    id: '53',
-    name: 'Isoniazid',
-    genericName: 'Isoniazid',
-    manufacturer: 'Various',
-    category: 'Antimycobacterial',
-    description: 'Medication used for the treatment of tuberculosis.',
-    drugClass: 'Antimycobacterial',
-    verified: true,
-    brandNames: ['INH']
-  },
-  {
-    id: '54',
-    name: 'Rifampicin',
-    genericName: 'Rifampicin',
-    manufacturer: 'Various',
-    category: 'Antimycobacterial',
-    description: 'Antibiotic used to treat several types of bacterial infections, particularly tuberculosis.',
-    drugClass: 'Rifamycin antibiotic',
-    verified: true,
-    brandNames: ['Rifadin']
-  },
-  {
-    id: '55',
-    name: 'Ethambutol',
-    genericName: 'Ethambutol',
-    manufacturer: 'Various',
-    category: 'Antimycobacterial',
-    description: 'Medication used to treat tuberculosis.',
-    drugClass: 'Antimycobacterial',
-    verified: true,
-    brandNames: ['Myambutol']
-  },
-  {
-    id: '56',
-    name: 'Chloramphenicol',
-    genericName: 'Chloramphenicol',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Broad-spectrum antibiotic used to treat serious infections.',
-    drugClass: 'Amphenicol antibiotic',
-    verified: true,
-    brandNames: ['Chloromycetin']
-  },
-  {
-    id: '57',
-    name: 'Gentamicin',
-    genericName: 'Gentamicin',
-    manufacturer: 'Various',
-    category: 'Antibiotic',
-    description: 'Aminoglycoside antibiotic used to treat many bacterial infections.',
-    drugClass: 'Aminoglycoside antibiotic',
-    verified: true,
-    brandNames: ['Garamycin']
-  },
-  {
-    id: '58',
-    name: 'Mebendazole',
-    genericName: 'Mebendazole',
-    manufacturer: 'Various',
-    category: 'Anthelmintic',
-    description: 'Medication used to treat parasitic worm infestations.',
-    drugClass: 'Anthelmintic',
-    verified: true,
-    brandNames: ['Vermox']
-  },
-  {
-    id: '59',
-    name: 'Albendazole',
-    genericName: 'Albendazole',
-    manufacturer: 'Various',
-    category: 'Anthelmintic',
-    description: 'Medication used to treat parasitic worm infestations.',
-    drugClass: 'Anthelmintic',
-    verified: true,
-    brandNames: ['Albenza']
-  },
-  {
-    id: '60',
-    name: 'Chloroquine',
-    genericName: 'Chloroquine phosphate',
-    manufacturer: 'Various',
-    category: 'Antimalarial',
-    description: 'Medication used primarily to prevent and treat malaria.',
-    drugClass: 'Antimalarial',
-    verified: true,
-    brandNames: ['Aralen']
-  },
-  {
-    id: '61',
-    name: 'Artemether',
-    genericName: 'Artemether',
-    manufacturer: 'Various',
-    category: 'Antimalarial',
-    description: 'Medication used to treat malaria.',
-    drugClass: 'Antimalarial',
-    verified: true,
-    brandNames: ['Coartem']
-  },
-  {
-    id: '62',
-    name: 'Acyclovir',
-    genericName: 'Acyclovir',
-    manufacturer: 'Various',
-    category: 'Antiviral',
-    description: 'Antiviral medication used to treat herpes simplex virus infections.',
-    drugClass: 'Antiviral',
-    verified: true,
-    brandNames: ['Zovirax']
-  },
-  {
-    id: '63',
-    name: 'Zidovudine',
-    genericName: 'Zidovudine',
-    manufacturer: 'Various',
-    category: 'Antiviral',
-    description: 'Antiretroviral medication used to prevent and treat HIV/AIDS.',
-    drugClass: 'Nucleoside reverse transcriptase inhibitor',
-    verified: true,
-    brandNames: ['Retrovir']
-  },
-  {
-    id: '64',
-    name: 'Lamivudine',
-    genericName: 'Lamivudine',
-    manufacturer: 'Various',
-    category: 'Antiviral',
-    description: 'Antiviral medication used to treat HIV/AIDS and hepatitis B virus infections.',
-    drugClass: 'Nucleoside reverse transcriptase inhibitor',
-    verified: true,
-    brandNames: ['Epivir']
-  },
-  {
-    id: '65',
-    name: 'Nevirapine',
-    genericName: 'Nevirapine',
-    manufacturer: 'Various',
-    category: 'Antiviral',
-    description: 'Antiretroviral medication used to treat and prevent HIV/AIDS.',
-    drugClass: 'Non-nucleoside reverse transcriptase inhibitor',
-    verified: true,
-    brandNames: ['Viramune']
-  },
-  {
-    id: '66',
-    name: 'Misoprostol',
-    genericName: 'Misoprostol',
-    manufacturer: 'Various',
-    category: 'Prostaglandin',
-    description: 'Medication used to prevent and treat stomach ulcers, induce labor, cause an abortion, and treat postpartum bleeding.',
-    drugClass: 'Prostaglandin',
-    verified: true,
-    brandNames: ['Cytotec']
-  },
-  {
-    id: '67',
-    name: 'Oxytocin',
-    genericName: 'Oxytocin',
-    manufacturer: 'Various',
-    category: 'Hormone',
-    description: 'Medication and hormone that causes contraction of the uterus and is used to induce labor, control bleeding after delivery, and help with abortion.',
-    drugClass: 'Hormone',
-    verified: true,
-    brandNames: ['Pitocin']
-  },
-  {
-    id: '68',
-    name: 'Magnesium Sulfate',
-    genericName: 'Magnesium sulfate',
-    manufacturer: 'Various',
-    category: 'Mineral supplement',
-    description: 'Medication used to treat and prevent low blood magnesium and seizures in women with eclampsia.',
-    drugClass: 'Mineral supplement',
-    verified: true,
-    brandNames: ['Epsom Salt']
-  },
-  {
-    id: '69',
-    name: 'Folic Acid',
-    genericName: 'Folic acid',
-    manufacturer: 'Various',
-    category: 'Vitamin',
-    description: 'Form of vitamin B used to treat folate deficiency and prevent neural tube defects during pregnancy.',
-    drugClass: 'Vitamin',
-    verified: true,
-    brandNames: ['Folacin']
-  },
-  {
-    id: '70',
-    name: 'Iron Supplements',
-    genericName: 'Ferrous sulfate',
-    manufacturer: 'Various',
-    category: 'Mineral supplement',
-    description: 'Dietary supplement used to treat or prevent low blood iron and iron deficiency anemia.',
-    drugClass: 'Mineral supplement',
-    verified: true,
-    brandNames: ['Feosol']
-  },
-  {
-    id: '71',
-    name: 'Calcium Supplements',
-    genericName: 'Calcium carbonate',
-    manufacturer: 'Various',
-    category: 'Mineral supplement',
-    description: 'Dietary supplement used to prevent or treat low blood calcium levels.',
-    drugClass: 'Mineral supplement',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat calcium deficiency',
+    drugClass: 'Mineral',
     verified: true,
     brandNames: ['Tums']
   },
   {
-    id: '72',
-    name: 'Zinc Supplements',
-    genericName: 'Zinc sulfate',
+    id: '41',
+    name: 'Iron Sulfate',
+    genericName: 'Iron Sulfate',
     manufacturer: 'Various',
-    category: 'Mineral supplement',
-    description: 'Dietary supplement used to prevent or treat zinc deficiency.',
-    drugClass: 'Mineral supplement',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat iron deficiency',
+    drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Orazinc']
+    brandNames: ['Various']
+  },
+  {
+    id: '42',
+    name: 'Magnesium Oxide',
+    genericName: 'Magnesium Oxide',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat magnesium deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '43',
+    name: 'Cyanocobalamin',
+    genericName: 'Cyanocobalamin',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat vitamin B12 deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '44',
+    name: 'Cholecalciferol',
+    genericName: 'Cholecalciferol',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat vitamin D deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '45',
+    name: 'Ergocalciferol',
+    genericName: 'Ergocalciferol',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat vitamin D deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '46',
+    name: 'Folic Acid',
+    genericName: 'Folic Acid',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat folic acid deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '47',
+    name: 'Niacin',
+    genericName: 'Niacin',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat niacin deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '48',
+    name: 'Riboflavin',
+    genericName: 'Riboflavin',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat riboflavin deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '49',
+    name: 'Thiamine',
+    genericName: 'Thiamine',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat thiamine deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '50',
+    name: 'Pyridoxine',
+    genericName: 'Pyridoxine',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat pyridoxine deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '51',
+    name: 'Ascorbic Acid',
+    genericName: 'Ascorbic Acid',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat ascorbic acid deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '52',
+    name: 'Retinol',
+    genericName: 'Retinol',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat retinol deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '53',
+    name: 'Tocopherol',
+    genericName: 'Tocopherol',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat tocopherol deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '54',
+    name: 'Phytonadione',
+    genericName: 'Phytonadione',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Vitamin supplement used to treat phytonadione deficiency',
+    drugClass: 'Vitamin',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '55',
+    name: 'Zinc Sulfate',
+    genericName: 'Zinc Sulfate',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat zinc deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '56',
+    name: 'Copper Sulfate',
+    genericName: 'Copper Sulfate',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat copper deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '57',
+    name: 'Selenium',
+    genericName: 'Selenium',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat selenium deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '58',
+    name: 'Chromium',
+    genericName: 'Chromium',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat chromium deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '59',
+    name: 'Molybdenum',
+    genericName: 'Molybdenum',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat molybdenum deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '60',
+    name: 'Manganese',
+    genericName: 'Manganese',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat manganese deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '61',
+    name: 'Fluoride',
+    genericName: 'Fluoride',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat fluoride deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '62',
+    name: 'Iodide',
+    genericName: 'Iodide',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Mineral supplement used to treat iodide deficiency',
+    drugClass: 'Mineral',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '63',
+    name: 'Omega-3 Fatty Acids',
+    genericName: 'Omega-3 Fatty Acids',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Fatty acid supplement used to treat omega-3 fatty acid deficiency',
+    drugClass: 'Fatty Acid',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '64',
+    name: 'Coenzyme Q10',
+    genericName: 'Coenzyme Q10',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Coenzyme supplement used to treat coenzyme Q10 deficiency',
+    drugClass: 'Coenzyme',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '65',
+    name: 'Glucosamine',
+    genericName: 'Glucosamine',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Supplement used to treat osteoarthritis',
+    drugClass: 'Supplement',
+    verified: true,
+    brandNames: ['Various']
+  },
+    {
+    id: '66',
+    name: 'Chondroitin',
+    genericName: 'Chondroitin',
+    manufacturer: 'Various',
+    category: 'Supplement',
+    description: 'Supplement used to treat osteoarthritis',
+    drugClass: 'Supplement',
+    verified: true,
+    brandNames: ['Various']
+  },
+  {
+    id: '67',
+    name: 'Meloxicam',
+    genericName: 'Meloxicam',
+    manufacturer: 'Various',
+    category: 'Anti-inflammatory',
+    description: 'NSAID used to treat pain and inflammation',
+    drugClass: 'NSAID',
+    verified: true,
+    brandNames: ['Mobic']
+  },
+  {
+    id: '68',
+    name: 'Gabapentin',
+    genericName: 'Gabapentin',
+    manufacturer: 'Various',
+    category: 'Neurologic',
+    description: 'Anticonvulsant used to treat seizures and nerve pain',
+    drugClass: 'Anticonvulsant',
+    verified: true,
+    brandNames: ['Neurontin']
+  },
+  {
+    id: '69',
+    name: 'Pregabalin',
+    genericName: 'Pregabalin',
+    manufacturer: 'Various',
+    category: 'Neurologic',
+    description: 'Anticonvulsant used to treat seizures and nerve pain',
+    drugClass: 'Anticonvulsant',
+    verified: true,
+    brandNames: ['Lyrica']
+  },
+  {
+    id: '70',
+    name: 'Cyclobenzaprine',
+    genericName: 'Cyclobenzaprine',
+    manufacturer: 'Various',
+    category: 'Muscle Relaxant',
+    description: 'Muscle relaxant used to treat muscle spasms',
+    drugClass: 'Muscle Relaxant',
+    verified: true,
+    brandNames: ['Flexeril']
+  },
+  {
+    id: '71',
+    name: 'Tizanidine',
+    genericName: 'Tizanidine',
+    manufacturer: 'Various',
+    category: 'Muscle Relaxant',
+    description: 'Muscle relaxant used to treat muscle spasms',
+    drugClass: 'Muscle Relaxant',
+    verified: true,
+    brandNames: ['Zanaflex']
+  },
+  {
+    id: '72',
+    name: 'Oxycodone',
+    genericName: 'Oxycodone',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Opioid analgesic used to treat moderate to severe pain',
+    drugClass: 'Opioid Analgesic',
+    verified: true,
+    brandNames: ['OxyContin']
   },
   {
     id: '73',
-    name: 'Vitamin A',
-    genericName: 'Vitamin A',
+    name: 'Morphine',
+    genericName: 'Morphine',
     manufacturer: 'Various',
-    category: 'Vitamin',
-    description: 'Dietary supplement used to prevent and treat vitamin A deficiency.',
-    drugClass: 'Vitamin',
+    category: 'Analgesic',
+    description: 'Opioid analgesic used to treat severe pain',
+    drugClass: 'Opioid Analgesic',
     verified: true,
-    brandNames: ['Aquasol A']
+    brandNames: ['MS Contin']
   },
   {
     id: '74',
-    name: 'Vitamin D',
-    genericName: 'Cholecalciferol',
+    name: 'Codeine',
+    genericName: 'Codeine',
     manufacturer: 'Various',
-    category: 'Vitamin',
-    description: 'Dietary supplement used to prevent and treat vitamin D deficiency.',
-    drugClass: 'Vitamin',
+    category: 'Analgesic',
+    description: 'Opioid analgesic used to treat mild to moderate pain',
+    drugClass: 'Opioid Analgesic',
     verified: true,
-    brandNames: ['Drisdol']
+    brandNames: ['Various']
   },
   {
     id: '75',
-    name: 'Oral Rehydration Salts',
-    genericName: 'Multiple electrolytes',
+    name: 'Promethazine',
+    genericName: 'Promethazine',
     manufacturer: 'Various',
-    category: 'Electrolyte replacement',
-    description: 'Oral electrolyte mixture used for the treatment of dehydration.',
-    drugClass: 'Electrolyte replacement',
+    category: 'Antiemetic',
+    description: 'Antiemetic used to treat nausea and vomiting',
+    drugClass: 'Antiemetic',
     verified: true,
-    brandNames: ['Pedialyte']
+    brandNames: ['Phenergan']
   },
   {
     id: '76',
-    name: 'Acetazolamide',
-    genericName: 'Acetazolamide',
+    name: 'Ondansetron',
+    genericName: 'Ondansetron',
     manufacturer: 'Various',
-    category: 'Diuretic',
-    description: 'Medication used to treat glaucoma, epilepsy, altitude sickness, and heart failure.',
-    drugClass: 'Carbonic anhydrase inhibitor',
+    category: 'Antiemetic',
+    description: 'Antiemetic used to treat nausea and vomiting',
+    drugClass: 'Antiemetic',
     verified: true,
-    brandNames: ['Diamox']
+    brandNames: ['Zofran']
   },
   {
     id: '77',
-    name: 'Spironolactone',
-    genericName: 'Spironolactone',
+    name: 'Loperamide',
+    genericName: 'Loperamide',
     manufacturer: 'Various',
-    category: 'Diuretic',
-    description: 'Medication used to treat heart failure, high blood pressure, edema, and low blood potassium levels.',
-    drugClass: 'Potassium-sparing diuretic',
+    category: 'Antidiarrheal',
+    description: 'Antidiarrheal used to treat diarrhea',
+    drugClass: 'Antidiarrheal',
     verified: true,
-    brandNames: ['Aldactone']
+    brandNames: ['Imodium']
   },
   {
     id: '78',
-    name: 'Salbutamol',
-    genericName: 'Salbutamol',
+    name: 'Bisacodyl',
+    genericName: 'Bisacodyl',
     manufacturer: 'Various',
-    category: 'Bronchodilator',
-    description: 'Medication used to treat asthma, bronchitis, and COPD.',
-    drugClass: 'Beta2-adrenergic agonist',
+    category: 'Laxative',
+    description: 'Laxative used to treat constipation',
+    drugClass: 'Laxative',
     verified: true,
-    brandNames: ['Ventolin']
+    brandNames: ['Dulcolax']
   },
   {
     id: '79',
-    name: 'Beclomethasone',
-    genericName: 'Beclomethasone dipropionate',
+    name: 'Docusate',
+    genericName: 'Docusate',
     manufacturer: 'Various',
-    category: 'Corticosteroid',
-    description: 'Corticosteroid used to treat asthma, allergic rhinitis, and other respiratory conditions.',
-    drugClass: 'Corticosteroid',
+    category: 'Stool Softener',
+    description: 'Stool softener used to treat constipation',
+    drugClass: 'Stool Softener',
     verified: true,
-    brandNames: ['Qvar']
+    brandNames: ['Colace']
   },
   {
     id: '80',
-    name: 'Budesonide',
-    genericName: 'Budesonide',
+    name: 'Polyethylene Glycol',
+    genericName: 'Polyethylene Glycol',
     manufacturer: 'Various',
-    category: 'Corticosteroid',
-    description: 'Corticosteroid used to treat asthma, allergic rhinitis, and inflammatory bowel disease.',
-    drugClass: 'Corticosteroid',
+    category: 'Laxative',
+    description: 'Laxative used to treat constipation',
+    drugClass: 'Laxative',
     verified: true,
-    brandNames: ['Pulmicort']
+    brandNames: ['Miralax']
   },
   {
     id: '81',
-    name: 'Timolol',
-    genericName: 'Timolol maleate',
+    name: 'Ranitidine',
+    genericName: 'Ranitidine',
     manufacturer: 'Various',
-    category: 'Beta blocker',
-    description: 'Medication used to treat open-angle glaucoma and high blood pressure.',
-    drugClass: 'Beta blocker',
+    category: 'Antacid',
+    description: 'H2 blocker used to reduce stomach acid',
+    drugClass: 'H2 Blocker',
     verified: true,
-    brandNames: ['Blocadren']
+    brandNames: ['Zantac']
   },
   {
     id: '82',
-    name: 'Carbamazepine',
-    genericName: 'Carbamazepine',
+    name: 'Famotidine',
+    genericName: 'Famotidine',
     manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Medication used to treat epilepsy, trigeminal neuralgia, and bipolar disorder.',
-    drugClass: 'Anticonvulsant',
+    category: 'Antacid',
+    description: 'H2 blocker used to reduce stomach acid',
+    drugClass: 'H2 Blocker',
     verified: true,
-    brandNames: ['Tegretol', 'Carbatrol', 'Epitol']
-  }
-];
-
-// Combine mock drugs data with additional drugs data
-export const combinedDrugsData = [...mockDrugsData, ...additionalDrugsData];
-
-// Function to get detailed drug data by ID
-export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
-  // First check in mockDrugsData
-  const drugFromMock = mockDrugsData.find(drug => drug.id === id);
-  
-  // If not found, check in additionalDrugsData
-  const drugFromAdditional = !drugFromMock ? additionalDrugsData.find(drug => drug.id === id) : null;
-  
-  // Get the base drug data from either source
-  const baseDrug = drugFromMock || drugFromAdditional;
-  
-  if (!baseDrug) {
-    return null;
-  }
-  
-  // Create detailed drug data by adding additional fields needed for the detailed view
-  const detailedDrug: DetailedDrugData = {
-    id: baseDrug.id,
-    name: baseDrug.name,
-    genericName: baseDrug.genericName,
-    manufacturer: baseDrug.manufacturer,
-    category: baseDrug.category,
-    description: baseDrug.description,
-    drugClass: baseDrug.drugClass || '',
-    verified: baseDrug.verified,
-    brandNames: baseDrug.brandNames || [],
-    prescriptionStatus: Math.random() > 0.3 ? 'Prescription Only' : 'OTC',
-    dosageAndAdmin: `Adults: Initially ${Math.floor(Math.random() * 500)}mg daily. May be increased based on response. Children: Dosage must be determined by a physician.`,
-    mechanism: `${baseDrug.name} works by ${baseDrug.drugClass === 'NSAID' ? 'inhibiting prostaglandin synthesis' : 'specific biological interactions related to its drug class'} to produce its therapeutic effects.`,
-    sideEffects: [
-      'Nausea or vomiting',
-      'Headache',
-      'Dizziness',
-      'Fatigue',
-      baseDrug.category === 'Antibiotic' ? 'Diarrhea' : 'Insomnia'
-    ],
-    interactions: [
-      'May interact with alcohol causing increased drowsiness',
-      'May interact with other medications metabolized by the liver',
-      'Use caution when combined with blood thinners'
-    ],
-    indications: [
-      `Treatment of ${baseDrug.category.toLowerCase()} related conditions`,
-      'Short-term management of acute symptoms',
-      baseDrug.category === 'Analgesic' ? 'Relief of mild to moderate pain' : 'As prescribed by healthcare provider'
-    ],
-    contraindications: [
-      'Hypersensitivity to the active ingredient or any component of the formulation',
-      'Severe liver or kidney impairment',
-      'Pregnancy (consult physician)',
-      'Lactation (consult physician)'
-    ],
-    pregnancy: 'This medication should be used during pregnancy only if the potential benefit justifies the potential risk to the fetus. Consult your doctor before use.',
-    storage: 'Store at room temperature between 68-77°F (20-25°C). Keep away from moisture, heat, and light. Keep out of reach of children.',
-    warnings: [
-      'Do not exceed recommended dose',
-      'Discontinue use and consult physician if symptoms persist or worsen',
-      'May cause drowsiness; use caution when driving or operating machinery'
-    ],
-    similarDrugs: getSimilarDrugs(baseDrug.category, baseDrug.id)
-  };
-  
-  return detailedDrug;
-};
-
-// Helper function to get similar drugs in the same category
-const getSimilarDrugs = (category: string, currentDrugId: string): Array<{ id: string, name: string }> => {
-  // Combine both data sources
-  const allDrugs = [...mockDrugsData, ...additionalDrugsData];
-  
-  // Find drugs in the same category, excluding the current drug
-  const similarDrugs = allDrugs
-    .filter(drug => drug.category === category && drug.id !== currentDrugId)
-    .slice(0, 4); // Limit to 4 similar drugs
-  
-  // Return simplified version with just id and name
-  return similarDrugs.map(drug => ({
-    id: drug.id,
-    name: drug.name
-  }));
-};
+    brandNames: ['Pepcid']
+  },
+  {
+    id: '83',
+    name: 'Calcium Carbonate',
+    genericName: 'Calcium Carbonate',
+    manufacturer: 'Various',
+    category: 'Antacid',
+    description: 'Antacid used to reduce stomach acid',
+    drugClass: 'Antacid',
+    verified: true,
+    brandNames: ['Tums']
+  },
+  {
+    id: '84',
+    name: 'Aluminum Hydroxide',
+    genericName: 'Aluminum Hydroxide',
+    manufacturer: 'Various',
+    category: 'Antacid',
+    description: 'Antacid used to reduce stomach acid',
+    drugClass: 'Antacid',
+    verified: true,
+    brandNames: ['Amphojel']
+  },
+  {
+    id: '85',
+    name: 'Magnesium Hydroxide',
+    genericName: 'Magnesium Hydroxide',
+    manufacturer: 'Various',
+    category: 'Antacid',
+    description: 'Antacid used to reduce stomach acid',
+    drugClass: 'Antacid',
+    verified: true,
+    brandNames: ['Milk of Magnesia']
+  },
+  {
+    id: '86',
+    name: 'Simethicone',
+    genericName: 'Simethicone',
+    manufacturer: 'Various',
+    category: 'Antiflatulent',
+    description: 'Antiflatulent used to reduce gas',
+    drugClass: 'Antiflatulent',
+    verified: true,
+    brandNames: ['Gas-X']
+  },
+  {
+    id: '87',
+    name: 'Dimenhydrinate',
+    genericName: 'Dimenhydrinate',
+    manufacturer: 'Various',
+    category: 'Antiemetic',
+    description: 'Antiemetic used to treat motion sickness',
+    drugClass: 'Antiemetic',
+    verified: true,
+    brandNames: ['Dramamine']
+  },
+  {
+    id: '88',
+    name: 'Meclizine',
+    genericName: 'Meclizine',
+    manufacturer: 'Various',
+    category: 'Antiemetic',
+    description: 'Antiemetic used to treat motion sickness',
+    drugClass: 'Antiemetic',
+    verified: true,
+    brandNames: ['Bonine']
+  },
+  {
+    id: '89',
+    name: 'Scopolamine',
+    genericName: 'Scopolamine',
+    manufacturer: 'Various',
+    category: 'Antiemetic',
+    description: 'Antiemetic used to treat motion sickness',
+    drugClass: 'Antiemetic',
+    verified: true,
+    brandNames: ['Transderm Scop']
+  },
+  {
+    id: '90',
+    name: 'Bismuth Subsalicylate',
+    genericName: 'Bismuth Subsalicylate',
+    manufacturer: 'Various',
+    category: 'Antidiarrheal',
+    description: 'Antidiarrheal used to treat diarrhea',
+    drugClass: 'Antidiarrheal',
+    verified: true,
+    brandNames: ['Pepto-Bismol']
+  },
+  {
+    id: '91',
+    name: 'Lactase',
+    genericName: 'Lactase',
+    manufacturer: 'Various',
+    category: 'Digestive Enzyme',
+    description: 'Digestive enzyme used to treat lactose intolerance',
+    drugClass: 'Digestive Enzyme',
+    verified: true,
+    brandNames: ['Lactaid']
+  },
+  {
+    id: '92',
+    name: 'Pancrelipase',
+    genericName: 'Pancrelipase',
+    manufacturer: 'Various',

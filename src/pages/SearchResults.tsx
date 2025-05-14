@@ -42,7 +42,7 @@ const SearchResults = () => {
           const supabaseDrugs = await fetchDrugs({ 
             searchTerm: searchQuery,
             category: activeFilters.length > 0 ? activeFilters[0] : undefined,
-            limit: 150 // Increase limit to get more results
+            limit: 200 // Increase limit to get more results
           });
           
           if (supabaseDrugs && supabaseDrugs.length > 0) {
@@ -68,7 +68,7 @@ const SearchResults = () => {
           }
         }
         
-        console.log("Searching local data");
+        console.log("Searching local data with total entries:", combinedDrugsData.length);
         // Fall back to combined data if no Supabase results
         // Enhanced search logic to include brand names and fuzzy matching
         const filtered = searchQuery

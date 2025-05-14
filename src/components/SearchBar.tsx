@@ -23,6 +23,8 @@ const SearchBar = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const navigate = useNavigate();
   
+  console.log("SearchBar rendering with combinedDrugsData length:", combinedDrugsData.length);
+  
   // Generate suggestions based on query
   useEffect(() => {
     if (query.trim().length < 2) {

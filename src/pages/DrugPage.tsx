@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -17,15 +16,21 @@ const DrugPage = () => {
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('general');
-
+  
   useEffect(() => {
+    console.log("DrugPage loaded with ID:", id);
     if (id) {
-      const drugData = getDetailedDrugData(id);
-      if (drugData) {
-        setDrug(drugData);
-      }
-      setLoading(false);
+      // Add a small delay to ensure data is loaded properly
+      const timer = setTimeout(() => {
+        const drugData = getDetailedDrugData(id);
+        console.log("Drug data retrieved:", drugData?.name);
+        if (drugData) {
+          setDrug(drugData);
+        }
+        setLoading(false);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [id]);
 
