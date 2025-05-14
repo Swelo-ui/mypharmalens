@@ -15,15 +15,15 @@ export interface DetailedDrugData {
   drugClass?: string;
   verified?: boolean;
   prescriptionStatus?: string;
-  dosageAndAdmin?: string;
-  mechanism?: string;
-  indications?: string[];
-  contraindications?: string[];
-  warnings?: string[];
-  sideEffects?: string[];
-  interactions?: string[];
-  pregnancy?: string;
-  storage?: string;
+  dosageAndAdmin: string; // Changed from optional to required to match DrugDetails.tsx
+  mechanism: string; // Changed from optional to required to match DrugDetails.tsx
+  indications: string[]; // Changed from optional to required to match DrugDetails.tsx
+  contraindications: string[]; // Changed from optional to required to match DrugDetails.tsx
+  warnings: string[]; // Changed from optional to required to match DrugDetails.tsx
+  sideEffects: string[]; // Changed from optional to required to match DrugDetails.tsx
+  interactions: string[]; // Changed from optional to required to match DrugDetails.tsx
+  pregnancy: string; // Changed from optional to required to match DrugDetails.tsx
+  storage: string; // Changed from optional to required to match DrugDetails.tsx
   image?: string;
   packageImage?: string;
   brandNames?: string[];
@@ -1145,3 +1145,4 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   
   return null;
 };
+
