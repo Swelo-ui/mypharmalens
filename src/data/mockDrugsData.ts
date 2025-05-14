@@ -1,3 +1,4 @@
+
 import { DetailedDrugData } from "@/components/DrugDetails";
 import { DrugData } from "@/components/DrugCard";
 import { additionalDrugsData } from "./additionalDrugsData";
@@ -1010,3 +1011,26 @@ export const mockDrugsData: DrugData[] = [
     name: 'Pancrelipase',
     genericName: 'Pancrelipase',
     manufacturer: 'Various',
+    category: 'Digestive Enzyme',
+    description: 'Digestive enzyme used to treat pancreatic insufficiency',
+    drugClass: 'Digestive Enzyme',
+    verified: true,
+    brandNames: ['Creon', 'Zenpep']
+  }
+];
+
+// Combine drug data from both sources and ensure no duplicates
+export const combinedDrugsData: DrugData[] = (() => {
+  const allDrugs = [...mockDrugsData, ...additionalDrugsData];
+  
+  // Create a Map to track unique drugs by ID
+  const uniqueDrugsMap = new Map<string, DrugData>();
+  
+  // Add each drug to the map, overwriting duplicates with the last entry
+  allDrugs.forEach(drug => {
+    uniqueDrugsMap.set(drug.id, drug);
+  });
+  
+  // Convert Map values back to array
+  return Array.from(uniqueDrugsMap.values());
+})();
