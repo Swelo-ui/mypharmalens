@@ -1034,3 +1034,43 @@ export const combinedDrugsData: DrugData[] = (() => {
   // Convert Map values back to array
   return Array.from(uniqueDrugsMap.values());
 })();
+
+// Add the missing getDetailedDrugData function
+export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+  console.log("Looking for drug with ID:", id);
+  
+  // Look for the drug in the combined data
+  const basicDrug = combinedDrugsData.find(drug => drug.id === id);
+  
+  if (!basicDrug) {
+    console.log("Drug not found with ID:", id);
+    return null;
+  }
+  
+  console.log("Found drug:", basicDrug.name);
+  
+  // Create detailed drug data from the basic drug data
+  const detailedDrugData: DetailedDrugData = {
+    id: basicDrug.id,
+    name: basicDrug.name,
+    genericName: basicDrug.genericName,
+    manufacturer: basicDrug.manufacturer,
+    category: basicDrug.category,
+    description: basicDrug.description,
+    verified: basicDrug.verified || false,
+    prescriptionStatus: "Prescription Only", // Default value
+    dosageAndAdmin: "Take as directed by your healthcare provider. Dosing may vary based on individual needs and medical condition.", // Default value
+    mechanism: "The exact mechanism of action is specific to the drug class and individual medication.", // Default value
+    indications: ["Treatment of specific medical conditions as directed by a healthcare provider"],
+    contraindications: ["Hypersensitivity to the active ingredient or any component of the formulation"],
+    warnings: ["Consult your healthcare provider before use, especially if you have existing medical conditions"],
+    sideEffects: ["Common side effects may vary; consult medication guide or healthcare provider"],
+    interactions: ["May interact with other medications; inform your healthcare provider about all medications you're taking"],
+    pregnancy: "Safety in pregnancy and lactation has not been established. Consult your healthcare provider.",
+    storage: "Store at room temperature, away from moisture, heat, and light. Keep out of reach of children.",
+    brandNames: basicDrug.brandNames || [],
+    similarDrugs: []
+  };
+  
+  return detailedDrugData;
+};
