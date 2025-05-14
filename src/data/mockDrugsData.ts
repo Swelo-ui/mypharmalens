@@ -1,37 +1,299 @@
+import { DetailedDrugData } from '@/components/DrugDetails';
+import { generateUniqueId } from '@/lib/utils';
 
-import { DrugData } from "@/components/DrugCard";
-import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetails";
-import { combinedDrugsData } from "./combinedDrugsData";
-import { getDetailedDrugData } from "./drugDataUtils";
+// Mock data for drugs
+export const mockDrugsData: DetailedDrugData[] = [
+  {
+    id: generateUniqueId(),
+    name: 'Amoxicillin',
+    genericName: 'Amoxicillin',
+    manufacturer: 'Aurobindo Pharma',
+    category: 'Antibiotic',
+    description: 'A penicillin antibiotic used to treat bacterial infections.',
+    dosageAndAdmin: '250-500mg every 8 hours, or 500-875mg every 12 hours.',
+    sideEffects: ['Nausea', 'Diarrhea', 'Rash'],
+    warnings: ['Hypersensitivity to penicillin', 'Renal impairment'],
+    interactions: ['Probenecid', 'Methotrexate'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits bacterial cell wall synthesis.',
+    indications: ['Respiratory tract infections', 'Skin infections', 'UTIs'],
+    contraindications: ['Known allergy to penicillins'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category B',
+    verified: true,
+    image: 'https://i.imgur.com/KgQtjbv.jpeg',
+    packageImage: 'https://i.imgur.com/sJt9nel.jpeg',
+    drugClass: 'Penicillin',
+    brandNames: ['Amoxil', 'Moxatag', 'Larotid'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Penicillin' },
+      { id: generateUniqueId(), name: 'Cephalexin' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Lisinopril',
+    genericName: 'Lisinopril',
+    manufacturer: 'Merck',
+    category: 'ACE Inhibitor',
+    description: 'An ACE inhibitor used to treat hypertension and heart failure.',
+    dosageAndAdmin: 'Initial dose of 10mg once daily, adjust as needed.',
+    sideEffects: ['Dizziness', 'Cough', 'Headache'],
+    warnings: ['Pregnancy', 'Angioedema'],
+    interactions: ['NSAIDs', 'Diuretics'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits angiotensin-converting enzyme (ACE).',
+    indications: ['Hypertension', 'Heart Failure', 'Diabetic Nephropathy'],
+    contraindications: ['Pregnancy', 'History of angioedema'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category D',
+    verified: true,
+    image: 'https://i.imgur.com/soqYhww.jpeg',
+    packageImage: 'https://i.imgur.com/j9yqV7R.jpeg',
+    drugClass: 'ACE Inhibitor',
+    brandNames: ['Prinivil', 'Zestril'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Enalapril' },
+      { id: generateUniqueId(), name: 'Ramipril' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Simvastatin',
+    genericName: 'Simvastatin',
+    manufacturer: 'Teva Pharmaceuticals',
+    category: 'Statin',
+    description: 'A statin medication used to lower cholesterol and prevent cardiovascular disease.',
+    dosageAndAdmin: '10-40mg once daily in the evening.',
+    sideEffects: ['Muscle pain', 'Liver abnormalities', 'Headache'],
+    warnings: ['Liver disease', 'Pregnancy'],
+    interactions: ['Grapefruit juice', 'Amiodarone'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits HMG-CoA reductase.',
+    indications: ['Hypercholesterolemia', 'Prevention of cardiovascular events'],
+    contraindications: ['Liver disease', 'Pregnancy'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category X',
+    verified: true,
+    image: 'https://i.imgur.com/jVqVma1.jpeg',
+    packageImage: 'https://i.imgur.com/WJwiw9l.jpeg',
+    drugClass: 'Statin',
+    brandNames: ['Zocor'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Atorvastatin' },
+      { id: generateUniqueId(), name: 'Rosuvastatin' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Metformin',
+    genericName: 'Metformin',
+    manufacturer: 'Bristol-Myers Squibb',
+    category: 'Biguanide',
+    description: 'An oral antidiabetic drug used to treat type 2 diabetes.',
+    dosageAndAdmin: '500mg twice daily or 850mg once daily, with meals.',
+    sideEffects: ['Nausea', 'Diarrhea', 'Abdominal discomfort'],
+    warnings: ['Renal impairment', 'Lactic acidosis'],
+    interactions: ['Alcohol', 'Cimetidine'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Decreases hepatic glucose production and increases insulin sensitivity.',
+    indications: ['Type 2 Diabetes Mellitus'],
+    contraindications: ['Severe renal impairment', 'Lactic acidosis'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category B',
+    verified: true,
+    image: 'https://i.imgur.com/okQVf8j.jpeg',
+    packageImage: 'https://i.imgur.com/wVzlEwa.jpeg',
+    drugClass: 'Biguanide',
+    brandNames: ['Glucophage', 'Riomet', 'Fortamet'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Glipizide' },
+      { id: generateUniqueId(), name: 'Sitagliptin' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Aspirin',
+    genericName: 'Acetylsalicylic Acid',
+    manufacturer: 'Bayer',
+    category: 'NSAID',
+    description: 'A nonsteroidal anti-inflammatory drug used to relieve pain, reduce fever, and prevent blood clots.',
+    dosageAndAdmin: '75-325mg once daily for cardiovascular protection; higher doses for pain relief.',
+    sideEffects: ['Stomach upset', 'Bleeding', 'Tinnitus'],
+    warnings: ['Bleeding disorders', 'Asthma'],
+    interactions: ['Warfarin', 'Ibuprofen'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits cyclooxygenase (COX) enzymes.',
+    indications: ['Pain relief', 'Fever reduction', 'Prevention of cardiovascular events'],
+    contraindications: ['Bleeding disorders', 'Allergy to salicylates'],
+    prescriptionStatus: 'OTC',
+    pregnancy: 'Category C/D (3rd trimester)',
+    verified: true,
+    image: 'https://i.imgur.com/k6G8g9R.jpeg',
+    packageImage: 'https://i.imgur.com/u9l5e8E.jpeg',
+    drugClass: 'Salicylate',
+    brandNames: ['Bayer', 'Ecotrin', 'Bufferin'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Ibuprofen' },
+      { id: generateUniqueId(), name: 'Naproxen' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Omeprazole',
+    genericName: 'Omeprazole',
+    manufacturer: 'AstraZeneca',
+    category: 'Proton Pump Inhibitor',
+    description: 'A proton pump inhibitor used to reduce stomach acid production.',
+    dosageAndAdmin: '20-40mg once daily before a meal.',
+    sideEffects: ['Headache', 'Nausea', 'Diarrhea'],
+    warnings: ['Long-term use may lead to vitamin B12 deficiency', 'Increased risk of fractures'],
+    interactions: ['Clopidogrel', 'Warfarin'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits the H+/K+-ATPase proton pump in gastric parietal cells.',
+    indications: ['Gastroesophageal Reflux Disease (GERD)', 'Peptic Ulcer Disease'],
+    contraindications: ['Hypersensitivity to omeprazole or other PPIs'],
+    prescriptionStatus: 'OTC',
+    pregnancy: 'Category C',
+    verified: true,
+    image: 'https://i.imgur.com/j4z8w9R.jpeg',
+    packageImage: 'https://i.imgur.com/vJ9wCac.jpeg',
+    drugClass: 'Proton Pump Inhibitor',
+    brandNames: ['Prilosec', 'Losec'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Pantoprazole' },
+      { id: generateUniqueId(), name: 'Esomeprazole' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Levothyroxine',
+    genericName: 'Levothyroxine Sodium',
+    manufacturer: 'AbbVie',
+    category: 'Thyroid Hormone',
+    description: 'A synthetic thyroid hormone used to treat hypothyroidism.',
+    dosageAndAdmin: 'Dosage varies; typically 1.6 mcg/kg daily, adjusted based on TSH levels.',
+    sideEffects: ['Palpitations', 'Anxiety', 'Weight loss'],
+    warnings: ['Overdosage can cause hyperthyroidism', 'Cardiac conditions'],
+    interactions: ['Calcium supplements', 'Iron supplements'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Synthetic form of thyroxine (T4), converted to triiodothyronine (T3).',
+    indications: ['Hypothyroidism'],
+    contraindications: ['Thyrotoxicosis', 'Acute myocardial infarction'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category A',
+    verified: true,
+    image: 'https://i.imgur.com/j4z8w9R.jpeg',
+    packageImage: 'https://i.imgur.com/vJ9wCac.jpeg',
+    drugClass: 'Thyroid Hormone',
+    brandNames: ['Synthroid', 'Levoxyl', 'Unithroid'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Liothyronine' },
+      { id: generateUniqueId(), name: 'Thyroid, Desiccated' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Albuterol',
+    genericName: 'Albuterol Sulfate',
+    manufacturer: 'Mylan',
+    category: 'Bronchodilator',
+    description: 'A short-acting bronchodilator used to relieve bronchospasm in asthma and COPD.',
+    dosageAndAdmin: '1-2 inhalations every 4-6 hours as needed.',
+    sideEffects: ['Tremors', 'Tachycardia', 'Nervousness'],
+    warnings: ['Overuse can lead to paradoxical bronchospasm', 'Cardiovascular effects'],
+    interactions: ['Beta-blockers', 'Diuretics'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Beta-2 adrenergic agonist that relaxes bronchial smooth muscle.',
+    indications: ['Asthma', 'Chronic Obstructive Pulmonary Disease (COPD)'],
+    contraindications: ['Hypersensitivity to albuterol'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category C',
+    verified: true,
+    image: 'https://i.imgur.com/j4z8w9R.jpeg',
+    packageImage: 'https://i.imgur.com/vJ9wCac.jpeg',
+    drugClass: 'Beta-2 Agonist',
+    brandNames: ['Ventolin', 'ProAir', 'AccuNeb'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Levalbuterol' },
+      { id: generateUniqueId(), name: 'Ipratropium' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Sertraline',
+    genericName: 'Sertraline Hydrochloride',
+    manufacturer: 'Pfizer',
+    category: 'SSRI',
+    description: 'A selective serotonin reuptake inhibitor (SSRI) used to treat depression, OCD, and anxiety disorders.',
+    dosageAndAdmin: 'Initial dose of 25-50mg once daily, adjust as needed.',
+    sideEffects: ['Nausea', 'Insomnia', 'Sexual dysfunction'],
+    warnings: ['Increased risk of suicidal thoughts in young adults', 'Serotonin syndrome'],
+    interactions: ['MAOIs', 'Warfarin'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Selectively inhibits the reuptake of serotonin in the CNS.',
+    indications: ['Major Depressive Disorder', 'Obsessive-Compulsive Disorder (OCD)', 'Panic Disorder', 'Social Anxiety Disorder', 'Posttraumatic Stress Disorder (PTSD)'],
+    contraindications: ['Concurrent use with MAOIs', 'Hypersensitivity to sertraline'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category C',
+    verified: true,
+    image: 'https://i.imgur.com/j4z8w9R.jpeg',
+    packageImage: 'https://i.imgur.com/vJ9wCac.jpeg',
+    drugClass: 'SSRI',
+    brandNames: ['Zoloft'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Fluoxetine' },
+      { id: generateUniqueId(), name: 'Paroxetine' },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    name: 'Hydrochlorothiazide',
+    genericName: 'Hydrochlorothiazide',
+    manufacturer: 'Various',
+    category: 'Thiazide Diuretic',
+    description: 'A thiazide diuretic used to treat hypertension and edema.',
+    dosageAndAdmin: '12.5-50mg once daily.',
+    sideEffects: ['Dizziness', 'Electrolyte imbalances', 'Increased urination'],
+    warnings: ['Electrolyte imbalances', 'Renal impairment'],
+    interactions: ['NSAIDs', 'Digoxin'],
+    storage: 'Store at room temperature away from moisture and heat.',
+    mechanism: 'Inhibits sodium reabsorption in the distal convoluted tubule.',
+    indications: ['Hypertension', 'Edema'],
+    contraindications: ['Anuria', 'Hypersensitivity to thiazides'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category B',
+    verified: true,
+    image: 'https://i.imgur.com/j4z8w9R.jpeg',
+    packageImage: 'https://i.imgur.com/vJ9wCac.jpeg',
+    drugClass: 'Thiazide Diuretic',
+    brandNames: ['Microzide', 'Oretic'],
+    similarDrugs: [
+      { id: generateUniqueId(), name: 'Chlorthalidone' },
+      { id: generateUniqueId(), name: 'Indapamide' },
+    ],
+  },
+];
 
-// Export interface from the existing file (not changing this)
-export interface DetailedDrugData {
-  id: string;
-  name: string;
-  genericName: string; 
-  manufacturer: string;
-  category: string;
-  description: string;
-  drugClass?: string;
-  verified: boolean; // Changed from optional to required to match DrugDetails.tsx
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled'; // Union type to match DrugDetails.tsx
-  dosageAndAdmin: string;
-  mechanism: string;
-  indications: string[];
-  contraindications: string[];
-  warnings: string[];
-  sideEffects: string[];
-  interactions: string[];
-  pregnancy: string;
-  storage: string;
-  image?: string;
-  packageImage?: string;
-  brandNames?: string[];
-  similarDrugs?: {id: string, name: string}[];
+// Update the function signature to accept a callback parameter
+export function getDetailedDrugData(id: string, callback?: (error?: Error) => void): DetailedDrugData | null {
+  try {
+    const drugData = mockDrugsData.find(drug => drug.id === id);
+    
+    if (!drugData) {
+      // If the drug is not found, you might still want to call the callback with an error
+      if (callback) {
+        callback(new Error("Drug not found"));
+      }
+      return null;
+    }
+    
+    return drugData;
+  } catch (error) {
+    // If there's an error, call the callback with the error
+    if (callback) {
+      callback(error as Error);
+    }
+    return null;
+  }
 }
-
-// Now exporting from combinedDrugsData
-export { combinedDrugsData, getDetailedDrugData };
-
-// Original mockDrugsData array is now imported from the category files and combined in combinedDrugsData.ts
-export const mockDrugsData = combinedDrugsData.slice(0, 90);

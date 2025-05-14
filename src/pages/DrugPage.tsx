@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -10,6 +11,7 @@ import { getDetailedDrugData } from '@/data/mockDrugsData';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
+import { toast } from '@/components/ui/use-toast';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,7 +24,17 @@ const DrugPage = () => {
     if (id) {
       // Add a small delay to ensure data is loaded properly
       const timer = setTimeout(() => {
-        const drugData = getDetailedDrugData(id);
+        // Pass both id and a callback function as the second argument
+        const drugData = getDetailedDrugData(id, (error) => {
+          if (error) {
+            toast({
+              title: "Error",
+              description: "Failed to load medication data.",
+              type: "error"
+            });
+          }
+        });
+        
         console.log("Drug data retrieved:", drugData?.name);
         if (drugData) {
           setDrug(drugData);
