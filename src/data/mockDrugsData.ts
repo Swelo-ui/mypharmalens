@@ -1,3 +1,4 @@
+
 import { DrugData } from "@/components/DrugCard";
 import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetails";
 import { additionalDrugsData } from "./additionalDrugsData";
@@ -1016,3 +1017,9 @@ export const mockDrugsData: DrugData[] = [
     genericName: 'Bismuth Subsalicylate',
     manufacturer: 'Various',
     category: 'Antidiarrheal',
+    description: 'Antidiarrheal used to treat diarrhea and upset stomach',
+    drugClass: 'Antidiarrheal',
+    verified: true,
+    brandNames: ['Pepto-Bismol']
+  }
+];
