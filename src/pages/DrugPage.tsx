@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -31,10 +30,7 @@ const DrugPage = () => {
         if (drugData) {
           setDrug(drugData);
         } else {
-          toast({
-            message: "Failed to load medication data.",
-            type: "error"
-          });
+          toast("Failed to load medication data.");
         }
         setLoading(false);
       }, 100);
