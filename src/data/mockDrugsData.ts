@@ -1,7 +1,7 @@
-import { DetailedDrugData } from "@/components/DrugDetails";
 import { DrugData } from "@/components/DrugCard";
+import { DetailedDrugData as DrugDetailsInterface } from "@/components/DrugDetails";
 import { additionalDrugsData } from "./additionalDrugsData";
-import { generateUniqueId, formatDosage } from "@/lib/utils";
+import { generateUniqueId } from "@/lib/utils";
 
 // Define the DetailedDrugData interface
 export interface DetailedDrugData {
@@ -1046,7 +1046,7 @@ export const mockDrugsData: DrugData[] = [
 ];
 
 // 50 additional drugs with stable dosage information
-const additionalDrugs = [
+const additionalDrugs: DrugDetailsInterface[] = [
   {
     id: generateUniqueId(),
     name: "Levetiracetam",
@@ -1653,8 +1653,8 @@ export const combinedDrugsData: DrugData[] = (() => {
   return Array.from(uniqueDrugsMap.values());
 })();
 
-// Add the missing getDetailedDrugData function
-export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
+// Add the getDetailedDrugData function
+export const getDetailedDrugData = (id: string): DrugDetailsInterface | null => {
   console.log("Looking for drug with ID:", id);
   
   // Look for the drug in the combined data
@@ -1668,17 +1668,17 @@ export const getDetailedDrugData = (id: string): DetailedDrugData | null => {
   console.log("Found drug:", basicDrug.name);
   
   // Create detailed drug data from the basic drug data, preserving any existing dosage information
-  const detailedDrugData: DetailedDrugData = {
+  const detailedDrugData: DrugDetailsInterface = {
     id: basicDrug.id,
     name: basicDrug.name,
-    genericName: basicDrug.genericName,
-    manufacturer: basicDrug.manufacturer,
-    category: basicDrug.category,
-    description: basicDrug.description,
-    drugClass: basicDrug.drugClass,
+    genericName: basicDrug.genericName || '',
+    manufacturer: basicDrug.manufacturer || '',
+    category: basicDrug.category || '',
+    description: basicDrug.description || '',
+    drugClass: basicDrug.drugClass || '',
     verified: basicDrug.verified || false,
     prescriptionStatus: "Prescription Only", // Default value
-    dosageAndAdmin: basicDrug.dosageAndAdmin || "Take as directed by your healthcare provider. Dosing may vary based on individual needs and medical condition.",
+    dosageAndAdmin: (basicDrug as any).dosageAndAdmin || "Take as directed by your healthcare provider. Dosing may vary based on individual needs and medical condition.",
     mechanism: "The exact mechanism of action is specific to the drug class and individual medication.", // Default value
     indications: ["Treatment of specific medical conditions as directed by a healthcare provider"],
     contraindications: ["Hypersensitivity to the active ingredient or any component of the formulation"],
