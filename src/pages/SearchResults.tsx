@@ -7,12 +7,14 @@ import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
 import { combinedDrugsData } from '@/data/mockDrugsData';
 import { fetchDrugs } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const SearchResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('q') || '';
+  const isMobile = useIsMobile();
   
   const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState<DrugData[]>([]);
@@ -313,7 +315,7 @@ const SearchResults = () => {
                           onChange={() => toggleFilter(category)}
                           className="rounded border-gray-300 text-pharma-600 shadow-sm focus:border-pharma-300 focus:ring focus:ring-pharma-200 focus:ring-opacity-50"
                         />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-pharma-600 transition-colors">
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-pharma-600 transition-colors truncate">
                           {category}
                         </span>
                       </label>

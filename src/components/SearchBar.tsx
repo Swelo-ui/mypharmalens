@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { combinedDrugsData } from '@/data/mockDrugsData';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SearchBarProps {
   fullWidth?: boolean;
@@ -22,8 +24,7 @@ const SearchBar = ({
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const navigate = useNavigate();
-  
-  console.log("SearchBar rendering with combinedDrugsData length:", combinedDrugsData.length);
+  const isMobile = useIsMobile();
   
   // Generate suggestions based on query
   useEffect(() => {
@@ -172,15 +173,15 @@ const SearchBar = ({
               // Delay hiding focus state to allow clicking on suggestions
               setTimeout(() => setIsFocused(false), 200);
             }}
-            placeholder={placeholder}
-            className="flex-1 bg-transparent border-none outline-none placeholder:text-gray-400 text-sm"
+            placeholder={isMobile ? "Search medications..." : placeholder}
+            className="flex-1 bg-transparent border-none outline-none placeholder:text-gray-400 text-sm min-w-0"
           />
           
           {query && (
             <button
               type="button"
               onClick={clearSearch}
-              className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </button>
@@ -190,7 +191,7 @@ const SearchBar = ({
             type="submit" 
             disabled={isLoading || !query.trim()} 
             className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-all",
+              "px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-all flex-shrink-0",
               "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-pharma-500",
               query.trim() 
                 ? "bg-pharma-600 text-white hover:bg-pharma-700" 
@@ -200,7 +201,7 @@ const SearchBar = ({
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Search"
+              <span>{isMobile ? "Search" : "Search"}</span>
             )}
           </button>
         </div>
