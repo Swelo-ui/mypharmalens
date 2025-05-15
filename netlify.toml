@@ -8,3 +8,15 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Add caching headers for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Exclude specific paths from caching
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
