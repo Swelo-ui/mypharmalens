@@ -61,9 +61,10 @@ const Hero = () => {
 
   return (
     <div className="relative pt-16 pb-12 md:pt-24 md:pb-16 overflow-hidden">
-      {/* Aurora background instead of gradient */}
+      {/* Aurora background wrapper with proper children */}
       <AuroraBackground className="absolute inset-0 z-0 h-full" showRadialGradient={true}>
-        {/* This is where the aurora effect will appear */}
+        {/* Empty div as children - the aurora effect will appear behind the content */}
+        <div></div>
       </AuroraBackground>
       
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
