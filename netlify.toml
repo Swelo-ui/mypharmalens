@@ -23,5 +23,5 @@
 
 # Configure build environment for Terser
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--no-optional"

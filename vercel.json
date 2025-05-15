@@ -24,5 +24,6 @@
       ]
     }
   ],
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "nodeVersion": "20"
 }
