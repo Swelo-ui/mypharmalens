@@ -1,6 +1,42 @@
 
 import type { Config } from "tailwindcss";
 
+function addVariablesForColors({ addBase, theme }: any) {
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ":root": {
+      ...newVars,
+      "--transparent": "transparent",
+      "--white": "#ffffff",
+      "--black": "#000000",
+    },
+  });
+}
+
+// Helper function to flatten color palette - simplified version of the Tailwind utility
+function flattenColorPalette(colors: Record<string, any>): Record<string, string> {
+  const result: Record<string, string> = {};
+  
+  const flattenColors = (obj: any, prefix = '') => {
+    for (const key in obj) {
+      const value = obj[key];
+      
+      if (typeof value === 'string') {
+        result[prefix + key] = value;
+      } else if (typeof value === 'object') {
+        flattenColors(value, `${prefix}${key}-`);
+      }
+    }
+  };
+  
+  flattenColors(colors);
+  return result;
+}
+
 export default {
 	darkMode: ["class"],
 	content: [
@@ -122,6 +158,14 @@ export default {
 				'pulse-subtle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' }
+				},
+				'aurora': {
+					from: {
+						backgroundPosition: '50% 50%, 50% 50%',
+					},
+					to: {
+						backgroundPosition: '350% 50%, 350% 50%',
+					},
 				}
 			},
 			animation: {
@@ -131,7 +175,8 @@ export default {
 				'fade-up': 'fade-up 0.5s ease-out',
 				'scale-in': 'scale-in 0.3s ease-out',
 				'float': 'float 3s ease-in-out infinite',
-				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite'
+				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+				'aurora': 'aurora 60s linear infinite'
 			},
 			boxShadow: {
 				'neo': '5px 5px 15px rgba(0, 0, 0, 0.05), -5px -5px 15px rgba(255, 255, 255, 0.95)',
@@ -143,5 +188,8 @@ export default {
 			},
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		addVariablesForColors  // Add this plugin
+	],
 } satisfies Config;

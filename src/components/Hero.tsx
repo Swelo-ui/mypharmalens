@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Search, Camera, Pill, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { AuroraBackground } from '@/components/ui/aurora-background';
 
 const Hero = () => {
   const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -60,10 +61,12 @@ const Hero = () => {
 
   return (
     <div className="relative pt-16 pb-12 md:pt-24 md:pb-16 overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-pharma-50/50 to-transparent -z-10"></div>
+      {/* Aurora background instead of gradient */}
+      <AuroraBackground className="absolute inset-0 z-0 h-full" showRadialGradient={true}>
+        {/* This is where the aurora effect will appear */}
+      </AuroraBackground>
       
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4 max-w-6xl relative z-10">
         {/* Main Hero Content */}
         <div className="text-center mb-12 md:mb-16 animate-fade-up">
           <div className="inline-block mb-3">
