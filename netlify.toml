@@ -20,3 +20,8 @@
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# Configure build environment for Terser
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--no-optional"
