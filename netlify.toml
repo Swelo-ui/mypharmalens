@@ -23,7 +23,7 @@
 
 # Configure build environment for Node.js
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "20.19.2"
   NPM_FLAGS = "--no-optional"
   CI = "true"
   NODE_ENV = "production"

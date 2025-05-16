@@ -25,5 +25,5 @@
     }
   ],
   "installCommand": "npm install",
-  "nodeVersion": "20"
+  "nodeVersion": "20.19.2"
 }
