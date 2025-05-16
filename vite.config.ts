@@ -18,10 +18,10 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Improved build settings for better deployment
-    outDir: "dist",
+    // Build to public directory for Netlify
+    outDir: "public",
     sourcemap: true,
-    minify: "terser", // Explicitly use terser
+    minify: "terser",
     emptyOutDir: true,
     rollupOptions: {
       output: {
@@ -38,7 +38,10 @@ export default defineConfig(({ mode }) => ({
             return 'vendor';
           }
         }
-      }
+      },
+      external: [
+        '@rollup/rollup-linux-x64-gnu'
+      ]
     }
   },
   // More specific optimizeDeps to ensure all Radix components are pre-bundled
@@ -56,7 +59,15 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-tabs',
       '@radix-ui/react-popover',
       '@radix-ui/react-radio-group',
-      '@radix-ui/react-slot'
+      '@radix-ui/react-slot',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-hover-card',
+      '@radix-ui/react-menubar',
+      '@radix-ui/react-navigation-menu'
     ]
   }
 }));

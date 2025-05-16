@@ -1,7 +1,7 @@
 
 [build]
   command = "npm run build"
-  publish = "dist"
+  publish = "public"
 
 # Handle SPA routing
 [[redirects]]
@@ -21,7 +21,10 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# Configure build environment for Terser
+# Configure build environment for Node.js
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--no-optional"
+
+[context.production.environment]
+  NODE_ENV = "production"
