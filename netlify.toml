@@ -1,6 +1,6 @@
 
 [build]
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = "public"
 
 # Handle SPA routing
@@ -25,6 +25,8 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--no-optional"
+  CI = "true"
+  NODE_ENV = "production"
 
 [context.production.environment]
   NODE_ENV = "production"
