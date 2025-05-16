@@ -1,6 +1,6 @@
 
 {
-  "buildCommand": "npm install && bun run build",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "public",
   "framework": "vite",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
