@@ -1,6 +1,6 @@
 
 [build]
-  command = "npm install && npm run build"
+  command = "npm install && bun run build"
   publish = "public"
 
 # Handle SPA routing
