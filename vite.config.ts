@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'public',
     sourcemap: true,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
