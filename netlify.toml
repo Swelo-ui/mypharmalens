@@ -1,6 +1,5 @@
-
 [build]
-  command = "npm install && ls -la node_modules/.bin && npm run build"
+  command = "npm ci && ls -la node_modules/.bin && npm run build" # Use npm ci, keep diagnostic ls
   publish = "public"
 
 # Handle SPA routing
@@ -24,7 +23,7 @@
 # Configure build environment for Node.js
 [build.environment]
   NODE_VERSION = "20.19.2"
-  NPM_FLAGS = "--no-optional"
+  # NPM_FLAGS = "--no-optional"  # Keep this commented out
   CI = "true"
   NODE_ENV = "production"
 
