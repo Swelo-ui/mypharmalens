@@ -1,0 +1,8 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.netlify.pharmalens.twa",
+      "sha256_cert_fingerprints": ["31:13:41:3B:70:58:7B:E9:15:3D:CC:D2:18:58:83:30:D2:35:9F:23:8F:1E:BA:0F:20:AE:9C:A0:9C:16:73:6C"]
+    }
+  }]
