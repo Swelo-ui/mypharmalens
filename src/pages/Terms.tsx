@@ -2,10 +2,19 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 
 const Terms = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="Terms of Use - PharmaLens"
+        description="Read PharmaLens Terms of Use and service conditions. Understand user responsibilities, medical disclaimers, privacy policies, and legal information for our medication identification platform."
+        keywords="PharmaLens terms of use, terms and conditions, service agreement, medical disclaimer, user responsibilities, legal information"
+        canonicalUrl="/terms"
+        noIndex={false}
+      />
+      
       <Header />
       
       <main className="flex-1 pt-24 pb-16">

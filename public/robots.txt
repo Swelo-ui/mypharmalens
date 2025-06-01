@@ -1,0 +1,17 @@
+
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /search
+Allow: /identify
+Allow: /about
+Allow: /faq
+Allow: /help
+Allow: /contact
+
+# Sitemap location
+Sitemap: https://pharmalens.tech/sitemap.xml
+
+# Crawl delay for better server performance
+Crawl-delay: 1

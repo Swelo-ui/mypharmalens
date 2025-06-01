@@ -2,11 +2,51 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const FAQ = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How accurate is the medication identification?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PharmaLens uses advanced AI models trained on large datasets of medication images. Our system can identify most standard medications with high accuracy, even from somewhat blurry images."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where does PharmaLens get its medication information?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We source our medication data from trusted pharmaceutical databases, including Drugs.com and national drug formularies. All information is regularly verified and updated to ensure accuracy."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can PharmaLens be used for medical advice?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, PharmaLens is an information tool only and should not be used as a substitute for professional medical advice. Always consult with a qualified healthcare provider."
+        }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="Frequently Asked Questions - PharmaLens"
+        description="Get answers to common questions about PharmaLens medication identification, accuracy, data sources, privacy, and usage. Learn how our AI-powered drug identification works."
+        keywords="PharmaLens FAQ, medication identification questions, pill identifier help, drug database questions, AI medication accuracy, pharmaceutical app support"
+        canonicalUrl="/faq"
+        structuredData={structuredData}
+      />
+      
       <Header />
       
       <main className="flex-1 pt-24 pb-12">

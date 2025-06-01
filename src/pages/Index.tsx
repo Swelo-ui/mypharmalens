@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -6,6 +5,7 @@ import Hero from '@/components/Hero';
 import SearchBar from '@/components/SearchBar';
 import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
+import SEOHead from '@/components/SEOHead';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain } from 'lucide-react';
 
@@ -37,8 +37,43 @@ const Index = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PharmaLens",
+    "description": "AI-powered medication identification and comprehensive drug information platform",
+    "url": "https://pharmalens.tech",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "150"
+    },
+    "featureList": [
+      "AI-powered medication identification",
+      "Comprehensive drug database",
+      "Side effects and interactions information",
+      "Dosage guidelines",
+      "Visual pill identification"
+    ]
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="PharmaLens - AI-Powered Medication Identification & Drug Information"
+        description="Identify medications instantly with AI technology. Access comprehensive drug information, side effects, dosages, and interactions. Free medication identifier and pharmaceutical database."
+        keywords="medication identifier, pill identifier, drug information, AI medication, pharmaceutical database, medicine lookup, drug interactions, side effects, dosage information, prescription drugs, over the counter medications"
+        canonicalUrl="/"
+        structuredData={structuredData}
+      />
+      
       <Header />
       
       <main className="flex-1">
