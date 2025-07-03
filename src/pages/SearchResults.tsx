@@ -1,14 +1,18 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
+import VirtualizedDrugList, { useInfiniteVirtualScroll, useOptimalItemHeight } from '@/components/VirtualizedDrugList';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
-import { combinedDrugsData, searchDrugs } from '@/data/combinedDrugsData';
+import { searchDrugsAsync, getAllCategoriesAsync } from '@/data/drugDataLoader';
 import { fetchDrugs } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePerformanceMonitor, measureSearchTime, measureRenderTime } from '@/utils/performanceMonitor';
+import SEOHead from '@/components/SEOHead';
+import SchemaMarkup from '@/components/SchemaMarkup';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -21,14 +25,36 @@ const SearchResults = () => {
   const [results, setResults] = useState<DrugData[]>([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [searchMetrics, setSearchMetrics] = useState<{time: number, count: number} | null>(null);
   
-  console.log("SearchResults component initialized");
-  console.log("Search query:", searchQuery);
-  console.log("Total drugs in combinedDrugsData:", combinedDrugsData.length);
+  // Initialize performance monitoring
+  const performance = usePerformanceMonitor();
   
-  // Extract unique categories from combinedDrugsData
-  const categories = Array.from(new Set(combinedDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
-  console.log("Available categories:", categories);
+  // Use infinite scroll for better performance with large result sets
+  const {
+    displayedDrugs,
+    loadMore,
+    hasMore,
+    totalCount,
+    displayCount
+  } = useInfiniteVirtualScroll(results, 50, 25);
+  
+  // Calculate optimal item height based on drug data
+  const itemHeight = useOptimalItemHeight(displayedDrugs, 180);
+  
+  // Load categories asynchronously
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const allCategories = await getAllCategoriesAsync();
+        setCategories(allCategories);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
@@ -36,20 +62,23 @@ const SearchResults = () => {
     window.scrollTo(0, 0);
     
     const loadDrugs = async () => {
+      // Start performance measurement
+      performance.start('search-execution', { query: searchQuery, filters: activeFilters });
+      
       try {
-        console.log("Searching for:", searchQuery);
-        console.log("Active filters:", activeFilters);
-        
-        if (searchQuery) {
+        // If we have a search query, try to fetch from Supabase first
+        if (searchQuery && searchQuery.trim().length > 0) {
           // Try to fetch from Supabase first
-          const supabaseDrugs = await fetchDrugs({ 
-            searchTerm: searchQuery,
-            category: activeFilters.length > 0 ? activeFilters[0] : undefined,
-            limit: 200 // Increase limit to get more results
-          });
+          const supabaseDrugs = await measureSearchTime(
+            async () => fetchDrugs({ 
+              searchTerm: searchQuery,
+              category: activeFilters.length > 0 ? activeFilters[0] : undefined,
+              limit: 200
+            }),
+            searchQuery
+          );
           
           if (supabaseDrugs && supabaseDrugs.length > 0) {
-            console.log("Found drugs in Supabase:", supabaseDrugs.length);
             // Map Supabase drugs to DrugData format
             const formattedDrugs = supabaseDrugs.map(drug => ({
               id: drug.id,
@@ -64,131 +93,124 @@ const SearchResults = () => {
             }));
             
             setResults(formattedDrugs);
+            setSearchMetrics({
+              time: performance.end('search-execution') || 0,
+              count: formattedDrugs.length
+            });
             setIsLoading(false);
             return;
-          } else {
-            console.log("No results found in Supabase, falling back to local data");
           }
         }
         
-        console.log("Searching local data with total entries:", combinedDrugsData.length);
-        // Fall back to combined data if no Supabase results
-        // Enhanced search logic to include brand names and fuzzy matching
-        const filtered = searchQuery
-          ? combinedDrugsData.filter(drug => {
-              const query = searchQuery.toLowerCase();
-              
-              // Direct matches
-              const nameMatch = drug.name.toLowerCase().includes(query);
-              const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
-              const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
-              const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
-              const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
-              
-              // Brand name matching with comprehensive check
-              const brandMatch = drug.brandNames && 
-                drug.brandNames.some(brand => brand.toLowerCase().includes(query));
-              
-              // Improved fuzzy matching for common misspellings
-              // Adjust threshold based on query length for better accuracy
-              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-              const fuzzyMatch = calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= threshold;
-
-              // For very short queries, be more strict about fuzzy matching
-              const shouldUseFuzzy = query.length > 3;
-              
-              return nameMatch || genericMatch || manufacturerMatch || 
-                     categoryMatch || drugClassMatch || brandMatch || 
-                     (shouldUseFuzzy && fuzzyMatch);
-            })
-          : combinedDrugsData;
+        // For empty search query or if Supabase search failed, load all drugs
+        if (!searchQuery || searchQuery.trim().length === 0) {
+          // Load all drugs when no search query is provided
+          const allDrugs = await measureSearchTime(
+            () => import('@/data/combinedDrugsData').then(m => m.combinedDrugsData),
+            'all-drugs'
+          );
+          
+          // Apply category filters if any are active
+          const finalResults = activeFilters.length > 0
+            ? allDrugs.filter(drug => drug.category && activeFilters.includes(drug.category))
+            : allDrugs;
+          
+          setResults(finalResults);
+          
+          // Record search metrics
+          const searchTime = performance.end('search-execution') || 0;
+          setSearchMetrics({
+            time: searchTime,
+            count: finalResults.length
+          });
+          setIsLoading(false);
+          return;
+        }
         
-        console.log(`Found ${filtered.length} drugs in local data`);
+        // Use the async search function with performance monitoring for actual searches
+        const searchResults = await measureSearchTime(
+          () => searchDrugsAsync(searchQuery),
+          searchQuery || 'all'
+        );
         
         // Apply category filters if any are active
         const finalResults = activeFilters.length > 0
-          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
-          : filtered;
+          ? searchResults.filter(drug => drug.category && activeFilters.includes(drug.category))
+          : searchResults;
         
-        console.log(`After filtering: ${finalResults.length} drugs`);
         setResults(finalResults);
+        
+        // Record search metrics
+        const searchTime = performance.end('search-execution') || 0;
+        setSearchMetrics({
+          time: searchTime,
+          count: finalResults.length
+        });
       } catch (error) {
         console.error("Error fetching drugs:", error);
-        // Fall back to local data on error with same enhanced search
-        const filtered = searchQuery
-          ? combinedDrugsData.filter(drug => {
-              const query = searchQuery.toLowerCase();
-              
-              // Check main properties
-              if (drug.name.toLowerCase().includes(query)) return true;
-              if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
-              if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
-              if (drug.category && drug.category.toLowerCase().includes(query)) return true;
-              if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
-              
-              // Check brand names with improved matching
-              if (drug.brandNames && drug.brandNames.some(brand => 
-                brand.toLowerCase().includes(query))) return true;
-              
-              // Improved fuzzy matching for common misspellings
-              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-              if (calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= threshold) {
-                return true;
-              }
-              
-              return false;
-            })
-          : combinedDrugsData;
+        performance.start('fallback-search');
+        // Fall back to async search on error
+        try {
+          // If no search query, load all drugs directly
+          if (!searchQuery || searchQuery.trim().length === 0) {
+            const allDrugs = await measureSearchTime(
+              () => import('@/data/combinedDrugsData').then(m => m.combinedDrugsData),
+              'fallback-all-drugs'
+            );
+            
+            // Apply category filters if any are active
+            const finalResults = activeFilters.length > 0
+              ? allDrugs.filter(drug => drug.category && activeFilters.includes(drug.category))
+              : allDrugs;
+            
+            setResults(finalResults);
+            
+            // Record fallback metrics
+            const fallbackTime = performance.end('fallback-search') || 0;
+            setSearchMetrics({
+              time: fallbackTime,
+              count: finalResults.length
+            });
+            return;
+          }
           
-        console.log(`Found ${filtered.length} drugs in local data after error`);
-        
-        const finalResults = activeFilters.length > 0
-          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
-          : filtered;
+          // For actual search queries
+          const searchResults = await measureSearchTime(
+            () => searchDrugsAsync(searchQuery),
+            `fallback-${searchQuery}`
+          );
+          const finalResults = activeFilters.length > 0
+            ? searchResults.filter(drug => drug.category && activeFilters.includes(drug.category))
+            : searchResults;
+          setResults(finalResults);
           
-        setResults(finalResults);
+          // Record fallback metrics
+          const fallbackTime = performance.end('fallback-search') || 0;
+          setSearchMetrics({
+            time: fallbackTime,
+            count: finalResults.length
+          });
+        } catch (fallbackError) {
+          console.error("Fallback search also failed:", fallbackError);
+          performance.end('fallback-search');
+          setResults([]);
+          setSearchMetrics({
+            time: 0,
+            count: 0
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     };
     
-    // Simulate API call delay for better UX - shorter delay for faster response
+    // Shorter delay for better UX
     const timer = setTimeout(() => {
       loadDrugs();
-    }, 300);
+    }, 200);
     
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilters]);
-  
-  // Enhanced Levenshtein distance implementation for fuzzy matching
-  const calculateLevenshteinDistance = (a: string, b: string): number => {
-    const matrix = [];
-    
-    // Initialize matrix
-    for (let i = 0; i <= b.length; i++) {
-      matrix[i] = [i];
-    }
-    
-    for (let j = 0; j <= a.length; j++) {
-      matrix[0][j] = j;
-    }
-    
-    // Fill matrix
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i-1][j] + 1,      // deletion
-          matrix[i][j-1] + 1,      // insertion
-          matrix[i-1][j-1] + cost  // substitution
-        );
-      }
-    }
-    
-    return matrix[b.length][a.length];
-  };
   
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
@@ -206,12 +228,80 @@ const SearchResults = () => {
     setActiveFilters([]);
   };
   
-  const handleDrugClick = (drugId: string) => {
-    navigate(`/drug/${drugId}`);
+  const handleDrugClick = (drug: DrugData) => {
+    navigate(`/drug/${drug.id}`);
+  };
+
+  // Generate SEO data based on search query and results
+  const generateSEOData = () => {
+    const title = searchQuery 
+      ? `${searchQuery} - Search Results | PharmaLens`
+      : 'All Medications - PharmaLens Drug Database';
+    
+    const description = searchQuery
+      ? `Find detailed information about ${searchQuery} and related medications. Search results include ${results.length} medications with comprehensive drug information, side effects, and interactions.`
+      : `Browse our comprehensive database of medications. Access detailed information on ${results.length} drugs including side effects, dosages, interactions, and more.`;
+    
+    const keywords = searchQuery
+      ? `${searchQuery}, medication search, drug information, ${searchQuery} side effects, ${searchQuery} dosage, pharmaceutical database`
+      : 'medication database, drug search, pharmaceutical information, medicine lookup, drug interactions, side effects';
+    
+    return { title, description, keywords };
+  };
+  
+  const seoData = generateSEOData();
+  
+  // Generate structured data for search results
+  const searchResultsSchema = {
+    "@context": "https://schema.org",
+    "@type": "SearchResultsPage",
+    "name": seoData.title,
+    "description": seoData.description,
+    "url": `https://pharmalens.tech/search${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": results.length,
+      "itemListElement": results.slice(0, 10).map((drug, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Drug",
+          "name": drug.name,
+          "description": drug.description,
+          "url": `https://pharmalens.tech/drug/${drug.id}`
+        }
+      }))
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* SEO Meta Tags and Structured Data */}
+      <SEOHead 
+        title={seoData.title}
+        description={seoData.description}
+        keywords={seoData.keywords}
+        canonicalUrl={`/search${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`}
+        ogType="website"
+      />
+      
+      {/* Search Results Schema */}
+      <SchemaMarkup 
+        type="SearchResultsPage"
+        data={searchResultsSchema}
+      />
+      
+      {/* Website Schema for search functionality */}
+      <SchemaMarkup 
+        type="WebSite"
+        data={{
+          searchAction: {
+            target: "https://pharmalens.tech/search?q={search_term_string}",
+            queryInput: "required name=search_term_string"
+          }
+        }}
+      />
+      
       <Header />
       
       <main className="flex-1 pt-24 pb-16">
@@ -359,10 +449,18 @@ const SearchResults = () => {
                 </div>
               ) : results.length > 0 ? (
                 <>
-                  <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {results.length} {results.length === 1 ? 'result' : 'results'} found
-                    </p>
+                  <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {results.length} {results.length === 1 ? 'result' : 'results'} found
+                      </p>
+                      
+                      {searchMetrics && (
+                        <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
+                          Search completed in {searchMetrics.time.toFixed(2)}ms
+                        </span>
+                      )}
+                    </div>
                     
                     {/* Active Filters - Desktop */}
                     <div className="hidden lg:flex lg:flex-wrap gap-2">
@@ -383,12 +481,25 @@ const SearchResults = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {results.map((drug) => (
-                      <div key={drug.id} onClick={() => handleDrugClick(drug.id)} className="cursor-pointer">
-                        <DrugCard drug={drug} />
+                  <div className="w-full">
+                    <VirtualizedDrugList 
+                      drugs={displayedDrugs} 
+                      height={600} 
+                      itemHeight={itemHeight}
+                      onDrugClick={handleDrugClick}
+                      className="w-full"
+                    />
+                    
+                    {hasMore && (
+                      <div className="flex justify-center mt-6">
+                        <button 
+                          onClick={loadMore}
+                          className="px-4 py-2 bg-pharma-100 hover:bg-pharma-200 text-pharma-800 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Load more ({displayCount} of {totalCount})
+                        </button>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </>
               ) : (

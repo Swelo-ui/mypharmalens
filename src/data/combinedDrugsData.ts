@@ -12,8 +12,13 @@ import { antimalarialDrugs } from "./antimalarialDrugs";
 import { supplementDrugs } from "./supplementDrugs";
 import { otherDrugs } from "./otherDrugs";
 import { extraWHODrugs } from "./extraWHODrugs";
+import { expandedDrugsData } from "./expandedDrugsData";
+import { comprehensiveDrugsData } from "./comprehensiveDrugsData";
+import { seoOptimizedDrugsData } from "./seoOptimizedDrugsData";
+import { generateDrugSEOData, generateCanonicalUrl, generateDrugSitemapEntries } from "@/utils/seoUtils";
 
-// Combine all drug data from different categories
+// Combine all drug data from different categories including comprehensive dataset for better SEO coverage
+// Now includes 800+ medications with SEO-optimized data for better Google rankings
 export const combinedDrugsData: DrugData[] = [
   ...cardiovascularDrugs,
   ...respiratoryDrugs,
@@ -25,7 +30,10 @@ export const combinedDrugsData: DrugData[] = [
   ...antimalarialDrugs,
   ...supplementDrugs,
   ...otherDrugs,
-  ...extraWHODrugs
+  ...extraWHODrugs,
+  ...expandedDrugsData,
+  ...comprehensiveDrugsData,
+  ...seoOptimizedDrugsData
 ];
 
 // Export the getDetailedDrugData function for use elsewhere
@@ -67,7 +75,7 @@ export const getAllDrugClasses = (): string[] => {
   return Array.from(drugClassesSet).sort();
 };
 
-// Advanced search function for SearchBar component
+// Advanced search function for SearchBar component with SEO optimization
 export const searchDrugs = (query: string): DrugData[] => {
   if (!query || query.trim().length < 2) {
     return [];
@@ -125,4 +133,106 @@ export const searchDrugs = (query: string): DrugData[] => {
     
     return matrix[nameLower.length][searchTerm.length] <= threshold;
   }).slice(0, 50); // Limit to 50 results for performance
+};
+
+// SEO Functions for better Google rankings
+
+// Generate SEO data for a specific drug
+export const getDrugSEOData = (drugId: string) => {
+  const drug = combinedDrugsData.find(d => d.id === drugId);
+  if (!drug) return null;
+  return generateDrugSEOData(drug);
+};
+
+// Generate canonical URL for a drug
+export const getDrugCanonicalUrl = (drugId: string): string | null => {
+  const drug = combinedDrugsData.find(d => d.id === drugId);
+  if (!drug) return null;
+  return generateCanonicalUrl(drug.id, drug.name);
+};
+
+// Generate sitemap for all drugs (for SEO)
+export const generateDrugsSitemap = (): string[] => {
+  return generateDrugSitemapEntries(combinedDrugsData);
+};
+
+// Get popular drugs for homepage SEO
+export const getPopularDrugs = (limit: number = 20): DrugData[] => {
+  // Return verified drugs from different categories for better SEO coverage
+  const popularCategories = [
+    'Pain Management',
+    'Cardiovascular',
+    'Respiratory',
+    'Dermatology',
+    'Ophthalmology',
+    'Antibiotics',
+    'Gastrointestinal'
+  ];
+  
+  const popularDrugs: DrugData[] = [];
+  
+  popularCategories.forEach(category => {
+    const categoryDrugs = combinedDrugsData
+      .filter(drug => drug.category === category && drug.verified)
+      .slice(0, 3); // Get top 3 from each category
+    popularDrugs.push(...categoryDrugs);
+  });
+  
+  return popularDrugs.slice(0, limit);
+};
+
+// Get trending searches for SEO keywords
+export const getTrendingSearchTerms = (): string[] => {
+  const trendingTerms = [
+    'ibuprofen',
+    'acetaminophen',
+    'aspirin',
+    'metformin',
+    'lisinopril',
+    'amlodipine',
+    'omeprazole',
+    'simvastatin',
+    'levothyroxine',
+    'azithromycin',
+    'amoxicillin',
+    'prednisone',
+    'gabapentin',
+    'tramadol',
+    'losartan',
+    'atorvastatin',
+    'sertraline',
+    'metoprolol',
+    'furosemide',
+    'hydrochlorothiazide'
+  ];
+  
+  return trendingTerms;
+};
+
+// Generate drug comparison data for SEO
+export const getDrugComparisons = (drugId: string): DrugData[] => {
+  const drug = combinedDrugsData.find(d => d.id === drugId);
+  if (!drug) return [];
+  
+  // Find similar drugs in the same category and drug class
+  return combinedDrugsData
+    .filter(d => 
+      d.id !== drugId && 
+      (d.category === drug.category || d.drugClass === drug.drugClass)
+    )
+    .slice(0, 5);
+};
+
+// Get drug alternatives for SEO content
+export const getDrugAlternatives = (drugId: string): DrugData[] => {
+  const drug = combinedDrugsData.find(d => d.id === drugId);
+  if (!drug) return [];
+  
+  // Find drugs with same generic name or in same drug class
+  return combinedDrugsData
+    .filter(d => 
+      d.id !== drugId && 
+      (d.genericName === drug.genericName || d.drugClass === drug.drugClass)
+    )
+    .slice(0, 8);
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Pill, ChevronRight, Shield, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,7 @@ interface DrugCardProps {
   onClick?: () => void;
 }
 
-const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
+const DrugCard = memo(({ drug, className, onClick }: DrugCardProps) => {
   return (
     <div 
       className={cn(
@@ -127,6 +127,17 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function for better performance
+  return (
+    prevProps.drug.id === nextProps.drug.id &&
+    prevProps.drug.name === nextProps.drug.name &&
+    prevProps.drug.verified === nextProps.drug.verified &&
+    prevProps.className === nextProps.className &&
+    prevProps.onClick === nextProps.onClick
+  );
+});
+
+DrugCard.displayName = 'DrugCard';
 
 export default DrugCard;

@@ -55,32 +55,56 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: 'dist',        // Output to 'dist' folder
-    emptyOutDir: true,     // Clean the 'dist' folder before each build
+    outDir: 'dist',
     sourcemap: true,
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
+        drop_debugger: true,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: [
-            'react',
-            'react-dom',
-            'react-router-dom',
-            '@tanstack/react-query'
-          ],
-          ui: [
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-toast',
-            'lucide-react'
-          ],
-        }
-      }
-    }
+        manualChunks: (id) => {
+          // Vendor chunk for core React libraries
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react';
+          }
+          
+          // Radix UI components chunk
+          if (id.includes('@radix-ui')) {
+            return 'vendor-radix';
+          }
+          
+          // Lucide icons chunk
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons';
+          }
+          
+          // Router and query libraries
+          if (id.includes('react-router') || id.includes('@tanstack/react-query')) {
+            return 'vendor-routing';
+          }
+          
+          // Supabase libraries
+          if (id.includes('@supabase')) {
+            return 'vendor-supabase';
+          }
+          
+          // Drug data files - separate chunk for lazy loading
+          if (id.includes('/src/data/') && id.includes('Drugs.ts')) {
+            return 'data-drugs';
+          }
+          
+          // Other vendor libraries
+          if (id.includes('node_modules')) {
+            return 'vendor-misc';
+          }
+        },
+      },
+    },
+    // Increase chunk size warning limit for drug data
+    chunkSizeWarningLimit: 600,
   }
 }));

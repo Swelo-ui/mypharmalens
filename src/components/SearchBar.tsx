@@ -1,11 +1,28 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { searchDrugs } from '@/data/combinedDrugsData';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DrugData } from '@/components/DrugCard';
+
+// Custom hook for debouncing search queries
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 interface SearchBarProps {
   fullWidth?: boolean;
@@ -16,35 +33,42 @@ interface SearchBarProps {
 
 const SearchBar = ({ 
   fullWidth = false, 
-  placeholder = "Search for medications by name, category, or manufacturer...",
+  placeholder = "Search for drugs, medications, or active ingredients...",
   onSearch,
   className 
 }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<DrugData[]>([]);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Generate suggestions based on query using the optimized searchDrugs function
-  useEffect(() => {
-    if (query.trim().length < 2) {
-      setSuggestions([]);
-      return;
+  // Debounce search query to reduce unnecessary computations
+  const debouncedQuery = useDebounce(query, 300);
+  
+  // Memoize search results to avoid recalculation
+  const searchResults = useMemo(() => {
+    if (debouncedQuery.trim().length >= 2) {
+      return searchDrugs(debouncedQuery).slice(0, 5); // Limit to 5 suggestions
     }
-    
-    console.log("Searching for:", query);
-    
-    // Find matching drugs using the optimized search function
-    const matchingDrugs = searchDrugs(query);
-    
-    console.log("Found matching drugs:", matchingDrugs.length);
-    
-    // Extract drug names from the matched drugs
-    const drugNames = matchingDrugs.map(drug => drug.name);
-    setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
-  }, [query]);
+    return [];
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    if (debouncedQuery.trim().length >= 2) {
+      setIsLoading(true);
+      // Simulate async behavior for better UX
+      const timer = setTimeout(() => {
+        setSuggestions(searchResults);
+        setIsLoading(false);
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      setSuggestions([]);
+      setIsLoading(false);
+    }
+  }, [searchResults, debouncedQuery]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,9 +182,9 @@ const SearchBar = ({
             <button
               key={index}
               className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-sm"
-              onClick={() => selectSuggestion(suggestion)}
+              onClick={() => selectSuggestion(suggestion.name)}
             >
-              {suggestion}
+              {suggestion.name}
             </button>
           ))}
         </div>

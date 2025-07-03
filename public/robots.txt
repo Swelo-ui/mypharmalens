@@ -2,16 +2,62 @@
 User-agent: *
 Allow: /
 
-# Important pages
+# Important pages for drug information
 Allow: /search
 Allow: /identify
 Allow: /about
 Allow: /faq
 Allow: /help
 Allow: /contact
+Allow: /categories
+
+# Drug category pages
+Allow: /category/
+Allow: /drug/
+
+# Specific high-value drug categories
+Allow: /category/pain-management
+Allow: /category/cardiovascular
+Allow: /category/respiratory
+Allow: /category/dermatology
+Allow: /category/ophthalmology
+Allow: /category/oncology
+Allow: /category/vaccines
+Allow: /category/antibiotics
+Allow: /category/gastrointestinal
+Allow: /category/endocrine
+
+# Popular drug search terms
+Allow: /search?q=ibuprofen
+Allow: /search?q=acetaminophen
+Allow: /search?q=aspirin
+Allow: /search?q=pain+relief
+Allow: /search?q=blood+pressure
+Allow: /search?q=diabetes
+Allow: /search?q=antibiotics
+Allow: /search?q=acne+treatment
+
+# Block admin and private areas
+Disallow: /admin/
+Disallow: /api/private/
+Disallow: /user/private/
 
 # Sitemap location
 Sitemap: https://pharmalens.tech/sitemap.xml
 
 # Crawl delay for better server performance
+Crawl-delay: 1
+
+# Additional SEO directives
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
 Crawl-delay: 1
