@@ -7,26 +7,46 @@ export const endocrineDrugs: DrugData[] = [
   {
     id: '8',
     name: 'Levothyroxine',
-    genericName: 'Levothyroxine',
+    genericName: 'Levothyroxine sodium',
     manufacturer: 'Various',
     category: 'Hormone Replacement',
-    description: 'Thyroid hormone used to treat hypothyroidism',
-    drugClass: 'Thyroid Hormone',
+    description: 'Synthetic thyroid hormone (T4) used as replacement therapy for hypothyroidism. Identical to the hormone produced naturally by the thyroid gland and converted to active T3 in peripheral tissues.',
+    drugClass: 'Thyroid hormone',
     verified: true,
-    brandNames: ['Synthroid', 'Levoxyl']
+    brandNames: ['Synthroid', 'Levoxyl', 'Tirosint', 'Unithroid', 'Levo-T'],
+    dosageAndAdmin: 'Adults: 1.6-1.8 mcg/kg/day, typically 25-200mcg once daily on empty stomach. Elderly: Start with 25-50mcg daily. Take 30-60 minutes before breakfast.',
+    sideEffects: ['Palpitations', 'Tachycardia', 'Anxiety', 'Insomnia', 'Tremor', 'Weight loss', 'Heat intolerance', 'Diarrhea'],
+    warnings: ['Cardiovascular disease', 'Adrenal insufficiency', 'Diabetes mellitus', 'Osteoporosis', 'Overtreatment risks'],
+    interactions: ['Calcium carbonate', 'Iron supplements', 'Soybean products', 'Coffee', 'Warfarin', 'Digoxin', 'Insulin'],
+    storage: 'Store at room temperature in a tight, light-resistant container. Protect from moisture.',
+    mechanism: 'Synthetic T4 hormone that is converted to T3 in peripheral tissues, regulating metabolic processes, growth, and development.',
+    indications: ['Hypothyroidism', 'Thyroid hormone replacement', 'TSH suppression in thyroid cancer', 'Myxedema coma'],
+    contraindications: ['Untreated adrenal insufficiency', 'Acute myocardial infarction', 'Thyrotoxicosis', 'Hypersensitivity to levothyroxine'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category A - Safe and often required during pregnancy'
   },
   
   // Antidiabetics
   {
     id: '11',
     name: 'Metformin',
-    genericName: 'Metformin',
+    genericName: 'Metformin hydrochloride',
     manufacturer: 'Various',
     category: 'Antidiabetic',
-    description: 'Biguanide used to treat type 2 diabetes',
+    description: 'First-line oral antidiabetic medication for type 2 diabetes. Decreases hepatic glucose production, reduces intestinal glucose absorption, and improves insulin sensitivity without causing hypoglycemia.',
     drugClass: 'Biguanide',
     verified: true,
-    brandNames: ['Glucophage']
+    brandNames: ['Glucophage', 'Glucophage XR', 'Fortamet', 'Glumetza', 'Riomet'],
+    dosageAndAdmin: 'Initial: 500mg twice daily or 850mg once daily with meals. Maximum: 2550mg/day in divided doses. Extended-release: 500-2000mg once daily with evening meal.',
+    sideEffects: ['Gastrointestinal upset', 'Nausea', 'Diarrhea', 'Metallic taste', 'Vitamin B12 deficiency', 'Lactic acidosis (rare)'],
+    warnings: ['Risk of lactic acidosis', 'Renal impairment', 'Hepatic impairment', 'Discontinue before surgery or contrast procedures'],
+    interactions: ['Iodinated contrast agents', 'Alcohol', 'Cimetidine', 'Furosemide', 'Nifedipine'],
+    storage: 'Store at room temperature in a dry place. Protect from light.',
+    mechanism: 'Decreases hepatic glucose production, reduces intestinal glucose absorption, and increases peripheral glucose uptake.',
+    indications: ['Type 2 diabetes mellitus', 'Prediabetes', 'Polycystic ovary syndrome (off-label)', 'Weight management in diabetes'],
+    contraindications: ['Severe renal impairment (eGFR <30)', 'Acute heart failure', 'Hepatic impairment', 'Alcoholism', 'History of lactic acidosis'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category B - Safe during pregnancy for gestational diabetes'
   },
   {
     id: '12',

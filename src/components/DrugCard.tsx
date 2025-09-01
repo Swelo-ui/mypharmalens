@@ -16,6 +16,17 @@ export interface DrugData {
   image?: string;
   packageImage?: string;
   brandNames?: string[]; // Brand names property
+  // Detailed medical information
+  dosageAndAdmin?: string;
+  sideEffects?: string[];
+  warnings?: string[];
+  interactions?: string[];
+  storage?: string;
+  mechanism?: string;
+  indications?: string[];
+  contraindications?: string[];
+  prescriptionStatus?: string;
+  pregnancy?: string;
 }
 
 interface DrugCardProps {

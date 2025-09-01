@@ -10,10 +10,20 @@ export const extraWHODrugs: DrugData[] = [
     genericName: 'Lithium carbonate',
     manufacturer: 'Various',
     category: 'Psychiatric',
-    description: 'Mood stabilizer used to treat bipolar disorder.',
+    description: 'Mood stabilizer primarily used for bipolar disorder treatment and maintenance. Also effective for acute mania and as adjunctive treatment for major depression. Requires regular monitoring due to narrow therapeutic index.',
     drugClass: 'Mood stabilizer',
     verified: true,
-    brandNames: ['Eskalith', 'Lithobid']
+    brandNames: ['Eskalith', 'Lithobid', 'Lithonate', 'Lithotabs'],
+    dosageAndAdmin: 'Acute mania: 300-600mg TID. Maintenance: 300mg BID-TID. Target serum level: 0.6-1.2 mEq/L (acute), 0.6-0.8 mEq/L (maintenance). Take with food.',
+    sideEffects: ['Nausea', 'Diarrhea', 'Tremor', 'Polyuria', 'Polydipsia', 'Weight gain', 'Hypothyroidism', 'Cognitive dulling'],
+    warnings: ['Narrow therapeutic index', 'Renal toxicity', 'Thyroid dysfunction', 'Cardiac effects', 'Neurotoxicity', 'Dehydration risk', 'Drug interactions'],
+    interactions: ['ACE inhibitors', 'NSAIDs', 'Thiazide diuretics', 'Metronidazole', 'Carbamazepine', 'Calcium channel blockers'],
+    storage: 'Store at room temperature in a tight container. Protect from moisture.',
+    mechanism: 'Exact mechanism unknown; may affect neurotransmitter reuptake, ion transport, and intracellular signaling pathways involved in mood regulation.',
+    indications: ['Bipolar disorder (acute mania and maintenance)', 'Major depression (adjunctive)', 'Schizoaffective disorder', 'Impulse control disorders'],
+    contraindications: ['Severe renal disease', 'Severe cardiovascular disease', 'Severe dehydration', 'Sodium depletion', 'Hypersensitivity to lithium'],
+    prescriptionStatus: 'Prescription Only',
+    pregnancy: 'Category D - Risk of cardiac malformations, avoid in first trimester'
   },
   {
     id: '502',
