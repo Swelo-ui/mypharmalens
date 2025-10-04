@@ -12,14 +12,9 @@ import { antimalarialDrugs } from "./antimalarialDrugs";
 import { supplementDrugs } from "./supplementDrugs";
 import { otherDrugs } from "./otherDrugs";
 import { extraWHODrugs } from "./extraWHODrugs";
-import { expandedDrugsData } from "./expandedDrugsData";
-import { comprehensiveDrugsData } from "./comprehensiveDrugsData";
-import { seoOptimizedDrugsData } from "./seoOptimizedDrugsData";
-import { generateDrugSEOData, generateCanonicalUrl, generateDrugSitemapEntries } from "@/utils/seoUtils";
 
-// Combine all drug data from different categories including comprehensive dataset for better SEO coverage
-// Now includes 800+ medications with SEO-optimized data for better Google rankings
-export const combinedDrugsData: DrugData[] = [
+// Static drug data (without Indian medicines)
+const staticDrugsData: DrugData[] = [
   ...cardiovascularDrugs,
   ...respiratoryDrugs,
   ...gastrointestinalDrugs,
@@ -30,11 +25,25 @@ export const combinedDrugsData: DrugData[] = [
   ...antimalarialDrugs,
   ...supplementDrugs,
   ...otherDrugs,
-  ...extraWHODrugs,
-  ...expandedDrugsData,
-  ...comprehensiveDrugsData,
-  ...seoOptimizedDrugsData
+  ...extraWHODrugs
 ];
+
+// Cache for combined data
+let cachedCombinedData: DrugData[] | null = null;
+
+// Async function to get all combined drug data
+export const getCombinedDrugsData = async (): Promise<DrugData[]> => {
+  if (cachedCombinedData === null) {
+    // Dynamically import to avoid static import linting issues
+    const { getIndianMedicineData } = await import("./indianMedicineData");
+    const indianData = await getIndianMedicineData();
+    cachedCombinedData = [...staticDrugsData, ...indianData];
+  }
+  return cachedCombinedData;
+};
+
+// Combine all drug data from different categories (for backward compatibility)
+export const combinedDrugsData: DrugData[] = staticDrugsData;
 
 // Export the getDetailedDrugData function for use elsewhere
 export { getDetailedDrugData };
@@ -44,29 +53,57 @@ export const getDrugDetails = (id: string): DetailedDrugData | null => {
   return getDetailedDrugData(id, combinedDrugsData);
 };
 
-// Helper function to get total drug count
-export const getTotalDrugCount = (): number => {
+// Async helper functions
+export const getTotalDrugCount = async (): Promise<number> => {
+  const data = await getCombinedDrugsData();
+  return data.length;
+};
+
+export const getDrugsByCategory = async (category: string): Promise<DrugData[]> => {
+  const data = await getCombinedDrugsData();
+  return data.filter(drug => drug.category === category);
+};
+
+export const getDrugsByClass = async (drugClass: string): Promise<DrugData[]> => {
+  const data = await getCombinedDrugsData();
+  return data.filter(drug => drug.drugClass === drugClass);
+};
+
+export const getAllCategories = async (): Promise<string[]> => {
+  const data = await getCombinedDrugsData();
+  const categoriesSet = new Set(data.map(drug => drug.category));
+  return Array.from(categoriesSet).sort();
+};
+
+export const getAllDrugClasses = async (): Promise<string[]> => {
+  const data = await getCombinedDrugsData();
+  const drugClassesSet = new Set(
+    data
+      .filter(drug => drug.drugClass) // Filter out undefined drugClass values
+      .map(drug => drug.drugClass as string)
+  );
+  return Array.from(drugClassesSet).sort();
+};
+
+// Synchronous helper functions (for backward compatibility, work with static data only)
+export const getTotalDrugCountSync = (): number => {
   return combinedDrugsData.length;
 };
 
-// Helper function to get drugs by category
-export const getDrugsByCategory = (category: string): DrugData[] => {
+export const getDrugsByCategorySync = (category: string): DrugData[] => {
   return combinedDrugsData.filter(drug => drug.category === category);
 };
 
-// Helper function to get drugs by drug class
-export const getDrugsByClass = (drugClass: string): DrugData[] => {
+export const getDrugsByClassSync = (drugClass: string): DrugData[] => {
   return combinedDrugsData.filter(drug => drug.drugClass === drugClass);
 };
 
-// Helper function to get all available categories
-export const getAllCategories = (): string[] => {
+export const getAllCategoriesSync = (): string[] => {
   const categoriesSet = new Set(combinedDrugsData.map(drug => drug.category));
   return Array.from(categoriesSet).sort();
 };
 
-// Helper function to get all available drug classes
-export const getAllDrugClasses = (): string[] => {
+export const getAllDrugClassesSync = (): string[] => {
   const drugClassesSet = new Set(
     combinedDrugsData
       .filter(drug => drug.drugClass) // Filter out undefined drugClass values
@@ -75,15 +112,16 @@ export const getAllDrugClasses = (): string[] => {
   return Array.from(drugClassesSet).sort();
 };
 
-// Advanced search function for SearchBar component with SEO optimization
-export const searchDrugs = (query: string): DrugData[] => {
+// Advanced search function for SearchBar component (async version)
+export const searchDrugs = async (query: string): Promise<DrugData[]> => {
   if (!query || query.trim().length < 2) {
     return [];
   }
   
   const searchTerm = query.toLowerCase().trim();
+  const data = await getCombinedDrugsData();
   
-  return combinedDrugsData.filter(drug => {
+  return data.filter(drug => {
     // Direct name match
     if (drug.name.toLowerCase().includes(searchTerm)) return true;
     
@@ -108,7 +146,7 @@ export const searchDrugs = (query: string): DrugData[] => {
     const threshold = Math.min(2, Math.max(1, Math.floor(searchTerm.length / 4)));
     
     // Calculate Levenshtein distance
-    const matrix = [];
+    const matrix = [] as number[][];
     
     // Initialize matrix
     for (let i = 0; i <= nameLower.length; i++) {
@@ -135,104 +173,33 @@ export const searchDrugs = (query: string): DrugData[] => {
   }).slice(0, 50); // Limit to 50 results for performance
 };
 
-// SEO Functions for better Google rankings
-
-// Generate SEO data for a specific drug
-export const getDrugSEOData = (drugId: string) => {
-  const drug = combinedDrugsData.find(d => d.id === drugId);
-  if (!drug) return null;
-  return generateDrugSEOData(drug);
-};
-
-// Generate canonical URL for a drug
-export const getDrugCanonicalUrl = (drugId: string): string | null => {
-  const drug = combinedDrugsData.find(d => d.id === drugId);
-  if (!drug) return null;
-  return generateCanonicalUrl(drug.id, drug.name);
-};
-
-// Generate sitemap for all drugs (for SEO)
-export const generateDrugsSitemap = (): string[] => {
-  return generateDrugSitemapEntries(combinedDrugsData);
-};
-
-// Get popular drugs for homepage SEO
-export const getPopularDrugs = (limit: number = 20): DrugData[] => {
-  // Return verified drugs from different categories for better SEO coverage
-  const popularCategories = [
-    'Pain Management',
-    'Cardiovascular',
-    'Respiratory',
-    'Dermatology',
-    'Ophthalmology',
-    'Antibiotics',
-    'Gastrointestinal'
-  ];
+// Synchronous search function (for backward compatibility, searches static data only)
+export const searchDrugsSync = (query: string): DrugData[] => {
+  if (!query || query.trim().length < 2) {
+    return [];
+  }
   
-  const popularDrugs: DrugData[] = [];
+  const searchTerm = query.toLowerCase().trim();
   
-  popularCategories.forEach(category => {
-    const categoryDrugs = combinedDrugsData
-      .filter(drug => drug.category === category && drug.verified)
-      .slice(0, 3); // Get top 3 from each category
-    popularDrugs.push(...categoryDrugs);
-  });
-  
-  return popularDrugs.slice(0, limit);
-};
-
-// Get trending searches for SEO keywords
-export const getTrendingSearchTerms = (): string[] => {
-  const trendingTerms = [
-    'ibuprofen',
-    'acetaminophen',
-    'aspirin',
-    'metformin',
-    'lisinopril',
-    'amlodipine',
-    'omeprazole',
-    'simvastatin',
-    'levothyroxine',
-    'azithromycin',
-    'amoxicillin',
-    'prednisone',
-    'gabapentin',
-    'tramadol',
-    'losartan',
-    'atorvastatin',
-    'sertraline',
-    'metoprolol',
-    'furosemide',
-    'hydrochlorothiazide'
-  ];
-  
-  return trendingTerms;
-};
-
-// Generate drug comparison data for SEO
-export const getDrugComparisons = (drugId: string): DrugData[] => {
-  const drug = combinedDrugsData.find(d => d.id === drugId);
-  if (!drug) return [];
-  
-  // Find similar drugs in the same category and drug class
-  return combinedDrugsData
-    .filter(d => 
-      d.id !== drugId && 
-      (d.category === drug.category || d.drugClass === drug.drugClass)
-    )
-    .slice(0, 5);
-};
-
-// Get drug alternatives for SEO content
-export const getDrugAlternatives = (drugId: string): DrugData[] => {
-  const drug = combinedDrugsData.find(d => d.id === drugId);
-  if (!drug) return [];
-  
-  // Find drugs with same generic name or in same drug class
-  return combinedDrugsData
-    .filter(d => 
-      d.id !== drugId && 
-      (d.genericName === drug.genericName || d.drugClass === drug.drugClass)
-    )
-    .slice(0, 8);
+  return combinedDrugsData.filter(drug => {
+    // Direct name match
+    if (drug.name.toLowerCase().includes(searchTerm)) return true;
+    
+    // Generic name match
+    if (drug.genericName && drug.genericName.toLowerCase().includes(searchTerm)) return true;
+    
+    // Brand name match
+    if (drug.brandNames && drug.brandNames.some(brand => brand.toLowerCase().includes(searchTerm))) return true;
+    
+    // Manufacturer match
+    if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchTerm)) return true;
+    
+    // Category match
+    if (drug.category && drug.category.toLowerCase().includes(searchTerm)) return true;
+    
+    // Drug class match
+    if (drug.drugClass && drug.drugClass.toLowerCase().includes(searchTerm)) return true;
+    
+    return false;
+  }).slice(0, 50); // Limit to 50 results for performance
 };
