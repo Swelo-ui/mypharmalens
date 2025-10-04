@@ -1,0 +1,112 @@
+[
+  {
+    "id": "indian_1",
+    "name": "Paracetamol 500 mg Tablet",
+    "generic_name": "Paracetamol",
+    "manufacturer": "Acme Pharma Pvt Ltd",
+    "category": "Analgesic",
+    "description": "Paracetamol 500 mg tablets. Available as strip of 10 tablets.",
+    "drug_class": "NSAID",
+    "verified": true,
+    "brand_names": ["Crocin", "Calpol"]
+  },
+  {
+    "id": "indian_2",
+    "name": "Amoxicillin 500 mg Capsule",
+    "generic_name": "Amoxicillin",
+    "manufacturer": "Healwell Laboratories",
+    "category": "Antibiotic",
+    "description": "Amoxicillin 500 mg capsules. Pack of 10.",
+    "drug_class": "Penicillin",
+    "verified": true,
+    "brand_names": ["Amoxil", "Mox"]
+  },
+  {
+    "id": "indian_3",
+    "name": "Azithromycin 250 mg Tablet",
+    "generic_name": "Azithromycin",
+    "manufacturer": "Sunrise Remedies",
+    "category": "Antibiotic",
+    "description": "Azithromycin 250 mg tablets. Pack of 6.",
+    "drug_class": "Macrolide",
+    "verified": true,
+    "brand_names": ["Azithral", "Zithromax"]
+  },
+  {
+    "id": "indian_4",
+    "name": "Amlodipine 5 mg Tablet",
+    "generic_name": "Amlodipine",
+    "manufacturer": "CardioCare Pharma",
+    "category": "Cardiovascular",
+    "description": "Amlodipine 5 mg tablets for hypertension.",
+    "drug_class": "Calcium channel blocker",
+    "verified": true,
+    "brand_names": ["Amlopress"]
+  },
+  {
+    "id": "indian_5",
+    "name": "Metformin 500 mg Tablet",
+    "generic_name": "Metformin",
+    "manufacturer": "GlucoLife Healthcare",
+    "category": "Endocrine",
+    "description": "Metformin 500 mg tablets for type 2 diabetes.",
+    "drug_class": "Biguanide",
+    "verified": true,
+    "brand_names": ["Glyciphage", "Glucophage"]
+  },
+  {
+    "id": "indian_6",
+    "name": "Salbutamol Inhaler 100 mcg",
+    "generic_name": "Salbutamol",
+    "manufacturer": "BreathEasy Labs",
+    "category": "Respiratory",
+    "description": "Salbutamol inhaler delivering 100 mcg per puff.",
+    "drug_class": "Beta-2 agonist",
+    "verified": true,
+    "brand_names": ["Ventolin", "Asthalin"]
+  },
+  {
+    "id": "indian_7",
+    "name": "Pantoprazole 40 mg Tablet",
+    "generic_name": "Pantoprazole",
+    "manufacturer": "GastroWell Pharmaceuticals",
+    "category": "Gastrointestinal",
+    "description": "Pantoprazole 40 mg tablets for acid reflux.",
+    "drug_class": "Proton pump inhibitor",
+    "verified": true,
+    "brand_names": ["Pantodac", "Protonix"]
+  },
+  {
+    "id": "indian_8",
+    "name": "Cetirizine 10 mg Tablet",
+    "generic_name": "Cetirizine",
+    "manufacturer": "AllerCare Labs",
+    "category": "Respiratory",
+    "description": "Cetirizine 10 mg tablets for allergic rhinitis.",
+    "drug_class": "Antihistamine",
+    "verified": true,
+    "brand_names": ["Zyrtec", "Cetzine"]
+  },
+  {
+    "id": "indian_9",
+    "name": "Diclofenac Gel 1%",
+    "generic_name": "Diclofenac",
+    "manufacturer": "Topical Remedies Pvt Ltd",
+    "category": "Analgesic",
+    "description": "Diclofenac 1% topical gel for localized pain relief.",
+    "drug_class": "NSAID",
+    "verified": true,
+    "brand_names": ["Volini", "Voveran"]
+  },
+  {
+    "id": "indian_10",
+    "name": "Losartan 50 mg Tablet",
+    "generic_name": "Losartan",
+    "manufacturer": "Renocare Pharmaceuticals",
+    "category": "Cardiovascular",
+    "description": "Losartan 50 mg tablets for hypertension.",
+    "drug_class": "ARB",
+    "verified": true,
+    "brand_names": ["Losar", "Cozaar"]
+  }
+]

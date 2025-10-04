@@ -36,14 +36,22 @@ const SearchBar = ({
     
     console.log("Searching for:", query);
     
-    // Find matching drugs using the optimized search function
-    const matchingDrugs = searchDrugs(query);
+    // Find matching drugs using the async search function
+    const searchAsync = async () => {
+      try {
+        const matchingDrugs = await searchDrugs(query);
+        console.log("Found matching drugs:", matchingDrugs.length);
+        
+        // Extract drug names from the matched drugs
+        const drugNames = matchingDrugs.map(drug => drug.name);
+        setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
+      } catch (error) {
+        console.error('Error searching drugs:', error);
+        setSuggestions([]);
+      }
+    };
     
-    console.log("Found matching drugs:", matchingDrugs.length);
-    
-    // Extract drug names from the matched drugs
-    const drugNames = matchingDrugs.map(drug => drug.name);
-    setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
+    searchAsync();
   }, [query]);
   
   const handleSearch = (e: React.FormEvent) => {
