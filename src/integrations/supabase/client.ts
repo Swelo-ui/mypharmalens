@@ -26,25 +26,6 @@ export const fetchDrugs = async ({
   console.log("Fetching drugs from Supabase with params:", { searchTerm, category, limit });
   
   try {
-    // Try Edge Function first to query JSON medicine data
-    try {
-      const { data: edgeData, error: edgeError } = await supabase.functions.invoke('medicine-data', {
-        body: { searchTerm, category, limit }
-      });
-
-      if (edgeError) {
-        console.warn('Edge Function medicine-data error:', edgeError);
-      } else if (Array.isArray(edgeData) && edgeData.length > 0) {
-        console.log(`Retrieved ${edgeData.length} drugs from Edge Function`);
-        return edgeData;
-      } else {
-        console.log('Edge Function returned no results, falling back to DB query');
-      }
-    } catch (edgeException) {
-      console.warn('Exception invoking Edge Function medicine-data:', edgeException);
-    }
-
-    // Fallback: query the existing drugs table
     let query = supabase
       .from('drugs')
       .select('*')
@@ -68,7 +49,7 @@ export const fetchDrugs = async ({
       return [];
     }
     
-    console.log(`Retrieved ${data?.length || 0} drugs from Supabase DB`);
+    console.log(`Retrieved ${data?.length || 0} drugs from Supabase`);
     return data;
   } catch (e) {
     console.error("Exception fetching from Supabase:", e);

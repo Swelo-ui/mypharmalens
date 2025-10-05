@@ -1,85 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, 
   ThumbsDown, Clock, ArrowLeft, PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getDrugDetails, getDrugSEOData } from '@/data/combinedDrugsData';
+import { getDrugDetails } from '@/data/combinedDrugsData';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DetailedDrugData } from '@/components/DrugDetails';
 import { toast } from '@/components/ui/use-toast';
-import { generateDrugSEOData } from '@/utils/seoUtils';
-import SchemaMarkup from '@/components/SchemaMarkup';
-import SEOHead from '@/components/SEOHead';
 
 const DrugPage = () => {
-  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [seoData, setSeoData] = useState<any>(null);
   
   useEffect(() => {
-    console.log("DrugPage loaded with ID:", id, "Slug:", slug);
-    
-    let drugId = id;
-    
-    // If we have a slug instead of ID, extract the ID from the slug
-    if (slug && !id) {
-      // Extract ID from slug format: drug-name-ID
-      const slugParts = slug.split('-');
-      const lastPart = slugParts[slugParts.length - 1];
+    console.log("DrugPage loaded with ID:", id);
+    if (id) {
+      // Add a small delay to ensure data is loaded properly
+      const timer = setTimeout(() => {
+        // Pass both id and a callback function as the second argument
+        const drugData = getDrugDetails(id);
+        
+        console.log("Drug data retrieved:", drugData?.name);
+        if (drugData) {
+          setDrug(drugData);
+        } else {
+          toast("Failed to load medication data.");
+        }
+        setLoading(false);
+      }, 100);
       
-      // Check if the last part is a valid drug ID
-      if (lastPart && /^[a-zA-Z0-9_-]+$/.test(lastPart)) {
-        drugId = lastPart;
-      } else {
-        // If no ID in slug, search by drug name
-        import('@/data/combinedDrugsData').then(({ combinedDrugsData }) => {
-          const drugName = slug.replace(/-/g, ' ');
-          const foundDrug = combinedDrugsData.find(d => 
-            d.name.toLowerCase().includes(drugName.toLowerCase()) ||
-            d.genericName?.toLowerCase().includes(drugName.toLowerCase())
-          );
-          if (foundDrug) {
-            drugId = foundDrug.id;
-            loadDrugData(drugId);
-          } else {
-            setLoading(false);
-          }
-        });
-        return;
-      }
+      return () => clearTimeout(timer);
     }
-    
-    if (drugId) {
-      loadDrugData(drugId);
-    }
-  }, [id, slug]);
-  
-  const loadDrugData = (drugId: string) => {
-    // Add a small delay to ensure data is loaded properly
-    const timer = setTimeout(() => {
-      const drugData = getDrugDetails(drugId);
-      
-      console.log("Drug data retrieved:", drugData?.name);
-      if (drugData) {
-        setDrug(drugData);
-        // Generate SEO data for the drug
-        const drugSEO = generateDrugSEOData(drugData);
-        setSeoData(drugSEO);
-      } else {
-        toast("Failed to load medication data.");
-      }
-      setLoading(false);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  };
+  }, [id]);
 
   if (loading) {
     return (
@@ -116,59 +74,6 @@ const DrugPage = () => {
 
   return (
     <>
-      {/* SEO Meta Tags and Structured Data */}
-      {seoData && drug && (
-        <>
-          <SEOHead 
-            title={seoData.metaTitle}
-            description={seoData.metaDescription}
-            keywords={seoData.keywords.join(', ')}
-            canonicalUrl={seoData.canonicalUrl}
-            ogType="article"
-            structuredData={seoData.structuredData}
-          />
-          
-          {/* Additional Medical/Drug specific meta tags */}
-          <Helmet>
-            <meta name="drug-name" content={drug.name} />
-            <meta name="generic-name" content={drug.genericName} />
-            <meta name="drug-category" content={drug.category} />
-            <meta name="prescription-status" content={drug.prescriptionStatus} />
-            <meta name="medical-disclaimer" content="This information is for educational purposes only and should not replace professional medical advice." />
-            <meta name="content-type" content="medical-information" />
-            <meta name="audience" content="healthcare-professionals, patients" />
-          </Helmet>
-          
-          {/* Structured Data using SchemaMarkup component */}
-          <SchemaMarkup 
-            type="Drug"
-            data={{
-              name: drug.name,
-              genericName: drug.genericName,
-              description: drug.description,
-              drugClass: drug.drugClass,
-              manufacturer: drug.manufacturer,
-              prescriptionStatus: drug.prescriptionStatus,
-              category: drug.category,
-              indications: drug.indications,
-              contraindications: drug.contraindications,
-              sideEffects: drug.sideEffects,
-              interactions: drug.interactions,
-              url: seoData.canonicalUrl
-            }}
-          />
-          
-          {/* Additional MedicalWebPage schema */}
-          <SchemaMarkup 
-            type="MedicalWebPage"
-            data={{
-              drugName: drug.name,
-              genericName: drug.genericName
-            }}
-          />
-        </>
-      )}
-      
       <Header />
       <div className="container max-w-4xl mx-auto px-4 pt-20 pb-28 sm:pb-12">
         <Button 
