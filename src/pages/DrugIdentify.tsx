@@ -276,9 +276,16 @@ const DrugIdentify = () => {
       setProcessingPhase("Processing AI response");
       setProcessingProgress(60);
 
+      // Check for Supabase client errors first
       if (error) {
         console.error('Error calling identify-drug function:', error);
         throw new Error(error.message || 'Failed to identify medication');
+      }
+
+      // Check for Edge Function errors in the response data
+      if (data && data.success === false) {
+        console.error('Edge Function returned error:', data);
+        throw new Error(data.message || data.error || 'Failed to identify medication');
       }
       
       setProcessingPhase("Finalizing results");
@@ -345,11 +352,12 @@ const DrugIdentify = () => {
             const drugData = await identifyDrugFromImage(base64Image);
             setProcessingProgress(90);
             
-            if (drugData.error) {
-              throw new Error(drugData.error);
+            // Check if the response indicates an error
+            if (drugData && drugData.success === false) {
+              throw new Error(drugData.message || drugData.error || 'Failed to identify medication');
             }
             
-            if (drugData) {
+            if (drugData && drugData.success !== false) {
               setProcessingProgress(95);
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
