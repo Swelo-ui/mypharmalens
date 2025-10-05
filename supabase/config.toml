@@ -1,1 +1,7 @@
 project_id = "vcshydrusnuxsxwctnod"
+
+[functions.identify-drug]
+verify_jwt = false
+
+[functions.manage-drug-history]
+verify_jwt = true
