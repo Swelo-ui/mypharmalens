@@ -193,19 +193,9 @@ const About = () => {
                 <Card className="overflow-hidden border-0 shadow-lg max-w-[200px]">
                   <CardContent className="p-0">
                     <img 
-                      src="https://res.cloudinary.com/dhf7udqhi/image/upload/c_fill,w_300,h_400,q_auto,f_auto,dpr_auto/v1759554125/WhatsApp_Image_2025-03-18_at_20.00.56_8bf29da3_lshibb.jpg" 
-                      alt="Himanshu Sharma - B.Pharm Student & Developer" 
-                      className="w-full h-auto object-cover rounded-lg"
-                      loading="eager"
-                      decoding="async"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.className = 'w-full h-48 bg-gradient-to-br from-pharma-100 to-pharma-200 flex items-center justify-center text-pharma-700 font-semibold text-lg rounded-lg';
-                        fallback.textContent = 'HS';
-                        target.parentNode?.appendChild(fallback);
-                      }}
+                      src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
+                      alt="Himanshu Sharma" 
+                      className="w-full h-auto object-cover"
                       style={{ 
                         maxWidth: "100%",
                         borderRadius: "0.5rem",

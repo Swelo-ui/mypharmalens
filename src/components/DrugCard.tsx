@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pill, ChevronRight, Shield, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,17 +16,6 @@ export interface DrugData {
   image?: string;
   packageImage?: string;
   brandNames?: string[]; // Brand names property
-  // Detailed medical information
-  dosageAndAdmin?: string;
-  sideEffects?: string[];
-  warnings?: string[];
-  interactions?: string[];
-  storage?: string;
-  mechanism?: string;
-  indications?: string[];
-  contraindications?: string[];
-  prescriptionStatus?: string;
-  pregnancy?: string;
 }
 
 interface DrugCardProps {
@@ -35,7 +24,7 @@ interface DrugCardProps {
   onClick?: () => void;
 }
 
-const DrugCard = memo(({ drug, className, onClick }: DrugCardProps) => {
+const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
   return (
     <div 
       className={cn(
@@ -138,17 +127,6 @@ const DrugCard = memo(({ drug, className, onClick }: DrugCardProps) => {
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for better performance
-  return (
-    prevProps.drug.id === nextProps.drug.id &&
-    prevProps.drug.name === nextProps.drug.name &&
-    prevProps.drug.verified === nextProps.drug.verified &&
-    prevProps.className === nextProps.className &&
-    prevProps.onClick === nextProps.onClick
-  );
-});
-
-DrugCard.displayName = 'DrugCard';
+};
 
 export default DrugCard;
