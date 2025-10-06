@@ -22,7 +22,7 @@ export interface DetailedDrugData {
   mechanism: string;
   indications: string[];
   contraindications: string[];
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled';
+  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled' | 'Non-pharmaceutical product';
   pregnancy: string;
   verified: boolean;
   image?: string;
@@ -260,7 +260,14 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             
             <div className="flex items-center bg-pharma-50 dark:bg-pharma-900/20 px-2 py-0.5 rounded-full">
               <Clock className="h-3 w-3 text-pharma-600 mr-1" />
-              <span className="text-xs font-medium text-pharma-600">{drug.prescriptionStatus}</span>
+              <span className={cn(
+                "text-xs font-medium",
+                drug.prescriptionStatus === 'Non-pharmaceutical product' 
+                  ? "text-orange-600" 
+                  : "text-pharma-600"
+              )}>
+                {drug.prescriptionStatus}
+              </span>
             </div>
           </div>
           

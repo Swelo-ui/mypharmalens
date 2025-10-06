@@ -97,27 +97,31 @@ async function stageGeminiAnalysis(imageBase64: string, extractedText?: string):
     const contextText = extractedText ? `\n\nExtracted text from image: "${extractedText}"` : '';
     
     const prompt = `
-    You are a pharmaceutical identification expert. Analyze this medication image comprehensively.
+    You are a pharmaceutical identification expert. Analyze this product image comprehensively.
+    
+    IMPORTANT: First determine if this is a pharmaceutical medication or a non-pharmaceutical product (cosmetic, lotion, supplement, etc.).
     
     ANALYSIS REQUIREMENTS:
-    1. Identify the medication name (brand and/or generic)
-    2. Extract all visible markings, imprints, numbers, letters
-    3. Describe physical characteristics (color, shape, size)
-    4. Identify manufacturer if visible
-    5. Determine dosage information if available
-    6. Assess confidence level of identification
+    1. Identify the product name (brand and/or generic)
+    2. Determine product type (medication, cosmetic, lotion, supplement, etc.)
+    3. Extract all visible markings, imprints, numbers, letters
+    4. Describe physical characteristics (color, shape, size)
+    5. Identify manufacturer if visible
+    6. Determine dosage/volume information if available
+    7. Assess confidence level of identification
     
     ${contextText}
     
     Return analysis in this exact JSON format:
     {
-      "name": "medication name",
+      "name": "product name",
+      "productType": "medication|cosmetic|lotion|supplement|other",
       "genericName": "generic name if different",
       "imprint": "all visible markings",
       "color": "color description",
       "shape": "shape description",
       "manufacturer": "manufacturer if identifiable",
-      "dosage": "dosage if visible",
+      "dosage": "dosage/volume if visible",
       "confidence": "high|medium|low",
       "physicalDescription": "detailed physical description",
       "identificationNotes": "any additional notes for identification"
@@ -433,32 +437,105 @@ function combineStageResults(stages: ProcessingStage[]): any {
         combinedResult.manufacturer = data.manufacturer || combinedResult.manufacturer;
         combinedResult.description = data.physicalDescription || data.identificationNotes || combinedResult.description;
         
+        // Handle non-pharmaceutical products
+        if (data.productType && data.productType !== 'medication') {
+          combinedResult.category = data.productType;
+          combinedResult.drugClass = data.productType;
+          combinedResult.prescriptionStatus = "Non-pharmaceutical product";
+          combinedResult.description = `This appears to be a ${data.productType} product: ${data.name}. ${combinedResult.description}`;
+          
+          // For non-pharmaceutical products, we don't need Drugs.com enrichment
+          if (data.confidence === 'high') combinedResult.confidence = 'high';
+          else if (data.confidence === 'medium') combinedResult.confidence = 'medium';
+          
+          return; // Skip Drugs.com enrichment for non-pharmaceutical products
+        }
+        
         if (data.confidence === 'high') combinedResult.confidence = 'high';
         else if (data.confidence === 'medium' && combinedResult.confidence === 'low') combinedResult.confidence = 'medium';
       }
 
-      // Drugs.com enrichment data
+      // Drugs.com enrichment data with validation
       if (stage.name === 'drugs-com-enrichment') {
         const data = stage.data;
-        combinedResult.genericName = data.genericName || combinedResult.genericName;
-        combinedResult.manufacturer = data.manufacturer || combinedResult.manufacturer;
-        combinedResult.category = data.category || combinedResult.category;
-        combinedResult.drugClass = data.drugClass || combinedResult.drugClass;
-        combinedResult.description = data.description || combinedResult.description;
-        combinedResult.dosageAndAdmin = data.dosageAndAdmin || combinedResult.dosageAndAdmin;
-        combinedResult.sideEffects = data.sideEffects || combinedResult.sideEffects;
-        combinedResult.warnings = data.warnings || combinedResult.warnings;
-        combinedResult.interactions = data.interactions || combinedResult.interactions;
-        combinedResult.storage = data.storage || combinedResult.storage;
-        combinedResult.mechanism = data.mechanism || combinedResult.mechanism;
-        combinedResult.indications = data.indications || combinedResult.indications;
-        combinedResult.contraindications = data.contraindications || combinedResult.contraindications;
-        combinedResult.prescriptionStatus = data.prescriptionStatus || combinedResult.prescriptionStatus;
-        combinedResult.pregnancy = data.pregnancy || combinedResult.pregnancy;
-        combinedResult.brandNames = data.brandNames || combinedResult.brandNames;
-        combinedResult.verified = true;
         
-        if (combinedResult.confidence === 'low') combinedResult.confidence = 'medium';
+        // Validate and merge data with quality checks
+        if (data.genericName && data.genericName.length > 2) {
+          combinedResult.genericName = data.genericName;
+        }
+        
+        if (data.manufacturer && data.manufacturer.length > 2) {
+          combinedResult.manufacturer = data.manufacturer;
+        }
+        
+        if (data.category && data.category.length > 2) {
+          combinedResult.category = data.category;
+        }
+        
+        if (data.drugClass && data.drugClass.length > 2) {
+          combinedResult.drugClass = data.drugClass;
+        }
+        
+        if (data.description && data.description.length > 20) {
+          combinedResult.description = data.description;
+        }
+        
+        if (data.dosageAndAdmin && data.dosageAndAdmin.length > 10) {
+          combinedResult.dosageAndAdmin = data.dosageAndAdmin;
+        }
+        
+        if (data.sideEffects && Array.isArray(data.sideEffects) && data.sideEffects.length > 0) {
+          combinedResult.sideEffects = data.sideEffects.filter(effect => effect && effect.length > 2);
+        }
+        
+        if (data.warnings && Array.isArray(data.warnings) && data.warnings.length > 0) {
+          combinedResult.warnings = data.warnings.filter(warning => warning && warning.length > 5);
+        }
+        
+        if (data.interactions && Array.isArray(data.interactions) && data.interactions.length > 0) {
+          combinedResult.interactions = data.interactions.filter(interaction => interaction && interaction.length > 5);
+        }
+        
+        if (data.storage && data.storage.length > 10) {
+          combinedResult.storage = data.storage;
+        }
+        
+        if (data.mechanism && data.mechanism.length > 10) {
+          combinedResult.mechanism = data.mechanism;
+        }
+        
+        if (data.indications && Array.isArray(data.indications) && data.indications.length > 0) {
+          combinedResult.indications = data.indications.filter(indication => indication && indication.length > 5);
+        }
+        
+        if (data.contraindications && Array.isArray(data.contraindications) && data.contraindications.length > 0) {
+          combinedResult.contraindications = data.contraindications.filter(contraindication => contraindication && contraindication.length > 5);
+        }
+        
+        if (data.prescriptionStatus && data.prescriptionStatus.length > 2) {
+          combinedResult.prescriptionStatus = data.prescriptionStatus;
+        }
+        
+        if (data.pregnancy && data.pregnancy.length > 5) {
+          combinedResult.pregnancy = data.pregnancy;
+        }
+        
+        if (data.brandNames && Array.isArray(data.brandNames) && data.brandNames.length > 0) {
+          combinedResult.brandNames = data.brandNames.filter(brand => brand && brand.length > 1);
+        }
+        
+        // Mark as verified if we have substantial data
+        const hasSubstantialData = (
+          (data.genericName && data.genericName.length > 2) ||
+          (data.description && data.description.length > 20) ||
+          (data.indications && data.indications.length > 0) ||
+          (data.sideEffects && data.sideEffects.length > 0)
+        );
+        
+        if (hasSubstantialData) {
+          combinedResult.verified = true;
+          if (combinedResult.confidence === 'low') combinedResult.confidence = 'medium';
+        }
       }
 
       // Imprint search data
@@ -513,9 +590,13 @@ serve(async (req) => {
     const geminiStage = await stageGeminiAnalysis(imageBase64, extractedText);
     stages.push(geminiStage);
 
-    // Stage 3: Drugs.com Enrichment (if we have a drug name)
+    // Stage 3: Drugs.com Enrichment (if we have a drug name and it's a pharmaceutical product)
     const drugName = geminiStage.success ? geminiStage.data?.name : undefined;
-    if (drugName && !drugName.toLowerCase().includes('unknown')) {
+    const productType = geminiStage.success ? geminiStage.data?.productType : undefined;
+    
+    if (drugName && 
+        !drugName.toLowerCase().includes('unknown') && 
+        (!productType || productType === 'medication')) {
       const drugsComStage = await stageDrugsComEnrichment(drugName);
       stages.push(drugsComStage);
     }

@@ -169,20 +169,30 @@ function parseHtmlForDrugInfo(html: string, drugName: string, sourceUrl: string)
       }
     }
 
-    // Extract description - multiple strategies
+    // Extract description - multiple strategies with better patterns
     const descPatterns = [
       /<div[^>]*class="[^"]*drug-subtitle[^"]*"[^>]*>([^<]+)<\/div>/i,
       /<p[^>]*class="[^"]*drug-subtitle[^"]*"[^>]*>([^<]+)<\/p>/i,
       /<div[^>]*class="[^"]*contentBox[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
       /<div[^>]*id="[^"]*description[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-      /<section[^>]*class="[^"]*drug-summary[^"]*"[^>]*>([\s\S]*?)<\/section>/i
+      /<section[^>]*class="[^"]*drug-summary[^"]*"[^>]*>([\s\S]*?)<\/section>/i,
+      /<div[^>]*class="[^"]*ddc-summary[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /<p[^>]*class="[^"]*drug-summary[^"]*"[^>]*>([\s\S]*?)<\/p>/i,
+      /<div[^>]*class="[^"]*drug-overview[^"]*"[^>]*>([\s\S]*?)<\/div>/i
     ];
 
     for (const pattern of descPatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        drugInfo.description = match[1].replace(/<[^>]*>/g, '').trim().substring(0, 1000);
-        if (drugInfo.description.length > 50) break;
+        let description = match[1].replace(/<[^>]*>/g, '').trim();
+        // Clean up common unwanted text
+        description = description.replace(/^(Overview|Description|Summary):\s*/i, '');
+        description = description.replace(/\s+/g, ' ').trim();
+        
+        if (description.length > 50 && description.length < 2000) {
+          drugInfo.description = description.substring(0, 1000);
+          break;
+        }
       }
     }
 
@@ -221,60 +231,85 @@ function parseHtmlForDrugInfo(html: string, drugName: string, sourceUrl: string)
       }
     }
 
-    // Extract side effects
+    // Extract side effects with improved patterns
     const sideEffectsPatterns = [
       /side effects?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
       /<div[^>]*id="[^"]*side-effects[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-      /<section[^>]*class="[^"]*side-effects[^"]*"[^>]*>([\s\S]*?)<\/section>/i
+      /<section[^>]*class="[^"]*side-effects[^"]*"[^>]*>([\s\S]*?)<\/section>/i,
+      /adverse reactions?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /common side effects?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<ul[^>]*class="[^"]*side-effects[^"]*"[^>]*>([\s\S]*?)<\/ul>/i,
+      /may cause[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
     ];
 
     for (const pattern of sideEffectsPatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        const sideEffectsText = match[1].replace(/<[^>]*>/g, '');
+        let sideEffectsText = match[1].replace(/<[^>]*>/g, '');
+        // Clean up and extract meaningful side effects
+        sideEffectsText = sideEffectsText.replace(/\s+/g, ' ').trim();
+        
         drugInfo.sideEffects = sideEffectsText
-          .split(/[,;.]/)
+          .split(/[,;.\n]/)
           .map(s => s.trim())
-          .filter(s => s.length > 3 && s.length < 100)
+          .filter(s => s.length > 3 && s.length < 100 && !s.match(/^(more|less|common|rare|serious)$/i))
           .slice(0, 15);
         if (drugInfo.sideEffects.length > 0) break;
       }
     }
 
-    // Extract warnings
+    // Extract warnings with improved patterns
     const warningsPatterns = [
       /warnings?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
       /<div[^>]*id="[^"]*warnings[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
       /<section[^>]*class="[^"]*warnings[^"]*"[^>]*>([\s\S]*?)<\/section>/i,
-      /black box warning[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
+      /black box warning[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /important safety information[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /boxed warning[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /caution[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<div[^>]*class="[^"]*boxed-warning[^"]*"[^>]*>([\s\S]*?)<\/div>/i
     ];
 
     for (const pattern of warningsPatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        const warningsText = match[1].replace(/<[^>]*>/g, '');
+        let warningsText = match[1].replace(/<[^>]*>/g, '');
+        // Clean up warnings text
+        warningsText = warningsText.replace(/\s+/g, ' ').trim();
+        
         drugInfo.warnings = warningsText
           .split(/[.!]/)
           .map(w => w.trim())
-          .filter(w => w.length > 10 && w.length < 200)
+          .filter(w => w.length > 10 && w.length < 300 && !w.match(/^(warning|caution|note)$/i))
           .slice(0, 10);
         if (drugInfo.warnings.length > 0) break;
       }
     }
 
-    // Extract dosage and administration
+    // Extract dosage and administration with improved patterns
     const dosagePatterns = [
       /dosage[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
       /administration[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
       /<div[^>]*id="[^"]*dosage[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-      /how to use[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
+      /how to use[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /dosing[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /dose[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<section[^>]*class="[^"]*dosage[^"]*"[^>]*>([\s\S]*?)<\/section>/i,
+      /usual dose[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
     ];
 
     for (const pattern of dosagePatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        drugInfo.dosageAndAdmin = match[1].replace(/<[^>]*>/g, '').trim().substring(0, 500);
-        if (drugInfo.dosageAndAdmin.length > 20) break;
+        let dosageText = match[1].replace(/<[^>]*>/g, '').trim();
+        // Clean up dosage text
+        dosageText = dosageText.replace(/\s+/g, ' ').trim();
+        dosageText = dosageText.replace(/^(Dosage|Administration|How to use):\s*/i, '');
+        
+        if (dosageText.length > 20 && dosageText.length < 1000) {
+          drugInfo.dosageAndAdmin = dosageText.substring(0, 500);
+          break;
+        }
       }
     }
 
@@ -295,6 +330,89 @@ function parseHtmlForDrugInfo(html: string, drugName: string, sourceUrl: string)
           .filter(i => i.length > 5 && i.length < 100)
           .slice(0, 10);
         if (drugInfo.interactions.length > 0) break;
+      }
+    }
+
+    // Extract indications (uses/what it treats)
+    const indicationPatterns = [
+      /indications?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /uses?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /what is [^<]+ used for[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<div[^>]*id="[^"]*indications[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /<div[^>]*id="[^"]*uses[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /treats?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<section[^>]*class="[^"]*uses[^"]*"[^>]*>([\s\S]*?)<\/section>/i
+    ];
+
+    for (const pattern of indicationPatterns) {
+      const match = html.match(pattern);
+      if (match && match[1]) {
+        const indicationsText = match[1].replace(/<[^>]*>/g, '');
+        drugInfo.indications = indicationsText
+          .split(/[,;.]/)
+          .map(i => i.trim())
+          .filter(i => i.length > 5 && i.length < 150)
+          .slice(0, 10);
+        if (drugInfo.indications.length > 0) break;
+      }
+    }
+
+    // Extract contraindications (when not to use)
+    const contraindicationPatterns = [
+      /contraindications?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /do not use[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /should not be used[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<div[^>]*id="[^"]*contraindications[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /avoid if[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /precautions?[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
+    ];
+
+    for (const pattern of contraindicationPatterns) {
+      const match = html.match(pattern);
+      if (match && match[1]) {
+        const contraindicationsText = match[1].replace(/<[^>]*>/g, '');
+        drugInfo.contraindications = contraindicationsText
+          .split(/[,;.]/)
+          .map(c => c.trim())
+          .filter(c => c.length > 5 && c.length < 150)
+          .slice(0, 10);
+        if (drugInfo.contraindications.length > 0) break;
+      }
+    }
+
+    // Extract storage information
+    const storagePatterns = [
+      /storage[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /store[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /how to store[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<div[^>]*id="[^"]*storage[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /keep at[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /room temperature[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
+    ];
+
+    for (const pattern of storagePatterns) {
+      const match = html.match(pattern);
+      if (match && match[1]) {
+        drugInfo.storage = match[1].replace(/<[^>]*>/g, '').trim().substring(0, 300);
+        if (drugInfo.storage.length > 10) break;
+      }
+    }
+
+    // Extract mechanism of action
+    const mechanismPatterns = [
+      /mechanism of action[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /how it works[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /pharmacology[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i,
+      /<div[^>]*id="[^"]*mechanism[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /<div[^>]*id="[^"]*pharmacology[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /works by[^<]*<[^>]*>([\s\S]*?)(?:<\/(?:div|section|ul)>|<h[2-6])/i
+    ];
+
+    for (const pattern of mechanismPatterns) {
+      const match = html.match(pattern);
+      if (match && match[1]) {
+        drugInfo.mechanism = match[1].replace(/<[^>]*>/g, '').trim().substring(0, 500);
+        if (drugInfo.mechanism.length > 20) break;
       }
     }
 

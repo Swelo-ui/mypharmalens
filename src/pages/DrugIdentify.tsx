@@ -471,7 +471,7 @@ const DrugIdentify = () => {
                 mechanism: drugData.mechanism || 'Mechanism of action not specified.',
                 indications: drugData.indications || [],
                 contraindications: drugData.contraindications || [],
-                prescriptionStatus: drugData.prescriptionStatus as 'OTC' | 'Prescription Only' | 'Controlled',
+                prescriptionStatus: drugData.prescriptionStatus as 'OTC' | 'Prescription Only' | 'Controlled' | 'Non-pharmaceutical product',
                 pregnancy: drugData.pregnancy || 'Consult your healthcare provider before using during pregnancy.',
                 verified: false,
                 image: drugData.image,
@@ -487,6 +487,11 @@ const DrugIdentify = () => {
               if (drugData.fromHistory) {
                 toast.success(`Matched with previously identified ${drugData.name}!`, { 
                   description: "Using your history helped identify this medication faster."
+                });
+              } else if (drugData.prescriptionStatus === 'Non-pharmaceutical product') {
+                toast.info(`Non-pharmaceutical product identified: ${drugData.name}`, { 
+                  description: "This appears to be a cosmetic, lotion, or other non-medication product.",
+                  duration: 5000
                 });
               } else if (drugData.enhancedProcessing) {
                 const confidenceMessage = {
