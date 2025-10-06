@@ -650,15 +650,15 @@ const DrugIdentify = () => {
               </Alert>
             )}
             
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8">
-              <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 sm:p-8 lg:p-10 mb-8 max-w-4xl mx-auto">
+              <p className="text-center text-gray-600 dark:text-gray-300 mb-6 text-base sm:text-lg">
                 {identificationMode === 'upload' 
                   ? "Upload a clear image of the medication for identification" 
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <Tabs defaultValue="standard" className="mb-4">
-                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-2">
+              <Tabs defaultValue="standard" className="mb-6">
+                <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-4">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
                 </TabsList>
@@ -729,24 +729,24 @@ const DrugIdentify = () => {
               )}
             </div>
             
-            <div className="bg-pharma-50 dark:bg-pharma-900/20 rounded-2xl p-6">
-              <h3 className="font-medium text-lg mb-4">Tips for better identification:</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <div className="bg-pharma-50 dark:bg-pharma-900/20 rounded-2xl p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto">
+              <h3 className="font-medium text-lg sm:text-xl mb-4 sm:mb-6">Tips for better identification:</h3>
+              <ul className="list-disc list-inside space-y-3 sm:space-y-4 text-gray-700 dark:text-gray-300">
                 <li className="flex items-start">
-                  <ZoomIn className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
-                  <span>Use good lighting and ensure the pill is clearly visible</span>
+                  <ZoomIn className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span className="text-sm sm:text-base">Use good lighting and ensure the pill is clearly visible</span>
                 </li>
                 <li className="flex items-start">
-                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded" />
-                  <span>Place the medication against a plain, contrasting background</span>
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded" />
+                  <span className="text-sm sm:text-base">Place the medication against a plain, contrasting background</span>
                 </li>
                 <li className="flex items-start">
-                  <RotateCw className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
-                  <span>Try multiple angles if identification fails initially</span>
+                  <RotateCw className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
+                  <span className="text-sm sm:text-base">Try multiple angles if identification fails initially</span>
                 </li>
                 <li className="flex items-start">
-                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 rounded-full border border-pharma-600" />
-                  <span>Make sure any markings, logos, or text are visible</span>
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 rounded-full border border-pharma-600" />
+                  <span className="text-sm sm:text-base">Make sure any markings, logos, or text are visible</span>
                 </li>
                 <li className="flex items-start">
                   <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-pharma-100 rounded-sm" />

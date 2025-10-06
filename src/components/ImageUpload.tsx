@@ -182,7 +182,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       {!previewImage ? (
         <div
           className={cn(
-            "w-full min-h-[280px] sm:h-64 border-2 border-dashed rounded-xl transition-all duration-200 flex flex-col items-center justify-center p-4 sm:p-6 mx-2 sm:mx-0",
+            "w-full min-h-[320px] sm:min-h-[360px] lg:min-h-[400px] max-w-2xl mx-auto border-2 border-dashed rounded-xl transition-all duration-200 flex flex-col items-center justify-center p-6 sm:p-8 lg:p-10",
             dragActive 
               ? "border-pharma-500 bg-pharma-50 dark:bg-pharma-950/20" 
               : "border-gray-300 dark:border-gray-700 hover:border-pharma-400 hover:bg-gray-50 dark:hover:bg-gray-900"
@@ -201,45 +201,45 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
             className="hidden"
           />
           
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-3 sm:mb-4">
-            <ImageIcon className="h-6 w-6 sm:h-8 sm:w-8 text-pharma-600" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4 sm:mb-6">
+            <ImageIcon className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-pharma-600" />
           </div>
           
-          <p className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center px-2">
+          <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3 text-center">
             Upload Medication Image
           </p>
           
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 text-center mb-4 max-w-xs sm:max-w-sm px-2 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 text-center mb-6 max-w-md lg:max-w-lg leading-relaxed">
             Drag and drop your medication image here, or click to browse. For best results, ensure the image is clear and well-lit.
           </p>
           
-          <div className="flex flex-col w-full max-w-xs gap-3 mb-3 sm:mb-4 px-2">
+          <div className="flex flex-col sm:flex-row w-full max-w-md lg:max-w-lg gap-3 sm:gap-4 mb-4 sm:mb-6">
             <button
               type="button"
               onClick={triggerFileInput}
-              className="w-full py-3.5 sm:py-3 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center touch-manipulation"
+              className="flex-1 py-4 sm:py-3 lg:py-4 px-6 rounded-lg bg-pharma-600 text-white text-sm sm:text-base font-medium hover:bg-pharma-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center touch-manipulation"
             >
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Upload Image
             </button>
             
             <button
               type="button"
               onClick={triggerFileInput}
-              className="w-full py-3.5 sm:py-3 rounded-lg bg-white text-pharma-800 text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 touch-manipulation"
+              className="flex-1 py-4 sm:py-3 lg:py-4 px-6 rounded-lg bg-white text-pharma-800 text-sm sm:text-base font-medium border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 touch-manipulation"
             >
-              <Camera className="h-4 w-4 mr-2" />
+              <Camera className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Take Photo
             </button>
           </div>
           
-          <div className="text-xs text-gray-500 dark:text-gray-400 text-center space-y-1 px-2">
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center space-y-1">
             <p className="leading-relaxed">Supported formats: JPEG, PNG, WebP • Max size: 10MB</p>
             <p className="leading-relaxed">Images are automatically optimized for best identification results</p>
           </div>
         </div>
       ) : (
-        <div className="w-full relative rounded-xl overflow-hidden shadow-lg transition-all animate-scale-in mx-2 sm:mx-0">
+        <div className="w-full max-w-2xl mx-auto relative rounded-xl overflow-hidden shadow-lg transition-all animate-scale-in">
           <div className="absolute top-3 right-3 z-10 flex gap-2">
             {imageQualityWarning && (
               <TooltipProvider>
@@ -270,14 +270,14 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
               "w-full object-cover transition-opacity duration-300",
               isLoading ? "opacity-60" : "opacity-100"
             )}
-            style={{ maxHeight: '400px', minHeight: '200px' }}
+            style={{ maxHeight: '500px', minHeight: '300px' }}
           />
           
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg flex items-center mx-4">
-                <Loader2 className="h-5 w-5 text-pharma-600 animate-spin mr-2" />
-                <span className="text-xs sm:text-sm font-medium">Preparing image...</span>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-5 shadow-lg flex items-center mx-4">
+                <Loader2 className="h-5 w-5 text-pharma-600 animate-spin mr-3" />
+                <span className="text-sm sm:text-base font-medium">Preparing image...</span>
               </div>
             </div>
           )}
