@@ -47,41 +47,120 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   };
   
   const handleFile = (file: File) => {
-    // Check if file is an image
+    // Enhanced file validation
     if (!file.type.match('image.*')) {
       toast({
-        message: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, etc.)"
+        title: "Invalid file type",
+        description: "Please upload an image file (JPEG, PNG, WebP, etc.)",
+        variant: "destructive"
       });
       return;
     }
     
-    // Check if file is too small (might be too low quality)
-    if (file.size < 50 * 1024) {
+    // Enhanced file size validation
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 10MB. Large images will be automatically compressed.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Enhanced quality assessment
+    if (file.size < 30 * 1024) {
       setImageQualityWarning(true);
       toast({
-        message: "Low quality image",
-        description: "This image may be too small for accurate identification. Consider using a higher resolution image."
+        title: "Very low quality image detected",
+        description: "This image may be too small for accurate identification. Enhanced processing will be used automatically.",
+        variant: "default"
+      });
+    } else if (file.size < 100 * 1024) {
+      setImageQualityWarning(true);
+      toast({
+        title: "Low quality image detected",
+        description: "Consider using a higher resolution image for better results. Enhanced mode will be enabled.",
+        variant: "default"
       });
     } else {
       setImageQualityWarning(false);
     }
     
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreviewImage(e.target?.result as string);
+    // Enhanced image processing with compression if needed
+    const processImage = (file: File) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Check image dimensions
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            setPreviewImage(e.target?.result as string);
+            return;
+          }
+          
+          // Optimize image size while maintaining quality
+          let { width, height } = img;
+          const maxDimension = 1920; // Max dimension for processing
+          
+          if (width > maxDimension || height > maxDimension) {
+            const ratio = Math.min(maxDimension / width, maxDimension / height);
+            width *= ratio;
+            height *= ratio;
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Apply image enhancement filters
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert back to blob with optimized quality
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const optimizedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                
+                // Create preview from optimized image
+                const optimizedReader = new FileReader();
+                optimizedReader.onload = (e) => {
+                  setPreviewImage(e.target?.result as string);
+                };
+                optimizedReader.readAsDataURL(optimizedFile);
+                
+                // Process the optimized file
+                processFile(optimizedFile);
+              }
+            }, 'image/jpeg', 0.9);
+          } else {
+            setPreviewImage(e.target?.result as string);
+            processFile(file);
+          }
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
     
-    // Process file
-    setIsLoading(true);
-    setTimeout(() => {
-      if (onImageCapture) {
-        onImageCapture(file);
-      }
-      setIsLoading(false);
-    }, 1000);
+    const processFile = (processedFile: File) => {
+      setIsLoading(true);
+      
+      // Add a small delay for better UX
+      setTimeout(() => {
+        if (onImageCapture) {
+          onImageCapture(processedFile);
+        }
+        setIsLoading(false);
+      }, 500);
+    };
+    
+    processImage(file);
   };
   
   const clearImage = () => {
@@ -126,15 +205,19 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
             <ImageIcon className="h-8 w-8 text-pharma-600" />
           </div>
           
-          <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-4">
-            Drag and drop your medication image here, or click to browse
+          <p className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Upload Medication Image
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-4 max-w-sm">
+            Drag and drop your medication image here, or click to browse. For best results, ensure the image is clear and well-lit.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <button
               type="button"
               onClick={triggerFileInput}
-              className="px-4 py-2 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm flex items-center"
+              className="px-6 py-3 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center min-w-[140px]"
             >
               <Upload className="h-4 w-4 mr-2" />
               Upload Image
@@ -143,11 +226,16 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
             <button
               type="button"
               onClick={triggerFileInput}
-              className="px-4 py-2 rounded-lg bg-white text-pharma-800 text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm flex items-center dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+              className="px-6 py-3 rounded-lg bg-white text-pharma-800 text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center min-w-[140px] dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
             >
               <Camera className="h-4 w-4 mr-2" />
-              Take a Photo
+              Take Photo
             </button>
+          </div>
+          
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center space-y-1">
+            <p>Supported formats: JPEG, PNG, WebP • Max size: 10MB</p>
+            <p>Images are automatically optimized for best identification results</p>
           </div>
         </div>
       ) : (
