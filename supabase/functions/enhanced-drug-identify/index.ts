@@ -26,6 +26,11 @@ interface ProcessingStage {
   data?: any;
   error?: string;
   processingTime: number;
+  metadata?: {
+    sourcesUsed?: string[];
+    completeness?: number;
+    searchAttempts?: string[];
+  };
 }
 
 // Helper functions
@@ -190,80 +195,90 @@ async function stageGeminiAnalysis(imageBase64: string, extractedText?: string):
   }
 }
 
-// Stage 3: Drugs.com Data Enrichment
-async function stageDrugsComEnrichment(drugName: string): Promise<ProcessingStage> {
+// Stage 3: Multi-Source Drug Information Enrichment
+async function stageMultiSourceEnrichment(drugName: string): Promise<ProcessingStage> {
   const startTime = Date.now();
   
   try {
-    console.log(`Stage 3: Drugs.com enrichment for: ${drugName}`);
+    console.log(`Stage 3: Multi-source enrichment for: ${drugName}`);
     
     if (!drugName || drugName.toLowerCase().includes('unknown')) {
       throw new Error('No valid drug name for enrichment');
     }
 
-    const formattedDrugName = drugName.toLowerCase().replace(/\s+/g, '-');
-    const url = `https://www.drugs.com/${formattedDrugName}.html`;
+    // Call the new multi-source drug API
+    const apiUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/multi-source-drug-api`;
+    const apiKey = Deno.env.get('SUPABASE_ANON_KEY');
     
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'apikey': apiKey
+      },
+      body: JSON.stringify({
+        drugName: drugName,
+        options: {
+          includeAllSources: true
+        }
+      })
     });
 
     if (!response.ok) {
-      // Try search if direct URL fails
-      const searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
-      const searchResponse = await fetch(searchUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-      });
-
-      if (!searchResponse.ok) {
-        throw new Error('Failed to search drugs.com');
-      }
-
-      const searchHtml = await searchResponse.text();
-      const firstResultMatch = searchHtml.match(/<a href="(\/[^"]+)" class="ddc-link-[^"]+">/);
-      
-      if (firstResultMatch && firstResultMatch[1]) {
-        const resultUrl = `https://www.drugs.com${firstResultMatch[1]}`;
-        const detailResponse = await fetch(resultUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          }
-        });
-
-        if (detailResponse.ok) {
-          const html = await detailResponse.text();
-          const enrichedData = parseHtmlForDrugInfo(html, drugName);
-          
-          return {
-            name: 'drugs-com-enrichment',
-            success: true,
-            data: enrichedData,
-            processingTime: Date.now() - startTime
-          };
-        }
-      }
-      
-      throw new Error('No search results found');
-    } else {
-      const html = await response.text();
-      const enrichedData = parseHtmlForDrugInfo(html, drugName);
-      
-      return {
-        name: 'drugs-com-enrichment',
-        success: true,
-        data: enrichedData,
-        processingTime: Date.now() - startTime
-      };
+      throw new Error(`Multi-source API failed: ${response.status} ${response.statusText}`);
     }
 
-  } catch (error) {
-    console.error('Drugs.com enrichment stage failed:', error);
+    const apiResult = await response.json();
+    
+    if (!apiResult.success || !apiResult.data) {
+      throw new Error(apiResult.error || 'No data returned from multi-source API');
+    }
+
+    const enrichedData = apiResult.data;
+    
+    // Transform the comprehensive data to match our expected format
+    const transformedData = {
+      name: enrichedData.name || drugName,
+      genericName: enrichedData.genericName || '',
+      manufacturer: enrichedData.manufacturer || '',
+      category: enrichedData.category || enrichedData.drugClass || '',
+      drugClass: enrichedData.drugClass || enrichedData.category || '',
+      description: enrichedData.description || '',
+      dosageAndAdmin: enrichedData.dosageAndAdmin || '',
+      sideEffects: enrichedData.sideEffects || [],
+      warnings: enrichedData.warnings || [],
+      interactions: enrichedData.interactions || [],
+      storage: enrichedData.storage || '',
+      mechanism: enrichedData.mechanism || '',
+      indications: enrichedData.indications || [],
+      contraindications: enrichedData.contraindications || [],
+      prescriptionStatus: enrichedData.prescriptionStatus || 'Unknown',
+      pregnancy: enrichedData.pregnancy || '',
+      brandNames: enrichedData.brandNames || [],
+      verified: enrichedData.verified || false,
+      completeness: enrichedData.completeness || 0,
+      sources: enrichedData.sources || {}
+    };
+    
+    console.log(`Multi-source enrichment completed with ${enrichedData.completeness}% completeness from sources: ${apiResult.sourcesUsed?.join(', ') || 'unknown'}`);
+    
     return {
-      name: 'drugs-com-enrichment',
+      name: 'multi-source-enrichment',
+      success: true,
+      data: transformedData,
+      processingTime: Date.now() - startTime,
+      metadata: {
+        sourcesUsed: apiResult.sourcesUsed || [],
+        completeness: enrichedData.completeness || 0,
+        searchAttempts: apiResult.searchAttempts || []
+      }
+    };
+
+  } catch (error) {
+    console.error('Multi-source enrichment stage failed:', error);
+    return {
+      name: 'multi-source-enrichment',
       success: false,
       error: error.message,
       processingTime: Date.now() - startTime
@@ -455,8 +470,8 @@ function combineStageResults(stages: ProcessingStage[]): any {
         else if (data.confidence === 'medium' && combinedResult.confidence === 'low') combinedResult.confidence = 'medium';
       }
 
-      // Drugs.com enrichment data with validation
-      if (stage.name === 'drugs-com-enrichment') {
+      // Multi-source enrichment data with comprehensive validation
+      if (stage.name === 'multi-source-enrichment') {
         const data = stage.data;
         
         // Validate and merge data with quality checks
@@ -505,14 +520,14 @@ function combineStageResults(stages: ProcessingStage[]): any {
         }
         
         if (data.indications && Array.isArray(data.indications) && data.indications.length > 0) {
-          combinedResult.indications = data.indications.filter(indication => indication && indication.length > 5);
+          combinedResult.indications = data.indications.filter(indication => indication && indication.length > 3);
         }
         
         if (data.contraindications && Array.isArray(data.contraindications) && data.contraindications.length > 0) {
           combinedResult.contraindications = data.contraindications.filter(contraindication => contraindication && contraindication.length > 5);
         }
         
-        if (data.prescriptionStatus && data.prescriptionStatus.length > 2) {
+        if (data.prescriptionStatus && data.prescriptionStatus !== 'Unknown') {
           combinedResult.prescriptionStatus = data.prescriptionStatus;
         }
         
@@ -524,17 +539,24 @@ function combineStageResults(stages: ProcessingStage[]): any {
           combinedResult.brandNames = data.brandNames.filter(brand => brand && brand.length > 1);
         }
         
-        // Mark as verified if we have substantial data
-        const hasSubstantialData = (
-          (data.genericName && data.genericName.length > 2) ||
-          (data.description && data.description.length > 20) ||
-          (data.indications && data.indications.length > 0) ||
-          (data.sideEffects && data.sideEffects.length > 0)
-        );
-        
-        if (hasSubstantialData) {
+        // Set verification status based on completeness and data quality
+        if (data.completeness && data.completeness >= 50) {
           combinedResult.verified = true;
-          if (combinedResult.confidence === 'low') combinedResult.confidence = 'medium';
+          
+          // Upgrade confidence based on completeness
+          if (data.completeness >= 80 && combinedResult.confidence !== 'high') {
+            combinedResult.confidence = 'high';
+          } else if (data.completeness >= 50 && combinedResult.confidence === 'low') {
+            combinedResult.confidence = 'medium';
+          }
+        }
+        
+        // Store metadata about sources used
+        if (stage.metadata && stage.metadata.sourcesUsed) {
+          combinedResult.processingStages = [
+            ...combinedResult.processingStages,
+            ...stage.metadata.sourcesUsed.map((source: string) => `${stage.name}-${source.toLowerCase()}`)
+          ];
         }
       }
 
@@ -590,15 +612,15 @@ serve(async (req) => {
     const geminiStage = await stageGeminiAnalysis(imageBase64, extractedText);
     stages.push(geminiStage);
 
-    // Stage 3: Drugs.com Enrichment (if we have a drug name and it's a pharmaceutical product)
+    // Stage 3: Multi-Source Enrichment (if we have a drug name and it's a pharmaceutical product)
     const drugName = geminiStage.success ? geminiStage.data?.name : undefined;
     const productType = geminiStage.success ? geminiStage.data?.productType : undefined;
     
     if (drugName && 
         !drugName.toLowerCase().includes('unknown') && 
         (!productType || productType === 'medication')) {
-      const drugsComStage = await stageDrugsComEnrichment(drugName);
-      stages.push(drugsComStage);
+      const multiSourceStage = await stageMultiSourceEnrichment(drugName);
+      stages.push(multiSourceStage);
     }
 
     // Stage 4: Imprint Search (fallback if other stages failed or low confidence)
