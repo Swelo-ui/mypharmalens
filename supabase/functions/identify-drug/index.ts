@@ -466,7 +466,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     
     // Make parallel requests to Gemini API
     const [primaryResponse, secondaryResponse] = await Promise.allSettled([
-      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -483,7 +483,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
           generation_config: { temperature: 0.1, max_output_tokens: 4000 }
         })
       }),
-      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -730,7 +730,7 @@ serve(async (req) => {
     
     try {
       // Standard analysis request
-      const standardResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const standardResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
