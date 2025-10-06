@@ -291,7 +291,12 @@ const DrugIdentify = () => {
       setProcessingPhase("Finalizing results");
       setProcessingProgress(80);
 
-      return data;
+      // Extract the actual drug data from the nested structure
+      // Edge function returns { success: true, data: {...actualDrugData...} }
+      const drugData = data?.data || data;
+      console.log('Extracted drug data:', drugData);
+      
+      return drugData;
     } catch (error: any) {
       console.error('Error identifying drug:', error);
       throw error;
