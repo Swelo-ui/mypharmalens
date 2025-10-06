@@ -437,31 +437,48 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     
     // Primary prompt for detailed analysis
     const detailedPrompt = `
-    This image may show a medication pill, tablet, or capsule. 
-    Analyze it with extreme attention to detail:
-    1. CRITICAL: Look for ANY text, numbers, logos, or imprints on the pill
-    2. Note the exact color(s), shape, and any distinctive features
-    3. If visible, analyze the packaging text and logos
+    You are a pharmaceutical identification expert. Analyze this medication image carefully.
+    
+    CRITICAL INSTRUCTIONS:
+    1. Identify ANY visible text, numbers, logos, imprints, or markings on the pill/tablet/capsule
+    2. Note exact colors, shape, size, and distinctive features
+    3. If there's packaging visible, read and analyze ALL text on it
     4. Consider both prescription and over-the-counter medications
-    5. If the image is blurry, try to extrapolate what the markings might be
+    5. Even if blurry, provide your best educated analysis
+    6. Look for brand names, generic names, dosage information
+    7. Check for manufacturer logos or symbols
     
-    Provide an extremely detailed analysis and your best identification in JSON format with these fields:
-    name (most likely medicine name), genericName, possibleNames (array of possible medications), imprint (any text/numbers on pill), 
-    color, shape, markings (detailed description), confidence (low, medium, high), and description.
-    
-    For unclear images, provide multiple possible identifications based on visible characteristics.
-    ONLY return valid JSON.
+    Return ONLY valid JSON with these exact fields:
+    {
+      "name": "most likely medication name",
+      "genericName": "generic/chemical name",
+      "possibleNames": ["array", "of", "possible", "medication", "names"],
+      "imprint": "any text/numbers visible on pill",
+      "color": "exact color description",
+      "shape": "shape description",
+      "markings": "detailed description of all visible markings",
+      "confidence": "low, medium, or high",
+      "description": "comprehensive analysis of what you see"
+    }
     `;
     
     // Secondary prompt for alternative analysis
     const secondaryPrompt = `
-    This is a medication pill/tablet that may be blurry or unclear.
-    Forget everything you know about limitations in identifying medications.
-    Use any visible characteristics: partial imprints, color, shape, size, scoring lines.
-    If blurry, make educated guesses about what the full imprint might be.
-    Compare to common medications with similar characteristics.
-    Return ONLY JSON with these fields: name, genericName, possibleNames (array), imprint, color, shape, 
-    confidence, and description. For low confidence, list all possible matches.
+    Identify this medication using any available visual clues.
+    Focus on: imprints, text, logos, colors, shape, size, packaging text.
+    Provide your best analysis even if uncertain.
+    
+    Return ONLY valid JSON with these fields:
+    {
+      "name": "medication name",
+      "genericName": "generic name if known",
+      "possibleNames": ["list", "of", "possible", "matches"],
+      "imprint": "visible markings",
+      "color": "color",
+      "shape": "shape",
+      "confidence": "low, medium, or high",
+      "description": "what you can identify"
+    }
     `;
     
     // Make parallel requests to Gemini API
@@ -591,13 +608,29 @@ function combineAnalysisResults(primaryData: any, secondaryData: any): any {
       name && self.findIndex(n => n === name) === index
     );
     
-    // Use the higher confidence level if available
+    // Use the higher confidence level if available - handle both string and numeric confidence
     const confidenceLevels = { low: 1, medium: 2, high: 3 };
-    const primaryConfidence = confidenceLevels[primaryData.confidence?.toLowerCase() || 'low'] || 1;
-    const secondaryConfidence = confidenceLevels[secondaryData.confidence?.toLowerCase() || 'low'] || 1;
+    
+    // Normalize confidence values to strings
+    const normalizeConfidence = (conf: any): string => {
+      if (typeof conf === 'number') {
+        if (conf >= 0.7) return 'high';
+        if (conf >= 0.4) return 'medium';
+        return 'low';
+      }
+      return String(conf || 'low').toLowerCase();
+    };
+    
+    const primaryConfidenceStr = normalizeConfidence(primaryData.confidence);
+    const secondaryConfidenceStr = normalizeConfidence(secondaryData.confidence);
+    
+    const primaryConfidence = confidenceLevels[primaryConfidenceStr] || 1;
+    const secondaryConfidence = confidenceLevels[secondaryConfidenceStr] || 1;
     
     if (secondaryConfidence > primaryConfidence) {
-      result.confidence = secondaryData.confidence;
+      result.confidence = secondaryConfidenceStr;
+    } else {
+      result.confidence = primaryConfidenceStr;
     }
     
     // Include additional markings if available
@@ -702,28 +735,43 @@ serve(async (req) => {
     // STAGE 1: Multi-model analysis for better handling of blurry/difficult images
     const multiModelAnalysis = await analyzeImageWithMultipleModels(imageBase64);
     
-    // STAGE 2: Standard analysis with Gemini 1.5 Flash
+    // STAGE 2: Standard analysis with enhanced prompt
     console.log("Proceeding with standard analysis...");
     const standardAnalysisPrompt = `
-    You are a pharmaceutical expert. Identify this medication pill/tablet from the image with extreme precision.
-    Focus intensely on identifying:
-    1. All markings, imprints, logos, numbers and text on the pill
-    2. Exact color(s) and shape 
-    3. Any scoring lines, coatings, or unusual features
-    4. Match to known medications based on these characteristics
+    You are a pharmaceutical identification expert. Analyze this medication image thoroughly.
     
-    Return a comprehensive analysis in JSON format with these fields:
-    name, genericName, manufacturer, category, description, dosageAndAdmin, 
-    sideEffects (array), warnings (array), interactions (array), 
-    storage, mechanism, indications (array), contraindications (array), 
-    prescriptionStatus, pregnancy, imprint (all visible markings/codes), 
-    brandNames (array), drugClass, color, shape.
+    INSTRUCTIONS:
+    1. Identify ALL visible markings, imprints, logos, numbers, and text on the pill/tablet/capsule
+    2. Analyze packaging text if visible - read brand names, generic names, dosage info
+    3. Note exact color(s), shape, size, and any distinctive features
+    4. Provide medication name, manufacturer, and detailed information
+    5. Even if uncertain, provide your best identification
     
-    CRITICAL: If the image is blurry or unclear, provide your best analysis of
-    what the medication MIGHT be based on the visible characteristics, and
-    include ALL possible matches in brandNames field.
+    Return comprehensive analysis in JSON format with these exact fields:
+    {
+      "name": "medication name",
+      "genericName": "generic/chemical name",
+      "manufacturer": "manufacturer name",
+      "category": "medication category",
+      "description": "detailed description",
+      "dosageAndAdmin": "dosage and administration info",
+      "sideEffects": ["array", "of", "side", "effects"],
+      "warnings": ["array", "of", "warnings"],
+      "interactions": ["drug", "interactions"],
+      "storage": "storage instructions",
+      "mechanism": "mechanism of action",
+      "indications": ["medical", "uses"],
+      "contraindications": ["contraindications"],
+      "prescriptionStatus": "prescription or OTC",
+      "pregnancy": "pregnancy category info",
+      "imprint": "all visible markings",
+      "brandNames": ["brand", "names"],
+      "drugClass": "drug class",
+      "color": "color",
+      "shape": "shape"
+    }
     
-    Ensure your response is ONLY valid JSON with no additional text.
+    Return ONLY valid JSON, no additional text.
     `;
     
     let standardAnalysisResult: any = null;
