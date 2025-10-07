@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-10-07T06:05:55.860Z",
+  "files": [
+    "pharmalens-secure.cjs",
+    "secure-wrapper.cjs",
+    "security-enhancer.cjs",
+    "initialize-security.cjs",
+    "secure-launcher.bat",
+    "SECURITY_README.md"
+  ],
+  "version": "2.0.0",
+  "type": "system-backup"
+}

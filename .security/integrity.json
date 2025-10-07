@@ -1,0 +1,47 @@
+{
+  "pharmalens-secure.cjs": {
+    "hash": "fe046aa6bcac20a8c7caab7d4852d949f392412b4024662a50b4f86313ae48e1",
+    "timestamp": "2025-10-07T06:05:55.756Z",
+    "size": 15949,
+    "permissions": 33206,
+    "critical": true,
+    "component": "pharmalens-core",
+    "initialized": "2025-10-07T06:05:55.753Z"
+  },
+  "secure-wrapper.cjs": {
+    "hash": "4995f2736a5cf8353cf3e1829daa524714aab90ba4130cb61bb2a35cd1529454",
+    "timestamp": "2025-10-07T06:05:55.768Z",
+    "size": 12105,
+    "permissions": 33206,
+    "critical": true,
+    "component": "pharmalens-core",
+    "initialized": "2025-10-07T06:05:55.767Z"
+  },
+  "security-enhancer.cjs": {
+    "hash": "06d52ba8426eac745dbcc66ba59b0e652ea3c32819db11605ed8c11f93c99277",
+    "timestamp": "2025-10-07T06:05:55.789Z",
+    "size": 17755,
+    "permissions": 33206,
+    "critical": true,
+    "component": "pharmalens-core",
+    "initialized": "2025-10-07T06:05:55.788Z"
+  },
+  "initialize-security.cjs": {
+    "hash": "f662133a1e7fe16ef2c7b12288625a586da5c55588e4099ecbd051eb40f96f0e",
+    "timestamp": "2025-10-07T06:05:55.796Z",
+    "size": 7048,
+    "permissions": 33206,
+    "critical": true,
+    "component": "pharmalens-core",
+    "initialized": "2025-10-07T06:05:55.795Z"
+  },
+  "test-file-1.txt.encrypted": {
+    "hash": "db4d9b937037a53a53911e47760d211f55de8e8139f9382db15c4ad67bf26c91",
+    "timestamp": "2025-10-07T06:05:55.801Z",
+    "size": 304,
+    "permissions": 33206,
+    "critical": false,
+    "component": "user-data",
+    "type": "encrypted-file"
+  }
+}
