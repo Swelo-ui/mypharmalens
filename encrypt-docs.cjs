@@ -237,30 +237,177 @@ class DocumentEncryption {
     console.log();
   }
 
-  // Clean up encrypted files
-  cleanup() {
-    console.log('🧹 Cleaning up encrypted files...\n');
-
-    let cleaned = false;
-
-    if (fs.existsSync(ENCRYPTED_FILE)) {
-      fs.unlinkSync(ENCRYPTED_FILE);
-      console.log(`✅ Removed: ${path.basename(ENCRYPTED_FILE)}`);
-      cleaned = true;
-    }
-
-    if (fs.existsSync(HASH_FILE)) {
-      fs.unlinkSync(HASH_FILE);
-      console.log(`✅ Removed: ${path.basename(HASH_FILE)}`);
-      cleaned = true;
-    }
-
-    if (cleaned) {
-      console.log('\n🎉 Cleanup completed successfully!');
-    } else {
-      console.log('ℹ️  No encrypted files found to clean up.');
-    }
+  // Clean up decrypted files with interactive selection
+  async cleanupDecrypted() {
+    console.clear();
+    console.log('╔══════════════════════════════════════════════════════════════════════════════╗');
+    console.log('║                    🧹 DOCUMENT CLEANUP MANAGEMENT                           ║');
+    console.log('╚══════════════════════════════════════════════════════════════════════════════╝');
     console.log();
+    console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+    console.log('│                      🔍 SCANNING FOR DECRYPTED FILES                        │');
+    console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+    console.log();
+
+    // Check if the original file exists
+    if (!fs.existsSync(SOURCE_FILE)) {
+      console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+      console.log('│                         ℹ️  NO FILES TO CLEANUP                             │');
+      console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+      console.log();
+      console.log('   No decrypted files found in the system.');
+      console.log('   Your document security is already optimized.');
+      console.log();
+      return;
+    }
+
+    console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+    console.log('│                        📁 DECRYPTED FILES DETECTED                          │');
+    console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+    console.log();
+    console.log(`   📄 ${path.basename(SOURCE_FILE)}`);
+    console.log();
+    console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+    console.log('│                      ⚠️  SECURITY CLEANUP WARNING                          │');
+    console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+    console.log();
+    console.log('   This operation will permanently remove decrypted files from your system.');
+    console.log('   Ensure you have encrypted copies before proceeding.');
+    console.log();
+
+    // Interactive selection with arrow keys
+    const files = [path.basename(SOURCE_FILE)];
+    let selectedIndex = 0;
+    let confirmed = false;
+
+    const showMenu = () => {
+      console.clear();
+      console.log('╔══════════════════════════════════════════════════════════════════════════════╗');
+      console.log('║                    🧹 DOCUMENT CLEANUP MANAGEMENT                           ║');
+      console.log('╚══════════════════════════════════════════════════════════════════════════════╝');
+      console.log();
+      console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+      console.log('│                       🎯 INTERACTIVE FILE SELECTION                         │');
+      console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+      console.log();
+      console.log('   Use ↑/↓ arrow keys to navigate • Enter to confirm • Esc to cancel');
+      console.log();
+      
+      files.forEach((file, index) => {
+        if (index === selectedIndex) {
+          console.log(`   ► 🗑️  ${file} ◄ [SELECTED]`);
+        } else {
+          console.log(`     📄 ${file}`);
+        }
+      });
+      
+      console.log();
+      console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+      console.log('│                      ⚠️  SECURITY CLEANUP WARNING                          │');
+      console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+      console.log();
+      console.log('   This action cannot be undone. Ensure encrypted backups exist.');
+      console.log();
+      console.log('   [ENTER] Delete Selected File    [ESC] Cancel Operation');
+    };
+
+    return new Promise((resolve) => {
+      const stdin = process.stdin;
+      
+      if (!stdin.isTTY) {
+        console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+        console.log('│                    ❌ INTERACTIVE MODE NOT SUPPORTED                        │');
+        console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+        console.log();
+        console.log('   This environment does not support interactive file selection.');
+        console.log('   Please run this command in a compatible terminal.');
+        console.log();
+        resolve();
+        return;
+      }
+
+      stdin.setRawMode(true);
+      stdin.resume();
+      stdin.setEncoding('utf8');
+
+      showMenu();
+
+      const onKeyPress = (key) => {
+        switch (key) {
+          case '\u001b[A': // Up arrow
+            selectedIndex = Math.max(0, selectedIndex - 1);
+            showMenu();
+            break;
+          case '\u001b[B': // Down arrow
+            selectedIndex = Math.min(files.length - 1, selectedIndex + 1);
+            showMenu();
+            break;
+          case '\r': // Enter
+          case '\n':
+            confirmed = true;
+            stdin.setRawMode(false);
+            stdin.pause();
+            stdin.removeListener('data', onKeyPress);
+            
+            console.clear();
+            console.log('╔══════════════════════════════════════════════════════════════════════════════╗');
+            console.log('║                    🧹 DOCUMENT CLEANUP MANAGEMENT                           ║');
+            console.log('╚══════════════════════════════════════════════════════════════════════════════╝');
+            console.log();
+            console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+            console.log('│                        🔄 PROCESSING DELETION                               │');
+            console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+            console.log();
+            console.log('   [⏳] Initializing secure deletion...');
+            console.log('   [🗑️] Removing selected file...');
+            console.log();
+            
+            try {
+              fs.unlinkSync(SOURCE_FILE);
+              console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+              console.log('│                      ✅ CLEANUP OPERATION SUCCESSFUL                        │');
+              console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+              console.log();
+              console.log(`   🗑️  Successfully removed: ${files[selectedIndex]}`);
+              console.log('   🛡️  Document security has been optimized');
+              console.log('   🎉 Cleanup process completed successfully');
+            } catch (error) {
+              console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+              console.log('│                        ❌ CLEANUP OPERATION FAILED                          │');
+              console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+              console.log();
+              console.log(`   ❌ Failed to delete: ${files[selectedIndex]}`);
+              console.log(`   🔍 Error details: ${error.message}`);
+              console.log('   💡 Please check file permissions and try again');
+            }
+            console.log();
+            resolve();
+            break;
+          case '\u001b': // Escape
+          case '\u0003': // Ctrl+C
+            stdin.setRawMode(false);
+            stdin.pause();
+            stdin.removeListener('data', onKeyPress);
+            
+            console.clear();
+            console.log('╔══════════════════════════════════════════════════════════════════════════════╗');
+            console.log('║                    🧹 DOCUMENT CLEANUP MANAGEMENT                           ║');
+            console.log('╚══════════════════════════════════════════════════════════════════════════════╝');
+            console.log();
+            console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
+            console.log('│                         ❌ OPERATION CANCELLED                              │');
+            console.log('└─────────────────────────────────────────────────────────────────────────────┘');
+            console.log();
+            console.log('   Cleanup operation has been cancelled by user request.');
+            console.log('   No files were modified or deleted.');
+            console.log();
+            resolve();
+            break;
+        }
+      };
+
+      stdin.on('data', onKeyPress);
+    });
   }
 
   // Verify password without decrypting
@@ -366,13 +513,15 @@ class DocumentEncryption {
     console.log('  status              - Check encryption status');
     console.log('  verify [password]   - Verify password without decrypting');
     console.log('  cleanup             - Remove encrypted files');
+    console.log('  cleanup-decrypted   - Document Cleanup Management (Interactive)');
     console.log('  help                - Show this help message\n');
     console.log('Examples:');
     console.log('  node encrypt-docs.cjs encrypt');
     console.log('  node encrypt-docs.cjs encrypt mypassword');
     console.log('  node encrypt-docs.cjs decrypt');
     console.log('  node encrypt-docs.cjs status');
-    console.log('  node encrypt-docs.cjs cleanup\n');
+    console.log('  node encrypt-docs.cjs cleanup');
+    console.log('  node encrypt-docs.cjs cleanup-decrypted\n');
     console.log('Security Features:');
     console.log('  • AES-256-CBC encryption');
     console.log('  • PBKDF2 key derivation (100,000 iterations)');
@@ -403,6 +552,9 @@ async function main() {
         break;
       case 'cleanup':
         encryptor.cleanup();
+        break;
+      case 'cleanup-decrypted':
+        await encryptor.cleanupDecrypted();
         break;
       case 'help':
       case '--help':
