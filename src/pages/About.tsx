@@ -1,16 +1,39 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 
 const About = () => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const profileImageUrl = "https://res.cloudinary.com/dhf7udqhi/image/upload/v1759912527/1759912263678_ignyew.png";
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
+    
+    // Add preload link to document head for better caching
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.as = 'image';
+    preloadLink.href = profileImageUrl;
+    preloadLink.crossOrigin = 'anonymous';
+    document.head.appendChild(preloadLink);
+    
+    // Preload the profile image
+    const preloadImage = new Image();
+    preloadImage.onload = () => {
+      setImageLoaded(true);
+    };
+    preloadImage.onerror = () => {
+      setImageError(true);
+    };
+    preloadImage.crossOrigin = 'anonymous';
+    preloadImage.src = profileImageUrl;
     
     // Fix animation issue by adding proper animation classes
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
@@ -37,7 +60,7 @@ const About = () => {
     return () => {
       elements.forEach(element => observer.unobserve(element));
     };
-  }, []);
+  }, [profileImageUrl]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -191,16 +214,37 @@ const About = () => {
               
               <div className="md:col-span-4 order-1 md:order-2 flex justify-center animate-on-scroll">
                 <Card className="overflow-hidden border-0 shadow-lg max-w-[200px]">
-                  <CardContent className="p-0">
+                  <CardContent className="p-0 relative">
+                    {!imageLoaded && !imageError && (
+                      <div className="flex items-center justify-center h-48 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                        <Loader2 className="h-8 w-8 animate-spin text-pharma-600" />
+                      </div>
+                    )}
+                    {imageError && (
+                      <div className="flex items-center justify-center h-48 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                        <div className="text-center text-gray-500">
+                          <div className="w-16 h-16 mx-auto mb-2 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span className="text-2xl">👤</span>
+                          </div>
+                          <p className="text-sm">Image unavailable</p>
+                        </div>
+                      </div>
+                    )}
                     <img 
-                      src="/lovable-uploads/b0f69091-6398-44ec-ab75-fbdd269964e4.png" 
+                      src={profileImageUrl}
                       alt="Himanshu Sharma" 
-                      className="w-full h-auto object-cover"
+                      className={`w-full h-auto object-cover transition-opacity duration-300 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                      }`}
                       style={{ 
                         maxWidth: "100%",
                         borderRadius: "0.5rem",
                         filter: "contrast(1.05) brightness(1.02)"
                       }}
+                      loading="eager"
+                      fetchPriority="high"
+                      onLoad={() => setImageLoaded(true)}
+                      onError={() => setImageError(true)}
                     />
                   </CardContent>
                 </Card>
