@@ -2,21 +2,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { LogIn, UserPlus, ArrowRight, Loader2 } from 'lucide-react';
+import { LogIn, UserPlus, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Link } from 'react-router-dom';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState('');
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate terms acceptance for sign-up
+    if (!acceptedTerms) {
+      setTermsError('You must accept the Terms and Conditions to create an account');
+      toast.error("Please accept the Terms and Conditions to proceed with account creation.");
+      return;
+    }
+    
+    setTermsError('');
     setLoading(true);
 
     try {
@@ -35,6 +49,11 @@ const AuthForm = () => {
       toast.success("Account created successfully!", { 
         description: "Please check your email to confirm your account."
       });
+      
+      // Clear form after successful signup
+      setEmail('');
+      setPassword('');
+      setAcceptedTerms(false);
       
     } catch (error: any) {
       console.error('Error signing up:', error);
@@ -162,34 +181,96 @@ const AuthForm = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="signup-password">Password</Label>
-                <Input 
-                  id="signup-password"
-                  type="password" 
-                  placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input 
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 <p className="text-xs text-gray-500">
                   Password must be at least 6 characters
+                </p>
+              </div>
+              
+              {/* Terms and Conditions Acceptance */}
+              <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="accept-terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => {
+                      setAcceptedTerms(checked as boolean);
+                      if (checked) {
+                        setTermsError('');
+                      }
+                    }}
+                    className="mt-0.5"
+                    aria-describedby="terms-error"
+                  />
+                  <div className="flex-1">
+                    <Label 
+                      htmlFor="accept-terms" 
+                      className="text-sm font-medium cursor-pointer leading-relaxed"
+                    >
+                      I agree to the{' '}
+                      <Link 
+                        to="/terms" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-pharma-600 hover:text-pharma-700 underline font-semibold"
+                      >
+                        Terms and Conditions
+                      </Link>
+                      {' '}and{' '}
+                      <Link 
+                        to="/privacy" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-pharma-600 hover:text-pharma-700 underline font-semibold"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </Label>
+                    {termsError && (
+                      <p 
+                        id="terms-error" 
+                        className="text-sm text-red-600 dark:text-red-400 mt-1"
+                        role="alert"
+                      >
+                        {termsError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 ml-7">
+                  By creating an account, you acknowledge that you have read and understood our terms regarding data collection, medical disclaimers, and age restrictions (13+).
                 </p>
               </div>
               
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={loading}
+                disabled={loading || !acceptedTerms}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
+                    Creating Account...
                   </>
                 ) : (
-                  <>
-                    Create Account
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
+                  'Create Account'
                 )}
               </Button>
             </form>
