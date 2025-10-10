@@ -13,7 +13,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Bronchodilator used to treat asthma and COPD',
     drugClass: 'Bronchodilator',
     verified: true,
-    brandNames: ['Ventolin', 'ProAir']
+    brandNames: ['Ventolin', 'ProAir'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 2 puffs every 4-6 hours as needed. Nebulizer: 2.5mg every 6-8 hours. Oral: 2-4mg 3-4 times daily.',
+    mechanism: 'Selective beta2-adrenergic receptor agonist that relaxes bronchial smooth muscle by increasing cyclic adenosine monophosphate (cAMP) levels.',
+    sideEffects: ['Tremor', 'nervousness', 'headache', 'tachycardia', 'palpitations', 'muscle cramps', 'throat irritation', 'paradoxical bronchospasm (rare).'],
+    interactions: ['Beta-blockers (antagonistic effects)', 'MAO inhibitors', 'tricyclic antidepressants (increased cardiovascular effects)', 'diuretics (hypokalemia).'],
+    indications: ['Bronchospasm associated with asthma', 'COPD', 'exercise-induced bronchospasm', 'reversible obstructive airway disease.'],
+    contraindications: ['Hypersensitivity to albuterol or any component. Use with caution in cardiovascular disorders', 'hyperthyroidism', 'diabetes.'],
+    warnings: ['Paradoxical bronchospasm may occur. Monitor for cardiovascular effects. May cause hypokalemia. Not for acute severe asthma attacks.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 15-25°C (59-77°F). Protect from light and excessive heat. Do not puncture or incinerate inhaler.'
   },
   {
     id: '109',
@@ -24,7 +34,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Corticosteroid that reduces inflammation in the airways. Used to treat asthma and allergic rhinitis.',
     drugClass: 'Corticosteroid',
     verified: true,
-    brandNames: ['Flonase', 'Flovent']
+    brandNames: ['Flonase', 'Flovent'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Nasal spray: 1-2 sprays per nostril daily. Inhaler: 88-880 mcg twice daily depending on severity. Oral: Not applicable.',
+    mechanism: 'Synthetic corticosteroid with potent anti-inflammatory activity. Binds to glucocorticoid receptors, inhibiting inflammatory mediators.',
+    sideEffects: ['Nasal irritation', 'nosebleeds', 'headache', 'throat irritation', 'oral thrush (inhaled)', 'hoarseness', 'cough', 'upper respiratory tract infection.'],
+    interactions: ['CYP3A4 inhibitors (ketoconazole', 'ritonavir) increase systemic exposure. Live vaccines should be avoided during treatment.'],
+    indications: ['Allergic rhinitis', 'asthma maintenance therapy', 'nasal polyps', 'eczema (topical formulations).'],
+    contraindications: ['Hypersensitivity to fluticasone. Primary treatment of status asthmaticus or acute bronchospasm.'],
+    warnings: ['May suppress HPA axis with prolonged use. Increased infection risk. Monitor growth in children. Avoid abrupt discontinuation.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Keep away from heat and direct light. Do not freeze nasal spray.'
   },
   {
     id: '110',
@@ -35,7 +55,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Leukotriene receptor antagonist used to prevent asthma attacks and to treat seasonal allergies.',
     drugClass: 'Leukotriene receptor antagonist',
     verified: true,
-    brandNames: ['Singulair']
+    brandNames: ['Singulair'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 10mg once daily in evening. Children 6-14 years: 5mg chewable tablet once daily. Children 2-5 years: 4mg once daily.',
+    mechanism: 'Selective antagonist of cysteinyl leukotriene receptor CysLT1, blocking leukotriene-mediated bronchoconstriction and inflammation.',
+    sideEffects: ['Headache', 'abdominal pain', 'cough', 'dental pain', 'fatigue', 'dizziness', 'fever', 'nasal congestion', 'skin rash', 'mood changes.'],
+    interactions: ['Phenobarbital', 'rifampin (decreased montelukast levels). Gemfibrozil (increased montelukast levels). Monitor with warfarin.'],
+    indications: ['Asthma prophylaxis and maintenance', 'exercise-induced bronchospasm', 'seasonal allergic rhinitis', 'perennial allergic rhinitis.'],
+    contraindications: ['Hypersensitivity to montelukast or any component. Not for acute asthma attacks or status asthmaticus.'],
+    warnings: ['Neuropsychiatric events reported including agitation', 'depression', 'suicidal thoughts. Monitor mood and behavior changes.'],
+    pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture. Keep in original container.'
   },
   {
     id: '111',
@@ -46,7 +76,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Anticholinergic bronchodilator that helps open air passages in the lungs. Used to treat COPD.',
     drugClass: 'Anticholinergic bronchodilator',
     verified: true,
-    brandNames: ['Spiriva', 'Spiriva Respimat']
+    brandNames: ['Spiriva', 'Spiriva Respimat'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'HandiHaler: 18 mcg once daily via inhalation. Respimat: 2.5 mcg (2 puffs) once daily. Same time each day recommended.',
+    mechanism: 'Long-acting muscarinic antagonist (LAMA) that binds to M1, M2, and M3 muscarinic receptors, causing bronchodilation.',
+    sideEffects: ['Dry mouth', 'constipation', 'upper respiratory tract infection', 'sinusitis', 'pharyngitis', 'non-specific chest pain', 'urinary retention.'],
+    interactions: ['Other anticholinergics (additive effects). Avoid with ipratropium. Use caution with other antimuscarinic drugs.'],
+    indications: ['Maintenance treatment of COPD including chronic bronchitis and emphysema. Reduction of COPD exacerbations.'],
+    contraindications: ['Hypersensitivity to tiotropium', 'ipratropium', 'or atropine derivatives. Not for acute bronchospasm or asthma.'],
+    warnings: ['Immediate hypersensitivity reactions possible. Narrow-angle glaucoma', 'prostatic hyperplasia', 'bladder neck obstruction risk.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 25°C (77°F). Do not expose to extreme temperatures. Keep capsules in sealed blister until use.'
   },
   {
     id: '112',
@@ -57,7 +97,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Anticholinergic bronchodilator that relaxes muscles in the airways and increases air flow to the lungs. Used to treat bronchospasm associated with COPD.',
     drugClass: 'Anticholinergic bronchodilator',
     verified: true,
-    brandNames: ['Atrovent', 'Atrovent HFA']
+    brandNames: ['Atrovent', 'Atrovent HFA'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhaler: 2 puffs 4 times daily. Nebulizer: 500 mcg 3-4 times daily. Nasal spray: 2 sprays per nostril 2-3 times daily.',
+    mechanism: 'Muscarinic receptor antagonist that blocks acetylcholine at parasympathetic sites in bronchial smooth muscle, causing bronchodilation.',
+    sideEffects: ['Dry mouth', 'cough', 'upper respiratory infection', 'bronchitis', 'dyspnea', 'headache', 'dizziness', 'nausea', 'blurred vision.'],
+    interactions: ['Other anticholinergics (additive effects). Avoid concurrent use with tiotropium. Use caution with other antimuscarinic agents.'],
+    indications: ['Bronchospasm associated with COPD', 'chronic bronchitis', 'emphysema. Rhinorrhea associated with allergic and non-allergic rhinitis.'],
+    contraindications: ['Hypersensitivity to ipratropium', 'atropine', 'or derivatives. Hypersensitivity to soy lecithin or related food products.'],
+    warnings: ['Immediate hypersensitivity reactions possible. Narrow-angle glaucoma', 'prostatic hypertrophy', 'bladder neck obstruction.'],
+    pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Do not expose to temperatures above 49°C (120°F). Protect from freezing.'
   },
   {
     id: '222',
@@ -68,7 +118,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Long-acting beta2-adrenergic agonist used to prevent bronchospasm in asthma and COPD.',
     drugClass: 'Long-acting beta agonist',
     verified: true,
-    brandNames: ['Serevent']
+    brandNames: ['Serevent'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 50 mcg (2 puffs) twice daily, approximately 12 hours apart. Not for acute bronchospasm relief.',
+    mechanism: 'Long-acting beta2-adrenergic receptor agonist that increases cAMP levels, leading to bronchial smooth muscle relaxation.',
+    sideEffects: ['Headache', 'tremor', 'nervousness', 'throat irritation', 'musculoskeletal pain', 'cough', 'palpitations', 'tachycardia.'],
+    interactions: ['Beta-blockers (antagonistic effects)', 'MAO inhibitors', 'tricyclic antidepressants', 'diuretics', 'CYP3A4 inhibitors.'],
+    indications: ['Maintenance treatment of asthma and COPD. Prevention of exercise-induced bronchospasm. Always used with inhaled corticosteroid.'],
+    contraindications: ['Hypersensitivity to salmeterol. Monotherapy for asthma without inhaled corticosteroid. Acute bronchospasm.'],
+    warnings: ['Black box warning: Increased risk of asthma-related death. Must use with inhaled corticosteroid for asthma treatment.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Keep in dry place. Discard after expiration date or when counter reads 000.'
   },
   {
     id: '223',
@@ -79,7 +139,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Long-acting beta2-adrenergic agonist used to prevent bronchospasm in asthma and COPD.',
     drugClass: 'Long-acting beta agonist',
     verified: true,
-    brandNames: ['Foradil', 'Perforomist']
+    brandNames: ['Foradil', 'Perforomist'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Capsule for inhalation: 12 mcg twice daily. Nebulizer solution: 20 mcg twice daily. Maximum 24 mcg per day.',
+    mechanism: 'Long-acting beta2-adrenergic receptor agonist with rapid onset that increases cAMP, causing bronchial smooth muscle relaxation.',
+    sideEffects: ['Tremor', 'headache', 'palpitations', 'muscle cramps', 'dizziness', 'insomnia', 'tachycardia', 'hypokalemia', 'hyperglycemia.'],
+    interactions: ['Beta-blockers', 'MAO inhibitors', 'tricyclic antidepressants', 'diuretics', 'xanthine derivatives', 'steroids.'],
+    indications: ['Maintenance treatment of asthma and COPD. Prevention of exercise-induced bronchospasm. Must use with inhaled corticosteroid for asthma.'],
+    contraindications: ['Hypersensitivity to formoterol or lactose. Monotherapy for asthma. Acute bronchospasm or status asthmaticus.'],
+    warnings: ['Black box warning: Increased risk of asthma-related death. Paradoxical bronchospasm may occur. Monitor cardiovascular effects.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store capsules at room temperature 20-25°C (68-77°F). Keep in original packaging. Use immediately after opening capsule.'
   },
   {
     id: '224',
@@ -90,7 +160,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Combination of a corticosteroid and a long-acting beta2-adrenergic agonist used to treat asthma and COPD.',
     drugClass: 'Corticosteroid/Long-acting beta agonist',
     verified: true,
-    brandNames: ['Symbicort']
+    brandNames: ['Symbicort'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Asthma: 2 puffs twice daily (80/4.5 or 160/4.5 mcg). COPD: 2 puffs twice daily (160/4.5 mcg). Rinse mouth after use.',
+    mechanism: 'Budesonide provides anti-inflammatory effects via glucocorticoid receptors. Formoterol provides bronchodilation via beta2-receptors.',
+    sideEffects: ['Upper respiratory infection', 'headache', 'pharyngitis', 'sinusitis', 'oral candidiasis', 'back pain', 'nasal congestion', 'stomach upset.'],
+    interactions: ['CYP3A4 inhibitors (increase budesonide exposure)', 'beta-blockers', 'MAO inhibitors', 'diuretics', 'live vaccines.'],
+    indications: ['Maintenance treatment of asthma in patients 6 years and older. Maintenance treatment of COPD.'],
+    contraindications: ['Hypersensitivity to budesonide', 'formoterol', 'or lactose. Primary treatment of status asthmaticus or acute bronchospasm.'],
+    warnings: ['Increased infection risk', 'HPA axis suppression', 'growth suppression in children', 'cardiovascular effects', 'hypokalemia.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Keep mouthpiece clean and dry. Discard after expiration or when counter reads 000.'
   },
   {
     id: '225',
@@ -101,7 +181,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Long-acting muscarinic antagonist used to treat COPD.',
     drugClass: 'Anticholinergic bronchodilator',
     verified: true,
-    brandNames: ['Incruse Ellipta']
+    brandNames: ['Incruse Ellipta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 62.5 mcg (1 inhalation) once daily at the same time each day. Do not use more than once every 24 hours.',
+    mechanism: 'Long-acting muscarinic antagonist (LAMA) that inhibits M3 muscarinic receptors in bronchial smooth muscle, causing bronchodilation.',
+    sideEffects: ['Upper respiratory tract infection', 'cough', 'arthralgia', 'nasopharyngitis', 'constipation', 'diarrhea', 'headache', 'chest pain.'],
+    interactions: ['Other anticholinergic medications (additive effects). Use caution with other antimuscarinic agents.'],
+    indications: ['Long-term maintenance treatment of airflow obstruction in patients with COPD', 'including chronic bronchitis and emphysema.'],
+    contraindications: ['Hypersensitivity to umeclidinium or any component. Not indicated for asthma treatment.'],
+    warnings: ['Not for acute bronchospasm relief. Narrow-angle glaucoma', 'urinary retention', 'severe hypersensitivity to milk proteins.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Keep in original foil tray until ready to use. Discard 6 weeks after opening.'
   },
   {
     id: '226',
@@ -112,10 +202,19 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Combination of a long-acting muscarinic antagonist and a long-acting beta2-adrenergic agonist used to treat COPD.',
     drugClass: 'Anticholinergic bronchodilator/Long-acting beta agonist',
     verified: true,
-    brandNames: ['Anoro Ellipta']
+    brandNames: ['Anoro Ellipta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 62.5/25 mcg (1 inhalation) once daily at the same time each day. Do not use more than once every 24 hours.',
+    mechanism: 'Umeclidinium blocks M3 muscarinic receptors; Vilanterol activates beta2-adrenergic receptors, both causing bronchodilation.',
+    sideEffects: ['Upper respiratory tract infection', 'cough', 'constipation', 'diarrhea', 'pain in extremity', 'muscle spasms', 'neck pain.'],
+    interactions: ['Beta-blockers', 'strong CYP3A4 inhibitors', 'MAO inhibitors', 'tricyclic antidepressants', 'other anticholinergics.'],
+    indications: ['Long-term maintenance treatment of airflow obstruction in patients with COPD', 'including chronic bronchitis and emphysema.'],
+    contraindications: ['Hypersensitivity to any component. Asthma without concomitant COPD. Severe hypersensitivity to milk proteins.'],
+    warnings: ['Not for acute bronchospasm. Cardiovascular effects', 'hypokalemia', 'hyperglycemia', 'narrow-angle glaucoma', 'urinary retention.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Keep in original foil tray. Discard 6 weeks after opening or when counter reads 0.'
   },
-  
-  // Antihistamine drugs
+  // Antihistamines
   {
     id: '26',
     name: 'Diphenhydramine',
@@ -125,7 +224,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Antihistamine used to treat allergies and insomnia',
     drugClass: 'Antihistamine',
     verified: true,
-    brandNames: ['Benadryl']
+    brandNames: ['Benadryl'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults: 25-50mg every 4-6 hours. Maximum 300mg/day. Children 6-12 years: 12.5-25mg every 4-6 hours. Maximum 150mg/day.',
+    mechanism: 'First-generation H1 antihistamine that blocks histamine receptors, reducing allergic symptoms. Also has anticholinergic and sedative effects.',
+    sideEffects: ['Drowsiness', 'dizziness', 'dry mouth', 'blurred vision', 'constipation', 'urinary retention', 'confusion (especially in elderly).'],
+    interactions: ['CNS depressants (increased sedation)', 'anticholinergics (additive effects)', 'MAO inhibitors', 'alcohol.'],
+    indications: ['Allergic reactions', 'motion sickness', 'insomnia', 'Parkinson disease symptoms', 'extrapyramidal reactions.'],
+    contraindications: ['Hypersensitivity to diphenhydramine. Newborns', 'premature infants. Nursing mothers.'],
+    warnings: ['May cause excitability in children. Use caution in elderly (increased fall risk). Avoid driving or operating machinery.'],
+    pregnancy: 'Category B - Generally considered safe but use only if clearly needed.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture. Keep out of reach of children.'
   },
   {
     id: '27',
@@ -136,7 +245,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Antihistamine used to treat allergies',
     drugClass: 'Antihistamine',
     verified: true,
-    brandNames: ['Claritin']
+    brandNames: ['Claritin'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults and children ≥6 years: 10mg once daily. Children 2-5 years: 5mg once daily. Take on empty stomach.',
+    mechanism: 'Second-generation H1 antihistamine that selectively blocks peripheral histamine receptors without significant CNS penetration.',
+    sideEffects: ['Headache', 'drowsiness (less than first-generation)', 'dry mouth', 'fatigue', 'nausea', 'nervousness.'],
+    interactions: ['Ketoconazole', 'erythromycin', 'cimetidine (may increase loratadine levels). Alcohol may increase drowsiness.'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria.'],
+    contraindications: ['Hypersensitivity to loratadine or any component. Children under 2 years of age.'],
+    warnings: ['Use caution in liver impairment. May cause drowsiness in some patients. Phenylketonurics should avoid orally disintegrating tablets.'],
+    pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Keep in dry place. Protect from light.'
   },
   {
     id: '28',
@@ -147,7 +266,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Antihistamine used to treat allergies',
     drugClass: 'Antihistamine',
     verified: true,
-    brandNames: ['Zyrtec']
+    brandNames: ['Zyrtec'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults and children ≥6 years: 5-10mg once daily. Children 2-5 years: 2.5-5mg once daily. May take with or without food.',
+    mechanism: 'Second-generation H1 antihistamine that selectively inhibits peripheral histamine receptors with minimal CNS effects.',
+    sideEffects: ['Drowsiness', 'fatigue', 'dry mouth', 'pharyngitis', 'dizziness', 'nausea', 'abdominal pain.'],
+    interactions: ['Theophylline (decreased cetirizine clearance). Alcohol and CNS depressants (increased sedation).'],
+    indications: ['Seasonal and perennial allergic rhinitis', 'chronic idiopathic urticaria.'],
+    contraindications: ['Hypersensitivity to cetirizine', 'hydroxyzine', 'or any component. End-stage renal disease.'],
+    warnings: ['Dose adjustment needed in renal impairment. May cause drowsiness. Use caution when driving or operating machinery.'],
+    pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light and moisture.'
   },
   {
     id: '227',
@@ -158,7 +287,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Allegra', 'Telfast']
+    brandNames: ['Allegra', 'Telfast'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults: 60mg twice daily or 180mg once daily. Children 6-11 years: 30mg twice daily. Take on empty stomach.',
+    mechanism: 'Second-generation H1 antihistamine that selectively blocks peripheral histamine receptors without crossing blood-brain barrier.',
+    sideEffects: ['Headache', 'drowsiness (minimal)', 'nausea', 'dyspepsia', 'fatigue', 'dizziness', 'upper respiratory tract infection.'],
+    interactions: ['Antacids containing aluminum/magnesium (decreased absorption). Fruit juices may decrease bioavailability.'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria.'],
+    contraindications: ['Hypersensitivity to fexofenadine or any component. Children under 6 years for most formulations.'],
+    warnings: ['Take on empty stomach. Avoid fruit juices within 4 hours of dosing. Use caution in renal impairment.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Protect from excessive moisture.'
   },
   {
     id: '228',
@@ -169,7 +308,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Clarinex', 'Aerius']
+    brandNames: ['Clarinex', 'Aerius'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults and children ≥12 years: 5mg once daily. Children 6-11 years: 2.5mg once daily. May take with or without food.',
+    mechanism: 'Active metabolite of loratadine. Selective H1 antihistamine that blocks peripheral histamine receptors.',
+    sideEffects: ['Headache', 'nausea', 'fatigue', 'dizziness', 'pharyngitis', 'dry mouth', 'myalgia', 'somnolence.'],
+    interactions: ['Ketoconazole', 'erythromycin', 'azithromycin (may increase desloratadine levels). Alcohol may increase drowsiness.'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria.'],
+    contraindications: ['Hypersensitivity to desloratadine', 'loratadine', 'or any component.'],
+    warnings: ['Use caution in renal or hepatic impairment. May cause drowsiness in some patients.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
     id: '229',
@@ -180,7 +329,17 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Xyzal', 'Xusal']
+    brandNames: ['Xyzal', 'Xusal'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults and children ≥12 years: 5mg once daily in evening. Children 6-11 years: 2.5mg once daily in evening.',
+    mechanism: 'R-enantiomer of cetirizine. Selective H1 antihistamine that blocks peripheral histamine receptors.',
+    sideEffects: ['Drowsiness', 'fatigue', 'dry mouth', 'pharyngitis', 'epistaxis', 'fever', 'cough', 'constipation.'],
+    interactions: ['Theophylline (decreased levocetirizine clearance). CNS depressants and alcohol (increased sedation).'],
+    indications: ['Seasonal and perennial allergic rhinitis', 'chronic idiopathic urticaria.'],
+    contraindications: ['Hypersensitivity to levocetirizine', 'cetirizine', 'or hydroxyzine. End-stage renal disease', 'hemodialysis patients.'],
+    warnings: ['Dose adjustment needed in renal impairment. May cause drowsiness. Avoid alcohol consumption.'],
+    pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
+    storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light.'
   },
   {
     id: '230',
@@ -191,6 +350,16 @@ export const respiratoryDrugs: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve nasal allergy symptoms and eye allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Astelin', 'Optivar', 'Astepro']
+    brandNames: ['Astelin', 'Optivar', 'Astepro'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Nasal spray: 1-2 sprays per nostril twice daily. Eye drops: 1 drop in each affected eye twice daily.',
+    mechanism: 'H1 antihistamine with anti-inflammatory properties. Also inhibits leukotriene and platelet-activating factor release.',
+    sideEffects: ['Bitter taste', 'headache', 'somnolence', 'nasal burning', 'pharyngitis', 'dry mouth', 'nausea', 'rhinitis', 'fatigue.'],
+    interactions: ['CNS depressants (increased sedation). Cimetidine (increased azelastine levels). Alcohol should be avoided.'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'allergic conjunctivitis.'],
+    contraindications: ['Hypersensitivity to azelastine or any component.'],
+    warnings: ['May cause drowsiness. Avoid driving or operating machinery. Do not exceed recommended dosage.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store upright at room temperature 15-30°C (59-86°F). Do not freeze. Replace cap after each use.'
   }
 ];

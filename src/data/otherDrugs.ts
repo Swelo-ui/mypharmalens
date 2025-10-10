@@ -13,7 +13,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Retinoid used to treat acne and reduce fine wrinkles and mottled skin discoloration.',
     drugClass: 'Retinoid',
     verified: true,
-    brandNames: ['Retin-A', 'Avita', 'Renova']
+    brandNames: ['Retin-A', 'Avita', 'Renova'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Topical: Apply thin layer once daily at bedtime. Start with lower strength (0.025%) and increase as tolerated. Avoid sun exposure.',
+    mechanism: 'Normalizes follicular keratinization, reduces comedone formation, and has anti-inflammatory properties',
+    sideEffects: ['Skin irritation', 'dryness', 'peeling', 'redness', 'photosensitivity', 'initial acne flare'],
+    interactions: ['Photosensitizing agents', 'benzoyl peroxide', 'salicylic acid', 'alcohol-containing products'],
+    indications: ['Acne vulgaris', 'photoaging', 'fine wrinkles', 'hyperpigmentation'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'eczema', 'sunburned skin'],
+    warnings: ['Severe skin irritation', 'photosensitivity', 'avoid during pregnancy'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and heat'
   },
   {
     id: '402',
@@ -24,7 +34,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Retinoid-like compound used to treat acne.',
     drugClass: 'Retinoid',
     verified: true,
-    brandNames: ['Differin']
+    brandNames: ['Differin'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Topical: Apply thin layer once daily at bedtime to clean, dry skin. Avoid eyes, lips, and mucous membranes.',
+    mechanism: 'Binds to specific retinoic acid nuclear receptors, normalizes differentiation of follicular epithelial cells',
+    sideEffects: ['Skin irritation', 'dryness', 'scaling', 'burning', 'stinging', 'erythema'],
+    interactions: ['Photosensitizing agents', 'abrasive soaps', 'astringents', 'products with high alcohol content'],
+    indications: ['Acne vulgaris'],
+    contraindications: ['Hypersensitivity to adapalene or excipients'],
+    warnings: ['Avoid excessive sun exposure', 'may cause severe irritation on eczematous skin'],
+    pregnancy: 'Category C - Limited systemic absorption, but use with caution',
+    storage: 'Store at room temperature, protect from freezing'
   },
   {
     id: '403',
@@ -35,7 +55,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Antifungal medication used to treat fungal infections of the skin, vagina, and mouth.',
     drugClass: 'Azole antifungal',
     verified: true,
-    brandNames: ['Lotrimin', 'Mycelex']
+    brandNames: ['Lotrimin', 'Mycelex'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Topical: Apply twice daily for 2-4 weeks. Vaginal: 1 applicator or suppository at bedtime for 3-7 days. Oral: Dissolve slowly in mouth 5 times daily.',
+    mechanism: 'Inhibits ergosterol synthesis by blocking 14α-demethylase, disrupting fungal cell membrane',
+    sideEffects: ['Local irritation', 'burning', 'stinging', 'erythema', 'blistering', 'urticaria'],
+    interactions: ['Minimal systemic absorption limits drug interactions'],
+    indications: ['Tinea pedis', 'tinea cruris', 'tinea corporis', 'cutaneous candidiasis', 'vulvovaginal candidiasis', 'oral thrush'],
+    contraindications: ['Hypersensitivity to clotrimazole or components'],
+    warnings: ['Discontinue if sensitization occurs', 'avoid contact with eyes'],
+    pregnancy: 'Category B - Safe for topical use during pregnancy',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '404',
@@ -46,7 +76,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Antifungal medication used to treat fungal infections.',
     drugClass: 'Azole antifungal',
     verified: true,
-    brandNames: ['Nizoral']
+    brandNames: ['Nizoral'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 200-400 mg daily with food. Topical: Apply once daily for 2-4 weeks. Shampoo: Use twice weekly for dandruff.',
+    mechanism: 'Inhibits ergosterol synthesis by blocking 14α-demethylase and other enzymes in sterol synthesis pathway',
+    sideEffects: ['Oral: Nausea', 'vomiting', 'abdominal pain', 'hepatotoxicity. Topical: Local irritation', 'contact dermatitis'],
+    interactions: ['CYP3A4 substrates', 'warfarin', 'cyclosporine', 'phenytoin', 'rifampin', 'antacids', 'H2 blockers'],
+    indications: ['Systemic fungal infections', 'seborrheic dermatitis', 'tinea versicolor', 'dandruff'],
+    contraindications: ['Hypersensitivity', 'acute/chronic liver disease', 'coadministration with certain CYP3A4 substrates'],
+    warnings: ['Hepatotoxicity', 'adrenal insufficiency', 'QT prolongation', 'drug interactions'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '405',
@@ -57,7 +97,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Antifungal medication used to treat fungal infections including candidiasis and cryptococcal meningitis.',
     drugClass: 'Azole antifungal',
     verified: true,
-    brandNames: ['Diflucan']
+    brandNames: ['Diflucan'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral/IV: 100-800 mg daily depending on indication. Vaginal candidiasis: 150 mg single dose. Take with or without food.',
+    mechanism: 'Inhibits fungal cytochrome P450 enzyme 14α-demethylase, preventing ergosterol synthesis',
+    sideEffects: ['Nausea', 'headache', 'abdominal pain', 'diarrhea', 'rash', 'elevated liver enzymes'],
+    interactions: ['Warfarin', 'phenytoin', 'cyclosporine', 'rifampin', 'cimetidine', 'hydrochlorothiazide'],
+    indications: ['Candidiasis', 'cryptococcal meningitis', 'coccidioidomycosis', 'prevention of fungal infections in immunocompromised patients'],
+    contraindications: ['Hypersensitivity', 'coadministration with terfenadine (high doses)'],
+    warnings: ['Hepatotoxicity', 'QT prolongation', 'serious skin reactions', 'adrenal insufficiency'],
+    pregnancy: 'Category C - Single dose for vaginal candidiasis is acceptable',
+    storage: 'Store at room temperature, protect from freezing'
   },
   
   // Ophthalmology medications
@@ -70,7 +120,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Prostaglandin analog used to treat glaucoma and ocular hypertension.',
     drugClass: 'Prostaglandin analog',
     verified: true,
-    brandNames: ['Xalatan']
+    brandNames: ['Xalatan'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Ophthalmic: 1 drop in affected eye(s) once daily in the evening. Remove contact lenses before instillation.',
+    mechanism: 'Prostaglandin F analog that increases outflow of aqueous humor, reducing intraocular pressure',
+    sideEffects: ['Eye irritation', 'increased iris pigmentation', 'eyelash changes', 'conjunctival hyperemia', 'foreign body sensation'],
+    interactions: ['Thimerosal-containing products (precipitation may occur)'],
+    indications: ['Open-angle glaucoma', 'ocular hypertension'],
+    contraindications: ['Hypersensitivity to latanoprost or benzalkonium chloride'],
+    warnings: ['Permanent iris color changes', 'eyelash changes', 'macular edema in aphakic patients'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Refrigerate unopened bottles, store at room temperature once opened, use within 6 weeks'
   },
   {
     id: '407',
@@ -81,7 +141,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Beta-blocker used to treat glaucoma and ocular hypertension.',
     drugClass: 'Beta blocker',
     verified: true,
-    brandNames: ['Timoptic']
+    brandNames: ['Timoptic'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Ophthalmic: 1 drop in affected eye(s) twice daily. Start with 0.25% solution, may increase to 0.5% if needed.',
+    mechanism: 'Non-selective beta-adrenergic receptor antagonist that reduces aqueous humor production',
+    sideEffects: ['Eye irritation', 'decreased heart rate', 'bronchospasm', 'fatigue', 'depression', 'masking of hypoglycemia'],
+    interactions: ['Calcium channel blockers', 'catecholamine-depleting drugs', 'CYP2D6 inhibitors'],
+    indications: ['Open-angle glaucoma', 'ocular hypertension', 'secondary glaucoma'],
+    contraindications: ['Bronchial asthma', 'severe COPD', 'sinus bradycardia', 'second/third-degree AV block', 'cardiogenic shock'],
+    warnings: ['Systemic absorption may cause cardiac/pulmonary effects', 'mask hypoglycemia symptoms'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '408',
@@ -92,7 +162,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Alpha-2 adrenergic receptor agonist used to treat glaucoma and ocular hypertension.',
     drugClass: 'Alpha-2 adrenergic receptor agonist',
     verified: true,
-    brandNames: ['Alphagan P']
+    brandNames: ['Alphagan P'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Ophthalmic: 1 drop in affected eye(s) three times daily, approximately 8 hours apart.',
+    mechanism: 'Selective alpha-2 adrenergic receptor agonist that reduces aqueous humor production and increases outflow',
+    sideEffects: ['Eye irritation', 'dry mouth', 'fatigue', 'headache', 'drowsiness', 'conjunctival hyperemia', 'allergic conjunctivitis'],
+    interactions: ['MAO inhibitors', 'tricyclic antidepressants', 'CNS depressants'],
+    indications: ['Open-angle glaucoma', 'ocular hypertension'],
+    contraindications: ['Hypersensitivity', 'MAO inhibitor therapy', 'children under 2 years'],
+    warnings: ['Severe cardiovascular disease', 'depression', 'cerebral/coronary insufficiency', 'Raynaud\'s phenomenon'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light'
   },
   
   // Immunosuppressants
@@ -105,7 +185,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Immunosuppressant used to prevent organ rejection after transplant and to treat certain skin conditions.',
     drugClass: 'Calcineurin inhibitor',
     verified: true,
-    brandNames: ['Prograf', 'Protopic']
+    brandNames: ['Prograf', 'Protopic'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 0.1-0.3 mg/kg/day divided twice daily. Topical: Apply thin layer twice daily. Monitor blood levels for oral use.',
+    mechanism: 'Inhibits calcineurin, preventing T-cell activation and cytokine production',
+    sideEffects: ['Nephrotoxicity', 'neurotoxicity', 'hypertension', 'hyperkalemia', 'increased infection risk', 'malignancy risk'],
+    interactions: ['CYP3A4 inhibitors/inducers', 'nephrotoxic drugs', 'potassium-sparing diuretics', 'live vaccines'],
+    indications: ['Organ transplant rejection prevention', 'atopic dermatitis (topical)'],
+    contraindications: ['Hypersensitivity', 'concurrent use with cyclosporine'],
+    warnings: ['Increased susceptibility to infections and malignancy', 'nephrotoxicity', 'neurotoxicity'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '410',
@@ -116,7 +206,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Immunosuppressant used to prevent organ rejection after transplant.',
     drugClass: 'IMDH inhibitor',
     verified: true,
-    brandNames: ['CellCept']
+    brandNames: ['CellCept'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 1-1.5 g twice daily on empty stomach. IV: Same dose when oral not possible. Take 1 hour before or 2 hours after meals.',
+    mechanism: 'Inhibits inosine monophosphate dehydrogenase, blocking de novo purine synthesis in lymphocytes',
+    sideEffects: ['GI upset', 'diarrhea', 'vomiting', 'leukopenia', 'anemia', 'increased infection risk', 'malignancy risk'],
+    interactions: ['Antacids', 'cholestyramine', 'iron supplements', 'acyclovir', 'probenecid', 'live vaccines'],
+    indications: ['Prevention of organ transplant rejection (kidney', 'heart', 'liver)'],
+    contraindications: ['Hypersensitivity to mycophenolate or mycophenolic acid'],
+    warnings: ['Increased risk of infections and malignancy', 'bone marrow suppression', 'GI bleeding'],
+    pregnancy: 'Category D - Contraindicated in pregnancy, teratogenic',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '411',
@@ -127,7 +227,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Immunosuppressant used to prevent organ rejection after transplant and to treat certain autoimmune conditions.',
     drugClass: 'Calcineurin inhibitor',
     verified: true,
-    brandNames: ['Sandimmune', 'Neoral', 'Restasis']
+    brandNames: ['Sandimmune', 'Neoral', 'Restasis'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10-15 mg/kg/day divided twice daily, adjust based on levels. Ophthalmic: 1 drop twice daily. Take consistently with meals.',
+    mechanism: 'Inhibits calcineurin, preventing T-cell activation and IL-2 production',
+    sideEffects: ['Nephrotoxicity', 'hypertension', 'gingival hyperplasia', 'hirsutism', 'tremor', 'increased infection risk'],
+    interactions: ['CYP3A4 inhibitors/inducers', 'nephrotoxic drugs', 'potassium-sparing diuretics', 'statins', 'live vaccines'],
+    indications: ['Organ transplant rejection prevention', 'rheumatoid arthritis', 'psoriasis', 'dry eye disease'],
+    contraindications: ['Hypersensitivity', 'uncontrolled hypertension', 'malignancy (except skin cancer)'],
+    warnings: ['Increased susceptibility to infections and malignancy', 'nephrotoxicity', 'hypertension'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   
   // Additional WHO essential medicines
@@ -140,7 +250,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Prostaglandin analog used to prevent and treat stomach ulcers, start labor, cause an abortion, and treat postpartum bleeding.',
     drugClass: 'Prostaglandin analog',
     verified: true,
-    brandNames: ['Cytotec']
+    brandNames: ['Cytotec'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Ulcer prevention: 200 mcg 4 times daily with meals. Labor induction: 25-50 mcg vaginally. Postpartum hemorrhage: 600-1000 mcg sublingually.',
+    mechanism: 'Prostaglandin E1 analog that inhibits gastric acid secretion and stimulates uterine contractions',
+    sideEffects: ['Diarrhea', 'abdominal pain', 'nausea', 'flatulence', 'uterine contractions', 'vaginal bleeding'],
+    interactions: ['Antacids (magnesium-containing)', 'NSAIDs effectiveness may be reduced'],
+    indications: ['NSAID-induced ulcer prevention', 'labor induction', 'medical abortion', 'postpartum hemorrhage'],
+    contraindications: ['Pregnancy (when used for ulcer prevention)', 'hypersensitivity', 'inflammatory bowel disease'],
+    warnings: ['Uterine rupture', 'severe diarrhea', 'contraindicated in pregnancy for ulcer prevention'],
+    pregnancy: 'Category X for ulcer prevention - Contraindicated. Used therapeutically for labor induction',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '413',
@@ -151,7 +271,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Hormone used to induce labor, strengthen labor contractions, and control bleeding after childbirth.',
     drugClass: 'Hormone',
     verified: true,
-    brandNames: ['Pitocin']
+    brandNames: ['Pitocin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV: Labor induction: 0.5-2 mU/min, increase gradually. Postpartum hemorrhage: 10-40 units in 1000 mL IV fluid. IM: 10 units after delivery of placenta.',
+    mechanism: 'Synthetic posterior pituitary hormone that stimulates uterine smooth muscle contractions',
+    sideEffects: ['Uterine hyperstimulation', 'water intoxication', 'hypotension', 'tachycardia', 'nausea', 'vomiting'],
+    interactions: ['Vasoconstrictors', 'cyclopropane anesthesia (may cause hypotension)'],
+    indications: ['Labor induction', 'labor augmentation', 'postpartum hemorrhage control', 'incomplete abortion'],
+    contraindications: ['Cephalopelvic disproportion', 'unfavorable fetal position', 'fetal distress', 'placenta previa'],
+    warnings: ['Uterine rupture', 'water intoxication', 'fetal distress', 'cervical laceration'],
+    pregnancy: 'Used therapeutically during labor and delivery',
+    storage: 'Refrigerate, protect from freezing and light'
   },
   {
     id: '414',
@@ -162,7 +292,17 @@ export const otherDrugs: DrugData[] = [
     description: 'Alpha-2 adrenergic agonist used to treat high blood pressure, especially during pregnancy.',
     drugClass: 'Alpha-2 adrenergic agonist',
     verified: true,
-    brandNames: ['Aldomet']
+    brandNames: ['Aldomet'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 250 mg 2-3 times daily. Maintenance: 500 mg to 2 g daily in 2-4 divided doses. Maximum: 3 g daily.',
+    mechanism: 'Converted to alpha-methylnorepinephrine, which stimulates central alpha-2 receptors, reducing sympathetic outflow',
+    sideEffects: ['Drowsiness', 'dry mouth', 'depression', 'orthostatic hypotension', 'hepatotoxicity', 'hemolytic anemia'],
+    interactions: ['MAO inhibitors', 'iron supplements', 'lithium', 'levodopa', 'haloperidol'],
+    indications: ['Hypertension', 'especially in pregnancy'],
+    contraindications: ['Hypersensitivity', 'active hepatic disease', 'pheochromocytoma', 'MAO inhibitor use'],
+    warnings: ['Hepatotoxicity', 'hemolytic anemia', 'positive Coombs test', 'sedation'],
+    pregnancy: 'Category B - Preferred antihypertensive in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '415',
@@ -173,6 +313,16 @@ export const otherDrugs: DrugData[] = [
     description: 'Mineral used to prevent seizures in women with preeclampsia and to delay preterm labor.',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV: Preeclampsia: Loading dose 4-6 g over 15-20 min, then 1-2 g/hr maintenance. Tocolysis: 4-6 g loading dose, then 2-4 g/hr.',
+    mechanism: 'Blocks neuromuscular transmission, has anticonvulsant properties, and causes uterine muscle relaxation',
+    sideEffects: ['Flushing', 'sweating', 'hypotension', 'depressed reflexes', 'respiratory depression', 'cardiac arrest'],
+    interactions: ['Neuromuscular blocking agents', 'CNS depressants', 'calcium channel blockers'],
+    indications: ['Preeclampsia/eclampsia seizure prevention', 'tocolysis for preterm labor', 'hypomagnesemia'],
+    contraindications: ['Heart block', 'myocardial damage', 'renal failure', 'within 2 hours of delivery'],
+    warnings: ['Respiratory depression', 'loss of deep tendon reflexes', 'cardiac conduction abnormalities'],
+    pregnancy: 'Category A - Safe and effective in pregnancy',
+    storage: 'Store at room temperature, protect from freezing'
   }
 ];

@@ -12,7 +12,17 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Medication used to prevent and treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Lariam']
+    brandNames: ['Lariam'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 250mg once weekly starting 1-2 weeks before travel. Treatment: 1250mg as single dose or divided over 6-8 hours.',
+    mechanism: 'Interferes with parasite food vacuole function and inhibits parasite protein synthesis.',
+    sideEffects: ['Nausea', 'vomiting', 'dizziness', 'headache', 'insomnia', 'vivid dreams', 'anxiety', 'depression'],
+    interactions: ['Anticonvulsants', 'beta-blockers', 'calcium channel blockers', 'quinidine', 'quinine'],
+    indications: ['Prevention and treatment of malaria caused by chloroquine-resistant P. falciparum'],
+    contraindications: ['Hypersensitivity', 'active depression', 'anxiety disorders', 'psychosis', 'seizure disorders'],
+    warnings: ['Neuropsychiatric reactions', 'seizures', 'cardiac conduction abnormalities', 'avoid in pilots/drivers'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '240',
@@ -23,7 +33,17 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Combination medication used to prevent and treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Malarone']
+    brandNames: ['Malarone'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 1 adult tablet daily with food. Treatment: 4 adult tablets daily for 3 days with food.',
+    mechanism: 'Atovaquone inhibits electron transport; proguanil inhibits dihydrofolate reductase.',
+    sideEffects: ['Abdominal pain', 'nausea', 'vomiting', 'headache', 'diarrhea', 'weakness', 'dizziness'],
+    interactions: ['Rifampin', 'rifabutin', 'tetracycline', 'metoclopramide', 'warfarin'],
+    indications: ['Prevention and treatment of acute', 'uncomplicated P. falciparum malaria'],
+    contraindications: ['Hypersensitivity to atovaquone or proguanil', 'severe renal impairment'],
+    warnings: ['Take with food to enhance absorption', 'monitor in renal impairment', 'vomiting may reduce efficacy'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '241',
@@ -34,7 +54,17 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Tetracycline antibiotic used to prevent malaria.',
     drugClass: 'Tetracycline antibiotic',
     verified: true,
-    brandNames: ['Vibramycin', 'Oracea', 'Doryx']
+    brandNames: ['Vibramycin', 'Oracea', 'Doryx'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 100mg daily starting 1-2 days before travel, continue 4 weeks after return. Take with food and water.',
+    mechanism: 'Inhibits protein synthesis by binding to 30S ribosomal subunit, preventing parasite development.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'photosensitivity', 'esophageal irritation', 'vaginal candidiasis'],
+    interactions: ['Antacids', 'iron', 'calcium', 'warfarin', 'methoxyflurane', 'isotretinoin'],
+    indications: ['Malaria prevention in areas with chloroquine-resistant P. falciparum'],
+    contraindications: ['Hypersensitivity to tetracyclines', 'pregnancy', 'children <8 years'],
+    warnings: ['Photosensitivity', 'esophageal ulceration', 'tooth discoloration in children', 'hepatotoxicity'],
+    pregnancy: 'Category D - Avoid in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '310',
@@ -45,7 +75,17 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Medication used to prevent and treat malaria and amebiasis.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Aralen']
+    brandNames: ['Aralen'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 500mg weekly starting 1-2 weeks before travel. Treatment: 1g initially, then 500mg at 6, 24, and 48 hours.',
+    mechanism: 'Concentrates in parasite food vacuole, interfering with hemoglobin digestion and DNA replication.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'headache', 'dizziness', 'blurred vision', 'pruritus'],
+    interactions: ['Antacids', 'kaolin', 'ampicillin', 'cyclosporine', 'mefloquine'],
+    indications: ['Prevention and treatment of malaria caused by chloroquine-sensitive parasites', 'amebiasis'],
+    contraindications: ['Hypersensitivity', 'retinal or visual field changes', 'porphyria'],
+    warnings: ['Retinal toxicity with long-term use', 'cardiac conduction abnormalities', 'seizures', 'blood dyscrasias'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '311',
@@ -56,7 +96,17 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Medication used to treat and prevent malaria, particularly for eliminating the liver stage of certain malaria parasites.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Primaquine']
+    brandNames: ['Primaquine'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 30mg daily starting 1-2 days before travel. Treatment: 15mg daily for 14 days. Take with food.',
+    mechanism: 'Interferes with parasite mitochondrial function and generates reactive oxygen species.',
+    sideEffects: ['Nausea', 'vomiting', 'abdominal cramps', 'headache', 'dizziness', 'weakness', 'pruritus'],
+    interactions: ['Quinacrine', 'dapsone', 'other hemolytic drugs'],
+    indications: ['Prevention of P. vivax and P. ovale relapse', 'radical cure of liver stages'],
+    contraindications: ['G6PD deficiency', 'pregnancy', 'breastfeeding', 'systemic lupus erythematosus'],
+    warnings: ['Hemolytic anemia in G6PD deficiency', 'methemoglobinemia', 'leukopenia', 'test G6PD before use'],
+    pregnancy: 'Category C - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '312',
@@ -67,6 +117,16 @@ export const antimalarialDrugs: DrugData[] = [
     description: 'Combination medication used to treat acute, uncomplicated malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Coartem', 'Riamet']
+    brandNames: ['Coartem', 'Riamet'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 4 tablets initially, then 4 tablets at 8, 24, 36, 48, and 60 hours (total 6 doses). Take with food.',
+    mechanism: 'Artemether generates free radicals that damage parasite proteins; lumefantrine interferes with heme detoxification.',
+    sideEffects: ['Headache', 'dizziness', 'nausea', 'vomiting', 'anorexia', 'weakness', 'arthralgia', 'myalgia'],
+    interactions: ['CYP3A4 inducers/inhibitors', 'QT-prolonging drugs', 'grapefruit juice'],
+    indications: ['Treatment of acute', 'uncomplicated malaria caused by P. falciparum'],
+    contraindications: ['Hypersensitivity', 'severe malaria', 'QT prolongation', 'family history of sudden death'],
+    warnings: ['QT prolongation', 'take with fatty food for absorption', 'monitor cardiac function'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   }
 ];

@@ -12,6 +12,7 @@ import { antimalarialDrugs } from "./antimalarialDrugs";
 import { supplementDrugs } from "./supplementDrugs";
 import { otherDrugs } from "./otherDrugs";
 import { extraWHODrugs } from "./extraWHODrugs";
+import { additionalDrugsData } from "./additionalDrugsData";
 
 // Combine all drug data from different categories
 export const combinedDrugsData: DrugData[] = [
@@ -25,7 +26,8 @@ export const combinedDrugsData: DrugData[] = [
   ...antimalarialDrugs,
   ...supplementDrugs,
   ...otherDrugs,
-  ...extraWHODrugs
+  ...extraWHODrugs,
+  ...additionalDrugsData
 ];
 
 // Export the getDetailedDrugData function for use elsewhere

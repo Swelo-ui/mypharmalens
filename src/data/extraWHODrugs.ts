@@ -13,7 +13,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Mood stabilizer used to treat bipolar disorder.',
     drugClass: 'Mood stabilizer',
     verified: true,
-    brandNames: ['Eskalith', 'Lithobid']
+    brandNames: ['Eskalith', 'Lithobid'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 300-1800 mg daily in divided doses. Maintenance: 900-1200 mg daily. Monitor serum levels regularly. Take with food to reduce GI upset.',
+    mechanism: 'Alters sodium transport in nerve and muscle cells, affects neurotransmitter metabolism including serotonin and norepinephrine',
+    sideEffects: ['Tremor', 'polyuria', 'polydipsia', 'weight gain', 'nausea', 'diarrhea', 'drowsiness', 'muscle weakness', 'cognitive impairment'],
+    interactions: ['Diuretics', 'ACE inhibitors', 'NSAIDs', 'tetracyclines', 'metronidazole', 'calcium channel blockers'],
+    indications: ['Bipolar disorder (manic episodes)', 'maintenance therapy for bipolar disorder', 'major depressive disorder (adjunctive)'],
+    contraindications: ['Severe renal disease', 'severe cardiovascular disease', 'severe dehydration', 'sodium depletion'],
+    warnings: ['Narrow therapeutic index', 'requires regular monitoring of serum levels', 'kidney function', 'and thyroid function'],
+    pregnancy: 'Category D - Risk of cardiac malformations (Ebstein anomaly), avoid in first trimester',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '502',
@@ -24,7 +34,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antipsychotic used to treat schizophrenia, Tourette syndrome, and acute psychosis.',
     drugClass: 'Typical antipsychotic',
     verified: true,
-    brandNames: ['Haldol']
+    brandNames: ['Haldol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 0.5-5 mg 2-3 times daily. Severe symptoms: up to 100 mg daily. IM: 2-5 mg every 4-8 hours. Take with or without food.',
+    mechanism: 'Blocks dopamine D2 receptors in the brain, particularly in the mesolimbic pathway',
+    sideEffects: ['Extrapyramidal symptoms', 'tardive dyskinesia', 'sedation', 'hypotension', 'dry mouth', 'constipation', 'blurred vision'],
+    interactions: ['CNS depressants', 'anticholinergics', 'lithium', 'carbamazepine', 'rifampin', 'QT-prolonging drugs'],
+    indications: ['Schizophrenia', 'acute psychosis', 'Tourette syndrome', 'severe behavioral problems', 'delirium'],
+    contraindications: ['Hypersensitivity', 'severe CNS depression', 'comatose states', 'Parkinson disease'],
+    warnings: ['Tardive dyskinesia', 'neuroleptic malignant syndrome', 'QT prolongation', 'increased mortality in elderly with dementia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '503',
@@ -35,7 +55,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and irritability in autism.',
     drugClass: 'Atypical antipsychotic',
     verified: true,
-    brandNames: ['Risperdal']
+    brandNames: ['Risperdal'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 1-6 mg daily in 1-2 divided doses. Bipolar: 2-3 mg daily. Autism: 0.25-3 mg daily. Take with or without food.',
+    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, with lower risk of extrapyramidal symptoms than typical antipsychotics',
+    sideEffects: ['Weight gain', 'sedation', 'orthostatic hypotension', 'extrapyramidal symptoms', 'hyperprolactinemia', 'metabolic changes'],
+    interactions: ['CNS depressants', 'CYP2D6 inhibitors/inducers', 'carbamazepine', 'phenytoin', 'rifampin', 'fluoxetine', 'paroxetine'],
+    indications: ['Schizophrenia', 'bipolar disorder (manic/mixed episodes)', 'irritability in autism spectrum disorder'],
+    contraindications: ['Hypersensitivity to risperidone'],
+    warnings: ['Increased mortality in elderly with dementia', 'metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks, may cause extrapyramidal symptoms in newborns',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   
   // Additional antiparasitics
@@ -48,7 +78,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antiparasitic used to treat many types of parasitic infections, including strongyloidiasis and onchocerciasis.',
     drugClass: 'Antiparasitic',
     verified: true,
-    brandNames: ['Stromectol']
+    brandNames: ['Stromectol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 150-200 mcg/kg as single dose. Strongyloidiasis: repeat in 2 weeks. Onchocerciasis: repeat every 6-12 months. Take on empty stomach with water.',
+    mechanism: 'Binds to glutamate-gated chloride channels in invertebrate nerve and muscle cells, causing paralysis and death of parasites',
+    sideEffects: ['Dizziness', 'nausea', 'diarrhea', 'fatigue', 'abdominal pain', 'decreased appetite', 'constipation', 'drowsiness'],
+    interactions: ['Warfarin', 'CYP3A4 substrates', 'P-glycoprotein substrates'],
+    indications: ['Strongyloidiasis', 'onchocerciasis (river blindness)', 'scabies', 'head lice'],
+    contraindications: ['Hypersensitivity to ivermectin'],
+    warnings: ['Severe adverse reactions in patients with high Loa loa microfilarial loads', 'neurologic adverse events'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '505',
@@ -59,7 +99,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anthelmintic used to treat schistosomiasis and other fluke infections.',
     drugClass: 'Anthelmintic',
     verified: true,
-    brandNames: ['Biltricide']
+    brandNames: ['Biltricide'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 20-25 mg/kg 2-3 times daily for 1-2 days. Schistosomiasis: 40-60 mg/kg in 2-3 divided doses in one day. Take with food.',
+    mechanism: 'Increases cell membrane permeability to calcium in schistosomes, causing paralysis and death',
+    sideEffects: ['Abdominal pain', 'nausea', 'headache', 'dizziness', 'drowsiness', 'fatigue', 'fever', 'sweating'],
+    interactions: ['CYP inducers (rifampin', 'phenytoin', 'carbamazepine)', 'cimetidine', 'chloroquine'],
+    indications: ['Schistosomiasis', 'clonorchiasis', 'opisthorchiasis', 'other trematode infections'],
+    contraindications: ['Hypersensitivity', 'ocular cysticercosis', 'spinal cysticercosis'],
+    warnings: ['May cause seizures in patients with cerebral cysticercosis', 'avoid driving on treatment day'],
+    pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '506',
@@ -70,7 +120,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anthelmintic used to treat various worm infections.',
     drugClass: 'Anthelmintic',
     verified: true,
-    brandNames: ['Vermox']
+    brandNames: ['Vermox'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 100 mg twice daily for 3 days or 500 mg single dose. Pinworms: 100 mg single dose, repeat in 2-3 weeks. Take with or without food.',
+    mechanism: 'Inhibits tubulin polymerization, disrupting cytoplasmic microtubules in helminth cells',
+    sideEffects: ['Abdominal pain', 'diarrhea', 'nausea', 'vomiting', 'headache', 'dizziness', 'rash'],
+    interactions: ['Carbamazepine', 'phenytoin', 'cimetidine', 'metronidazole'],
+    indications: ['Pinworm', 'roundworm', 'hookworm', 'whipworm infections'],
+    contraindications: ['Hypersensitivity to mebendazole'],
+    warnings: ['Rare reports of severe skin reactions', 'monitor for signs of infection'],
+    pregnancy: 'Category C - Avoid in first trimester, use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '507',
@@ -81,7 +141,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anthelmintic used to treat various worm infections.',
     drugClass: 'Anthelmintic',
     verified: true,
-    brandNames: ['Albenza']
+    brandNames: ['Albenza'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 400 mg twice daily with meals for 8-30 days depending on condition. Hydatid disease: 400 mg twice daily for 1-6 months.',
+    mechanism: 'Inhibits tubulin polymerization, disrupting cytoplasmic microtubules in helminth cells',
+    sideEffects: ['Abdominal pain', 'nausea', 'vomiting', 'headache', 'dizziness', 'temporary hair loss', 'fever'],
+    interactions: ['Dexamethasone', 'praziquantel', 'cimetidine', 'theophylline'],
+    indications: ['Hydatid disease', 'neurocysticercosis', 'ascariasis', 'trichuriasis', 'hookworm infections'],
+    contraindications: ['Hypersensitivity to albendazole or benzimidazole compounds'],
+    warnings: ['Bone marrow suppression', 'hepatotoxicity', 'monitor blood counts and liver function'],
+    pregnancy: 'Category C - Contraindicated, teratogenic effects reported',
+    storage: 'Store at room temperature, protect from light'
   },
   
   // Additional antituberculosis drugs
@@ -94,7 +164,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antibiotic used to treat tuberculosis.',
     drugClass: 'Antituberculosis',
     verified: true,
-    brandNames: ['Nydrazid']
+    brandNames: ['Nydrazid'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5 mg/kg daily (max 300 mg) or 15 mg/kg 2-3 times weekly (max 900 mg). Take on empty stomach 1 hour before or 2 hours after meals.',
+    mechanism: 'Inhibits mycolic acid synthesis in mycobacterial cell walls by blocking InhA enzyme',
+    sideEffects: ['Peripheral neuropathy', 'hepatotoxicity', 'rash', 'fever', 'nausea', 'vomiting', 'dizziness'],
+    interactions: ['Phenytoin', 'carbamazepine', 'warfarin', 'theophylline', 'acetaminophen', 'alcohol'],
+    indications: ['Active tuberculosis (combination therapy)', 'latent tuberculosis infection'],
+    contraindications: ['Hypersensitivity', 'acute liver disease', 'previous isoniazid-associated hepatic injury'],
+    warnings: ['Hepatotoxicity', 'peripheral neuropathy', 'monitor liver function', 'supplement with pyridoxine (vitamin B6)'],
+    pregnancy: 'Category A - Safe for use in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '509',
@@ -105,7 +185,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antibiotic used to treat tuberculosis and certain other infections.',
     drugClass: 'Antituberculosis',
     verified: true,
-    brandNames: ['Rifadin', 'Rimactane']
+    brandNames: ['Rifadin', 'Rimactane'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10 mg/kg daily (max 600 mg) or 10 mg/kg 2-3 times weekly (max 600 mg). Take on empty stomach 1 hour before or 2 hours after meals.',
+    mechanism: 'Inhibits bacterial DNA-dependent RNA polymerase, preventing RNA synthesis',
+    sideEffects: ['Orange discoloration of body fluids', 'GI upset', 'hepatotoxicity', 'thrombocytopenia', 'flu-like syndrome'],
+    interactions: ['Strong CYP3A4 inducer - reduces levels of many drugs including warfarin', 'oral contraceptives', 'protease inhibitors'],
+    indications: ['Active tuberculosis', 'latent tuberculosis', 'atypical mycobacterial infections', 'prophylaxis of meningococcal disease'],
+    contraindications: ['Hypersensitivity to rifamycins', 'concurrent use with protease inhibitors'],
+    warnings: ['Hepatotoxicity', 'drug interactions', 'may cause orange discoloration of body fluids', 'monitor liver function'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '510',
@@ -116,7 +206,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antibiotic used to treat tuberculosis.',
     drugClass: 'Antituberculosis',
     verified: true,
-    brandNames: ['Myambutol']
+    brandNames: ['Myambutol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 15-25 mg/kg daily or 50 mg/kg 2-3 times weekly. Take with or without food. Monitor visual acuity regularly.',
+    mechanism: 'Inhibits arabinosyl transferases involved in mycobacterial cell wall synthesis',
+    sideEffects: ['Optic neuritis', 'decreased visual acuity', 'color blindness', 'peripheral neuropathy', 'nausea', 'headache'],
+    interactions: ['Aluminum-containing antacids (reduce absorption)'],
+    indications: ['Active tuberculosis (combination therapy)', 'atypical mycobacterial infections'],
+    contraindications: ['Hypersensitivity', 'optic neuritis', 'inability to monitor visual changes'],
+    warnings: ['Optic neuritis (dose-related)', 'monitor visual acuity and color discrimination monthly'],
+    pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '511',
@@ -127,7 +227,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Antibiotic used to treat tuberculosis.',
     drugClass: 'Antituberculosis',
     verified: true,
-    brandNames: ['Pyrazinamide']
+    brandNames: ['Pyrazinamide'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 15-30 mg/kg daily (max 2 g) or 50-70 mg/kg 2-3 times weekly (max 4 g). Take with or without food.',
+    mechanism: 'Converted to pyrazinoic acid which disrupts mycobacterial membrane transport and energy production',
+    sideEffects: ['Hepatotoxicity', 'hyperuricemia', 'arthralgia', 'nausea', 'vomiting', 'anorexia', 'malaise'],
+    interactions: ['Probenecid (may increase uric acid levels)'],
+    indications: ['Active tuberculosis (combination therapy during intensive phase)'],
+    contraindications: ['Hypersensitivity', 'severe hepatic damage', 'acute gout'],
+    warnings: ['Hepatotoxicity', 'hyperuricemia', 'monitor liver function and uric acid levels'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   
   // Additional anticonvulsants
@@ -140,7 +250,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anticonvulsant and mood stabilizer used to treat epilepsy, trigeminal neuralgia, and bipolar disorder.',
     drugClass: 'Anticonvulsant',
     verified: true,
-    brandNames: ['Tegretol', 'Carbatrol', 'Epitol']
+    brandNames: ['Tegretol', 'Carbatrol', 'Epitol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial 200 mg twice daily, increase gradually. Maintenance: 800-1200 mg daily in divided doses. Take with food to reduce GI upset.',
+    mechanism: 'Blocks voltage-gated sodium channels, stabilizing neuronal membranes and reducing repetitive firing',
+    sideEffects: ['Dizziness', 'drowsiness', 'nausea', 'vomiting', 'blurred vision', 'ataxia', 'rash', 'hyponatremia'],
+    interactions: ['CYP3A4 inducer/substrate - many drug interactions including warfarin', 'oral contraceptives', 'phenytoin', 'valproic acid'],
+    indications: ['Epilepsy (partial seizures)', 'trigeminal neuralgia', 'bipolar disorder', 'neuropathic pain'],
+    contraindications: ['Hypersensitivity', 'bone marrow depression', 'MAOIs within 14 days', 'AV heart block'],
+    warnings: ['Serious dermatologic reactions', 'aplastic anemia', 'agranulocytosis', 'hyponatremia', 'monitor blood counts'],
+    pregnancy: 'Category D - Risk of neural tube defects, use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '513',
@@ -151,7 +271,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anticonvulsant and mood stabilizer used to treat epilepsy, bipolar disorder, and migraine headaches.',
     drugClass: 'Anticonvulsant',
     verified: true,
-    brandNames: ['Depakene', 'Depakote']
+    brandNames: ['Depakene', 'Depakote'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial 10-15 mg/kg/day, increase weekly by 5-10 mg/kg/day. Maintenance: 30-60 mg/kg/day in divided doses. Take with food.',
+    mechanism: 'Increases GABA levels by inhibiting GABA transaminase and blocking voltage-gated sodium channels',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'drowsiness', 'dizziness', 'hair loss', 'weight gain', 'tremor', 'thrombocytopenia'],
+    interactions: ['Phenytoin', 'carbamazepine', 'lamotrigine', 'warfarin', 'aspirin', 'carbapenem antibiotics'],
+    indications: ['Epilepsy (absence', 'myoclonic', 'tonic-clonic seizures)', 'bipolar disorder', 'migraine prophylaxis'],
+    contraindications: ['Hepatic disease', 'urea cycle disorders', 'mitochondrial disorders', 'pregnancy (for migraine)'],
+    warnings: ['Hepatotoxicity', 'pancreatitis', 'teratogenicity', 'thrombocytopenia', 'monitor liver function and blood counts'],
+    pregnancy: 'Category D/X - High risk of neural tube defects and developmental delays, avoid if possible',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '514',
@@ -162,7 +292,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Anticonvulsant used to prevent and control seizures.',
     drugClass: 'Anticonvulsant',
     verified: true,
-    brandNames: ['Dilantin']
+    brandNames: ['Dilantin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Loading dose 15-20 mg/kg, then 4-6 mg/kg/day in divided doses. Monitor serum levels. Take consistently with or without food.',
+    mechanism: 'Blocks voltage-gated sodium channels, stabilizing neuronal membranes and preventing seizure propagation',
+    sideEffects: ['Gingival hyperplasia', 'hirsutism', 'coarsening of facial features', 'nystagmus', 'ataxia', 'confusion', 'rash'],
+    interactions: ['CYP2C9/2C19 substrate - warfarin', 'carbamazepine', 'valproic acid', 'isoniazid', 'cimetidine', 'alcohol'],
+    indications: ['Tonic-clonic seizures', 'partial seizures', 'status epilepticus', 'trigeminal neuralgia'],
+    contraindications: ['Hypersensitivity', 'sinus bradycardia', 'SA block', 'second/third-degree AV block'],
+    warnings: ['Serious dermatologic reactions', 'lymphadenopathy', 'hepatotoxicity', 'monitor serum levels'],
+    pregnancy: 'Category D - Risk of fetal hydantoin syndrome, use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '515',
@@ -173,7 +313,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Barbiturate anticonvulsant used to control seizures.',
     drugClass: 'Barbiturate',
     verified: true,
-    brandNames: ['Luminal']
+    brandNames: ['Luminal'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Oral: 1-3 mg/kg/day in divided doses. Loading dose: 15-20 mg/kg. Take with or without food. Monitor serum levels.',
+    mechanism: 'Enhances GABA-mediated inhibition by prolonging chloride channel opening',
+    sideEffects: ['Sedation', 'cognitive impairment', 'ataxia', 'nystagmus', 'rash', 'megaloblastic anemia', 'osteomalacia'],
+    interactions: ['CYP inducer - reduces levels of many drugs including warfarin', 'oral contraceptives', 'corticosteroids'],
+    indications: ['Tonic-clonic seizures', 'partial seizures', 'status epilepticus', 'neonatal seizures'],
+    contraindications: ['Hypersensitivity to barbiturates', 'severe respiratory depression', 'porphyria'],
+    warnings: ['Physical dependence', 'withdrawal seizures', 'respiratory depression', 'cognitive effects in children'],
+    pregnancy: 'Category D - Risk of bleeding in newborns, use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   
   // Remaining entries to reach over 500 drugs
@@ -187,7 +337,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Alpha-1 blocker used to treat symptoms of an enlarged prostate.',
     drugClass: 'Alpha-1 blocker',
     verified: true,
-    brandNames: ['Flomax']
+    brandNames: ['Flomax'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 0.4 mg once daily, 30 minutes after the same meal each day. May increase to 0.8 mg daily if needed.',
+    mechanism: 'Selectively blocks alpha-1A adrenergic receptors in prostate smooth muscle, reducing urethral resistance',
+    sideEffects: ['Dizziness', 'headache', 'abnormal ejaculation', 'rhinitis', 'orthostatic hypotension', 'asthenia'],
+    interactions: ['CYP3A4/2D6 inhibitors', 'alpha-blockers', 'PDE5 inhibitors', 'warfarin'],
+    indications: ['Benign prostatic hyperplasia (BPH)', 'ureteral stones (off-label)'],
+    contraindications: ['Hypersensitivity to tamsulosin or sulfonamides'],
+    warnings: ['Orthostatic hypotension', 'priapism', 'intraoperative floppy iris syndrome', 'syncope'],
+    pregnancy: 'Not applicable (male-only indication)',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '517',
@@ -198,7 +358,17 @@ export const extraWHODrugs: DrugData[] = [
     description: '5-alpha reductase inhibitor used to treat enlarged prostate and male pattern baldness.',
     drugClass: '5-alpha reductase inhibitor',
     verified: true,
-    brandNames: ['Proscar', 'Propecia']
+    brandNames: ['Proscar', 'Propecia'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: BPH: 5 mg once daily. Male pattern baldness: 1 mg once daily. Take with or without food.',
+    mechanism: 'Inhibits 5-alpha reductase, reducing conversion of testosterone to dihydrotestosterone (DHT)',
+    sideEffects: ['Decreased libido', 'erectile dysfunction', 'ejaculation disorders', 'breast tenderness', 'depression'],
+    interactions: ['No significant drug interactions reported'],
+    indications: ['Benign prostatic hyperplasia', 'male pattern baldness (androgenetic alopecia)'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'women of childbearing potential'],
+    warnings: ['Sexual dysfunction may persist after discontinuation', 'increased risk of high-grade prostate cancer'],
+    pregnancy: 'Category X - Contraindicated in pregnancy, can cause genital abnormalities in male fetuses',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '518',
@@ -209,7 +379,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Phosphodiesterase type 5 (PDE5) inhibitor used to treat erectile dysfunction and pulmonary arterial hypertension.',
     drugClass: 'PDE5 inhibitor',
     verified: true,
-    brandNames: ['Viagra', 'Revatio']
+    brandNames: ['Viagra', 'Revatio'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: ED: 25-100 mg 1 hour before sexual activity (max once daily). PAH: 20 mg three times daily. Take on empty stomach for faster onset.',
+    mechanism: 'Inhibits phosphodiesterase type 5, increasing cGMP levels and causing smooth muscle relaxation',
+    sideEffects: ['Headache', 'flushing', 'dyspepsia', 'nasal congestion', 'dizziness', 'visual disturbances', 'priapism'],
+    interactions: ['Nitrates (contraindicated)', 'alpha-blockers', 'CYP3A4 inhibitors', 'riociguat'],
+    indications: ['Erectile dysfunction', 'pulmonary arterial hypertension'],
+    contraindications: ['Nitrate use', 'severe cardiovascular disease', 'severe hepatic impairment', 'hypotension'],
+    warnings: ['Priapism', 'sudden vision/hearing loss', 'cardiovascular events', 'hypotension with alpha-blockers'],
+    pregnancy: 'Category B - Not indicated for use in women',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '519',
@@ -220,7 +400,17 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Phosphodiesterase type 5 (PDE5) inhibitor used to treat erectile dysfunction, pulmonary arterial hypertension, and benign prostatic hyperplasia.',
     drugClass: 'PDE5 inhibitor',
     verified: true,
-    brandNames: ['Cialis', 'Adcirca']
+    brandNames: ['Cialis', 'Adcirca'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: ED: 10-20 mg before sexual activity or 2.5-5 mg daily. BPH: 5 mg daily. PAH: 40 mg daily. Take with or without food.',
+    mechanism: 'Inhibits phosphodiesterase type 5, increasing cGMP levels and causing smooth muscle relaxation',
+    sideEffects: ['Headache', 'dyspepsia', 'back pain', 'myalgia', 'nasal congestion', 'flushing', 'limb pain'],
+    interactions: ['Nitrates (contraindicated)', 'alpha-blockers', 'CYP3A4 inhibitors', 'riociguat'],
+    indications: ['Erectile dysfunction', 'benign prostatic hyperplasia', 'pulmonary arterial hypertension'],
+    contraindications: ['Nitrate use', 'severe cardiovascular disease', 'severe hepatic impairment'],
+    warnings: ['Priapism', 'sudden vision/hearing loss', 'cardiovascular events', 'hypotension with alpha-blockers'],
+    pregnancy: 'Category B - Not typically used in women',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '520',
@@ -231,6 +421,16 @@ export const extraWHODrugs: DrugData[] = [
     description: 'Phosphodiesterase type 5 (PDE5) inhibitor used to treat erectile dysfunction.',
     drugClass: 'PDE5 inhibitor',
     verified: true,
-    brandNames: ['Levitra', 'Staxyn']
+    brandNames: ['Levitra', 'Staxyn'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5-20 mg 1 hour before sexual activity (max once daily). ODT: 10 mg on tongue without water. Take on empty stomach for best results.',
+    mechanism: 'Inhibits phosphodiesterase type 5, increasing cGMP levels and causing penile smooth muscle relaxation',
+    sideEffects: ['Headache', 'flushing', 'rhinitis', 'dyspepsia', 'dizziness', 'back pain', 'flu-like symptoms'],
+    interactions: ['Nitrates (contraindicated)', 'alpha-blockers', 'CYP3A4 inhibitors', 'riociguat', 'Class IA/III antiarrhythmics'],
+    indications: ['Erectile dysfunction'],
+    contraindications: ['Nitrate use', 'severe cardiovascular disease', 'severe hepatic impairment', 'QT prolongation'],
+    warnings: ['Priapism', 'sudden vision/hearing loss', 'QT prolongation', 'cardiovascular events'],
+    pregnancy: 'Not applicable (male-only indication)',
+    storage: 'Store at room temperature, protect from light and moisture'
   }
 ];

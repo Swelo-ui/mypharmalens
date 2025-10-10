@@ -12,7 +12,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Penicillin antibiotic used to treat bacterial infections',
     drugClass: 'Penicillin',
     verified: true,
-    brandNames: ['Amoxil']
+    brandNames: ['Amoxil'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 8 hours or 500-875mg every 12 hours. Children: 20-40mg/kg/day divided every 8 hours. Take with or without food.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing cell wall weakening and bacterial lysis.',
+    sideEffects: ['Common: Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'headache. Serious: Clostridioides difficile-associated diarrhea', 'severe allergic reactions.'],
+    interactions: ['Probenecid increases amoxicillin levels. May reduce effectiveness of oral contraceptives. Allopurinol increases risk of skin rash.'],
+    indications: ['Respiratory tract infections', 'urinary tract infections', 'skin and soft tissue infections', 'otitis media', 'sinusitis', 'dental infections.'],
+    contraindications: ['Hypersensitivity to penicillins or any component. History of severe allergic reaction to beta-lactam antibiotics.'],
+    warnings: ['Monitor for signs of allergic reactions. Complete full course even if symptoms improve. May cause antibiotic-associated diarrhea.'],
+    pregnancy: 'Category B - Generally considered safe during pregnancy. Crosses placenta but no evidence of harm to fetus.',
+    storage: 'Store capsules/tablets at room temperature 20-25°C. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
     id: '16',
@@ -23,7 +33,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Macrolide antibiotic used to treat bacterial infections',
     drugClass: 'Macrolide',
     verified: true,
-    brandNames: ['Zithromax']
+    brandNames: ['Zithromax'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 500mg on day 1, then 250mg daily for 4 days. Or 500mg daily for 3 days. Take on empty stomach 1 hour before or 2 hours after meals.',
+    mechanism: 'Binds to 50S ribosomal subunit, inhibiting bacterial protein synthesis by blocking peptide chain elongation.',
+    sideEffects: ['Common: Nausea', 'vomiting', 'diarrhea', 'abdominal pain. Serious: QT prolongation', 'hepatotoxicity', 'severe allergic reactions.'],
+    interactions: ['Warfarin (increased bleeding risk)', 'digoxin (increased levels)', 'antacids (decreased absorption). Avoid with other QT-prolonging drugs.'],
+    indications: ['Respiratory tract infections', 'skin infections', 'sexually transmitted infections', 'otitis media', 'community-acquired pneumonia.'],
+    contraindications: ['Hypersensitivity to azithromycin or macrolides. History of cholestatic jaundice with azithromycin use.'],
+    warnings: ['Monitor for cardiac arrhythmias', 'especially in patients with risk factors for QT prolongation. Complete full course of therapy.'],
+    pregnancy: 'Category B - Generally considered safe during pregnancy. Limited human data but no evidence of teratogenicity.',
+    storage: 'Store tablets at room temperature 15-30°C. Oral suspension: store at room temperature, use within 10 days after reconstitution.'
   },
   {
     id: '207',
@@ -34,7 +54,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Macrolide antibiotic used to treat various bacterial infections, including respiratory tract infections, skin infections, and H. pylori infections.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
-    brandNames: ['Biaxin', 'Klacid']
+    brandNames: ['Biaxin', 'Klacid'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 12 hours for 7-14 days. Extended-release: 1000mg once daily. Take with food to reduce GI upset.',
+    mechanism: 'Binds to 50S ribosomal subunit, inhibiting bacterial protein synthesis and preventing bacterial growth.',
+    sideEffects: ['Common: Nausea', 'diarrhea', 'abnormal taste', 'dyspepsia. Serious: QT prolongation', 'hepatotoxicity', 'severe skin reactions.'],
+    interactions: ['Strong CYP3A4 inhibitor - increases levels of many drugs including warfarin', 'digoxin', 'theophylline. Avoid with ergot alkaloids.'],
+    indications: ['Respiratory infections', 'skin infections', 'H. pylori eradication', 'atypical mycobacterial infections', 'pertussis.'],
+    contraindications: ['Hypersensitivity to macrolides. Concurrent use with cisapride', 'pimozide', 'or ergot alkaloids. History of QT prolongation.'],
+    warnings: ['Monitor liver function. Risk of cardiac arrhythmias. May exacerbate myasthenia gravis. Complete full course of therapy.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies risk. Animal studies show adverse effects.',
+    storage: 'Store tablets at room temperature 15-30°C. Oral suspension: refrigerate and use within 14 days after reconstitution.'
   },
   {
     id: '208',
@@ -45,7 +75,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Macrolide antibiotic used to treat a variety of bacterial infections.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
-    brandNames: ['E-Mycin', 'Eryc', 'Erythrocin']
+    brandNames: ['E-Mycin', 'Eryc', 'Erythrocin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 6 hours or 333mg every 8 hours. Children: 30-50mg/kg/day divided every 6-8 hours. Take on empty stomach.',
+    mechanism: 'Binds reversibly to 50S ribosomal subunit, inhibiting bacterial protein synthesis by blocking peptidyl transfer.',
+    sideEffects: ['Common: Nausea', 'vomiting', 'abdominal cramping', 'diarrhea. Serious: QT prolongation', 'hepatotoxicity', 'ototoxicity at high doses.'],
+    interactions: ['CYP3A4 inhibitor - increases levels of warfarin', 'digoxin', 'theophylline', 'carbamazepine. Enhances effects of oral anticoagulants.'],
+    indications: ['Respiratory infections', 'skin infections', 'pertussis', 'diphtheria', 'chlamydial infections', 'alternative to penicillin in allergic patients.'],
+    contraindications: ['Hypersensitivity to macrolides. Concurrent use with cisapride', 'pimozide', 'or ergot alkaloids.'],
+    warnings: ['Monitor for cardiac arrhythmias and hepatotoxicity. May cause infantile hypertrophic pyloric stenosis in neonates.'],
+    pregnancy: 'Category B - Generally considered safe. Preferred macrolide during pregnancy for susceptible infections.',
+    storage: 'Store at room temperature 15-30°C. Protect from light and moisture. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
     id: '209',
@@ -55,8 +95,18 @@ export const antibioticDrugs: DrugData[] = [
     category: 'Antibiotic',
     description: 'Combination antibiotic used to treat a variety of bacterial infections.',
     drugClass: 'Sulfonamide antibiotic',
-    verified: true,
-    brandNames: ['Bactrim', 'Septra', 'Cotrim']
+    brandNames: ['Bactrim', 'Septra', 'Cotrim'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 1-2 double-strength tablets every 12 hours. Children: 8-12mg/kg/day (trimethoprim component) divided every 12 hours. Take with full glass of water.',
+    mechanism: 'Sequential blockade of folate synthesis - sulfamethoxazole inhibits dihydrofolate synthesis, trimethoprim inhibits dihydrofolate reductase.',
+    sideEffects: ['Common: Nausea', 'vomiting', 'anorexia', 'rash. Serious: Stevens-Johnson syndrome', 'bone marrow suppression', 'hyperkalemia.'],
+    interactions: ['Warfarin (increased bleeding)', 'metformin (increased levels)', 'ACE inhibitors (hyperkalemia risk). Monitor with digoxin', 'phenytoin.'],
+    indications: ['Urinary tract infections', 'pneumocystis pneumonia', 'traveler\'s diarrhea', 'MRSA skin infections', 'nocardiosis'],
+    contraindications: ['Hypersensitivity to sulfonamides or trimethoprim. Megaloblastic anemia due to folate deficiency. Severe renal/hepatic impairment.'],
+    warnings: ['Monitor CBC and electrolytes. Increased risk of severe reactions in elderly. Maintain adequate hydration to prevent crystalluria.'],
+    pregnancy: 'Category C/D - Avoid in first trimester and near term. Risk of neural tube defects and kernicterus',
+    storage: 'Store tablets at room temperature 15-30°C. Protect from light. Oral suspension: store at room temperature, discard after 14 days',
+    verified: true
   },
   {
     id: '210',
@@ -67,7 +117,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including respiratory, urinary tract, and skin infections.',
     drugClass: 'Fluoroquinolone antibiotic',
     verified: true,
-    brandNames: ['Levaquin', 'Quixin', 'Iquix']
+    brandNames: ['Levaquin', 'Quixin', 'Iquix'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-750mg once daily for 3-14 days depending on infection. Take with or without food. Maintain adequate hydration.',
+    mechanism: 'Inhibits bacterial DNA gyrase and topoisomerase IV, preventing DNA replication and transcription, leading to bacterial death.',
+    sideEffects: ['Common: Nausea', 'diarrhea', 'headache', 'insomnia. Serious: Tendon rupture', 'peripheral neuropathy', 'QT prolongation', 'CNS effects.'],
+    interactions: ['Antacids', 'iron', 'zinc reduce absorption. Warfarin (increased bleeding). NSAIDs (increased seizure risk). Avoid with Class IA/III antiarrhythmics.'],
+    indications: ['Community-acquired pneumonia', 'acute bacterial sinusitis', 'complicated UTI', 'skin infections', 'chronic bacterial prostatitis.'],
+    contraindications: ['Hypersensitivity to fluoroquinolones. History of tendon disorders related to fluoroquinolone use.'],
+    warnings: ['Black box warning for tendon rupture', 'peripheral neuropathy', 'CNS effects. Avoid in patients >60 years', 'steroid use', 'or organ transplant.'],
+    pregnancy: 'Category C - Avoid during pregnancy due to potential for cartilage damage in developing fetus.',
+    storage: 'Store tablets at room temperature 15-30°C. Protect from light. Oral solution: store at room temperature, discard after 14 days.'
   },
   {
     id: '211',
@@ -78,7 +138,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'First-generation cephalosporin antibiotic used to treat bacterial infections including upper respiratory, ear, skin, and urinary tract infections.',
     drugClass: 'Cephalosporin antibiotic',
     verified: true,
-    brandNames: ['Keflex', 'Ceporex']
+    brandNames: ['Keflex', 'Ceporex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 6 hours or 500mg every 12 hours. Children: 25-50mg/kg/day divided every 6-12 hours. Take with or without food.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing cell wall disruption and bacterial lysis.',
+    sideEffects: ['Common: Nausea', 'diarrhea', 'dyspepsia', 'abdominal pain. Serious: Clostridioides difficile-associated diarrhea', 'severe allergic reactions.'],
+    interactions: ['Probenecid increases cephalexin levels. May reduce effectiveness of oral contraceptives. Monitor with anticoagulants.'],
+    indications: ['Skin and soft tissue infections', 'respiratory tract infections', 'urinary tract infections', 'otitis media', 'bone infections.'],
+    contraindications: ['Hypersensitivity to cephalosporins. Use caution in patients with penicillin allergy (cross-reactivity 1-10%).'],
+    warnings: ['Monitor for signs of allergic reactions. Complete full course of therapy. May cause false-positive urine glucose tests.'],
+    pregnancy: 'Category B - Generally considered safe during pregnancy. Crosses placenta but no evidence of teratogenicity.',
+    storage: 'Store capsules at room temperature 15-30°C. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
     id: '212',
@@ -89,7 +159,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Third-generation cephalosporin antibiotic used to treat serious bacterial infections.',
     drugClass: 'Cephalosporin antibiotic',
     verified: true,
-    brandNames: ['Rocephin', 'Ceftriaxone Sandoz']
+    brandNames: ['Rocephin', 'Ceftriaxone Sandoz'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 1-2g IV/IM every 12-24 hours. Children: 50-75mg/kg/day divided every 12-24 hours. Maximum 2g/day in children.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, particularly effective against gram-negative bacteria.',
+    sideEffects: ['Common: Pain at injection site', 'diarrhea', 'rash. Serious: Clostridioides difficile colitis', 'biliary slugging', 'severe allergic reactions.'],
+    interactions: ['Incompatible with calcium-containing solutions. May enhance anticoagulant effects. Avoid concurrent calcium administration in neonates.'],
+    indications: ['Meningitis', 'pneumonia', 'septicemia', 'gonorrhea', 'pelvic inflammatory disease', 'complicated intra-abdominal infections.'],
+    contraindications: ['Hypersensitivity to cephalosporins. Neonates with hyperbilirubinemia. Concurrent calcium-containing IV solutions in neonates.'],
+    warnings: ['Monitor for biliary complications. Risk of kernicterus in neonates. Complete full course of therapy.'],
+    pregnancy: 'Category B - Generally considered safe during pregnancy. Crosses placenta but no evidence of harm.',
+    storage: 'Store vials at room temperature. Reconstituted solution stable for 24 hours at room temperature or 3 days refrigerated.'
   },
   {
     id: '301',
@@ -100,7 +180,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Fluoroquinolone antibiotic used to treat various bacterial infections.',
     drugClass: 'Fluoroquinolone antibiotic',
     verified: true,
-    brandNames: ['Cipro', 'Ciprodex']
+    brandNames: ['Cipro', 'Ciprodex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-750mg every 12 hours for 3-14 days. Take 2 hours before or 6 hours after antacids, iron, or zinc supplements.',
+    mechanism: 'Inhibits bacterial DNA gyrase and topoisomerase IV, preventing DNA replication and repair, leading to bacterial death.',
+    sideEffects: ['Common: Nausea', 'diarrhea', 'dizziness', 'headache. Serious: Tendon rupture', 'peripheral neuropathy', 'QT prolongation', 'seizures.'],
+    interactions: ['Antacids', 'iron', 'zinc reduce absorption. Theophylline', 'warfarin levels increased. NSAIDs increase seizure risk. Avoid with tizanidine.'],
+    indications: ['Urinary tract infections', 'respiratory infections', 'skin infections', 'bone/joint infections', 'infectious diarrhea', 'anthrax exposure.'],
+    contraindications: ['Hypersensitivity to fluoroquinolones. Concurrent use with tizanidine. History of tendon disorders with fluoroquinolones.'],
+    warnings: ['Black box warning for tendon rupture', 'peripheral neuropathy', 'CNS effects. Avoid in patients >60', 'steroid use', 'or organ transplant.'],
+    pregnancy: 'Category C - Avoid during pregnancy and breastfeeding due to potential cartilage damage in developing joints.',
+    storage: 'Store tablets at room temperature 15-30°C. Oral suspension: store at room temperature, discard after 14 days.'
   },
   {
     id: '302',
@@ -111,7 +201,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Tetracycline antibiotic used to treat various bacterial infections and certain parasitic diseases.',
     drugClass: 'Tetracycline antibiotic',
     verified: true,
-    brandNames: ['Vibramycin', 'Oracea', 'Doryx']
+    brandNames: ['Vibramycin', 'Oracea', 'Doryx'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 100mg every 12 hours or 200mg once daily. Children >8 years: 2-4mg/kg/day. Take with food and full glass of water.',
+    mechanism: 'Binds to 30S ribosomal subunit, inhibiting bacterial protein synthesis by preventing tRNA binding.',
+    sideEffects: ['Common: Nausea', 'vomiting', 'diarrhea', 'photosensitivity. Serious: Clostridioides difficile colitis', 'intracranial hypertension', 'esophageal ulceration.'],
+    interactions: ['Antacids', 'iron', 'calcium reduce absorption. May enhance warfarin effects. Reduces effectiveness of oral contraceptives.'],
+    indications: ['Respiratory infections', 'acne', 'malaria prophylaxis', 'Lyme disease', 'chlamydial infections', 'rickettsial diseases.'],
+    contraindications: ['Hypersensitivity to tetracyclines. Children <8 years (tooth discoloration). Pregnancy (tooth/bone development issues).'],
+    warnings: ['Avoid sun exposure (photosensitivity). Take with adequate fluid to prevent esophageal irritation. Complete full course.'],
+    pregnancy: 'Category D - Contraindicated in pregnancy. Causes permanent tooth discoloration and inhibits bone growth in fetus.',
+    storage: 'Store at room temperature 15-30°C. Protect from light and moisture. Discard expired medication (nephrotoxic).'
   },
   {
     id: '303',
@@ -122,7 +222,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Antibiotic and antiprotozoal medication used to treat bacterial infections of the vagina, stomach, skin, joints, and respiratory tract.',
     drugClass: 'Nitroimidazole antibiotic',
     verified: true,
-    brandNames: ['Flagyl', 'Metrocream', 'Metrogel']
+    brandNames: ['Flagyl', 'Metrocream', 'Metrogel'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 8 hours or 750mg every 8 hours for severe infections. Children: 15-35mg/kg/day divided every 8 hours.',
+    mechanism: 'Disrupts DNA synthesis in anaerobic bacteria and protozoa by forming toxic metabolites that damage DNA strands.',
+    sideEffects: ['Common: Nausea', 'metallic taste', 'headache', 'dizziness. Serious: Peripheral neuropathy', 'seizures', 'severe skin reactions.'],
+    interactions: ['Disulfiram-like reaction with alcohol. Increases warfarin effects. May increase lithium and phenytoin levels.'],
+    indications: ['Anaerobic bacterial infections', 'bacterial vaginosis', 'trichomoniasis', 'amebiasis', 'H. pylori eradication', 'Clostridioides difficile colitis.'],
+    contraindications: ['Hypersensitivity to nitroimidazoles. First trimester of pregnancy. Concurrent alcohol use or disulfiram.'],
+    warnings: ['Avoid alcohol during treatment and for 48 hours after. Monitor for neurological symptoms. Complete full course of therapy.'],
+    pregnancy: 'Category B - Avoid in first trimester. Generally considered safe in second and third trimesters when benefits outweigh risks.',
+    storage: 'Store tablets at room temperature 15-30°C. Protect from light. Topical preparations: store at room temperature.'
   },
   {
     id: '304',
@@ -133,7 +243,17 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Glycopeptide antibiotic used to treat severe bacterial infections, particularly those caused by Gram-positive bacteria.',
     drugClass: 'Glycopeptide antibiotic',
     verified: true,
-    brandNames: ['Vancocin', 'Firvanq']
+    brandNames: ['Vancocin', 'Firvanq'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 15-20mg/kg IV every 8-12 hours. Oral: 125-500mg every 6 hours for C. diff. Requires therapeutic drug monitoring.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to D-alanyl-D-alanine terminus of peptidoglycan precursors.',
+    sideEffects: ['Common: Nephrotoxicity', 'ototoxicity', 'red man syndrome. Serious: Severe hypotension', 'cardiac arrest with rapid infusion.'],
+    interactions: ['Increased nephrotoxicity with aminoglycosides', 'amphotericin B', 'cisplatin. Enhanced ototoxicity with loop diuretics.'],
+    indications: ['MRSA infections', 'endocarditis', 'meningitis', 'severe staphylococcal infections', 'Clostridioides difficile colitis (oral).'],
+    contraindications: ['Hypersensitivity to vancomycin. Use caution in patients with hearing loss or kidney disease.'],
+    warnings: ['Monitor renal function and hearing. Infuse slowly over 60+ minutes to prevent red man syndrome. Therapeutic drug monitoring required.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies risk. Limited human data available.',
+    storage: 'Store vials at room temperature. Reconstituted solution stable for 14 days refrigerated. Oral solution: refrigerate, discard after 14 days.'
   },
   {
     id: '305',
@@ -144,6 +264,16 @@ export const antibioticDrugs: DrugData[] = [
     description: 'Lincosamide antibiotic used to treat serious bacterial infections, particularly those caused by anaerobic bacteria.',
     drugClass: 'Lincosamide antibiotic',
     verified: true,
-    brandNames: ['Cleocin', 'Clindesse', 'Evoclin']
+    brandNames: ['Cleocin', 'Clindesse', 'Evoclin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 150-450mg every 6 hours orally, or 600-900mg IV every 8 hours. Children: 8-25mg/kg/day divided every 6-8 hours.',
+    mechanism: 'Binds to 50S ribosomal subunit, inhibiting bacterial protein synthesis by blocking peptide bond formation.',
+    sideEffects: ['Common: Diarrhea', 'nausea', 'abdominal pain', 'rash. Serious: Clostridioides difficile-associated diarrhea', 'severe colitis.'],
+    interactions: ['Antagonistic with erythromycin and chloramphenicol. May enhance neuromuscular blocking agents. Monitor with warfarin.'],
+    indications: ['Anaerobic infections', 'skin and soft tissue infections', 'bone/joint infections', 'bacterial vaginosis', 'acne (topical).'],
+    contraindications: ['Hypersensitivity to clindamycin or lincomycin. History of antibiotic-associated colitis with clindamycin.'],
+    warnings: ['High risk of Clostridioides difficile colitis. Discontinue if severe diarrhea develops. Monitor liver function with prolonged use.'],
+    pregnancy: 'Category B - Generally considered safe during pregnancy. Crosses placenta but no evidence of teratogenicity.',
+    storage: 'Store capsules at room temperature 15-30°C. Topical preparations: store at room temperature. Oral solution: do not refrigerate.'
   }
 ];

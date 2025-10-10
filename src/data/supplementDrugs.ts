@@ -12,7 +12,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat vitamin B12 deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 25-100 mcg daily for maintenance. IM/SubQ: 100-1000 mcg monthly for deficiency. Take with food to reduce GI upset.',
+    mechanism: 'Essential cofactor for DNA synthesis, fatty acid synthesis, and amino acid metabolism',
+    sideEffects: ['Generally well tolerated. Rare: allergic reactions', 'hypokalemia', 'polycythemia vera'],
+    interactions: ['Metformin', 'proton pump inhibitors', 'H2 blockers', 'chloramphenicol', 'colchicine'],
+    indications: ['Vitamin B12 deficiency', 'pernicious anemia', 'dietary supplementation'],
+    contraindications: ['Hypersensitivity to cyanocobalamin or cobalt'],
+    warnings: ['May mask folate deficiency', 'monitor potassium levels with high doses'],
+    pregnancy: 'Category A - Safe during pregnancy and breastfeeding',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '44',
@@ -23,7 +33,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat vitamin D deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 400-4000 IU daily for maintenance. 50,000 IU weekly for deficiency. Take with fat-containing meal for better absorption.',
+    mechanism: 'Converted to calcitriol, regulates calcium and phosphate homeostasis, bone mineralization',
+    sideEffects: ['Hypercalcemia', 'hypercalciuria', 'kidney stones', 'nausea', 'vomiting', 'weakness'],
+    interactions: ['Thiazide diuretics', 'digoxin', 'calcium channel blockers', 'aluminum-containing antacids'],
+    indications: ['Vitamin D deficiency', 'osteoporosis prevention', 'rickets', 'osteomalacia'],
+    contraindications: ['Hypercalcemia', 'hypercalciuria', 'kidney stones', 'sarcoidosis'],
+    warnings: ['Monitor serum calcium and 25(OH)D levels', 'avoid excessive doses'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '45',
@@ -34,7 +54,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat vitamin D deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 400-4000 IU daily for maintenance. 50,000 IU weekly for 6-8 weeks for deficiency. Take with meals.',
+    mechanism: 'Plant-derived vitamin D2, converted to active hormone regulating calcium absorption',
+    sideEffects: ['Hypercalcemia', 'hypercalciuria', 'kidney stones', 'nausea', 'vomiting', 'constipation'],
+    interactions: ['Thiazide diuretics', 'digoxin', 'phenytoin', 'glucocorticoids'],
+    indications: ['Vitamin D deficiency', 'hypoparathyroidism', 'rickets', 'osteomalacia'],
+    contraindications: ['Hypercalcemia', 'hypercalciuria', 'malabsorption syndrome'],
+    warnings: ['Less potent than cholecalciferol', 'monitor calcium levels'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '46',
@@ -45,7 +75,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat folic acid deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 400-800 mcg daily for prevention. 1-5 mg daily for deficiency. Take on empty stomach or with food.',
+    mechanism: 'Essential cofactor for DNA synthesis, amino acid metabolism, and red blood cell formation',
+    sideEffects: ['Generally well tolerated. Rare: allergic reactions', 'sleep disturbances', 'irritability'],
+    interactions: ['Methotrexate', 'phenytoin', 'sulfasalazine', 'trimethoprim', 'zinc'],
+    indications: ['Folate deficiency', 'neural tube defect prevention', 'megaloblastic anemia'],
+    contraindications: ['Hypersensitivity', 'undiagnosed anemia (may mask B12 deficiency)'],
+    warnings: ['May mask vitamin B12 deficiency', 'high doses may reduce zinc absorption'],
+    pregnancy: 'Category A - Essential during pregnancy, prevents neural tube defects',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '47',
@@ -56,7 +96,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat niacin deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 14-16 mg daily for RDA. 100-500 mg daily for deficiency. 1-3 g daily for hyperlipidemia. Take with food to reduce flushing.',
+    mechanism: 'Precursor to NAD and NADP, essential for cellular energy metabolism',
+    sideEffects: ['Flushing', 'pruritus', 'GI upset', 'hepatotoxicity (high doses)', 'hyperglycemia', 'hyperuricemia'],
+    interactions: ['Statins (increased myopathy risk)', 'anticoagulants', 'antidiabetic drugs'],
+    indications: ['Niacin deficiency', 'pellagra', 'hyperlipidemia (prescription doses)'],
+    contraindications: ['Active liver disease', 'active peptic ulcer', 'arterial bleeding'],
+    warnings: ['Monitor liver function with high doses', 'may worsen diabetes and gout'],
+    pregnancy: 'Category A in RDA doses, Category C in pharmacologic doses',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '48',
@@ -67,7 +117,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat riboflavin deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1.1-1.3 mg daily for RDA. 5-30 mg daily for deficiency. Take with food for better absorption.',
+    mechanism: 'Precursor to FAD and FMN, essential cofactors in energy metabolism',
+    sideEffects: ['Generally well tolerated. High doses may cause yellow-orange urine discoloration'],
+    interactions: ['Probenecid (decreases absorption)', 'phenothiazines', 'tricyclic antidepressants'],
+    indications: ['Riboflavin deficiency', 'ariboflavinosis', 'migraine prevention (high doses)'],
+    contraindications: ['Hypersensitivity to riboflavin'],
+    warnings: ['Urine discoloration is harmless', 'photosensitive vitamin'],
+    pregnancy: 'Category A - Safe during pregnancy',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '49',
@@ -78,7 +138,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat thiamine deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1-1.2 mg daily for RDA. 50-100 mg daily for deficiency. IM/IV: 100 mg for acute deficiency. Take on empty stomach.',
+    mechanism: 'Essential cofactor for carbohydrate metabolism and neural function',
+    sideEffects: ['Generally well tolerated. Rare: allergic reactions', 'anaphylaxis (IV route)'],
+    interactions: ['Loop diuretics', 'phenytoin', 'digoxin (may increase requirements)'],
+    indications: ['Thiamine deficiency', 'beriberi', 'Wernicke-Korsakoff syndrome', 'alcoholism'],
+    contraindications: ['Hypersensitivity to thiamine'],
+    warnings: ['IV administration may cause anaphylaxis', 'give slowly'],
+    pregnancy: 'Category A - Safe during pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '50',
@@ -89,7 +159,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat pyridoxine deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1.3-1.7 mg daily for RDA. 25-100 mg daily for deficiency. 100-200 mg daily for nausea in pregnancy. Take with food.',
+    mechanism: 'Essential cofactor for amino acid metabolism, neurotransmitter synthesis, and hemoglobin formation',
+    sideEffects: ['Peripheral neuropathy (high doses >200 mg/day)', 'photosensitivity', 'nausea'],
+    interactions: ['Levodopa', 'phenytoin', 'phenobarbital', 'isoniazid', 'hydralazine'],
+    indications: ['Pyridoxine deficiency', 'pregnancy nausea', 'premenstrual syndrome', 'carpal tunnel syndrome'],
+    contraindications: ['Hypersensitivity to pyridoxine'],
+    warnings: ['High doses may cause irreversible peripheral neuropathy'],
+    pregnancy: 'Category A - Safe for morning sickness treatment',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '51',
@@ -100,7 +180,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat ascorbic acid deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 75-90 mg daily for RDA. 100-500 mg daily for deficiency. 1-2 g daily for immune support. Take with food to reduce GI upset.',
+    mechanism: 'Essential for collagen synthesis, antioxidant activity, and immune function',
+    sideEffects: ['GI upset', 'diarrhea', 'kidney stones (high doses)', 'iron overload in susceptible individuals'],
+    interactions: ['Iron (enhances absorption)', 'warfarin', 'aluminum-containing antacids'],
+    indications: ['Vitamin C deficiency', 'scurvy', 'wound healing', 'immune support'],
+    contraindications: ['Hypersensitivity', 'hemochromatosis', 'glucose-6-phosphate dehydrogenase deficiency'],
+    warnings: ['High doses may cause kidney stones', 'rebound scurvy with sudden discontinuation'],
+    pregnancy: 'Category A - Safe during pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '52',
@@ -111,7 +201,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat retinol deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 700-900 mcg RAE daily for RDA. 1500-3000 mcg RAE daily for deficiency. Take with fat-containing meal for better absorption.',
+    mechanism: 'Essential for vision, immune function, cell differentiation, and reproduction',
+    sideEffects: ['Hypervitaminosis A: nausea', 'vomiting', 'headache', 'dizziness', 'blurred vision', 'muscle aches', 'liver toxicity'],
+    interactions: ['Warfarin', 'tetracyclines', 'orlistat', 'cholestyramine', 'alcohol'],
+    indications: ['Vitamin A deficiency', 'night blindness', 'xerophthalmia', 'immune support'],
+    contraindications: ['Hypervitaminosis A', 'pregnancy (high doses)', 'liver disease'],
+    warnings: ['Teratogenic in high doses', 'avoid excessive intake', 'monitor liver function'],
+    pregnancy: 'Category A in RDA doses, Category X in high doses (>3000 mcg/day)',
+    storage: 'Store at room temperature, protect from light and air'
   },
   {
     id: '53',
@@ -122,7 +222,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat tocopherol deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 15 mg (22.4 IU) daily for RDA. 100-800 IU daily for supplementation. Take with fat-containing meal.',
+    mechanism: 'Potent antioxidant protecting cell membranes from oxidative damage',
+    sideEffects: ['Generally well tolerated. High doses: bleeding', 'fatigue', 'weakness', 'nausea', 'diarrhea'],
+    interactions: ['Warfarin (increased bleeding risk)', 'cyclosporine', 'statins', 'iron supplements'],
+    indications: ['Vitamin E deficiency', 'antioxidant support', 'cardiovascular health'],
+    contraindications: ['Hypersensitivity', 'bleeding disorders (high doses)'],
+    warnings: ['High doses may increase bleeding risk', 'especially with anticoagulants'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from light and heat'
   },
   {
     id: '54',
@@ -133,7 +243,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Vitamin supplement used to treat phytonadione deficiency',
     drugClass: 'Vitamin',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 90-120 mcg daily for RDA. 2.5-25 mg daily for deficiency. IM/IV: 0.5-1 mg for newborns. Take with fat-containing meal.',
+    mechanism: 'Essential cofactor for synthesis of clotting factors II, VII, IX, X and proteins C, S',
+    sideEffects: ['Rare: allergic reactions', 'hemolysis in G6PD deficiency', 'kernicterus in newborns (high doses)'],
+    interactions: ['Warfarin (antagonizes effect)', 'antibiotics', 'cholestyramine', 'orlistat'],
+    indications: ['Vitamin K deficiency', 'bleeding disorders', 'warfarin reversal', 'newborn prophylaxis'],
+    contraindications: ['Hypersensitivity', 'severe liver disease'],
+    warnings: ['IV administration may cause anaphylaxis', 'monitor INR with warfarin'],
+    pregnancy: 'Category A - Safe during pregnancy',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '55',
@@ -144,7 +264,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat zinc deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 8-11 mg elemental zinc daily for RDA. 15-30 mg daily for deficiency. Take on empty stomach or with food if GI upset occurs.',
+    mechanism: 'Essential cofactor for over 300 enzymes, protein synthesis, immune function, wound healing',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'metallic taste', 'copper deficiency (chronic use)', 'immune suppression (high doses)'],
+    interactions: ['Antibiotics (tetracyclines', 'quinolones)', 'iron', 'copper', 'calcium', 'phytates'],
+    indications: ['Zinc deficiency', 'wound healing', 'immune support', 'diarrhea in children'],
+    contraindications: ['Hypersensitivity to zinc compounds'],
+    warnings: ['High doses may cause copper deficiency', 'separate from other minerals'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, keep dry'
   },
   {
     id: '56',
@@ -155,7 +285,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat copper deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 0.9 mg daily for RDA. 2-6 mg daily for deficiency. Take with food to reduce GI irritation.',
+    mechanism: 'Essential cofactor for enzymes involved in iron metabolism, collagen synthesis, and antioxidant defense',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'metallic taste', 'hepatotoxicity (high doses)'],
+    interactions: ['Zinc (mutual antagonism)', 'iron', 'vitamin C', 'molybdenum'],
+    indications: ['Copper deficiency', 'Wilson disease (chelation therapy)', 'anemia'],
+    contraindications: ['Wilson disease (for supplementation)', 'hemochromatosis'],
+    warnings: ['Monitor liver function with high doses', 'avoid excessive intake'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '57',
@@ -166,7 +306,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat selenium deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 55 mcg daily for RDA. 100-200 mcg daily for supplementation. Maximum 400 mcg daily. Take with or without food.',
+    mechanism: 'Essential component of selenoproteins with antioxidant and thyroid hormone metabolism functions',
+    sideEffects: ['Selenosis (high doses): hair loss', 'nail brittleness', 'garlic breath', 'fatigue', 'irritability', 'nausea'],
+    interactions: ['Vitamin C (enhances absorption)', 'heavy metals', 'warfarin'],
+    indications: ['Selenium deficiency', 'antioxidant support', 'thyroid function support'],
+    contraindications: ['Hypersensitivity to selenium compounds'],
+    warnings: ['Narrow therapeutic window', 'avoid excessive intake', 'monitor for toxicity'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '58',
@@ -177,7 +327,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat chromium deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 20-35 mcg daily for RDA. 200-400 mcg daily for glucose metabolism support. Take with meals.',
+    mechanism: 'Enhances insulin action and glucose metabolism, may improve lipid profiles',
+    sideEffects: ['Generally well tolerated. High doses: GI upset', 'headache', 'sleep disturbances', 'mood changes'],
+    interactions: ['Antacids', 'H2 blockers', 'proton pump inhibitors', 'insulin', 'antidiabetic drugs'],
+    indications: ['Chromium deficiency', 'glucose metabolism support', 'diabetes management adjunct'],
+    contraindications: ['Hypersensitivity to chromium compounds'],
+    warnings: ['Monitor blood glucose in diabetics', 'limited evidence for efficacy'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, keep dry'
   },
   {
     id: '59',
@@ -188,7 +348,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat molybdenum deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 45 mcg daily for RDA. 75-250 mcg daily for supplementation. Take with or without food.',
+    mechanism: 'Essential cofactor for enzymes involved in sulfur amino acid metabolism and purine catabolism',
+    sideEffects: ['Generally well tolerated. High doses: gout-like symptoms', 'copper deficiency'],
+    interactions: ['Copper (antagonistic)', 'sulfur-containing compounds'],
+    indications: ['Molybdenum deficiency (rare)', 'sulfite sensitivity support'],
+    contraindications: ['Hypersensitivity to molybdenum compounds'],
+    warnings: ['Deficiency is extremely rare', 'avoid excessive intake'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, keep dry'
   },
   {
     id: '60',
@@ -199,7 +369,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat manganese deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1.8-2.3 mg daily for RDA. 5-15 mg daily for supplementation. Take with food to reduce GI upset.',
+    mechanism: 'Essential cofactor for enzymes involved in metabolism, bone development, and antioxidant defense',
+    sideEffects: ['Generally well tolerated. High doses: neurological symptoms', 'Parkinson-like syndrome'],
+    interactions: ['Iron', 'calcium', 'phytates (reduce absorption)', 'tetracyclines'],
+    indications: ['Manganese deficiency', 'bone health support', 'antioxidant support'],
+    contraindications: ['Liver disease', 'Parkinson disease'],
+    warnings: ['Avoid excessive intake', 'may accumulate in brain tissue'],
+    pregnancy: 'Category A - Safe in recommended doses',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '61',
@@ -210,7 +390,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat fluoride deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 0.25-1 mg daily for children (age-dependent). Adults: 3-4 mg daily from all sources. Take on empty stomach.',
+    mechanism: 'Promotes tooth remineralization and inhibits bacterial acid production in dental plaque',
+    sideEffects: ['Dental fluorosis (excess during tooth development)', 'skeletal fluorosis (chronic excess)', 'GI upset'],
+    interactions: ['Calcium', 'magnesium', 'aluminum (reduce absorption)'],
+    indications: ['Dental caries prevention', 'fluoride deficiency in low-fluoride areas'],
+    contraindications: ['Fluorosis', 'areas with adequate water fluoridation'],
+    warnings: ['Narrow therapeutic window', 'monitor total fluoride intake from all sources'],
+    pregnancy: 'Category B - Generally safe, benefits outweigh risks',
+    storage: 'Store at room temperature, keep away from children'
   },
   {
     id: '62',
@@ -221,7 +411,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Mineral supplement used to treat iodide deficiency',
     drugClass: 'Mineral',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 150 mcg daily for RDA. 220-290 mcg daily during pregnancy/lactation. 1-5 mg daily for deficiency. Take with food.',
+    mechanism: 'Essential component of thyroid hormones T3 and T4, regulates metabolism',
+    sideEffects: ['Iodism (excess): metallic taste', 'salivation', 'GI upset', 'skin rash', 'hyperthyroidism or hypothyroidism'],
+    interactions: ['Lithium', 'antithyroid drugs', 'potassium perchlorate'],
+    indications: ['Iodine deficiency', 'goiter prevention', 'thyroid storm', 'radiation protection'],
+    contraindications: ['Hyperthyroidism', 'iodine allergy', 'dermatitis herpetiformis'],
+    warnings: ['Monitor thyroid function', 'avoid excessive intake', 'may trigger autoimmune thyroiditis'],
+    pregnancy: 'Category A - Essential during pregnancy for fetal brain development',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '63',
@@ -232,7 +432,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Fatty acid supplement used to treat omega-3 fatty acid deficiency',
     drugClass: 'Fatty Acid',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1-4 g daily of combined EPA/DHA. Take with meals to improve absorption and reduce GI upset.',
+    mechanism: 'Essential fatty acids with anti-inflammatory properties, important for cardiovascular and neurological health',
+    sideEffects: ['Fishy aftertaste', 'GI upset', 'nausea', 'diarrhea', 'increased bleeding risk (high doses)'],
+    interactions: ['Anticoagulants (increased bleeding risk)', 'antihypertensive drugs'],
+    indications: ['Hypertriglyceridemia', 'cardiovascular disease prevention', 'inflammatory conditions', 'depression'],
+    contraindications: ['Fish or shellfish allergy (fish oil products)', 'bleeding disorders'],
+    warnings: ['Monitor for bleeding with anticoagulants', 'choose purified products to avoid contaminants'],
+    pregnancy: 'Category A - Beneficial for fetal brain development',
+    storage: 'Store in refrigerator, protect from light and heat'
   },
   {
     id: '64',
@@ -243,7 +453,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Coenzyme supplement used to treat coenzyme Q10 deficiency',
     drugClass: 'Coenzyme',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 30-200 mg daily for supplementation. 100-300 mg daily for heart conditions. Take with fat-containing meal for better absorption.',
+    mechanism: 'Essential component of mitochondrial electron transport chain, antioxidant properties',
+    sideEffects: ['Generally well tolerated. Mild GI upset', 'headache', 'dizziness', 'insomnia'],
+    interactions: ['Warfarin (may reduce anticoagulant effect)', 'statins (may reduce CoQ10 levels)'],
+    indications: ['Heart failure', 'statin-induced myopathy', 'migraine prevention', 'Parkinson disease adjunct'],
+    contraindications: ['Hypersensitivity to coenzyme Q10'],
+    warnings: ['Limited evidence for many claimed benefits', 'may affect INR with warfarin'],
+    pregnancy: 'Category C - Limited safety data available',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '65',
@@ -254,7 +474,17 @@ export const supplementDrugs: DrugData[] = [
     description: 'Supplement used to treat osteoarthritis',
     drugClass: 'Supplement',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 1500 mg daily (glucosamine sulfate) or 1200 mg daily (glucosamine HCl). Take with meals to reduce GI upset.',
+    mechanism: 'Building block of cartilage matrix, may stimulate cartilage synthesis and inhibit degradation',
+    sideEffects: ['GI upset', 'nausea', 'heartburn', 'diarrhea', 'constipation', 'drowsiness', 'headache'],
+    interactions: ['Warfarin (may enhance anticoagulant effect)', 'antidiabetic drugs (may affect glucose levels)'],
+    indications: ['Osteoarthritis', 'joint health support'],
+    contraindications: ['Shellfish allergy (shellfish-derived products)', 'diabetes (monitor glucose)'],
+    warnings: ['Mixed evidence for efficacy', 'monitor blood glucose in diabetics'],
+    pregnancy: 'Category C - Limited safety data, avoid use',
+    storage: 'Store at room temperature, keep dry'
   },
   {
     id: '66',
@@ -265,6 +495,16 @@ export const supplementDrugs: DrugData[] = [
     description: 'Supplement used to treat osteoarthritis',
     drugClass: 'Supplement',
     verified: true,
-    brandNames: ['Various']
+    brandNames: ['Various'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: 800-1200 mg daily in divided doses. Often combined with glucosamine. Take with meals.',
+    mechanism: 'Major component of cartilage matrix, may inhibit cartilage-degrading enzymes and stimulate synthesis',
+    sideEffects: ['Generally well tolerated. Mild GI upset', 'nausea', 'diarrhea', 'constipation', 'edema'],
+    interactions: ['Warfarin (may enhance anticoagulant effect)', 'heparin'],
+    indications: ['Osteoarthritis', 'joint health support'],
+    contraindications: ['Bleeding disorders', 'prostate cancer (theoretical risk)'],
+    warnings: ['Mixed evidence for efficacy', 'quality varies between products'],
+    pregnancy: 'Category C - Limited safety data, avoid use',
+    storage: 'Store at room temperature, protect from moisture'
   },
 ];

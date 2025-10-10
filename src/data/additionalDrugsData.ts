@@ -11,7 +11,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to prevent kidney problems in people with diabetes.',
     drugClass: 'ACE inhibitor',
     verified: true,
-    brandNames: ['Vasotec', 'Epaned']
+    brandNames: ['Vasotec', 'Epaned'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 2.5-5mg twice daily. Maintenance: 10-40mg daily in 1-2 divided doses. Max: 40mg/day. Take with or without food.',
+    mechanism: 'Inhibits angiotensin-converting enzyme, reducing angiotensin II formation and aldosterone secretion.',
+    sideEffects: ['Dry cough', 'hyperkalemia', 'hypotension', 'dizziness', 'headache', 'fatigue', 'nausea'],
+    interactions: ['Potassium supplements', 'diuretics', 'NSAIDs', 'lithium', 'aliskiren'],
+    indications: ['Hypertension', 'heart failure', 'asymptomatic left ventricular dysfunction'],
+    contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'bilateral renal artery stenosis'],
+    warnings: ['Angioedema', 'hyperkalemia', 'renal impairment', 'hypotension', 'neutropenia'],
+    pregnancy: 'Category D - Avoid in pregnancy',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '102',
@@ -22,7 +32,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Beta-blocker that affects the heart and circulation. Used to treat angina and high blood pressure.',
     drugClass: 'Beta blocker',
     verified: true,
-    brandNames: ['Tenormin']
+    brandNames: ['Tenormin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 25-50mg once daily, max 100mg/day. Angina: 50mg once daily, max 200mg/day. Take with or without food.',
+    mechanism: 'Selectively blocks beta-1 adrenergic receptors, reducing heart rate and cardiac output.',
+    sideEffects: ['Bradycardia', 'hypotension', 'fatigue', 'dizziness', 'cold extremities', 'depression'],
+    interactions: ['Calcium channel blockers', 'digoxin', 'insulin', 'clonidine', 'NSAIDs'],
+    indications: ['Hypertension', 'angina pectoris', 'post-myocardial infarction'],
+    contraindications: ['Sinus bradycardia', 'heart block', 'cardiogenic shock', 'severe heart failure'],
+    warnings: ['Abrupt withdrawal', 'diabetes masking', 'bronchospasm', 'peripheral vascular disease'],
+    pregnancy: 'Category D - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '103',
@@ -33,7 +53,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Calcium channel blocker used to treat high blood pressure, angina, and certain heart rhythm disorders.',
     drugClass: 'Calcium channel blocker',
     verified: true,
-    brandNames: ['Cardizem', 'Cartia XT', 'Tiazac']
+    brandNames: ['Cardizem', 'Cartia XT', 'Tiazac'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Immediate-release: 30mg 4 times daily, titrate to 180-360mg/day. Extended-release: 120-540mg once daily.',
+    mechanism: 'Blocks calcium channels in cardiac and smooth muscle, reducing contractility and vasodilation.',
+    sideEffects: ['Dizziness', 'headache', 'edema', 'bradycardia', 'constipation', 'nausea', 'fatigue'],
+    interactions: ['Beta-blockers', 'digoxin', 'cyclosporine', 'statins', 'warfarin', 'CYP3A4 substrates'],
+    indications: ['Hypertension', 'angina pectoris', 'atrial fibrillation/flutter rate control'],
+    contraindications: ['Sick sinus syndrome', 'second/third-degree AV block', 'hypotension', 'acute MI with pulmonary congestion'],
+    warnings: ['Heart failure', 'hepatic impairment', 'elderly patients', 'abrupt withdrawal'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '104',
@@ -44,7 +74,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Calcium channel blocker used to treat high blood pressure, angina, and certain heart rhythm disorders.',
     drugClass: 'Calcium channel blocker',
     verified: true,
-    brandNames: ['Calan', 'Verelan', 'Isoptin SR']
+    brandNames: ['Calan', 'Verelan', 'Isoptin SR'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Immediate-release: 80-120mg 3 times daily. Extended-release: 120-480mg once daily. Take with food.',
+    mechanism: 'Blocks L-type calcium channels, reducing cardiac contractility and causing vasodilation.',
+    sideEffects: ['Constipation', 'dizziness', 'headache', 'nausea', 'hypotension', 'bradycardia', 'edema'],
+    interactions: ['Beta-blockers', 'digoxin', 'lithium', 'carbamazepine', 'cyclosporine', 'statins'],
+    indications: ['Hypertension', 'angina', 'supraventricular tachycardia', 'atrial fibrillation rate control'],
+    contraindications: ['Severe left ventricular dysfunction', 'hypotension', 'sick sinus syndrome', 'second/third-degree AV block'],
+    warnings: ['Heart failure', 'hepatic impairment', 'neuromuscular transmission disorders'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   
   // Gastrointestinal drugs
@@ -57,7 +97,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'H2 blocker that reduces the amount of acid in the stomach. Used to treat and prevent ulcers in the stomach and intestines.',
     drugClass: 'H2 receptor antagonist',
     verified: true,
-    brandNames: ['Zantac']
+    brandNames: ['Zantac'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Note: Withdrawn from market due to NDMA contamination. Historical dosing: 150mg twice daily or 300mg at bedtime.',
+    mechanism: 'Competitively inhibits histamine H2 receptors, reducing gastric acid secretion.',
+    sideEffects: ['Headache', 'dizziness', 'constipation', 'diarrhea', 'nausea', 'abdominal pain'],
+    interactions: ['Warfarin', 'phenytoin', 'theophylline', 'midazolam', 'glipizide'],
+    indications: ['Previously used for peptic ulcers', 'GERD', 'Zollinger-Ellison syndrome'],
+    contraindications: ['Hypersensitivity to ranitidine or H2 antagonists'],
+    warnings: ['WITHDRAWN: Contains NDMA impurity (probable carcinogen). Use alternatives.'],
+    pregnancy: 'Category B - Previously considered safe',
+    storage: 'Product withdrawn - not available for storage'
   },
   {
     id: '106',
@@ -68,7 +118,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'H2 blocker that reduces the amount of acid in the stomach. Used to treat conditions such as ulcers and GERD.',
     drugClass: 'H2 receptor antagonist',
     verified: true,
-    brandNames: ['Pepcid']
+    brandNames: ['Pepcid'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: GERD: 20mg twice daily. Peptic ulcer: 40mg at bedtime or 20mg twice daily. OTC: 10-20mg for heartburn.',
+    mechanism: 'Competitively inhibits histamine H2 receptors, reducing gastric acid secretion.',
+    sideEffects: ['Headache', 'dizziness', 'constipation', 'diarrhea', 'fatigue', 'dry mouth'],
+    interactions: ['Atazanavir', 'dasatinib', 'delavirdine', 'ketoconazole', 'itraconazole'],
+    indications: ['Peptic ulcers', 'GERD', 'Zollinger-Ellison syndrome', 'heartburn prevention'],
+    contraindications: ['Hypersensitivity to famotidine or H2 antagonists'],
+    warnings: ['Renal impairment dosing', 'CNS effects in elderly', 'gastric malignancy exclusion'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '107',
@@ -79,7 +139,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor that decreases the amount of acid produced in the stomach. Used to treat ulcers, GERD, and Zollinger-Ellison syndrome.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    brandNames: ['Prevacid', 'Prevacid SoluTab']
+    brandNames: ['Prevacid', 'Prevacid SoluTab'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: GERD: 15-30mg once daily. Peptic ulcer: 15-30mg once daily. Take 30-60 minutes before eating.',
+    mechanism: 'Irreversibly inhibits gastric H+/K+-ATPase (proton pump), blocking final step of acid production.',
+    sideEffects: ['Headache', 'diarrhea', 'nausea', 'abdominal pain', 'constipation', 'dizziness'],
+    interactions: ['Atazanavir', 'rilpivirine', 'warfarin', 'digoxin', 'methotrexate', 'clopidogrel'],
+    indications: ['GERD', 'peptic ulcers', 'Zollinger-Ellison syndrome', 'H. pylori eradication'],
+    contraindications: ['Hypersensitivity to lansoprazole or benzimidazoles', 'rilpivirine co-administration'],
+    warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'vitamin B12 deficiency'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '108',
@@ -90,66 +160,42 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor that reduces stomach acid. Used to treat GERD, gastric ulcers, and Zollinger-Ellison syndrome.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    brandNames: ['Nexium', 'Nexium 24HR']
+    brandNames: ['Nexium', 'Nexium 24HR'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: GERD: 20-40mg once daily. Peptic ulcer: 40mg once daily. Take 1 hour before meals.',
+    mechanism: 'S-isomer of omeprazole; irreversibly inhibits gastric H+/K+-ATPase, blocking acid secretion.',
+    sideEffects: ['Headache', 'diarrhea', 'nausea', 'flatulence', 'abdominal pain', 'dry mouth'],
+    interactions: ['Atazanavir', 'nelfinavir', 'warfarin', 'digoxin', 'methotrexate', 'clopidogrel'],
+    indications: ['GERD', 'erosive esophagitis', 'peptic ulcers', 'Zollinger-Ellison syndrome', 'H. pylori eradication'],
+    contraindications: ['Hypersensitivity to esomeprazole', 'omeprazole', 'or benzimidazoles'],
+    warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'acute interstitial nephritis'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
-  
-  // Respiratory drugs
-  {
-    id: '109',
-    name: 'Fluticasone',
-    genericName: 'Fluticasone propionate',
-    manufacturer: 'Various',
-    category: 'Respiratory',
-    description: 'Corticosteroid that reduces inflammation in the airways. Used to treat asthma and allergic rhinitis.',
-    drugClass: 'Corticosteroid',
-    verified: true,
-    brandNames: ['Flonase', 'Flovent']
-  },
-  {
-    id: '110',
-    name: 'Montelukast',
-    genericName: 'Montelukast sodium',
-    manufacturer: 'Various',
-    category: 'Respiratory',
-    description: 'Leukotriene receptor antagonist used to prevent asthma attacks and to treat seasonal allergies.',
-    drugClass: 'Leukotriene receptor antagonist',
-    verified: true,
-    brandNames: ['Singulair']
-  },
-  {
-    id: '111',
-    name: 'Tiotropium',
-    genericName: 'Tiotropium bromide',
-    manufacturer: 'Various',
-    category: 'Respiratory',
-    description: 'Anticholinergic bronchodilator that helps open air passages in the lungs. Used to treat COPD.',
-    drugClass: 'Anticholinergic bronchodilator',
-    verified: true,
-    brandNames: ['Spiriva', 'Spiriva Respimat']
-  },
-  {
-    id: '112',
-    name: 'Ipratropium',
-    genericName: 'Ipratropium bromide',
-    manufacturer: 'Various',
-    category: 'Respiratory',
-    description: 'Anticholinergic bronchodilator that relaxes muscles in the airways and increases air flow to the lungs. Used to treat bronchospasm associated with COPD.',
-    drugClass: 'Anticholinergic bronchodilator',
-    verified: true,
-    brandNames: ['Atrovent', 'Atrovent HFA']
-  },
-  
-  // Endocrine drugs
+
+  // Note: Respiratory drugs with IDs 109-112 removed to prevent duplicates with respiratoryDrugs.ts
+
+  // Antidiabetic drugs
   {
     id: '113',
     name: 'Glimepiride',
     genericName: 'Glimepiride',
     manufacturer: 'Various',
     category: 'Antidiabetic',
-    description: 'Sulfonylurea that helps control blood sugar levels by causing the pancreas to produce insulin. Used to treat type 2 diabetes.',
+    description: 'Sulfonylurea used to control blood sugar levels in people with type 2 diabetes.',
     drugClass: 'Sulfonylurea',
     verified: true,
-    brandNames: ['Amaryl']
+    brandNames: ['Amaryl'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 1-2mg once daily with breakfast. Maintenance: 1-4mg once daily. Max: 8mg/day.',
+    mechanism: 'Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.',
+    sideEffects: ['Hypoglycemia', 'weight gain', 'dizziness', 'headache', 'nausea', 'diarrhea'],
+    interactions: ['Beta-blockers', 'warfarin', 'NSAIDs', 'alcohol', 'miconazole', 'fluconazole'],
+    indications: ['Type 2 diabetes mellitus (adjunct to diet and exercise)'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal/hepatic impairment', 'hypersensitivity'],
+    warnings: ['Hypoglycemia', 'cardiovascular mortality', 'G6PD deficiency', 'elderly patients'],
+    pregnancy: 'Category C - Use insulin during pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '114',
@@ -157,10 +203,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Glyburide',
     manufacturer: 'Various',
     category: 'Antidiabetic',
-    description: 'Sulfonylurea that stimulates the release of insulin from the pancreas. Used to treat type 2 diabetes.',
+    description: 'Sulfonylurea used to control blood sugar levels in people with type 2 diabetes.',
     drugClass: 'Sulfonylurea',
     verified: true,
-    brandNames: ['DiaBeta', 'Glynase PresTab']
+    brandNames: ['DiaBeta', 'Glynase'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 2.5-5mg once daily with breakfast. Maintenance: 1.25-20mg daily in 1-2 divided doses. Max: 20mg/day.',
+    mechanism: 'Stimulates insulin release from pancreatic beta cells by closing ATP-sensitive potassium channels.',
+    sideEffects: ['Hypoglycemia', 'weight gain', 'nausea', 'heartburn', 'dizziness', 'skin reactions'],
+    interactions: ['Beta-blockers', 'warfarin', 'NSAIDs', 'alcohol', 'fluconazole', 'clarithromycin'],
+    indications: ['Type 2 diabetes mellitus (adjunct to diet and exercise)'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal/hepatic impairment', 'hypersensitivity'],
+    warnings: ['Hypoglycemia', 'cardiovascular mortality', 'renal impairment', 'elderly patients'],
+    pregnancy: 'Category B - Use insulin during pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '115',
@@ -168,10 +224,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Sitagliptin phosphate',
     manufacturer: 'Various',
     category: 'Antidiabetic',
-    description: 'DPP-4 inhibitor that helps control blood sugar levels by increasing insulin production and decreasing liver glucose production. Used to treat type 2 diabetes.',
+    description: 'DPP-4 inhibitor used to improve blood sugar control in adults with type 2 diabetes.',
     drugClass: 'DPP-4 inhibitor',
     verified: true,
-    brandNames: ['Januvia']
+    brandNames: ['Januvia'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 100mg once daily. Renal impairment: 50mg (CrCl 30-50) or 25mg (CrCl <30) once daily. Take with or without food.',
+    mechanism: 'Inhibits dipeptidyl peptidase-4, increasing incretin levels and improving glucose-dependent insulin secretion.',
+    sideEffects: ['Upper respiratory infection', 'headache', 'diarrhea', 'nausea', 'abdominal pain'],
+    interactions: ['Digoxin (monitor levels)', 'minimal drug interactions'],
+    indications: ['Type 2 diabetes mellitus (monotherapy or combination therapy)'],
+    contraindications: ['Hypersensitivity to sitagliptin', 'type 1 diabetes', 'diabetic ketoacidosis'],
+    warnings: ['Pancreatitis', 'heart failure', 'severe joint pain', 'bullous pemphidoid'],
+    pregnancy: 'Category B - Use only if clearly needed',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '116',
@@ -179,12 +245,22 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Linagliptin',
     manufacturer: 'Various',
     category: 'Antidiabetic',
-    description: 'DPP-4 inhibitor that helps control blood sugar levels by increasing insulin production and decreasing liver glucose production. Used to treat type 2 diabetes.',
+    description: 'DPP-4 inhibitor used to improve blood sugar control in adults with type 2 diabetes.',
     drugClass: 'DPP-4 inhibitor',
     verified: true,
-    brandNames: ['Tradjenta']
+    brandNames: ['Tradjenta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5mg once daily. No dose adjustment needed for renal or hepatic impairment. Take with or without food.',
+    mechanism: 'Inhibits dipeptidyl peptidase-4, increasing incretin hormone levels and improving glucose homeostasis.',
+    sideEffects: ['Nasopharyngitis', 'diarrhea', 'cough', 'headache', 'back pain', 'arthralgia'],
+    interactions: ['Rifampin (reduces efficacy)', 'P-glycoprotein inducers', 'minimal other interactions'],
+    indications: ['Type 2 diabetes mellitus (monotherapy or combination therapy)'],
+    contraindications: ['Hypersensitivity to linagliptin', 'type 1 diabetes', 'diabetic ketoacidosis'],
+    warnings: ['Pancreatitis', 'heart failure', 'severe joint pain', 'bullous pemphidoid'],
+    pregnancy: 'Category B - Use only if clearly needed',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
-  
+
   // CNS drugs - Antidepressants
   {
     id: '117',
@@ -195,7 +271,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin-norepinephrine reuptake inhibitor (SNRI) used to treat major depressive disorder, anxiety, and panic disorder.',
     drugClass: 'SNRI',
     verified: true,
-    brandNames: ['Effexor', 'Effexor XR']
+    brandNames: ['Effexor', 'Effexor XR'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 37.5-375 mg daily in divided doses. Extended-release: 75-225 mg once daily. Take with food.',
+    mechanism: 'Inhibits reuptake of serotonin and norepinephrine, increasing neurotransmitter levels in synaptic clefts',
+    sideEffects: ['Nausea', 'dizziness', 'dry mouth', 'constipation', 'decreased appetite', 'sweating', 'sexual dysfunction', 'hypertension'],
+    interactions: ['MAOIs (contraindicated)', 'warfarin', 'NSAIDs', 'other serotonergic drugs', 'CYP2D6 inhibitors'],
+    indications: ['Major depressive disorder', 'generalized anxiety disorder', 'social anxiety disorder', 'panic disorder'],
+    contraindications: ['Hypersensitivity', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'hypertension', 'withdrawal syndrome', 'bleeding risk'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '118',
@@ -206,7 +292,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin-norepinephrine reuptake inhibitor (SNRI) used to treat depression, anxiety disorders, fibromyalgia, and diabetic neuropathy.',
     drugClass: 'SNRI',
     verified: true,
-    brandNames: ['Cymbalta']
+    brandNames: ['Cymbalta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 20-120 mg daily. Depression: 40-60 mg daily. Diabetic neuropathy: 60 mg daily. Take with or without food.',
+    mechanism: 'Inhibits reuptake of serotonin and norepinephrine, modulating pain pathways and mood regulation',
+    sideEffects: ['Nausea', 'dry mouth', 'constipation', 'decreased appetite', 'fatigue', 'dizziness', 'increased sweating', 'sexual dysfunction'],
+    interactions: ['MAOIs (contraindicated)', 'thioridazine', 'warfarin', 'NSAIDs', 'other serotonergic drugs', 'CYP1A2 inhibitors'],
+    indications: ['Major depressive disorder', 'generalized anxiety disorder', 'diabetic peripheral neuropathy', 'fibromyalgia', 'chronic musculoskeletal pain'],
+    contraindications: ['Hypersensitivity', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma', 'severe hepatic impairment'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'hepatotoxicity', 'orthostatic hypotension', 'withdrawal syndrome'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '119',
@@ -214,10 +310,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Paroxetine hydrochloride',
     manufacturer: 'Various',
     category: 'Antidepressant',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, panic attacks, obsessive-compulsive disorder, anxiety disorders, and post-traumatic stress disorder.',
+    description: 'Selective serotonin reuptake inhibitor (SSRI) used to treat depression, anxiety disorders, fibromyalgia, and diabetic neuropathy.',
     drugClass: 'SSRI',
     verified: true,
-    brandNames: ['Paxil', 'Paxil CR', 'Pexeva']
+    brandNames: ['Paxil', 'Paxil CR', 'Pexeva'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10-60 mg daily. Depression: 20 mg daily initially. Panic disorder: 10 mg daily initially. Take with food.',
+    mechanism: 'Selectively inhibits serotonin reuptake, increasing serotonin levels in synaptic clefts',
+    sideEffects: ['Nausea', 'drowsiness', 'dizziness', 'dry mouth', 'constipation', 'decreased appetite', 'sweating', 'sexual dysfunction', 'weight gain'],
+    interactions: ['MAOIs (contraindicated)', 'thioridazine', 'pimozide', 'warfarin', 'NSAIDs', 'other serotonergic drugs', 'CYP2D6 substrates'],
+    indications: ['Major depressive disorder', 'panic disorder', 'social anxiety disorder', 'generalized anxiety disorder', 'PTSD', 'OCD'],
+    contraindications: ['Hypersensitivity', 'concurrent MAOI', 'thioridazine', 'or pimozide use'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'withdrawal syndrome', 'bleeding risk', 'bone fractures'],
+    pregnancy: 'Category D - Avoid use, especially in first trimester',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '120',
@@ -225,12 +331,22 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Bupropion hydrochloride',
     manufacturer: 'Various',
     category: 'Antidepressant',
-    description: 'Aminoketone antidepressant used to treat depression and seasonal affective disorder, and as an aid to smoking cessation treatment.',
-    drugClass: 'Aminoketone',
+    description: 'Atypical antidepressant also used for smoking cessation. Works differently from SSRIs.',
+    drugClass: 'Atypical antidepressant',
     verified: true,
-    brandNames: ['Wellbutrin', 'Wellbutrin SR', 'Wellbutrin XL', 'Zyban']
+    brandNames: ['Wellbutrin', 'Wellbutrin SR', 'Wellbutrin XL', 'Zyban'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 150-450 mg daily in divided doses. Smoking cessation: 150 mg twice daily. Take with or without food.',
+    mechanism: 'Inhibits reuptake of dopamine and norepinephrine, minimal effect on serotonin',
+    sideEffects: ['Dry mouth', 'nausea', 'insomnia', 'dizziness', 'constipation', 'tremor', 'weight loss', 'headache', 'anxiety'],
+    interactions: ['MAOIs (contraindicated)', 'CYP2B6 inhibitors/inducers', 'drugs lowering seizure threshold', 'alcohol'],
+    indications: ['Major depressive disorder', 'seasonal affective disorder', 'smoking cessation'],
+    contraindications: ['Hypersensitivity', 'seizure disorder', 'eating disorders', 'concurrent MAOI use', 'abrupt alcohol/sedative discontinuation'],
+    warnings: ['Seizure risk', 'suicidal thoughts', 'hypertension', 'angle-closure glaucoma', 'neuropsychiatric events'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
-  
+
   // CNS drugs - Antipsychotics
   {
     id: '121',
@@ -238,10 +354,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Olanzapine',
     manufacturer: 'Various',
     category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia and bipolar disorder.',
+    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and agitation.',
     drugClass: 'Atypical antipsychotic',
     verified: true,
-    brandNames: ['Zyprexa', 'Zyprexa Zydis']
+    brandNames: ['Zyprexa', 'Zyprexa Zydis'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5-20 mg daily. Schizophrenia: 10 mg daily initially. Bipolar: 10-15 mg daily. Take with or without food.',
+    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, with additional activity at multiple neurotransmitter receptors',
+    sideEffects: ['Weight gain', 'sedation', 'dizziness', 'dry mouth', 'constipation', 'increased appetite', 'orthostatic hypotension', 'metabolic changes'],
+    interactions: ['CNS depressants', 'anticholinergics', 'antihypertensives', 'CYP1A2 inhibitors/inducers', 'alcohol'],
+    indications: ['Schizophrenia', 'bipolar I disorder (manic/mixed episodes)', 'treatment-resistant depression (adjunct)'],
+    contraindications: ['Hypersensitivity to olanzapine'],
+    warnings: ['Increased mortality in elderly with dementia', 'metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '122',
@@ -249,10 +375,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Quetiapine fumarate',
     manufacturer: 'Various',
     category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and as add-on treatment for major depressive disorder.',
+    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and major depressive disorder.',
     drugClass: 'Atypical antipsychotic',
     verified: true,
-    brandNames: ['Seroquel', 'Seroquel XR']
+    brandNames: ['Seroquel', 'Seroquel XR'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 25-800 mg daily in divided doses. Schizophrenia: 300-400 mg daily. Bipolar: 400-800 mg daily. Take with or without food.',
+    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, with activity at histamine and adrenergic receptors',
+    sideEffects: ['Sedation', 'dizziness', 'dry mouth', 'constipation', 'weight gain', 'orthostatic hypotension', 'blurred vision', 'dyspepsia'],
+    interactions: ['CNS depressants', 'antihypertensives', 'CYP3A4 inhibitors/inducers', 'phenytoin', 'alcohol'],
+    indications: ['Schizophrenia', 'bipolar disorder (manic/depressive episodes)', 'major depressive disorder (adjunct)'],
+    contraindications: ['Hypersensitivity to quetiapine'],
+    warnings: ['Increased mortality in elderly with dementia', 'metabolic changes', 'tardive dyskinesia', 'cataracts', 'seizures'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '123',
@@ -260,10 +396,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
     category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, major depressive disorder, and irritability associated with autism.',
+    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, depression, and autism-related irritability.',
     drugClass: 'Atypical antipsychotic',
     verified: true,
-    brandNames: ['Abilify', 'Abilify Maintena', 'Aristada']
+    brandNames: ['Abilify', 'Abilify Maintena'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 2-30 mg daily. Schizophrenia: 10-15 mg daily. Bipolar: 15 mg daily. Depression adjunct: 2-15 mg daily.',
+    mechanism: 'Partial agonist at dopamine D2 and serotonin 5-HT1A receptors, antagonist at 5-HT2A receptors',
+    sideEffects: ['Nausea', 'vomiting', 'constipation', 'headache', 'dizziness', 'anxiety', 'insomnia', 'restlessness', 'weight gain'],
+    interactions: ['CYP3A4 inhibitors/inducers', 'CYP2D6 inhibitors', 'CNS depressants', 'antihypertensives'],
+    indications: ['Schizophrenia', 'bipolar I disorder', 'major depressive disorder (adjunct)', 'autism-related irritability', 'Tourette syndrome'],
+    contraindications: ['Hypersensitivity to aripiprazole'],
+    warnings: ['Increased mortality in elderly with dementia', 'suicidal thoughts', 'neuroleptic malignant syndrome', 'tardive dyskinesia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '124',
@@ -271,12 +417,22 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Ziprasidone hydrochloride',
     manufacturer: 'Various',
     category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia and acute episodes of bipolar mania.',
+    description: 'Atypical antipsychotic used to treat schizophrenia and bipolar disorder.',
     drugClass: 'Atypical antipsychotic',
     verified: true,
-    brandNames: ['Geodon']
+    brandNames: ['Geodon'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 40-160 mg daily in divided doses. Take with food (increases absorption by 2-fold). IM: 10-20 mg every 4 hours.',
+    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, with additional serotonin and norepinephrine reuptake inhibition',
+    sideEffects: ['Sedation', 'dizziness', 'nausea', 'constipation', 'dyspepsia', 'rash', 'respiratory tract infection', 'extrapyramidal symptoms'],
+    interactions: ['QT-prolonging drugs', 'CYP3A4 inhibitors', 'CNS depressants', 'antihypertensives', 'carbamazepine'],
+    indications: ['Schizophrenia', 'bipolar I disorder (manic/mixed episodes)'],
+    contraindications: ['Hypersensitivity', 'QT prolongation', 'recent MI', 'uncompensated heart failure', 'concurrent QT-prolonging drugs'],
+    warnings: ['QT prolongation', 'increased mortality in elderly with dementia', 'neuroleptic malignant syndrome', 'tardive dyskinesia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
-  
+
   // CNS drugs - Anxiolytics
   {
     id: '125',
@@ -284,10 +440,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Lorazepam',
     manufacturer: 'Various',
     category: 'Anxiolytic',
-    description: 'Benzodiazepine used to treat anxiety disorders, trouble sleeping, active seizures, and alcohol withdrawal.',
+    description: 'Benzodiazepine used to treat anxiety disorders, insomnia, and seizures.',
     drugClass: 'Benzodiazepine',
     verified: true,
-    brandNames: ['Ativan']
+    brandNames: ['Ativan'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Oral: 0.5-6 mg daily in divided doses. Anxiety: 2-3 mg daily. Insomnia: 2-4 mg at bedtime. Take with or without food.',
+    mechanism: 'Enhances GABA neurotransmission by binding to benzodiazepine receptors, producing anxiolytic and sedative effects',
+    sideEffects: ['Sedation', 'dizziness', 'weakness', 'unsteadiness', 'memory impairment', 'confusion', 'depression', 'nausea'],
+    interactions: ['CNS depressants', 'alcohol', 'opioids', 'muscle relaxants', 'antihistamines', 'CYP3A4 inhibitors'],
+    indications: ['Anxiety disorders', 'insomnia', 'status epilepticus', 'preoperative sedation'],
+    contraindications: ['Hypersensitivity', 'acute narrow-angle glaucoma', 'severe respiratory insufficiency', 'sleep apnea syndrome'],
+    warnings: ['Physical dependence', 'withdrawal syndrome', 'respiratory depression', 'cognitive impairment', 'falls risk in elderly'],
+    pregnancy: 'Category D - Avoid use, risk of congenital malformations and withdrawal in newborns',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '126',
@@ -295,10 +461,20 @@ export const additionalDrugsData: DrugData[] = [
     genericName: 'Clonazepam',
     manufacturer: 'Various',
     category: 'Anxiolytic',
-    description: 'Benzodiazepine used to treat panic disorder, anxiety disorders, and seizures.',
+    description: 'Benzodiazepine used to treat panic disorder, seizure disorders, and anxiety.',
     drugClass: 'Benzodiazepine',
     verified: true,
-    brandNames: ['Klonopin']
+    brandNames: ['Klonopin'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Oral: 0.25-4 mg daily in divided doses. Panic disorder: 0.25 mg twice daily initially. Seizures: 1.5 mg daily in 3 divided doses.',
+    mechanism: 'Enhances GABA neurotransmission by binding to benzodiazepine receptors, producing anticonvulsant and anxiolytic effects',
+    sideEffects: ['Sedation', 'dizziness', 'fatigue', 'coordination problems', 'memory impairment', 'depression', 'increased salivation'],
+    interactions: ['CNS depressants', 'alcohol', 'opioids', 'muscle relaxants', 'CYP3A4 inhibitors/inducers'],
+    indications: ['Panic disorder', 'seizure disorders (Lennox-Gastaut syndrome', 'akinetic seizures)', 'anxiety'],
+    contraindications: ['Hypersensitivity', 'severe liver disease', 'acute narrow-angle glaucoma', 'severe respiratory insufficiency'],
+    warnings: ['Physical dependence', 'withdrawal syndrome', 'respiratory depression', 'suicidal thoughts', 'cognitive impairment'],
+    pregnancy: 'Category D - Avoid use, risk of congenital malformations and withdrawal in newborns',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '127',
@@ -309,7 +485,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Anxiolytic medication used to treat anxiety disorders.',
     drugClass: 'Azapirone',
     verified: true,
-    brandNames: ['BuSpar']
+    brandNames: ['BuSpar'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 15-60 mg daily in divided doses. Initial: 7.5 mg twice daily. Take consistently with or without food.',
+    mechanism: 'Partial agonist at serotonin 5-HT1A receptors, with some activity at dopamine D2 receptors',
+    sideEffects: ['Dizziness', 'nausea', 'headache', 'nervousness', 'lightheadedness', 'excitement', 'fatigue', 'insomnia', 'dry mouth'],
+    interactions: ['MAOIs', 'CYP3A4 inhibitors/inducers', 'grapefruit juice', 'alcohol', 'CNS depressants'],
+    indications: ['Generalized anxiety disorder'],
+    contraindications: ['Hypersensitivity to buspirone', 'concurrent MAOI use'],
+    warnings: ['Not effective for benzodiazepine withdrawal', 'may cause dizziness', 'avoid abrupt discontinuation'],
+    pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '128',
@@ -320,7 +506,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Antihistamine with anxiolytic properties used to treat anxiety, nausea and vomiting, and severe itching.',
     drugClass: 'Antihistamine',
     verified: true,
-    brandNames: ['Atarax', 'Vistaril']
+    brandNames: ['Atarax', 'Vistaril'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 25-100 mg 3-4 times daily. Anxiety: 50-100 mg 4 times daily. Pruritus: 25 mg 3-4 times daily. Take with or without food.',
+    mechanism: 'Antagonizes histamine H1 receptors and has anticholinergic and sedative properties',
+    sideEffects: ['Sedation', 'dizziness', 'dry mouth', 'blurred vision', 'constipation', 'urinary retention', 'confusion (especially in elderly)'],
+    interactions: ['CNS depressants', 'anticholinergics', 'alcohol', 'MAOIs', 'QT-prolonging drugs'],
+    indications: ['Anxiety', 'tension', 'pruritus', 'preoperative sedation', 'nausea and vomiting'],
+    contraindications: ['Hypersensitivity', 'early pregnancy', 'prolonged QT interval', 'concurrent QT-prolonging drugs'],
+    warnings: ['QT prolongation', 'anticholinergic effects', 'sedation', 'falls risk in elderly', 'avoid in dementia patients'],
+    pregnancy: 'Category N - Contraindicated in early pregnancy, may be used later if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   
   // Analgesics - NSAIDs

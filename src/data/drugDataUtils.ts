@@ -114,40 +114,71 @@ export const getDetailedDrugData = (id: string, allDrugs: DrugData[]): DetailedD
     return detailedDrugDataRepository[id];
   }
   
-  // If not found in detailed data, try to find in combinedDrugsData and create a basic DetailedDrugData object
+  // If not found in detailed data, try to find in combinedDrugsData and use the comprehensive data
   const basicDrugData = allDrugs.find(drug => drug.id === id);
   
   if (basicDrugData) {
-    // Create a minimum viable DetailedDrugData object from the basic drug data
-    // Ensure all required fields are provided
-    return {
-      id: basicDrugData.id,
-      name: basicDrugData.name,
-      genericName: basicDrugData.genericName || basicDrugData.name, // Fallback to name if genericName is missing
-      manufacturer: basicDrugData.manufacturer || 'Various',
-      category: basicDrugData.category || 'Unknown',
-      description: basicDrugData.description || 'No description available.',
-      drugClass: basicDrugData.drugClass,
-      verified: basicDrugData.verified || false, // Provide default false if not present
-      prescriptionStatus: 'Prescription Only' as 'Prescription Only', // Use as const to ensure type safety
-      dosageAndAdmin: 'Consult your healthcare provider for proper dosage information.',
-      mechanism: 'Mechanism of action information not available.',
-      indications: ['Consult your healthcare provider for information on approved uses.'],
-      contraindications: ['Hypersensitivity to active ingredient or excipients.'],
-      warnings: ['Always consult your healthcare provider before using this medication.'],
-      sideEffects: ['Common side effects information not available.'],
-      interactions: ['Information on drug interactions not available.'],
-      pregnancy: 'Safety during pregnancy not established. Consult your healthcare provider.',
-      storage: 'Store at room temperature away from moisture and heat.',
-      brandNames: basicDrugData.brandNames || [],
-      similarDrugs: []
-    };
+    // Check if the drug data already has comprehensive information
+    const hasComprehensiveData = basicDrugData.mechanism && 
+                                 basicDrugData.sideEffects && 
+                                 basicDrugData.interactions &&
+                                 basicDrugData.indications &&
+                                 basicDrugData.contraindications &&
+                                 basicDrugData.warnings &&
+                                 basicDrugData.pregnancy &&
+                                 basicDrugData.storage &&
+                                 basicDrugData.dosageAndAdmin;
+    
+    if (hasComprehensiveData) {
+      // Use the comprehensive data directly from the drug files
+      return {
+        id: basicDrugData.id,
+        name: basicDrugData.name,
+        genericName: basicDrugData.genericName || basicDrugData.name,
+        manufacturer: basicDrugData.manufacturer || 'Various',
+        category: basicDrugData.category || 'Unknown',
+        description: basicDrugData.description || 'No description available.',
+        drugClass: basicDrugData.drugClass,
+        verified: basicDrugData.verified || false,
+        prescriptionStatus: basicDrugData.prescriptionStatus || 'Prescription Only',
+        dosageAndAdmin: basicDrugData.dosageAndAdmin,
+        mechanism: basicDrugData.mechanism,
+        indications: basicDrugData.indications,
+        contraindications: basicDrugData.contraindications,
+        warnings: basicDrugData.warnings,
+        sideEffects: basicDrugData.sideEffects,
+        interactions: basicDrugData.interactions,
+        pregnancy: basicDrugData.pregnancy,
+        storage: basicDrugData.storage,
+        brandNames: basicDrugData.brandNames || [],
+        similarDrugs: []
+      };
+    } else {
+      // Create a minimum viable DetailedDrugData object from the basic drug data
+      return {
+        id: basicDrugData.id,
+        name: basicDrugData.name,
+        genericName: basicDrugData.genericName || basicDrugData.name,
+        manufacturer: basicDrugData.manufacturer || 'Various',
+        category: basicDrugData.category || 'Unknown',
+        description: basicDrugData.description || 'No description available.',
+        drugClass: basicDrugData.drugClass,
+        verified: basicDrugData.verified || false,
+        prescriptionStatus: 'Prescription Only' as 'Prescription Only',
+        dosageAndAdmin: 'Consult your healthcare provider for proper dosage information.',
+        mechanism: 'Mechanism of action information not available.',
+        indications: ['Consult your healthcare provider for information on approved uses.'],
+        contraindications: ['Hypersensitivity to active ingredient or excipients.'],
+        warnings: ['Always consult your healthcare provider before using this medication.'],
+        sideEffects: ['Common side effects information not available.'],
+        interactions: ['Information on drug interactions not available.'],
+        pregnancy: 'Safety during pregnancy not established. Consult your healthcare provider.',
+        storage: 'Store at room temperature away from moisture and heat.',
+        brandNames: basicDrugData.brandNames || [],
+        similarDrugs: []
+      };
+    }
   }
   
   return null;
 };
-
-// Helper function to generate a unique ID
-export function generateDrugId(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
-}

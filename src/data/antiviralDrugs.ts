@@ -12,7 +12,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Neuraminidase inhibitor used to treat and prevent influenza.',
     drugClass: 'Neuraminidase inhibitor',
     verified: true,
-    brandNames: ['Tamiflu']
+    brandNames: ['Tamiflu'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Treatment: 75mg twice daily for 5 days. Prevention: 75mg once daily for 10 days. Adjust for renal impairment.',
+    mechanism: 'Inhibits influenza neuraminidase enzyme, preventing viral release from infected cells.',
+    sideEffects: ['Nausea', 'vomiting', 'headache', 'dizziness', 'fatigue', 'abdominal pain', 'diarrhea'],
+    interactions: ['Live attenuated influenza vaccine (avoid concurrent use)', 'probenecid'],
+    indications: ['Treatment and prevention of influenza A and B in patients ≥1 year old'],
+    contraindications: ['Hypersensitivity to oseltamivir or any component'],
+    warnings: ['Neuropsychiatric events', 'especially in pediatric patients', 'renal impairment dosing'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture. Suspension stable 10 days refrigerated'
   },
   {
     id: '243',
@@ -23,7 +33,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Antiviral medication used to treat herpes virus infections.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Valtrex']
+    brandNames: ['Valtrex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Herpes zoster: 1g three times daily for 7 days. Genital herpes: 1g twice daily for 7-10 days. Cold sores: 2g twice daily for 1 day.',
+    mechanism: 'Prodrug of acyclovir; inhibits viral DNA polymerase and terminates DNA chain elongation.',
+    sideEffects: ['Headache', 'nausea', 'abdominal pain', 'dizziness', 'fatigue', 'depression'],
+    interactions: ['Nephrotoxic drugs', 'probenecid', 'cimetidine'],
+    indications: ['Herpes zoster', 'genital herpes', 'cold sores', 'herpes suppression'],
+    contraindications: ['Hypersensitivity to valacyclovir', 'acyclovir', 'or any component'],
+    warnings: ['Thrombotic thrombocytopenic purpura', 'acute renal failure', 'CNS effects'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '244',
@@ -34,7 +54,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Antiviral medication used to treat herpes virus infections.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Famvir']
+    brandNames: ['Famvir'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Herpes zoster: 500mg three times daily for 7 days. Genital herpes: 250mg three times daily for 7-10 days. Recurrent episodes: 125mg twice daily for 5 days.',
+    mechanism: 'Prodrug converted to penciclovir; inhibits viral DNA polymerase and blocks viral replication.',
+    sideEffects: ['Headache', 'nausea', 'fatigue', 'dizziness', 'abdominal pain', 'vomiting'],
+    interactions: ['Probenecid (increases levels)', 'digoxin', 'theophylline'],
+    indications: ['Herpes zoster', 'genital herpes', 'recurrent herpes labialis'],
+    contraindications: ['Hypersensitivity to famciclovir', 'penciclovir', 'or any component'],
+    warnings: ['Renal impairment dosing', 'elderly patients', 'galactose intolerance'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '245',
@@ -45,7 +75,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Combination of two antiretroviral medications used to treat and prevent HIV infection.',
     drugClass: 'Nucleoside reverse transcriptase inhibitor',
     verified: true,
-    brandNames: ['Truvada']
+    brandNames: ['Truvada'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: One tablet (200mg/300mg) once daily with or without food. PrEP: Same dose for HIV prevention.',
+    mechanism: 'Dual nucleoside analog that inhibits HIV reverse transcriptase and terminates viral DNA chain.',
+    sideEffects: ['Headache', 'diarrhea', 'nausea', 'fatigue', 'dizziness', 'depression', 'insomnia', 'abnormal dreams'],
+    interactions: ['Nephrotoxic drugs', 'didanosine', 'atazanavir', 'lopinavir/ritonavir'],
+    indications: ['HIV treatment (with other antiretrovirals)', 'HIV pre-exposure prophylaxis (PrEP)'],
+    contraindications: ['Hypersensitivity', 'unknown HIV status (for PrEP)', 'creatinine clearance <30 mL/min'],
+    warnings: ['Lactic acidosis', 'hepatomegaly', 'renal toxicity', 'bone density loss', 'hepatitis B exacerbation'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture, keep in original container'
   },
   {
     id: '306',
@@ -56,7 +96,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Antiviral medication used to treat herpes virus infections including herpes simplex and varicella zoster.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Zovirax', 'Sitavig']
+    brandNames: ['Zovirax', 'Sitavig'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 200-800mg 5 times daily for 7-10 days. IV: 5-10mg/kg every 8 hours. Topical: Apply 5 times daily for 4 days.',
+    mechanism: 'Inhibits viral DNA polymerase and terminates DNA chain elongation in infected cells.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'headache', 'dizziness', 'fatigue', 'rash (topical)'],
+    interactions: ['Probenecid', 'zidovudine', 'nephrotoxic drugs'],
+    indications: ['Herpes simplex', 'varicella zoster', 'herpes encephalitis', 'neonatal herpes'],
+    contraindications: ['Hypersensitivity to acyclovir or valacyclovir'],
+    warnings: ['Renal toxicity', 'CNS effects', 'thrombotic thrombocytopenic purpura'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '307',
@@ -67,7 +117,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Antiviral medication used to treat hepatitis C and viral hemorrhagic fevers.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Rebetol', 'Ribasphere', 'Virazole']
+    brandNames: ['Rebetol', 'Ribasphere', 'Virazole'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 800-1200mg daily in divided doses with food (weight-based). Inhalation: 6g/day for 12-18 hours for 3-7 days.',
+    mechanism: 'Inhibits viral RNA polymerase and interferes with viral mRNA capping and elongation.',
+    sideEffects: ['Hemolytic anemia', 'fatigue', 'headache', 'nausea', 'insomnia', 'irritability', 'depression'],
+    interactions: ['Didanosine (contraindicated)', 'zidovudine', 'warfarin', 'theophylline'],
+    indications: ['Chronic hepatitis C (with interferon)', 'RSV in hospitalized infants', 'viral hemorrhagic fevers'],
+    contraindications: ['Pregnancy', 'male partners of pregnant women', 'autoimmune hepatitis', 'severe cardiac disease'],
+    warnings: ['Hemolytic anemia', 'cardiac effects', 'pulmonary toxicity', 'teratogenicity', 'depression/suicide'],
+    pregnancy: 'Category X - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '308',
@@ -78,7 +138,17 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Antiviral medication used to treat chronic hepatitis B.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Baraclude']
+    brandNames: ['Baraclude'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 0.5mg once daily on empty stomach (2 hours before or after meals). Lamivudine-resistant: 1mg once daily.',
+    mechanism: 'Nucleoside analog that inhibits hepatitis B virus polymerase and terminates viral DNA synthesis.',
+    sideEffects: ['Headache', 'fatigue', 'dizziness', 'nausea', 'diarrhea', 'dyspepsia', 'insomnia'],
+    interactions: ['Drugs that reduce renal function', 'lamivudine', 'adefovir'],
+    indications: ['Chronic hepatitis B with evidence of viral replication and liver inflammation'],
+    contraindications: ['Hypersensitivity to entecavir or any component'],
+    warnings: ['Lactic acidosis', 'hepatomegaly', 'HIV resistance (if undiagnosed HIV)', 'renal impairment'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '309',
@@ -89,6 +159,16 @@ export const antiviralDrugs: DrugData[] = [
     description: 'Neuraminidase inhibitor used to treat and prevent influenza.',
     drugClass: 'Neuraminidase inhibitor',
     verified: true,
-    brandNames: ['Relenza']
+    brandNames: ['Relenza'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: Treatment: 10mg (two 5mg inhalations) twice daily for 5 days. Prevention: 10mg once daily for 10-28 days.',
+    mechanism: 'Inhibits influenza neuraminidase enzyme, preventing viral release and spread to new cells.',
+    sideEffects: ['Diarrhea', 'nausea', 'sinusitis', 'nasal signs/symptoms', 'bronchitis', 'cough', 'headache'],
+    interactions: ['Live attenuated influenza vaccine (avoid concurrent use)'],
+    indications: ['Treatment and prevention of influenza A and B in patients ≥7 years old'],
+    contraindications: ['Hypersensitivity to zanamivir', 'milk proteins', 'or any component'],
+    warnings: ['Bronchospasm risk in asthma/COPD patients', 'allergic reactions', 'neuropsychiatric events'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture, do not puncture blister until use'
   }
 ];

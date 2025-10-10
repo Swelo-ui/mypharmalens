@@ -15,7 +15,19 @@ export interface DrugData {
   verified?: boolean;
   image?: string;
   packageImage?: string;
-  brandNames?: string[]; // Brand names property
+  brandNames?: string[];
+  // Comprehensive pharmaceutical information
+  prescriptionStatus?: 'OTC' | 'Prescription Only' | 'Controlled';
+  dosageAndAdmin?: string;
+  mechanism?: string;
+  indications?: string[];
+  contraindications?: string[];
+  warnings?: string[];
+  sideEffects?: string[];
+  interactions?: string[];
+  pregnancy?: string;
+  storage?: string;
+  similarDrugs?: {id: string, name: string}[];
 }
 
 interface DrugCardProps {
