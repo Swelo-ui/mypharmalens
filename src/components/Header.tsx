@@ -80,24 +80,24 @@ const Header = () => {
   if (isCompactHeader) {
     return (
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
-                <span className="font-bold text-sm">PL</span>
+              <div className="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-xs sm:text-sm">PL</span>
               </div>
-              <span className="font-bold text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
+              <span className="font-bold text-lg sm:text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
             </Link>
 
             {/* Right Side Actions */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
+                className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
                 aria-label="Toggle theme"
               >
-                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </button>
             </div>
           </div>
@@ -109,14 +109,14 @@ const Header = () => {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <div className="flex items-center justify-center h-8 w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
-                <span className="font-bold text-sm">PL</span>
+              <div className="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 bg-[#0289C8] dark:bg-[#0289C8] text-white rounded-full mr-2">
+                <span className="font-bold text-xs sm:text-sm">PL</span>
               </div>
-              <span className="font-bold text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
+              <span className="font-bold text-lg sm:text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
             </Link>
 
             {/* Desktop Navigation */}

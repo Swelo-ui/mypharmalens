@@ -18,22 +18,22 @@ const HelpCenter = () => {
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold mb-4">PharmaLens Help Center</h1>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 px-2">PharmaLens Help Center</h1>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base px-4">
               Find answers to common questions, learn how to use our features, and get support when you need it.
             </p>
           </div>
           
-          <div className="max-w-2xl mx-auto mb-16">
+          <div className="max-w-2xl mx-auto mb-12 sm:mb-16 px-2">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
               <input
                 type="text"
                 placeholder="Search for help articles..."
-                className="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-pharma-500 focus:border-transparent"
+                className="block w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-pharma-500 focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -66,111 +66,121 @@ const HelpCenter = () => {
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
-                <Camera className="h-6 w-6 text-pharma-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-3 sm:mb-4">
+                <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Using Visual Identification</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                Learn how to take good photos of medications and get the most accurate identification results.
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Visual Identification</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+                Learn how to use our camera feature to identify pills and medications visually.
               </p>
               <Link 
                 to="/help/visual-identification" 
-                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
               >
-                Read guides <ArrowRight className="ml-1 h-4 w-4" />
+                Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
-                <Search className="h-6 w-6 text-pharma-600" />
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-3 sm:mb-4">
+                <Search className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Searching for Medications</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                Tips for finding medications quickly using names, ingredients, or physical characteristics.
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Searching</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+                Tips and tricks for finding medications using our search functionality.
               </p>
               <Link 
                 to="/help/searching" 
-                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
               >
-                Read guides <ArrowRight className="ml-1 h-4 w-4" />
+                Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-pharma-600" />
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-3 sm:mb-4">
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Understanding Results</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                How to interpret medication information, including usage, side effects, and interactions.
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Understanding Results</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+                How to interpret and understand the medication information provided.
               </p>
               <Link 
                 to="/help/results" 
-                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
               >
-                Read guides <ArrowRight className="ml-1 h-4 w-4" />
+                Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
             </div>
           </div>
           
-          <div className="bg-gray-50 dark:bg-gray-900/30 rounded-xl p-8 mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-3">Need More Help?</h2>
-              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <div className="bg-gray-50 dark:bg-gray-900/30 rounded-xl p-4 sm:p-8 mb-16">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Need More Help?</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base px-2">
                 Our support team is ready to assist you with any questions or issues you may have.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-start">
-                <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-4 shrink-0">
-                  <MessageCircle className="h-6 w-6 text-pharma-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Contact Support</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
-                    Get help with technical issues or ask questions about using PharmaLens.
-                  </p>
-                  <Link to="/contact" className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium">
-                    Contact us <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 md:gap-8 max-w-4xl mx-auto">
+              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md">
+                <div className="flex items-start space-x-3 sm:space-x-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center shrink-0">
+                    <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium mb-2 text-sm sm:text-base">Contact Support</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                      Get help with technical issues or ask questions about using PharmaLens.
+                    </p>
+                    <Link 
+                      to="/contact" 
+                      className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
+                    >
+                      Contact us <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                    </Link>
+                  </div>
                 </div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-start">
-                <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-4 shrink-0">
-                  <Mail className="h-6 w-6 text-pharma-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Email Us</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
-                    Send an email directly to our support team for personalized assistance.
-                  </p>
-                  <a 
-                    href="mailto:himanshusharma.shriram@gmail.com" 
-                    className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-sm font-medium"
-                  >
-                    himanshusharma.shriram@gmail.com <ArrowRight className="ml-1 h-4 w-4" />
-                  </a>
+              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md">
+                <div className="flex items-start space-x-3 sm:space-x-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center shrink-0">
+                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium mb-2 text-sm sm:text-base">Email Us</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                      Send an email directly to our support team for personalized assistance.
+                    </p>
+                    <a 
+                      href="mailto:himanshusharma.shriram@gmail.com" 
+                      className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium break-all"
+                    >
+                      <span className="break-all">himanshusharma.shriram@gmail.com</span>
+                      <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
           <div>
-            <h2 className="text-2xl font-bold mb-6">Popular Help Articles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 px-2">Popular Help Articles</h2>
+            <div className="grid grid-cols-1 gap-2 sm:gap-4 md:grid-cols-2 md:gap-x-8">
               {helpArticles.map((article) => (
                 <Link 
                   key={article.id} 
                   to={`/help/article/${article.id}`}
-                  className="flex items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center p-3 sm:p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group"
                 >
-                  <PenTool className="h-5 w-5 text-pharma-600 mr-3 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-200">{article.title}</span>
+                  <PenTool className="h-4 w-4 sm:h-5 sm:w-5 text-pharma-600 mr-3 shrink-0" />
+                  <span className="text-gray-700 dark:text-gray-200 text-sm sm:text-base group-hover:text-pharma-600 dark:group-hover:text-pharma-400 transition-colors">
+                    {article.title}
+                  </span>
                 </Link>
               ))}
             </div>
