@@ -244,5 +244,5 @@ export const searchDrugs = (query: string): DrugData[] => {
     }
     
     return matrix[nameLower.length][searchTerm.length] <= threshold;
-  }).slice(0, 50); // Limit to 50 results for performance
+  }); // Removed slice limit - pagination will handle performance
 };

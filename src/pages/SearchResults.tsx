@@ -9,6 +9,36 @@ import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
 import { combinedDrugsData, searchDrugs } from '@/data/combinedDrugsData';
 import { fetchDrugs } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+
+// Inline Levenshtein distance implementation to avoid missing module error
+function calculateLevenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
 
 const SearchResults = () => {
   const location = useLocation();
@@ -18,10 +48,14 @@ const SearchResults = () => {
   const isMobile = useIsMobile();
   
   const [isLoading, setIsLoading] = useState(true);
-  const [results, setResults] = useState<DrugData[]>([]);
+  const [allResults, setAllResults] = useState<DrugData[]>([]);
+  const [displayedResults, setDisplayedResults] = useState<DrugData[]>([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20); // Show 20 items per page
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   console.log("SearchResults component initialized");
   console.log("Search query:", searchQuery);
   console.log("Total drugs in combinedDrugsData:", combinedDrugsData.length);
@@ -30,11 +64,24 @@ const SearchResults = () => {
   const categories = Array.from(new Set(combinedDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
   console.log("Available categories:", categories);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(allResults.length / itemsPerPage);
+  const startIndex = 0;
+  const endIndex = currentPage * itemsPerPage;
+  const hasMoreResults = endIndex < allResults.length;
+
+  // Update displayed results when page or results change
+  useEffect(() => {
+    const newDisplayedResults = allResults.slice(startIndex, endIndex);
+    setDisplayedResults(newDisplayedResults);
+  }, [allResults, currentPage, itemsPerPage, startIndex, endIndex]);
+
   useEffect(() => {
     // Reset loading state and scroll to top when search query changes
     setIsLoading(true);
+    setCurrentPage(1);
     window.scrollTo(0, 0);
-    
+
     const loadDrugs = async () => {
       try {
         console.log("Searching for:", searchQuery);
@@ -63,7 +110,7 @@ const SearchResults = () => {
               brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
             }));
             
-            setResults(formattedDrugs);
+            setAllResults(formattedDrugs);
             setIsLoading(false);
             return;
           } else {
@@ -112,7 +159,7 @@ const SearchResults = () => {
           : filtered;
         
         console.log(`After filtering: ${finalResults.length} drugs`);
-        setResults(finalResults);
+        setAllResults(finalResults);
       } catch (error) {
         console.error("Error fetching drugs:", error);
         // Fall back to local data on error with same enhanced search
@@ -126,7 +173,7 @@ const SearchResults = () => {
               if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
               if (drug.category && drug.category.toLowerCase().includes(query)) return true;
               if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
-              
+
               // Check brand names with improved matching
               if (drug.brandNames && drug.brandNames.some(brand => 
                 brand.toLowerCase().includes(query))) return true;
@@ -148,64 +195,48 @@ const SearchResults = () => {
           ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
           : filtered;
           
-        setResults(finalResults);
+        setAllResults(finalResults);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    // Simulate API call delay for better UX - shorter delay for faster response
-    const timer = setTimeout(() => {
-      loadDrugs();
-    }, 300);
-    
-    return () => clearTimeout(timer);
+
+    loadDrugs();
   }, [searchQuery, activeFilters]);
-  
-  // Enhanced Levenshtein distance implementation for fuzzy matching
-  const calculateLevenshteinDistance = (a: string, b: string): number => {
-    const matrix = [];
-    
-    // Initialize matrix
-    for (let i = 0; i <= b.length; i++) {
-      matrix[i] = [i];
-    }
-    
-    for (let j = 0; j <= a.length; j++) {
-      matrix[0][j] = j;
-    }
-    
-    // Fill matrix
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i-1][j] + 1,      // deletion
-          matrix[i][j-1] + 1,      // insertion
-          matrix[i-1][j-1] + cost  // substitution
-        );
-      }
-    }
-    
-    return matrix[b.length][a.length];
+
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true);
+    // Simulate a small delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setCurrentPage(prev => prev + 1);
+    setIsLoadingMore(false);
   };
-  
-  const handleSearch = (query: string) => {
-    navigate(`/search?q=${encodeURIComponent(query)}`);
-  };
-  
+
   const toggleFilter = (category: string) => {
-    setActiveFilters(prev => 
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
+    setActiveFilters(prev => {
+      const newFilters = prev.includes(category)
+        ? prev.filter(f => f !== category)
+        : [...prev, category];
+      
+      // Reset to first page when filters change
+      setCurrentPage(1);
+      return newFilters;
+    });
   };
-  
+
   const clearFilters = () => {
     setActiveFilters([]);
+    setCurrentPage(1);
   };
-  
+
+  const handleSearch = (query: string) => {
+    const params = new URLSearchParams();
+    if (query) {
+      params.set('q', query);
+    }
+    navigate(`/search?${params.toString()}`);
+  };
+
   const handleDrugClick = (drugId: string) => {
     navigate(`/drug/${drugId}`);
   };
@@ -346,65 +377,128 @@ const SearchResults = () => {
               )}
             </div>
             
-            {/* Results */}
+            {/* Results Section */}
             <div className="flex-1">
               {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="flex flex-col items-center">
-                    <Loader2 className="h-8 w-8 text-pharma-600 animate-spin mb-2" />
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      Searching for medications...
-                    </p>
-                  </div>
-                </div>
-              ) : results.length > 0 ? (
-                <>
-                  <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {results.length} {results.length === 1 ? 'result' : 'results'} found
-                    </p>
-                    
-                    {/* Active Filters - Desktop */}
-                    <div className="hidden lg:flex lg:flex-wrap gap-2">
-                      {activeFilters.map((filter) => (
-                        <div 
-                          key={filter} 
-                          className="bg-pharma-100 text-pharma-800 px-2 py-1 rounded-full text-xs font-medium flex items-center"
-                        >
-                          {filter}
-                          <button 
-                            onClick={() => toggleFilter(filter)}
-                            className="ml-1 rounded-full hover:bg-pharma-200 p-0.5"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 dark:bg-gray-700 h-48 rounded-lg"></div>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {results.map((drug) => (
-                      <div key={drug.id} onClick={() => handleDrugClick(drug.id)} className="cursor-pointer">
-                        <DrugCard drug={drug} />
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-64 glass-card rounded-xl p-8">
-                  <Search className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-xl font-medium mb-2">No medications found</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-                    We couldn't find any medications matching your search criteria.
-                  </p>
-                  <button
-                    onClick={clearFilters}
-                    className="px-4 py-2 rounded-lg bg-pharma-600 text-white text-sm font-medium hover:bg-pharma-700 transition-colors shadow-sm"
-                  >
-                    Clear all filters
-                  </button>
+                  ))}
                 </div>
+              ) : (
+                <>
+                  {/* Results Header */}
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {searchQuery ? (
+                        <>
+                          Showing {displayedResults.length} of {allResults.length} results for "{searchQuery}"
+                          {activeFilters.length > 0 && (
+                            <span className="ml-2">
+                              (filtered by: {activeFilters.join(', ')})
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          Showing {displayedResults.length} of {allResults.length} medications
+                          {activeFilters.length > 0 && (
+                            <span className="ml-2">
+                              (filtered by: {activeFilters.join(', ')})
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Mobile Filter Toggle */}
+                    {isMobile && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFiltersVisible(!filtersVisible)}
+                        className="flex items-center gap-2"
+                      >
+                        <Filter className="h-4 w-4" />
+                        Filters
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Results Grid */}
+                  {displayedResults.length > 0 ? (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        {displayedResults.map((result) => (
+                          <DrugCard
+                            key={result.id}
+                            drug={result}
+                            onClick={() => handleDrugClick(result.id)}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Load More Button */}
+                      {hasMoreResults && (
+                        <div className="flex justify-center">
+                          <Button
+                            onClick={handleLoadMore}
+                            disabled={isLoadingMore}
+                            className="flex items-center gap-2 px-8 py-3"
+                            variant="outline"
+                          >
+                            {isLoadingMore ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="h-4 w-4" />
+                                Load More ({allResults.length - displayedResults.length} remaining)
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Results Summary */}
+                      {!hasMoreResults && allResults.length > itemsPerPage && (
+                        <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+                          Showing all {allResults.length} results
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-gray-500 dark:text-gray-400 mb-4">
+                        {searchQuery ? (
+                          <>
+                            No medications found for "{searchQuery}"
+                            {activeFilters.length > 0 && (
+                              <span className="block mt-2">
+                                Try removing some filters or search for a different term
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          "No medications found"
+                        )}
+                      </div>
+                      {activeFilters.length > 0 && (
+                        <Button
+                          onClick={clearFilters}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Clear Filters
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
