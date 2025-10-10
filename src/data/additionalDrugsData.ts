@@ -529,7 +529,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'NSAID used to treat pain, fever, inflammation, and stiffness.',
     drugClass: 'NSAID',
     verified: true,
-    brandNames: ['Aleve', 'Naprosyn', 'Anaprox']
+    brandNames: ['Aleve', 'Naprosyn', 'Anaprox'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 220-440 mg every 8-12 hours. Max: 660 mg/day (OTC), 1500 mg/day (prescription). Take with food to reduce GI irritation.',
+    mechanism: 'Inhibits cyclooxygenase (COX-1 and COX-2) enzymes, reducing prostaglandin synthesis and inflammation',
+    sideEffects: ['Nausea', 'heartburn', 'stomach pain', 'dizziness', 'headache', 'drowsiness', 'fluid retention', 'increased blood pressure'],
+    interactions: ['Warfarin', 'ACE inhibitors', 'diuretics', 'lithium', 'methotrexate', 'aspirin', 'corticosteroids'],
+    indications: ['Pain relief', 'fever reduction', 'inflammation', 'arthritis', 'menstrual cramps', 'headache'],
+    contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'severe kidney disease', 'third trimester pregnancy'],
+    warnings: ['GI bleeding risk', 'cardiovascular thrombotic events', 'kidney damage', 'liver toxicity', 'hypertension', 'heart failure'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '130',
@@ -540,7 +550,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'NSAID used to treat pain and inflammation caused by osteoarthritis and rheumatoid arthritis.',
     drugClass: 'NSAID',
     verified: true,
-    brandNames: ['Mobic', 'Vivlodex']
+    brandNames: ['Mobic', 'Vivlodex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 7.5-15 mg once daily. Max: 15 mg/day. Take with or without food, preferably with food to reduce GI irritation.',
+    mechanism: 'Preferentially inhibits cyclooxygenase-2 (COX-2) over COX-1, reducing inflammation with potentially less GI toxicity',
+    sideEffects: ['Nausea', 'diarrhea', 'dyspepsia', 'flu-like symptoms', 'headache', 'dizziness', 'edema', 'hypertension'],
+    interactions: ['Warfarin', 'ACE inhibitors', 'diuretics', 'lithium', 'methotrexate', 'aspirin', 'cholestyramine'],
+    indications: ['Osteoarthritis', 'rheumatoid arthritis', 'juvenile rheumatoid arthritis'],
+    contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'severe kidney disease', 'CABG surgery'],
+    warnings: ['GI bleeding risk', 'cardiovascular thrombotic events', 'kidney damage', 'liver toxicity', 'skin reactions', 'hypertension'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   
   // Adding more WHO essential medicines (extending what we already have)
@@ -553,7 +573,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Beta-blocker used to treat high blood pressure and heart failure.',
     drugClass: 'Beta blocker',
     verified: true,
-    brandNames: ['Zebeta', 'Concor']
+    brandNames: ['Zebeta', 'Concor'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 2.5-10 mg once daily. Heart failure: 1.25 mg once daily initially, titrate up to 10 mg daily. Take with or without food.',
+    mechanism: 'Selectively blocks beta-1 adrenergic receptors, reducing heart rate, cardiac output, and blood pressure',
+    sideEffects: ['Bradycardia', 'hypotension', 'fatigue', 'dizziness', 'cold extremities', 'depression', 'insomnia', 'nausea'],
+    interactions: ['Calcium channel blockers', 'digoxin', 'insulin', 'clonidine', 'NSAIDs', 'CYP3A4 inhibitors'],
+    indications: ['Hypertension', 'heart failure', 'angina pectoris'],
+    contraindications: ['Cardiogenic shock', 'severe bradycardia', 'second/third-degree AV block', 'severe asthma', 'severe COPD'],
+    warnings: ['Abrupt withdrawal may cause rebound hypertension', 'mask hypoglycemia symptoms', 'worsen heart failure initially', 'bronchospasm risk'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '201',
@@ -564,7 +594,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'ACE inhibitor used to treat high blood pressure, heart failure, and to reduce the risk of cardiovascular events.',
     drugClass: 'ACE inhibitor',
     verified: true,
-    brandNames: ['Altace', 'Ramace']
+    brandNames: ['Altace', 'Ramace'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 2.5-20 mg daily in 1-2 divided doses. Heart failure: 1.25-10 mg twice daily. Take with or without food.',
+    mechanism: 'Inhibits angiotensin-converting enzyme, reducing angiotensin II formation and aldosterone secretion, leading to vasodilation',
+    sideEffects: ['Dry cough', 'hyperkalemia', 'hypotension', 'dizziness', 'headache', 'fatigue', 'nausea', 'angioedema (rare)'],
+    interactions: ['Potassium supplements', 'diuretics', 'NSAIDs', 'lithium', 'aliskiren', 'ARBs'],
+    indications: ['Hypertension', 'heart failure', 'post-myocardial infarction', 'cardiovascular risk reduction'],
+    contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'bilateral renal artery stenosis', 'hyperkalemia'],
+    warnings: ['Angioedema', 'hyperkalemia', 'renal impairment', 'hypotension', 'neutropenia', 'fetal toxicity'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '202',
@@ -575,7 +615,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Angiotensin II receptor antagonist used to treat high blood pressure and heart failure.',
     drugClass: 'Angiotensin II receptor antagonist',
     verified: true,
-    brandNames: ['Atacand', 'Blopress']
+    brandNames: ['Atacand', 'Blopress'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 8-32 mg once daily. Heart failure: 4-32 mg once daily. Take with or without food.',
+    mechanism: 'Selectively blocks angiotensin II type 1 (AT1) receptors, preventing vasoconstriction and aldosterone release',
+    sideEffects: ['Dizziness', 'headache', 'fatigue', 'hyperkalemia', 'hypotension', 'back pain', 'upper respiratory infection'],
+    interactions: ['Potassium supplements', 'diuretics', 'NSAIDs', 'lithium', 'ACE inhibitors', 'aliskiren'],
+    indications: ['Hypertension', 'heart failure', 'diabetic nephropathy'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
+    warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '203',
@@ -586,7 +636,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Angiotensin II receptor antagonist used to treat high blood pressure and diabetic nephropathy.',
     drugClass: 'Angiotensin II receptor antagonist',
     verified: true,
-    brandNames: ['Avapro', 'Aprovel']
+    brandNames: ['Avapro', 'Aprovel'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 150-300 mg once daily. Diabetic nephropathy: 300 mg once daily. Take with or without food.',
+    mechanism: 'Selectively blocks angiotensin II type 1 (AT1) receptors, preventing vasoconstriction and aldosterone release',
+    sideEffects: ['Dizziness', 'fatigue', 'headache', 'hyperkalemia', 'hypotension', 'diarrhea', 'dyspepsia'],
+    interactions: ['Potassium supplements', 'diuretics', 'NSAIDs', 'lithium', 'ACE inhibitors', 'aliskiren'],
+    indications: ['Hypertension', 'diabetic nephropathy in type 2 diabetes'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
+    warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '204',
@@ -597,7 +657,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Angiotensin II receptor antagonist used to treat high blood pressure and reduce cardiovascular risk.',
     drugClass: 'Angiotensin II receptor antagonist',
     verified: true,
-    brandNames: ['Micardis', 'Pritor']
+    brandNames: ['Micardis', 'Pritor'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Hypertension: 20-80 mg once daily. Cardiovascular risk reduction: 80 mg once daily. Take with or without food.',
+    mechanism: 'Selectively blocks angiotensin II type 1 (AT1) receptors, preventing vasoconstriction and aldosterone release',
+    sideEffects: ['Dizziness', 'headache', 'fatigue', 'hyperkalemia', 'hypotension', 'back pain', 'sinusitis'],
+    interactions: ['Potassium supplements', 'diuretics', 'NSAIDs', 'lithium', 'ACE inhibitors', 'aliskiren', 'digoxin'],
+    indications: ['Hypertension', 'cardiovascular risk reduction in patients unable to take ACE inhibitors'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
+    warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '205',
@@ -608,7 +678,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination of a thiazide diuretic and an ACE inhibitor used to treat high blood pressure.',
     drugClass: 'ACE inhibitor/Thiazide diuretic',
     verified: true,
-    brandNames: ['Zestoretic', 'Prinzide']
+    brandNames: ['Zestoretic', 'Prinzide'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10/12.5 mg to 20/25 mg once daily. Take in the morning with or without food. Adjust based on blood pressure response.',
+    mechanism: 'Lisinopril inhibits ACE, reducing angiotensin II; HCTZ inhibits sodium reabsorption in distal tubules, promoting diuresis',
+    sideEffects: ['Dry cough', 'dizziness', 'hypotension', 'hyperkalemia', 'hyponatremia', 'headache', 'fatigue', 'nausea'],
+    interactions: ['Potassium supplements', 'NSAIDs', 'lithium', 'digoxin', 'diabetes medications', 'cholestyramine'],
+    indications: ['Hypertension (when combination therapy is appropriate)'],
+    contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'anuria', 'severe renal/hepatic impairment'],
+    warnings: ['Angioedema', 'hyperkalemia', 'hypotension', 'renal impairment', 'electrolyte imbalances', 'photosensitivity'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '206',
@@ -619,7 +699,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination of a calcium channel blocker and an angiotensin II receptor antagonist used to treat high blood pressure.',
     drugClass: 'Calcium channel blocker/Angiotensin II receptor antagonist',
     verified: true,
-    brandNames: ['Exforge', 'Amlovas']
+    brandNames: ['Exforge', 'Amlovas'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5/80 mg to 10/320 mg once daily. Take with or without food. Adjust based on blood pressure response.',
+    mechanism: 'Amlodipine blocks calcium channels causing vasodilation; Valsartan blocks AT1 receptors preventing vasoconstriction',
+    sideEffects: ['Peripheral edema', 'dizziness', 'headache', 'fatigue', 'flushing', 'hyperkalemia', 'hypotension'],
+    interactions: ['Potassium supplements', 'NSAIDs', 'lithium', 'CYP3A4 inhibitors', 'simvastatin', 'cyclosporine'],
+    indications: ['Hypertension (when combination therapy is appropriate)'],
+    contraindications: ['Hypersensitivity', 'pregnancy', 'severe aortic stenosis', 'cardiogenic shock', 'severe hepatic impairment'],
+    warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'peripheral edema', 'renal impairment'],
+    pregnancy: 'Category D - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   
   // Additional Antibiotics
@@ -632,7 +722,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Macrolide antibiotic used to treat various bacterial infections, including respiratory tract infections, skin infections, and H. pylori infections.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
-    brandNames: ['Biaxin', 'Klacid']
+    brandNames: ['Biaxin', 'Klacid'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 250-500 mg twice daily for 7-14 days. H. pylori: 500 mg twice daily for 10-14 days. Take with or without food.',
+    mechanism: 'Inhibits bacterial protein synthesis by binding to the 50S ribosomal subunit, preventing peptide chain elongation',
+    sideEffects: ['Nausea', 'diarrhea', 'abdominal pain', 'headache', 'metallic taste', 'QT prolongation', 'hepatotoxicity'],
+    interactions: ['Warfarin', 'digoxin', 'theophylline', 'carbamazepine', 'statins', 'CYP3A4 substrates', 'QT-prolonging drugs'],
+    indications: ['Respiratory tract infections', 'skin/soft tissue infections', 'H. pylori eradication', 'atypical mycobacterial infections'],
+    contraindications: ['Hypersensitivity to macrolides', 'concurrent use with ergot alkaloids', 'history of QT prolongation', 'severe hepatic impairment'],
+    warnings: ['QT prolongation', 'hepatotoxicity', 'C. difficile-associated diarrhea', 'drug interactions', 'myasthenia gravis exacerbation'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '208',
@@ -643,7 +743,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Macrolide antibiotic used to treat a variety of bacterial infections.',
     drugClass: 'Macrolide antibiotic',
     verified: true,
-    brandNames: ['E-Mycin', 'Eryc', 'Erythrocin']
+    brandNames: ['E-Mycin', 'Eryc', 'Erythrocin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 250-500 mg every 6 hours or 333-500 mg every 8 hours. Take on empty stomach 1 hour before or 2 hours after meals.',
+    mechanism: 'Inhibits bacterial protein synthesis by binding to the 50S ribosomal subunit, preventing peptide chain elongation',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal cramping', 'QT prolongation', 'hepatotoxicity', 'hearing loss (high doses)'],
+    interactions: ['Warfarin', 'digoxin', 'theophylline', 'carbamazepine', 'statins', 'CYP3A4 substrates', 'QT-prolonging drugs'],
+    indications: ['Respiratory tract infections', 'skin/soft tissue infections', 'pertussis', 'chlamydial infections', 'diphtheria'],
+    contraindications: ['Hypersensitivity to macrolides', 'concurrent use with ergot alkaloids', 'history of QT prolongation', 'severe hepatic impairment'],
+    warnings: ['QT prolongation', 'hepatotoxicity', 'C. difficile-associated diarrhea', 'drug interactions', 'ototoxicity'],
+    pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '209',
@@ -654,7 +764,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination antibiotic used to treat a variety of bacterial infections.',
     drugClass: 'Sulfonamide antibiotic',
     verified: true,
-    brandNames: ['Bactrim', 'Septra', 'Cotrim']
+    brandNames: ['Bactrim', 'Septra', 'Cotrim'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 160/800 mg (1 DS tablet) twice daily for 10-14 days. UTI: 160/800 mg twice daily for 3 days. Take with plenty of water.',
+    mechanism: 'Trimethoprim inhibits dihydrofolate reductase; Sulfamethoxazole inhibits dihydropteroate synthase, both disrupting folate synthesis',
+    sideEffects: ['Nausea', 'vomiting', 'anorexia', 'rash', 'hyperkalemia', 'photosensitivity', 'Stevens-Johnson syndrome (rare)'],
+    interactions: ['Warfarin', 'phenytoin', 'methotrexate', 'digoxin', 'ACE inhibitors', 'diuretics', 'oral hypoglycemics'],
+    indications: ['UTIs', 'pneumocystis pneumonia', 'traveler\'s diarrhea', 'MRSA skin infections', 'nocardiosis'],
+    contraindications: ['Hypersensitivity to sulfonamides', 'megaloblastic anemia due to folate deficiency', 'severe renal/hepatic impairment', 'pregnancy (near term)'],
+    warnings: ['Severe skin reactions', 'blood dyscrasias', 'hyperkalemia', 'folate deficiency', 'C. difficile-associated diarrhea'],
+    pregnancy: 'Category C (first trimester), Category D (near term) - Avoid near term',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '210',
@@ -665,7 +785,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Fluoroquinolone antibiotic used to treat a variety of bacterial infections, including respiratory, urinary tract, and skin infections.',
     drugClass: 'Fluoroquinolone antibiotic',
     verified: true,
-    brandNames: ['Levaquin', 'Quixin', 'Iquix']
+    brandNames: ['Levaquin', 'Quixin', 'Iquix'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral/IV: 250-750 mg once daily for 3-14 days depending on infection. Take with plenty of water, avoid dairy products and antacids.',
+    mechanism: 'Inhibits bacterial DNA gyrase and topoisomerase IV, preventing DNA replication and transcription',
+    sideEffects: ['Nausea', 'diarrhea', 'headache', 'dizziness', 'insomnia', 'tendon rupture', 'QT prolongation', 'photosensitivity'],
+    interactions: ['Antacids', 'iron supplements', 'warfarin', 'NSAIDs', 'theophylline', 'QT-prolonging drugs', 'corticosteroids'],
+    indications: ['Pneumonia', 'UTIs', 'skin/soft tissue infections', 'sinusitis', 'chronic bronchitis exacerbation', 'anthrax exposure'],
+    contraindications: ['Hypersensitivity to fluoroquinolones', 'myasthenia gravis', 'history of tendon disorders with fluoroquinolones'],
+    warnings: ['Tendon rupture', 'peripheral neuropathy', 'CNS effects', 'QT prolongation', 'C. difficile-associated diarrhea', 'aortic dissection'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '211',
@@ -676,7 +806,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'First-generation cephalosporin antibiotic used to treat bacterial infections including upper respiratory, ear, skin, and urinary tract infections.',
     drugClass: 'Cephalosporin antibiotic',
     verified: true,
-    brandNames: ['Keflex', 'Ceporex']
+    brandNames: ['Keflex', 'Ceporex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 250-500 mg every 6 hours or 500 mg every 12 hours. Max: 4g/day. Take with or without food.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing cell lysis',
+    sideEffects: ['Diarrhea', 'nausea', 'vomiting', 'abdominal pain', 'dyspepsia', 'allergic reactions', 'C. difficile colitis'],
+    interactions: ['Probenecid (increases levels)', 'metformin', 'warfarin (monitor INR)', 'oral contraceptives'],
+    indications: ['Skin/soft tissue infections', 'respiratory tract infections', 'UTIs', 'otitis media', 'bone infections'],
+    contraindications: ['Hypersensitivity to cephalosporins', 'severe penicillin allergy (cross-reactivity)'],
+    warnings: ['C. difficile-associated diarrhea', 'allergic reactions', 'renal impairment dosing', 'superinfection'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture. Suspension: refrigerate, discard after 14 days'
   },
   {
     id: '212',
@@ -687,7 +827,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Third-generation cephalosporin antibiotic used to treat serious bacterial infections.',
     drugClass: 'Cephalosporin antibiotic',
     verified: true,
-    brandNames: ['Rocephin', 'Ceftriaxone Sandoz']
+    brandNames: ['Rocephin', 'Ceftriaxone Sandoz'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV/IM: 1-2g once daily or 0.5-1g every 12 hours. Max: 4g/day. Severe infections: 2g every 12 hours.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing bacterial cell death',
+    sideEffects: ['Injection site reactions', 'diarrhea', 'nausea', 'rash', 'eosinophilia', 'thrombocytosis', 'biliary sludge'],
+    interactions: ['Calcium-containing solutions (precipitation)', 'warfarin', 'probenecid', 'loop diuretics'],
+    indications: ['Pneumonia', 'meningitis', 'sepsis', 'gonorrhea', 'pelvic inflammatory disease', 'surgical prophylaxis'],
+    contraindications: ['Hypersensitivity to cephalosporins', 'neonates with hyperbilirubinemia', 'calcium-containing IV solutions'],
+    warnings: ['C. difficile-associated diarrhea', 'biliary precipitation', 'hemolytic anemia', 'bleeding disorders'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store powder at room temperature. Reconstituted solution stable 24 hours at room temperature'
   },
   
   // Additional Antidiabetic medications
@@ -700,7 +850,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'SGLT2 inhibitor used to treat type 2 diabetes and reduce the risk of cardiovascular death in patients with type 2 diabetes and cardiovascular disease.',
     drugClass: 'SGLT2 inhibitor',
     verified: true,
-    brandNames: ['Jardiance', 'Empaglif']
+    brandNames: ['Jardiance', 'Empaglif'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10 mg once daily in the morning, may increase to 25 mg once daily. Take with or without food.',
+    mechanism: 'Inhibits sodium-glucose co-transporter 2 (SGLT2) in the kidney, reducing glucose reabsorption and increasing urinary glucose excretion',
+    sideEffects: ['Genital mycotic infections', 'UTIs', 'increased urination', 'hypotension', 'ketoacidosis (rare)', 'necrotizing fasciitis'],
+    interactions: ['Diuretics (increased hypotension risk)', 'insulin/sulfonylureas (increased hypoglycemia risk)', 'lithium'],
+    indications: ['Type 2 diabetes mellitus', 'cardiovascular risk reduction in type 2 diabetes', 'heart failure with reduced ejection fraction'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis'],
+    warnings: ['Ketoacidosis', 'necrotizing fasciitis of perineum', 'genital infections', 'hypotension', 'acute kidney injury'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '214',
@@ -711,7 +871,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'SGLT2 inhibitor used to treat type 2 diabetes and heart failure.',
     drugClass: 'SGLT2 inhibitor',
     verified: true,
-    brandNames: ['Farxiga', 'Forxiga']
+    brandNames: ['Farxiga', 'Forxiga'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Type 2 diabetes: 5mg once daily, may increase to 10mg once daily. Heart failure: 10mg once daily. Take with or without food.',
+    mechanism: 'Inhibits sodium-glucose co-transporter 2 (SGLT2) in the kidney, reducing glucose reabsorption and increasing urinary glucose excretion.',
+    sideEffects: ['Genital mycotic infections', 'urinary tract infections', 'increased urination', 'hypotension', 'dehydration', 'hypoglycemia (with insulin/sulfonylureas)'],
+    interactions: ['Insulin', 'sulfonylureas', 'diuretics', 'lithium', 'digoxin'],
+    indications: ['Type 2 diabetes mellitus', 'heart failure with reduced ejection fraction', 'chronic kidney disease'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis', 'hypersensitivity'],
+    warnings: ['Ketoacidosis', 'acute kidney injury', 'hypotension', 'genital infections', 'Fournier gangrene', 'amputation risk'],
+    pregnancy: 'Category C - Not recommended during pregnancy',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '215',
@@ -722,7 +892,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'GLP-1 receptor agonist used to treat type 2 diabetes and obesity.',
     drugClass: 'GLP-1 receptor agonist',
     verified: true,
-    brandNames: ['Victoza', 'Saxenda']
+    brandNames: ['Victoza', 'Saxenda'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Subcutaneous: Type 2 diabetes (Victoza): Initial 0.6mg daily, increase to 1.2-1.8mg daily. Obesity (Saxenda): Start 0.6mg daily, titrate weekly to 3mg daily.',
+    mechanism: 'GLP-1 receptor agonist that increases insulin secretion, decreases glucagon release, slows gastric emptying, and promotes satiety.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'constipation', 'abdominal pain', 'headache', 'injection site reactions', 'hypoglycemia'],
+    interactions: ['Insulin', 'sulfonylureas', 'warfarin', 'digoxin', 'oral medications (delayed absorption)'],
+    indications: ['Type 2 diabetes mellitus', 'chronic weight management (BMI ≥30 or ≥27 with comorbidities)', 'cardiovascular risk reduction'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'Multiple Endocrine Neoplasia syndrome type 2'],
+    warnings: ['Thyroid C-cell tumors', 'pancreatitis', 'gallbladder disease', 'renal impairment', 'hypoglycemia', 'suicidal thoughts'],
+    pregnancy: 'Category C - Discontinue before planned pregnancy',
+    storage: 'Refrigerate unopened pens. Once opened, store at room temperature for up to 30 days'
   },
   {
     id: '216',
@@ -733,7 +913,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'GLP-1 receptor agonist used to treat type 2 diabetes.',
     drugClass: 'GLP-1 receptor agonist',
     verified: true,
-    brandNames: ['Trulicity']
+    brandNames: ['Trulicity'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Subcutaneous: 0.75mg once weekly, may increase to 1.5mg once weekly. Max: 4.5mg once weekly. Inject in thigh, abdomen, or upper arm.',
+    mechanism: 'GLP-1 receptor agonist that increases insulin secretion, decreases glucagon release, slows gastric emptying, and promotes satiety.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'decreased appetite', 'fatigue', 'injection site reactions'],
+    interactions: ['Insulin', 'sulfonylureas', 'warfarin', 'oral medications (delayed absorption due to gastric emptying)'],
+    indications: ['Type 2 diabetes mellitus', 'cardiovascular risk reduction in adults with type 2 diabetes'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'Multiple Endocrine Neoplasia syndrome type 2'],
+    warnings: ['Thyroid C-cell tumors', 'pancreatitis', 'diabetic retinopathy complications', 'hypoglycemia', 'acute gallbladder disease'],
+    pregnancy: 'Category C - Discontinue before planned pregnancy',
+    storage: 'Refrigerate. Do not freeze or shake. Use within 14 days if stored at room temperature'
   },
   {
     id: '217',
@@ -744,7 +934,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'SGLT2 inhibitor used to treat type 2 diabetes and reduce the risk of cardiovascular events.',
     drugClass: 'SGLT2 inhibitor',
     verified: true,
-    brandNames: ['Invokana']
+    brandNames: ['Invokana'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 100mg once daily before first meal. May increase to 300mg once daily if eGFR ≥60 mL/min/1.73m².',
+    mechanism: 'Inhibits sodium-glucose co-transporter 2 (SGLT2) in the kidney, reducing glucose reabsorption and increasing urinary glucose excretion.',
+    sideEffects: ['Genital mycotic infections', 'urinary tract infections', 'increased urination', 'hypotension', 'hyperkalemia', 'bone fractures'],
+    interactions: ['Digoxin', 'rifampin', 'phenytoin', 'ritonavir', 'phenobarbital', 'UGT enzyme inducers'],
+    indications: ['Type 2 diabetes mellitus', 'cardiovascular risk reduction', 'diabetic nephropathy'],
+    contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis', 'hypersensitivity'],
+    warnings: ['Lower limb amputation risk', 'ketoacidosis', 'acute kidney injury', 'hypotension', 'bone fractures', 'Fournier gangrene'],
+    pregnancy: 'Category C - Not recommended during pregnancy',
+    storage: 'Store at room temperature, protect from moisture'
   },
   
   // Additional Anti-inflammatory drugs
@@ -757,7 +957,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'COX-2 selective nonsteroidal anti-inflammatory drug used to treat pain and inflammation.',
     drugClass: 'COX-2 inhibitor',
     verified: true,
-    brandNames: ['Celebrex']
+    brandNames: ['Celebrex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Osteoarthritis: 200mg daily or 100mg twice daily. Rheumatoid arthritis: 100-200mg twice daily. Acute pain: 400mg initially, then 200mg twice daily.',
+    mechanism: 'Selectively inhibits cyclooxygenase-2 (COX-2), reducing prostaglandin synthesis and inflammation while sparing COX-1.',
+    sideEffects: ['Abdominal pain', 'diarrhea', 'dyspepsia', 'flatulence', 'peripheral edema', 'dizziness', 'headache'],
+    interactions: ['Warfarin', 'lithium', 'ACE inhibitors', 'diuretics', 'methotrexate', 'fluconazole'],
+    indications: ['Osteoarthritis', 'rheumatoid arthritis', 'acute pain', 'primary dysmenorrhea', 'ankylosing spondylitis'],
+    contraindications: ['Hypersensitivity to sulfonamides', 'aspirin/NSAID allergy', 'CABG surgery', 'severe heart failure'],
+    warnings: ['Cardiovascular thrombotic events', 'GI bleeding', 'hepatotoxicity', 'renal toxicity', 'hypertension', 'heart failure'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '219',
@@ -768,7 +978,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'NSAID used to treat pain and inflammation.',
     drugClass: 'NSAID',
     verified: true,
-    brandNames: ['Voltaren', 'Cataflam', 'Zipsor']
+    brandNames: ['Voltaren', 'Cataflam', 'Zipsor'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 50mg 2-3 times daily or 75mg twice daily. Max: 150mg/day. Topical: Apply thin layer 2-4 times daily. Take oral forms with food.',
+    mechanism: 'Inhibits cyclooxygenase (COX-1 and COX-2), reducing prostaglandin synthesis and inflammation.',
+    sideEffects: ['GI upset', 'nausea', 'diarrhea', 'dizziness', 'headache', 'skin rash', 'elevated liver enzymes'],
+    interactions: ['Warfarin', 'ACE inhibitors', 'diuretics', 'lithium', 'methotrexate', 'cyclosporine'],
+    indications: ['Osteoarthritis', 'rheumatoid arthritis', 'ankylosing spondylitis', 'acute pain', 'dysmenorrhea'],
+    contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'CABG surgery'],
+    warnings: ['GI bleeding', 'cardiovascular thrombotic events', 'renal toxicity', 'hepatotoxicity', 'hypertension'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '220',
@@ -779,7 +999,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'NSAID used to treat pain, inflammation, and fever.',
     drugClass: 'NSAID',
     verified: true,
-    brandNames: ['Indocin', 'Tivorbex']
+    brandNames: ['Indocin', 'Tivorbex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 25-50mg 2-3 times daily. Max: 200mg/day. Extended-release: 75mg once or twice daily. Take with food.',
+    mechanism: 'Potent inhibitor of cyclooxygenase, reducing prostaglandin synthesis and inflammation.',
+    sideEffects: ['Headache', 'dizziness', 'nausea', 'dyspepsia', 'diarrhea', 'CNS effects', 'fluid retention'],
+    interactions: ['Warfarin', 'ACE inhibitors', 'diuretics', 'lithium', 'methotrexate', 'probenecid'],
+    indications: ['Rheumatoid arthritis', 'osteoarthritis', 'ankylosing spondylitis', 'acute gouty arthritis', 'patent ductus arteriosus closure'],
+    contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'necrotizing enterocolitis'],
+    warnings: ['GI bleeding', 'cardiovascular events', 'CNS effects', 'renal toxicity', 'hepatotoxicity'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '221',
@@ -790,7 +1020,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'NSAID used for short-term management of moderate to severe pain.',
     drugClass: 'NSAID',
     verified: true,
-    brandNames: ['Toradol', 'Sprix', 'Acular']
+    brandNames: ['Toradol', 'Sprix', 'Acular'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10mg every 4-6 hours. Max: 40mg/day for ≤5 days. IM/IV: 15-30mg every 6 hours. Nasal: 15.75mg every 6-8 hours.',
+    mechanism: 'Potent inhibitor of cyclooxygenase, with analgesic potency comparable to morphine.',
+    sideEffects: ['GI upset', 'nausea', 'dizziness', 'headache', 'drowsiness', 'injection site pain', 'edema'],
+    interactions: ['Warfarin', 'ACE inhibitors', 'diuretics', 'lithium', 'methotrexate', 'probenecid'],
+    indications: ['Short-term management of moderate to severe acute pain', 'postoperative pain'],
+    contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'renal impairment', 'CABG surgery', 'labor and delivery'],
+    warnings: ['GI bleeding', 'renal toxicity', 'cardiovascular events', 'bleeding risk', 'limited to 5 days use'],
+    pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
+    storage: 'Store at room temperature, protect from light'
   },
   
   // Additional Respiratory medications
@@ -803,7 +1043,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Long-acting beta2-adrenergic agonist used to prevent bronchospasm in asthma and COPD.',
     drugClass: 'Long-acting beta agonist',
     verified: true,
-    brandNames: ['Serevent']
+    brandNames: ['Serevent'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 50mcg (2 puffs) twice daily, approximately 12 hours apart. Not for acute bronchospasm relief.',
+    mechanism: 'Long-acting selective beta2-adrenergic agonist that relaxes bronchial smooth muscle.',
+    sideEffects: ['Headache', 'tremor', 'nervousness', 'throat irritation', 'muscle cramps', 'palpitations'],
+    interactions: ['Beta-blockers', 'MAOIs', 'tricyclic antidepressants', 'diuretics', 'CYP3A4 inhibitors'],
+    indications: ['Asthma maintenance therapy', 'COPD maintenance therapy', 'exercise-induced bronchospasm prevention'],
+    contraindications: ['Hypersensitivity to salmeterol', 'acute bronchospasm', 'monotherapy for asthma'],
+    warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'hypokalemia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and freezing'
   },
   {
     id: '223',
@@ -814,7 +1064,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Long-acting beta2-adrenergic agonist used to prevent bronchospasm in asthma and COPD.',
     drugClass: 'Long-acting beta agonist',
     verified: true,
-    brandNames: ['Foradil', 'Perforomist']
+    brandNames: ['Foradil', 'Perforomist'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 12mcg twice daily. Nebulizer: 20mcg twice daily. Maximum: 24mcg/day. Not for acute symptoms.',
+    mechanism: 'Long-acting selective beta2-adrenergic agonist with rapid onset, relaxes bronchial smooth muscle.',
+    sideEffects: ['Tremor', 'headache', 'palpitations', 'muscle cramps', 'nervousness', 'throat irritation'],
+    interactions: ['Beta-blockers', 'MAOIs', 'tricyclic antidepressants', 'diuretics', 'xanthine derivatives'],
+    indications: ['Asthma maintenance therapy', 'COPD maintenance therapy', 'exercise-induced bronchospasm prevention'],
+    contraindications: ['Hypersensitivity to formoterol', 'acute bronchospasm', 'monotherapy for asthma'],
+    warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'hypokalemia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and heat'
   },
   {
     id: '224',
@@ -825,7 +1085,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination of a corticosteroid and a long-acting beta2-adrenergic agonist used to treat asthma and COPD.',
     drugClass: 'Corticosteroid/Long-acting beta agonist',
     verified: true,
-    brandNames: ['Symbicort']
+    brandNames: ['Symbicort'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 2 puffs twice daily. Asthma: 80/4.5mcg or 160/4.5mcg. COPD: 160/4.5mcg. Rinse mouth after use.',
+    mechanism: 'Budesonide reduces inflammation; formoterol provides bronchodilation through beta2-agonist activity.',
+    sideEffects: ['Oral thrush', 'hoarseness', 'headache', 'tremor', 'palpitations', 'upper respiratory infection'],
+    interactions: ['CYP3A4 inhibitors', 'beta-blockers', 'MAOIs', 'tricyclic antidepressants', 'diuretics'],
+    indications: ['Asthma maintenance therapy', 'COPD maintenance therapy'],
+    contraindications: ['Hypersensitivity to components', 'acute bronchospasm', 'severe milk protein allergy'],
+    warnings: ['Increased infection risk', 'adrenal suppression', 'growth suppression in children', 'asthma-related death risk'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and freezing'
   },
   {
     id: '225',
@@ -836,7 +1106,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Long-acting muscarinic antagonist used to treat COPD.',
     drugClass: 'Anticholinergic bronchodilator',
     verified: true,
-    brandNames: ['Incruse Ellipta']
+    brandNames: ['Incruse Ellipta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 62.5mcg once daily at the same time each day. Not for acute bronchospasm relief.',
+    mechanism: 'Long-acting muscarinic antagonist that blocks acetylcholine at muscarinic receptors in bronchial smooth muscle.',
+    sideEffects: ['Nasopharyngitis', 'upper respiratory tract infection', 'cough', 'arthralgia', 'back pain'],
+    interactions: ['Anticholinergic medications', 'CYP2D6 inhibitors', 'P-glycoprotein inhibitors'],
+    indications: ['COPD maintenance therapy', 'chronic bronchitis', 'emphysema'],
+    contraindications: ['Hypersensitivity to umeclidinium', 'severe milk protein allergy', 'acute bronchospasm'],
+    warnings: ['Paradoxical bronchospasm', 'worsening of narrow-angle glaucoma', 'urinary retention', 'hypersensitivity reactions'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and heat'
   },
   {
     id: '226',
@@ -847,7 +1127,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination of a long-acting muscarinic antagonist and a long-acting beta2-adrenergic agonist used to treat COPD.',
     drugClass: 'Anticholinergic bronchodilator/Long-acting beta agonist',
     verified: true,
-    brandNames: ['Anoro Ellipta']
+    brandNames: ['Anoro Ellipta'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhalation: 62.5/25mcg once daily at the same time each day. Not for acute bronchospasm relief.',
+    mechanism: 'Umeclidinium blocks muscarinic receptors; vilanterol activates beta2-adrenergic receptors for bronchodilation.',
+    sideEffects: ['Nasopharyngitis', 'upper respiratory tract infection', 'chest pain', 'constipation', 'diarrhea'],
+    interactions: ['Beta-blockers', 'anticholinergic medications', 'CYP3A4 inhibitors', 'MAOIs', 'tricyclic antidepressants'],
+    indications: ['COPD maintenance therapy', 'chronic bronchitis', 'emphysema'],
+    contraindications: ['Hypersensitivity to components', 'severe milk protein allergy', 'acute bronchospasm', 'asthma monotherapy'],
+    warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'narrow-angle glaucoma'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and heat'
   },
   
   // Additional Anti-allergy medications
@@ -860,7 +1150,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Allegra', 'Telfast']
+    brandNames: ['Allegra', 'Telfast'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: Adults: 60mg twice daily or 180mg once daily. Children 6-11 years: 30mg twice daily. Take on empty stomach.',
+    mechanism: 'Selective H1-receptor antagonist with minimal CNS penetration, blocking histamine-mediated allergic responses.',
+    sideEffects: ['Headache', 'drowsiness', 'dizziness', 'nausea', 'dyspepsia', 'fatigue'],
+    interactions: ['Antacids containing aluminum/magnesium', 'fruit juices', 'ketoconazole', 'erythromycin'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria'],
+    contraindications: ['Hypersensitivity to fexofenadine', 'severe renal impairment'],
+    warnings: ['Renal impairment dosing', 'avoid with fruit juices', 'elderly patients'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '228',
@@ -871,7 +1171,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Clarinex', 'Aerius']
+    brandNames: ['Clarinex', 'Aerius'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Adults: 5mg once daily. Children 6-11 years: 2.5mg once daily. Can be taken with or without food.',
+    mechanism: 'Long-acting selective H1-receptor antagonist with anti-inflammatory properties, minimal CNS penetration.',
+    sideEffects: ['Headache', 'dry mouth', 'fatigue', 'somnolence', 'dizziness', 'nausea'],
+    interactions: ['Ketoconazole', 'erythromycin', 'azithromycin', 'fluoxetine', 'cimetidine'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria'],
+    contraindications: ['Hypersensitivity to desloratadine or loratadine'],
+    warnings: ['Renal/hepatic impairment dosing', 'elderly patients', 'phenylketonuria (orally disintegrating tablets)'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '229',
@@ -882,7 +1192,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Xyzal', 'Xusal']
+    brandNames: ['Xyzal', 'Xusal'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: Adults: 5mg once daily in the evening. Children 6-11 years: 2.5mg once daily. Can be taken with or without food.',
+    mechanism: 'Active enantiomer of cetirizine; selective H1-receptor antagonist with minimal CNS penetration and anti-inflammatory properties.',
+    sideEffects: ['Drowsiness', 'fatigue', 'dry mouth', 'pharyngitis', 'epistaxis', 'fever'],
+    interactions: ['Theophylline', 'ritonavir', 'CNS depressants', 'alcohol'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'chronic idiopathic urticaria'],
+    contraindications: ['Hypersensitivity to levocetirizine or cetirizine', 'end-stage renal disease', 'hemodialysis patients'],
+    warnings: ['Renal impairment dosing', 'elderly patients', 'avoid alcohol', 'driving impairment'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '230',
@@ -893,7 +1213,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Second-generation antihistamine used to relieve nasal allergy symptoms and eye allergy symptoms.',
     drugClass: 'Second-generation antihistamine',
     verified: true,
-    brandNames: ['Astelin', 'Optivar', 'Astepro']
+    brandNames: ['Astelin', 'Optivar', 'Astepro'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Nasal spray: 1-2 sprays per nostril twice daily. Eye drops: 1 drop in each affected eye twice daily.',
+    mechanism: 'H1-receptor antagonist with anti-inflammatory properties; also inhibits mast cell degranulation and leukotriene release.',
+    sideEffects: ['Bitter taste', 'drowsiness', 'nasal irritation', 'headache', 'epistaxis', 'eye irritation (ophthalmic)'],
+    interactions: ['CNS depressants', 'alcohol', 'cimetidine', 'ketoconazole'],
+    indications: ['Seasonal allergic rhinitis', 'perennial allergic rhinitis', 'allergic conjunctivitis'],
+    contraindications: ['Hypersensitivity to azelastine', 'children under 5 years (nasal)', 'children under 3 years (ophthalmic)'],
+    warnings: ['Drowsiness', 'avoid alcohol', 'driving impairment', 'nasal septum perforation (rare)'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store upright at room temperature, protect from freezing'
   },
   
   // Additional Antilipemic medications
@@ -906,7 +1236,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'HMG-CoA reductase inhibitor used to lower cholesterol and prevent cardiovascular disease.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    brandNames: ['Crestor']
+    brandNames: ['Crestor'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 10-20mg once daily. Range: 5-40mg once daily. Max: 40mg/day. Take with or without food.',
+    mechanism: 'Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis, reducing LDL cholesterol production.',
+    sideEffects: ['Headache', 'myalgia', 'abdominal pain', 'weakness', 'nausea', 'dizziness'],
+    interactions: ['Cyclosporine', 'warfarin', 'gemfibrozil', 'niacin', 'antacids', 'protease inhibitors'],
+    indications: ['Hypercholesterolemia', 'mixed dyslipidemia', 'hypertriglyceridemia', 'primary prevention of cardiovascular disease'],
+    contraindications: ['Active liver disease', 'unexplained persistent elevations of serum transaminases', 'pregnancy', 'nursing mothers'],
+    warnings: ['Myopathy/rhabdomyolysis', 'liver enzyme elevations', 'diabetes mellitus', 'cognitive impairment'],
+    pregnancy: 'Category X - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '232',
@@ -917,7 +1257,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'HMG-CoA reductase inhibitor used to lower cholesterol and prevent cardiovascular disease.',
     drugClass: 'HMG-CoA reductase inhibitor (statin)',
     verified: true,
-    brandNames: ['Pravachol', 'Lipostat']
+    brandNames: ['Pravachol', 'Lipostat'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 40mg once daily at bedtime. Range: 10-80mg once daily. Max: 80mg/day. Take with or without food.',
+    mechanism: 'Inhibits HMG-CoA reductase, blocking cholesterol synthesis and increasing LDL receptor expression.',
+    sideEffects: ['Headache', 'dizziness', 'chest pain', 'nausea', 'vomiting', 'diarrhea', 'myalgia'],
+    interactions: ['Cyclosporine', 'gemfibrozil', 'niacin', 'erythromycin', 'clarithromycin', 'colestipol'],
+    indications: ['Hypercholesterolemia', 'mixed dyslipidemia', 'primary prevention of coronary events', 'secondary prevention'],
+    contraindications: ['Active liver disease', 'unexplained persistent elevations of serum transaminases', 'pregnancy', 'nursing mothers'],
+    warnings: ['Myopathy/rhabdomyolysis', 'liver dysfunction', 'diabetes mellitus', 'renal impairment'],
+    pregnancy: 'Category X - Contraindicated in pregnancy',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   {
     id: '233',
@@ -928,7 +1278,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Cholesterol absorption inhibitor used to lower cholesterol.',
     drugClass: 'Cholesterol absorption inhibitor',
     verified: true,
-    brandNames: ['Zetia', 'Ezetrol']
+    brandNames: ['Zetia', 'Ezetrol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10mg once daily. Can be taken with or without food. May be given with statin therapy.',
+    mechanism: 'Inhibits cholesterol absorption at the brush border of the small intestine via NPC1L1 transporter.',
+    sideEffects: ['Upper respiratory infection', 'diarrhea', 'arthralgia', 'sinusitis', 'pain in extremity'],
+    interactions: ['Cyclosporine (increases ezetimibe levels)', 'fibrates', 'cholestyramine (decreases absorption)'],
+    indications: ['Primary hypercholesterolemia', 'mixed hyperlipidemia', 'homozygous sitosterolemia'],
+    contraindications: ['Hypersensitivity to ezetimibe', 'active liver disease (when used with statin)', 'pregnancy (with statin)'],
+    warnings: ['Liver enzyme monitoring (with statin)', 'myopathy (with statin)', 'gallbladder disease'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '234',
@@ -939,7 +1299,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Fibric acid derivative used to lower triglycerides and cholesterol.',
     drugClass: 'Fibric acid derivative',
     verified: true,
-    brandNames: ['Tricor', 'Fenoglide', 'Antara']
+    brandNames: ['Tricor', 'Fenoglide', 'Antara'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 48-145mg once daily with meals. Tricor: 48-145mg daily. Fenoglide: 40-120mg daily. Antara: 43-130mg daily. Take with food to enhance absorption.',
+    mechanism: 'Activates peroxisome proliferator-activated receptor alpha (PPARα), increasing lipoprotein lipase activity and reducing VLDL production.',
+    sideEffects: ['Abdominal pain', 'back pain', 'headache', 'abnormal liver tests', 'respiratory disorder', 'increased CPK'],
+    interactions: ['Warfarin', 'statins', 'cyclosporine', 'bile acid sequestrants', 'colchicine'],
+    indications: ['Primary hypercholesterolemia', 'mixed dyslipidemia', 'hypertriglyceridemia', 'severe hypertriglyceridemia'],
+    contraindications: ['Hepatic dysfunction', 'severe renal dysfunction', 'preexisting gallbladder disease', 'nursing mothers'],
+    warnings: ['Myopathy/rhabdomyolysis', 'hepatotoxicity', 'cholelithiasis', 'pulmonary embolism', 'deep vein thrombosis'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture and light'
   },
   
   // Additional Psychotropic medications
@@ -952,7 +1322,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Tetracyclic antidepressant used to treat depression.',
     drugClass: 'Tetracyclic antidepressant',
     verified: true,
-    brandNames: ['Remeron']
+    brandNames: ['Remeron'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 15mg at bedtime. Maintenance: 15-45mg daily at bedtime. Max: 45mg/day. Take with or without food.',
+    mechanism: 'Antagonizes central presynaptic α2-adrenergic receptors and blocks 5-HT2 and 5-HT3 receptors, enhancing noradrenergic and serotonergic neurotransmission.',
+    sideEffects: ['Somnolence', 'increased appetite', 'weight gain', 'dizziness', 'dry mouth', 'constipation', 'confusion'],
+    interactions: ['MAO inhibitors', 'warfarin', 'phenytoin', 'carbamazepine', 'rifampin', 'cimetidine'],
+    indications: ['Major depressive disorder', 'off-label: insomnia', 'appetite stimulation', 'PTSD'],
+    contraindications: ['Hypersensitivity to mirtazapine', 'concurrent MAO inhibitor use', 'within 14 days of MAO inhibitor'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'angle-closure glaucoma', 'urinary retention', 'seizures'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '236',
@@ -963,7 +1343,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin antagonist and reuptake inhibitor used to treat depression and insomnia.',
     drugClass: 'Serotonin antagonist and reuptake inhibitor',
     verified: true,
-    brandNames: ['Desyrel', 'Oleptro']
+    brandNames: ['Desyrel', 'Oleptro'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Depression: Initial: 150mg daily in divided doses. Max: 400mg/day. Insomnia: 25-100mg at bedtime. Take with food.',
+    mechanism: 'Inhibits serotonin reuptake and antagonizes 5-HT2A receptors; also blocks α1-adrenergic and histamine H1 receptors.',
+    sideEffects: ['Drowsiness', 'dizziness', 'dry mouth', 'blurred vision', 'constipation', 'nausea', 'headache'],
+    interactions: ['MAO inhibitors', 'warfarin', 'digoxin', 'phenytoin', 'carbamazepine', 'ketoconazole'],
+    indications: ['Major depressive disorder', 'insomnia (off-label)', 'anxiety disorders (off-label)'],
+    contraindications: ['Hypersensitivity to trazodone', 'concurrent MAO inhibitor use', 'recovery phase of myocardial infarction'],
+    warnings: ['Suicidal thoughts', 'priapism', 'cardiac arrhythmias', 'orthostatic hypotension', 'serotonin syndrome'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '237',
@@ -974,7 +1364,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin-norepinephrine reuptake inhibitor used to treat depression.',
     drugClass: 'SNRI',
     verified: true,
-    brandNames: ['Pristiq', 'Khedezla']
+    brandNames: ['Pristiq', 'Khedezla'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 50mg once daily with or without food. Range: 50-100mg daily. Max: 100mg/day. Do not crush or chew extended-release tablets.',
+    mechanism: 'Inhibits reuptake of serotonin and norepinephrine with minimal effects on other neurotransmitters or receptors.',
+    sideEffects: ['Nausea', 'dizziness', 'insomnia', 'hyperhidrosis', 'constipation', 'somnolence', 'decreased appetite'],
+    interactions: ['MAO inhibitors', 'linezolid', 'methylene blue', 'triptans', 'warfarin', 'aspirin', 'NSAIDs'],
+    indications: ['Major depressive disorder'],
+    contraindications: ['Hypersensitivity to desvenlafaxine or venlafaxine', 'concurrent MAO inhibitor use'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'elevated blood pressure', 'mydriasis', 'hyponatremia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '238',
@@ -985,7 +1385,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin reuptake inhibitor and 5-HT1A partial agonist used to treat depression.',
     drugClass: 'SSRI/5-HT1A partial agonist',
     verified: true,
-    brandNames: ['Viibryd']
+    brandNames: ['Viibryd'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Initial: 10mg daily for 7 days, then 20mg daily for 7 days, then 40mg daily. Take with food (≥500 calories).',
+    mechanism: 'Inhibits serotonin reuptake and acts as partial agonist at 5-HT1A receptors, providing antidepressant effects with reduced sexual side effects.',
+    sideEffects: ['Diarrhea', 'nausea', 'vomiting', 'insomnia', 'dizziness', 'dry mouth', 'somnolence'],
+    interactions: ['MAO inhibitors', 'linezolid', 'methylene blue', 'strong CYP3A4 inhibitors', 'aspirin', 'warfarin'],
+    indications: ['Major depressive disorder'],
+    contraindications: ['Hypersensitivity to vilazodone', 'concurrent MAO inhibitor use', 'within 14 days of MAO inhibitor'],
+    warnings: ['Suicidal thoughts', 'serotonin syndrome', 'abnormal bleeding', 'activation of mania', 'discontinuation syndrome'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   
   // Additional Antimalarial medications
@@ -998,7 +1408,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Medication used to prevent and treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Lariam']
+    brandNames: ['Lariam'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 250mg weekly, start 1-2 weeks before travel. Treatment: 1250mg as single dose or 750mg followed by 500mg 6-12 hours later.',
+    mechanism: 'Interferes with parasite food vacuole function and inhibits polymerization of heme, leading to parasite death.',
+    sideEffects: ['Nausea', 'vomiting', 'dizziness', 'loss of balance', 'headache', 'insomnia', 'vivid dreams'],
+    interactions: ['Halofantrine', 'ketoconazole', 'quinidine', 'quinine', 'chloroquine', 'anticonvulsants'],
+    indications: ['Malaria prevention', 'malaria treatment (chloroquine-resistant P. falciparum)'],
+    contraindications: ['Hypersensitivity to mefloquine', 'active depression', 'anxiety disorders', 'psychosis', 'schizophrenia'],
+    warnings: ['Neuropsychiatric reactions', 'seizures', 'cardiac conduction disorders', 'hepatic impairment'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '240',
@@ -1009,7 +1429,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination medication used to prevent and treat malaria.',
     drugClass: 'Antimalarial',
     verified: true,
-    brandNames: ['Malarone']
+    brandNames: ['Malarone'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Prevention: 1 adult tablet daily with food, start 1-2 days before travel. Treatment: 4 adult tablets daily for 3 days with food.',
+    mechanism: 'Atovaquone inhibits parasite mitochondrial electron transport; proguanil inhibits dihydrofolate reductase, disrupting DNA synthesis.',
+    sideEffects: ['Abdominal pain', 'nausea', 'vomiting', 'headache', 'diarrhea', 'weakness', 'dizziness'],
+    interactions: ['Rifampin', 'rifabutin', 'tetracycline', 'metoclopramide', 'warfarin'],
+    indications: ['Malaria prevention', 'malaria treatment (uncomplicated P. falciparum)'],
+    contraindications: ['Hypersensitivity to atovaquone or proguanil', 'severe renal impairment (CrCl <30 mL/min)'],
+    warnings: ['Renal impairment', 'hepatic impairment', 'severe or complicated malaria', 'vomiting'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   {
     id: '241',
@@ -1020,7 +1450,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Tetracycline antibiotic used to prevent malaria.',
     drugClass: 'Tetracycline antibiotic',
     verified: true,
-    brandNames: ['Vibramycin', 'Oracea', 'Doryx']
+    brandNames: ['Vibramycin', 'Oracea', 'Doryx'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Malaria prevention: 100mg daily, start 1-2 days before travel, continue 4 weeks after return. Take with food and plenty of water.',
+    mechanism: 'Inhibits protein synthesis by binding to 30S ribosomal subunit, preventing malaria parasite development in liver and blood.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'photosensitivity', 'esophageal irritation', 'vaginal candidiasis'],
+    interactions: ['Antacids', 'iron supplements', 'warfarin', 'digoxin', 'methoxyflurane', 'penicillin'],
+    indications: ['Malaria prevention', 'malaria treatment (in combination)', 'bacterial infections'],
+    contraindications: ['Hypersensitivity to tetracyclines', 'pregnancy', 'children <8 years', 'severe hepatic impairment'],
+    warnings: ['Photosensitivity', 'esophageal ulceration', 'intracranial hypertension', 'tooth discoloration in children'],
+    pregnancy: 'Category D - Avoid in pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
   },
   
   // Additional Antivirals
@@ -1033,7 +1473,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Neuraminidase inhibitor used to treat and prevent influenza.',
     drugClass: 'Neuraminidase inhibitor',
     verified: true,
-    brandNames: ['Tamiflu']
+    brandNames: ['Tamiflu'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Treatment: 75mg twice daily for 5 days (start within 48 hours). Prevention: 75mg once daily for 10 days. Take with or without food.',
+    mechanism: 'Inhibits influenza neuraminidase enzyme, preventing viral release from infected cells and reducing viral spread.',
+    sideEffects: ['Nausea', 'vomiting', 'headache', 'diarrhea', 'abdominal pain', 'dizziness', 'fatigue'],
+    interactions: ['Live attenuated influenza vaccine', 'probenecid', 'warfarin (monitor INR)'],
+    indications: ['Influenza A and B treatment', 'influenza prophylaxis in high-risk patients'],
+    contraindications: ['Hypersensitivity to oseltamivir', 'severe renal impairment (CrCl <10 mL/min)'],
+    warnings: ['Neuropsychiatric events', 'renal impairment dosing', 'resistance development', 'allergic reactions'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '243',
@@ -1044,7 +1494,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Antiviral medication used to treat herpes virus infections.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Valtrex']
+    brandNames: ['Valtrex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Herpes zoster: 1g three times daily for 7 days. Genital herpes: 1g twice daily for 10 days (initial) or 500mg twice daily for 3 days (recurrent). Take with or without food.',
+    mechanism: 'Prodrug of acyclovir; converted to acyclovir which inhibits viral DNA polymerase, preventing viral replication.',
+    sideEffects: ['Headache', 'nausea', 'abdominal pain', 'dizziness', 'fatigue', 'constipation', 'rash'],
+    interactions: ['Probenecid', 'cimetidine', 'mycophenolate mofetil', 'nephrotoxic drugs'],
+    indications: ['Herpes zoster (shingles)', 'genital herpes', 'herpes labialis', 'cytomegalovirus prophylaxis'],
+    contraindications: ['Hypersensitivity to valacyclovir or acyclovir', 'immunocompromised patients with TTP/HUS history'],
+    warnings: ['Renal impairment', 'CNS effects', 'thrombotic thrombocytopenic purpura', 'acute renal failure'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '244',
@@ -1055,7 +1515,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Antiviral medication used to treat herpes virus infections.',
     drugClass: 'Antiviral',
     verified: true,
-    brandNames: ['Famvir']
+    brandNames: ['Famvir'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Herpes zoster: 500mg three times daily for 7 days. Genital herpes: 1000mg twice daily for 1 day (recurrent) or 250mg three times daily for 7-10 days (initial). Take with or without food.',
+    mechanism: 'Prodrug of penciclovir; converted to penciclovir which inhibits viral DNA polymerase, preventing viral replication.',
+    sideEffects: ['Headache', 'nausea', 'diarrhea', 'fatigue', 'dizziness', 'abdominal pain', 'vomiting'],
+    interactions: ['Probenecid', 'digoxin', 'theophylline', 'raloxifene'],
+    indications: ['Herpes zoster (shingles)', 'genital herpes', 'herpes labialis', 'suppressive therapy'],
+    contraindications: ['Hypersensitivity to famciclovir or penciclovir'],
+    warnings: ['Renal impairment dosing', 'elderly patients', 'galactose intolerance', 'lactase deficiency'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '245',
@@ -1066,7 +1536,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Combination of two antiretroviral medications used to treat and prevent HIV infection.',
     drugClass: 'Nucleoside reverse transcriptase inhibitor',
     verified: true,
-    brandNames: ['Truvada']
+    brandNames: ['Truvada'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: HIV treatment: 1 tablet once daily with or without food. PrEP: 1 tablet once daily with or without food. Must be part of combination therapy for treatment.',
+    mechanism: 'Emtricitabine and tenofovir are nucleoside analogs that inhibit HIV reverse transcriptase, preventing viral DNA synthesis and replication.',
+    sideEffects: ['Nausea', 'diarrhea', 'headache', 'fatigue', 'dizziness', 'depression', 'insomnia', 'rash'],
+    interactions: ['Nephrotoxic drugs', 'didanosine', 'atazanavir', 'lopinavir/ritonavir', 'ledipasvir/sofosbuvir'],
+    indications: ['HIV-1 infection treatment (with other antiretrovirals)', 'HIV-1 pre-exposure prophylaxis (PrEP)'],
+    contraindications: ['Hypersensitivity to emtricitabine or tenofovir', 'CrCl <30 mL/min for PrEP', 'unknown HIV status for PrEP'],
+    warnings: ['Renal toxicity', 'bone density loss', 'lactic acidosis', 'hepatomegaly with steatosis', 'immune reconstitution syndrome'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture, keep in original container'
   },
   
   // Additional Gastrointestinal medications
@@ -1079,7 +1559,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor used to treat acid reflux and ulcers.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    brandNames: ['Aciphex', 'Pariet']
+    brandNames: ['Aciphex', 'Pariet'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: GERD: 20mg once daily for 4-8 weeks. Peptic ulcer: 20mg once daily for 4-8 weeks. Take 30-60 minutes before eating.',
+    mechanism: 'Irreversibly inhibits gastric H+/K+-ATPase (proton pump), blocking the final step of gastric acid secretion.',
+    sideEffects: ['Headache', 'diarrhea', 'nausea', 'abdominal pain', 'vomiting', 'flatulence', 'constipation'],
+    interactions: ['Atazanavir', 'rilpivirine', 'warfarin', 'digoxin', 'methotrexate', 'ketoconazole'],
+    indications: ['GERD', 'erosive esophagitis', 'peptic ulcers', 'Zollinger-Ellison syndrome', 'H. pylori eradication'],
+    contraindications: ['Hypersensitivity to rabeprazole or benzimidazoles', 'rilpivirine co-administration'],
+    warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'vitamin B12 deficiency', 'acute interstitial nephritis'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '247',
@@ -1090,7 +1580,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Proton pump inhibitor used to treat acid reflux.',
     drugClass: 'Proton pump inhibitor',
     verified: true,
-    brandNames: ['Dexilant']
+    brandNames: ['Dexilant'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: GERD: 30mg once daily for 4 weeks. Erosive esophagitis: 60mg once daily for up to 8 weeks. Take with or without food.',
+    mechanism: 'R-enantiomer of lansoprazole; irreversibly inhibits gastric H+/K+-ATPase with dual delayed-release formulation for extended acid suppression.',
+    sideEffects: ['Diarrhea', 'abdominal pain', 'nausea', 'upper respiratory tract infection', 'vomiting', 'flatulence'],
+    interactions: ['Atazanavir', 'rilpivirine', 'warfarin', 'tacrolimus', 'methotrexate', 'digoxin'],
+    indications: ['GERD', 'erosive esophagitis healing and maintenance'],
+    contraindications: ['Hypersensitivity to dexlansoprazole', 'lansoprazole', 'or benzimidazoles'],
+    warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'acute interstitial nephritis', 'fundic gland polyps'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '248',
@@ -1101,7 +1601,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Serotonin 5-HT3 receptor antagonist used to prevent nausea and vomiting.',
     drugClass: '5-HT3 receptor antagonist',
     verified: true,
-    brandNames: ['Zofran', 'Zuplenz']
+    brandNames: ['Zofran', 'Zuplenz'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Chemotherapy-induced nausea: 8mg 30 minutes before chemotherapy, then 8mg every 8 hours. Post-operative: 16mg 1 hour before anesthesia. Take with or without food.',
+    mechanism: 'Selectively blocks serotonin 5-HT3 receptors in the chemoreceptor trigger zone and vagal nerve terminals, preventing nausea and vomiting.',
+    sideEffects: ['Headache', 'constipation', 'diarrhea', 'fatigue', 'dizziness', 'drowsiness', 'fever'],
+    interactions: ['Apomorphine', 'tramadol', 'QT-prolonging drugs', 'CYP3A4 inducers', 'serotonergic drugs'],
+    indications: ['Chemotherapy-induced nausea and vomiting', 'radiation-induced nausea', 'post-operative nausea and vomiting'],
+    contraindications: ['Hypersensitivity to ondansetron', 'concomitant apomorphine use', 'congenital long QT syndrome'],
+    warnings: ['QT prolongation', 'serotonin syndrome', 'masking of ileus', 'hypersensitivity reactions'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light'
   },
   {
     id: '249',
@@ -1112,7 +1622,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Medication used to treat diarrhea.',
     drugClass: 'Antidiarrheal',
     verified: true,
-    brandNames: ['Imodium']
+    brandNames: ['Imodium'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Oral: Initial: 4mg, then 2mg after each loose stool. Max: 16mg/day for OTC use, 8mg/day for >2 days. Take with water.',
+    mechanism: 'Opioid receptor agonist that slows intestinal motility by acting on μ-opioid receptors in the gut wall, increasing transit time and water absorption.',
+    sideEffects: ['Constipation', 'dizziness', 'drowsiness', 'nausea', 'dry mouth', 'abdominal pain', 'fatigue'],
+    interactions: ['P-glycoprotein inhibitors', 'quinidine', 'ritonavir', 'itraconazole', 'gemfibrozil'],
+    indications: ['Acute diarrhea', 'chronic diarrhea', 'traveler\'s diarrhea', 'ileostomy discharge reduction'],
+    contraindications: ['Hypersensitivity to loperamide', 'acute dysentery', 'bacterial enterocolitis', 'pseudomembranous colitis'],
+    warnings: ['Cardiac arrhythmias at high doses', 'toxic megacolon', 'CNS depression', 'abuse potential'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from moisture'
   },
   {
     id: '250',
@@ -1123,7 +1643,17 @@ export const additionalDrugsData: DrugData[] = [
     description: 'Medication used to treat nausea, vomiting, and gastroparesis.',
     drugClass: 'Dopamine antagonist',
     verified: true,
-    brandNames: ['Reglan', 'Metozolv ODT']
+    brandNames: ['Reglan', 'Metozolv ODT'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Gastroparesis: 10mg 30 minutes before meals and at bedtime. GERD: 10-15mg up to 4 times daily. Max treatment duration: 12 weeks.',
+    mechanism: 'Blocks dopamine D2 receptors in the chemoreceptor trigger zone and enhances GI motility by facilitating acetylcholine release.',
+    sideEffects: ['Drowsiness', 'restlessness', 'fatigue', 'diarrhea', 'nausea', 'insomnia', 'headache'],
+    interactions: ['Levodopa', 'digoxin', 'cyclosporine', 'tetracycline', 'MAO inhibitors', 'sedatives'],
+    indications: ['Gastroparesis', 'GERD', 'nausea and vomiting', 'facilitation of small bowel intubation'],
+    contraindications: ['GI obstruction', 'perforation', 'hemorrhage', 'pheochromocytoma', 'tardive dyskinesia history'],
+    warnings: ['Tardive dyskinesia', 'neuroleptic malignant syndrome', 'depression', 'Parkinson\'s disease', 'seizures'],
+    pregnancy: 'Category B - Generally considered safe',
+    storage: 'Store at room temperature, protect from light'
   }
 ];
 

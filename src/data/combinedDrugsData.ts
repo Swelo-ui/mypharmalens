@@ -1,6 +1,13 @@
 
 import { DrugData } from "@/components/DrugCard";
-import { DetailedDrugData, getDetailedDrugData } from "./drugDataUtils";
+import { 
+  DetailedDrugData, 
+  getDetailedDrugData,
+  validateDrugDataset,
+  detectAllDuplicates,
+  ValidationResult,
+  DuplicateDetectionResult
+} from "./drugDataUtils";
 import { cardiovascularDrugs } from "./cardiovascularDrugs";
 import { respiratoryDrugs } from "./respiratoryDrugs";
 import { gastrointestinalDrugs } from "./gastrointestinalDrugs";
@@ -14,28 +21,139 @@ import { otherDrugs } from "./otherDrugs";
 import { extraWHODrugs } from "./extraWHODrugs";
 import { additionalDrugsData } from "./additionalDrugsData";
 
-// Combine all drug data from different categories
-export const combinedDrugsData: DrugData[] = [
-  ...cardiovascularDrugs,
-  ...respiratoryDrugs,
-  ...gastrointestinalDrugs,
-  ...endocrineDrugs,
-  ...centralNervousDrugs,
-  ...antibioticDrugs, 
-  ...antiviralDrugs,
-  ...antimalarialDrugs,
-  ...supplementDrugs,
-  ...otherDrugs,
-  ...extraWHODrugs,
-  ...additionalDrugsData
+// Create a map to track drug sources for validation reporting
+const drugSources = new Map<string, string>();
+
+// Helper function to add drugs with source tracking
+function addDrugsWithSource(drugs: DrugData[], sourceName: string): DrugData[] {
+  drugs.forEach(drug => {
+    drugSources.set(drug.id, sourceName);
+  });
+  return drugs;
+}
+
+// Combine all drug data from different categories with source tracking
+const allDrugsData: DrugData[] = [
+  ...addDrugsWithSource(cardiovascularDrugs, 'cardiovascularDrugs.ts'),
+  ...addDrugsWithSource(respiratoryDrugs, 'respiratoryDrugs.ts'),
+  ...addDrugsWithSource(gastrointestinalDrugs, 'gastrointestinalDrugs.ts'),
+  ...addDrugsWithSource(endocrineDrugs, 'endocrineDrugs.ts'),
+  ...addDrugsWithSource(centralNervousDrugs, 'centralNervousDrugs.ts'),
+  ...addDrugsWithSource(antibioticDrugs, 'antibioticDrugs.ts'), 
+  ...addDrugsWithSource(antiviralDrugs, 'antiviralDrugs.ts'),
+  ...addDrugsWithSource(antimalarialDrugs, 'antimalarialDrugs.ts'),
+  ...addDrugsWithSource(supplementDrugs, 'supplementDrugs.ts'),
+  ...addDrugsWithSource(otherDrugs, 'otherDrugs.ts'),
+  ...addDrugsWithSource(extraWHODrugs, 'extraWHODrugs.ts'),
+  ...addDrugsWithSource(additionalDrugsData, 'additionalDrugsData.ts')
 ];
 
-// Export the getDetailedDrugData function for use elsewhere
-export { getDetailedDrugData };
+// Enhanced deduplication with validation logging for both ID and name duplicates
+let duplicatesFound = 0;
+let duplicateLog: Array<{id: string, kept: string, replaced: string[]}> = [];
+
+export const combinedDrugsData: DrugData[] = allDrugsData.reduce((unique: DrugData[], drug: DrugData) => {
+  // Check for ID duplicates first
+  const existingIdIndex = unique.findIndex(existingDrug => existingDrug.id === drug.id);
+  if (existingIdIndex !== -1) {
+    // Log duplicate found
+    duplicatesFound++;
+    const existingDrug = unique[existingIdIndex];
+    const existingSource = drugSources.get(existingDrug.id) || 'unknown';
+    const currentSource = drugSources.get(drug.id) || 'unknown';
+    
+    // Find existing log entry or create new one
+    let logEntry = duplicateLog.find(entry => entry.id === drug.id);
+    if (!logEntry) {
+      logEntry = {
+        id: drug.id,
+        kept: currentSource, // additionalDrugsData takes precedence (last in array)
+        replaced: [existingSource]
+      };
+      duplicateLog.push(logEntry);
+    } else {
+      logEntry.replaced.push(existingSource);
+    }
+    
+    // Replace with current drug (additionalDrugsData takes precedence)
+    unique[existingIdIndex] = drug;
+    return unique;
+  }
+  
+  // Check for name duplicates (case-insensitive)
+  const existingNameIndex = unique.findIndex(existingDrug => 
+    existingDrug.name.toLowerCase().trim() === drug.name.toLowerCase().trim()
+  );
+  if (existingNameIndex !== -1) {
+    // Log name duplicate found
+    duplicatesFound++;
+    const existingDrug = unique[existingNameIndex];
+    const existingSource = drugSources.get(existingDrug.id) || 'unknown';
+    const currentSource = drugSources.get(drug.id) || 'unknown';
+    
+    // Create log entry for name duplicate
+    const logEntry = {
+      id: `${drug.name} (ID: ${drug.id} vs ${existingDrug.id})`,
+      kept: currentSource, // additionalDrugsData takes precedence (last in array)
+      replaced: [existingSource]
+    };
+    duplicateLog.push(logEntry);
+    
+    // Replace with current drug (additionalDrugsData takes precedence)
+    unique[existingNameIndex] = drug;
+    return unique;
+  }
+  
+  unique.push(drug);
+  return unique;
+}, []);
+
+// Log deduplication results in development
+if (process.env.NODE_ENV === 'development' && duplicatesFound > 0) {
+  console.warn(`🔍 Drug Data Deduplication Report:`);
+  console.warn(`📊 Total duplicates resolved: ${duplicatesFound}`);
+  console.warn(`📋 Duplicate details:`, duplicateLog);
+  console.warn(`ℹ️  Note: Later sources take precedence (additionalDrugsData.ts has highest priority)`);
+}
+
+// Export validation functions for external use
+export { 
+  getDetailedDrugData,
+  validateDrugDataset,
+  detectAllDuplicates,
+  type ValidationResult,
+  type DuplicateDetectionResult
+};
 
 // Wrap the function to include combinedDrugsData by default
 export const getDrugDetails = (id: string): DetailedDrugData | null => {
   return getDetailedDrugData(id, combinedDrugsData);
+};
+
+// Validation functions for the combined dataset
+export const validateCombinedDrugData = (): ValidationResult => {
+  return validateDrugDataset(combinedDrugsData);
+};
+
+export const detectCombinedDrugDuplicates = (): DuplicateDetectionResult => {
+  return detectAllDuplicates(combinedDrugsData, drugSources);
+};
+
+// Get validation report for debugging
+export const getValidationReport = (): {
+  totalDrugs: number;
+  duplicatesResolved: number;
+  duplicateLog: Array<{id: string, kept: string, replaced: string[]}>;
+  validation: ValidationResult;
+  duplicateDetection: DuplicateDetectionResult;
+} => {
+  return {
+    totalDrugs: combinedDrugsData.length,
+    duplicatesResolved: duplicatesFound,
+    duplicateLog,
+    validation: validateCombinedDrugData(),
+    duplicateDetection: detectCombinedDrugDuplicates()
+  };
 };
 
 // Helper function to get total drug count
