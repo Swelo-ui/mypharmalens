@@ -21,12 +21,13 @@ const Disclaimer = () => {
           <div className="container mx-auto px-4 max-w-4xl">
             <h1 className="text-3xl font-bold mb-8">Medical Disclaimer</h1>
             
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 my-8">
-              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-3">⚠️ Critical Medical Notice</h3>
-              <p className="text-red-700 dark:text-red-300 font-medium">
+            <Alert variant="destructive" className="mb-8">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Critical Medical Notice</AlertTitle>
+              <AlertDescription>
                 PharmaLens is an AI-powered informational tool only and is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult healthcare professionals for medical decisions.
-              </p>
-            </div>
+              </AlertDescription>
+            </Alert>
             
             <div className="prose prose-lg dark:prose-invert max-w-none">
               <h2>1. Developer Information</h2>
