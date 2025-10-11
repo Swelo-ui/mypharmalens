@@ -66,6 +66,12 @@ class AudioService {
         const audio = new Audio(path);
         audio.preload = 'auto';
         audio.volume = this.settings.volume;
+        
+        // Add error handling for missing files
+        audio.addEventListener('error', (e) => {
+          console.warn(`Audio file not found: ${path}. Please add the required audio files to the public/notifications folder.`);
+        });
+        
         this.audioCache.set(key as NotificationSound, audio);
       } catch (error) {
         console.warn(`Failed to preload sound ${key}:`, error);

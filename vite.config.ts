@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2,mp3}'],
       },
     }),
   ].filter(Boolean),

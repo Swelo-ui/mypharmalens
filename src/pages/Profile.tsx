@@ -168,29 +168,35 @@ const Profile = () => {
     <div className="min-h-screen flex flex-col pt-16 pb-20">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
+      <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center sm:text-left">Profile Settings</h1>
         
-        <Tabs defaultValue="profile" className="max-w-3xl mx-auto">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="profile">Profile Information</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="audio">Audio Settings</TabsTrigger>
+        <Tabs defaultValue="profile" className="w-full max-w-4xl mx-auto">
+          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-auto">
+            <TabsTrigger value="profile" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
+              Profile Information
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="audio" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
+              Audio Settings
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
+            <Card className="border-0 sm:border shadow-none sm:shadow-sm">
+              <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
+                <CardTitle className="text-lg sm:text-xl">Profile Information</CardTitle>
+                <CardDescription className="text-sm">
                   Update your profile details
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col gap-6">
-                  <div className="mb-6">
-                    <Label htmlFor="displayName" className="mb-2 block">
-                      <User className="inline-block w-4 h-4 mr-2" />
+              <CardContent className="px-4 sm:px-6 pb-6">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="displayName" className="flex items-center text-sm font-medium">
+                      <User className="w-4 h-4 mr-2 flex-shrink-0" />
                       Display Name
                     </Label>
                     <Input
@@ -198,12 +204,13 @@ const Profile = () => {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="Your display name"
+                      className="w-full"
                     />
                   </div>
                   
-                  <div className="mb-6">
-                    <Label htmlFor="email" className="mb-2 block">
-                      <Mail className="inline-block w-4 h-4 mr-2" />
+                  <div className="space-y-3">
+                    <Label htmlFor="email" className="flex items-center text-sm font-medium">
+                      <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
                       Email Address
                     </Label>
                     <Input
@@ -211,19 +218,20 @@ const Profile = () => {
                       value={email}
                       readOnly
                       disabled
-                      className="bg-gray-100 dark:bg-gray-800"
+                      className="bg-gray-100 dark:bg-gray-800 w-full"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-2">
                       Email address cannot be changed
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex justify-end mt-6">
+                <div className="flex justify-center sm:justify-end mt-8">
                   <Button 
                     variant="primary" 
                     onClick={handleUpdateProfile} 
                     disabled={isUpdating}
+                    className="w-full sm:w-auto min-w-[140px]"
                   >
                     {isUpdating ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -238,18 +246,18 @@ const Profile = () => {
           </TabsContent>
           
           <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>
+            <Card className="border-0 sm:border shadow-none sm:shadow-sm">
+              <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
+                <CardTitle className="text-lg sm:text-xl">Security Settings</CardTitle>
+                <CardDescription className="text-sm">
                   Change your password and manage account security
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="currentPassword" className="mb-2 block">
-                      <Key className="inline-block w-4 h-4 mr-2" />
+              <CardContent className="px-4 sm:px-6 pb-6">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="currentPassword" className="flex items-center text-sm font-medium">
+                      <Key className="w-4 h-4 mr-2 flex-shrink-0" />
                       Current Password
                     </Label>
                     <Input
@@ -258,11 +266,12 @@ const Profile = () => {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Enter your current password"
+                      className="w-full"
                     />
                   </div>
                   
-                  <div>
-                    <Label htmlFor="newPassword" className="mb-2 block">
+                  <div className="space-y-3">
+                    <Label htmlFor="newPassword" className="text-sm font-medium block">
                       New Password
                     </Label>
                     <Input
@@ -271,11 +280,12 @@ const Profile = () => {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter your new password"
+                      className="w-full"
                     />
                   </div>
                   
-                  <div>
-                    <Label htmlFor="confirmPassword" className="mb-2 block">
+                  <div className="space-y-3">
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium block">
                       Confirm New Password
                     </Label>
                     <Input
@@ -284,23 +294,26 @@ const Profile = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your new password"
+                      className="w-full"
                     />
                   </div>
                   
-                  <div className="pt-4">
-                    <Button 
-                      variant="primary" 
-                      onClick={handleChangePassword} 
-                      disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
-                      className="w-full sm:w-auto"
-                    >
-                      {isChangingPassword ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Key className="mr-2 h-4 w-4" />
-                      )}
-                      Change Password
-                    </Button>
+                  <div className="pt-6">
+                    <div className="flex justify-center sm:justify-start">
+                      <Button 
+                        variant="primary" 
+                        onClick={handleChangePassword} 
+                        disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                        className="w-full sm:w-auto min-w-[160px]"
+                      >
+                        {isChangingPassword ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Key className="mr-2 h-4 w-4" />
+                        )}
+                        Change Password
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
