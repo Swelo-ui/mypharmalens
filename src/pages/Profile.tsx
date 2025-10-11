@@ -172,15 +172,15 @@ const Profile = () => {
         <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center sm:text-left">Profile Settings</h1>
         
         <Tabs defaultValue="profile" className="w-full max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-auto">
-            <TabsTrigger value="profile" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
-              Profile Information
+          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-12 sm:h-14">
+            <TabsTrigger value="profile" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
+              <span className="text-center leading-tight">Profile<br className="sm:hidden" /><span className="hidden sm:inline"> Information</span></span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
+            <TabsTrigger value="security" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
               Security
             </TabsTrigger>
-            <TabsTrigger value="audio" className="text-xs sm:text-sm px-2 py-2 sm:px-4 sm:py-3">
-              Audio Settings
+            <TabsTrigger value="audio" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
+              <span className="text-center leading-tight">Audio<br className="sm:hidden" /><span className="hidden sm:inline"> Settings</span></span>
             </TabsTrigger>
           </TabsList>
           
