@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AudioSettings from '@/components/AudioSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -171,9 +172,10 @@ const Profile = () => {
         <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
         
         <Tabs defaultValue="profile" className="max-w-3xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="profile">Profile Information</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="audio">Audio Settings</TabsTrigger>
           </TabsList>
           
           <TabsContent value="profile">
@@ -303,6 +305,10 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="audio">
+            <AudioSettings />
           </TabsContent>
         </Tabs>
       </main>

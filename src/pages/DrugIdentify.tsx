@@ -16,6 +16,7 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { playDrugIdentificationSound } from '@/utils/audioService';
 
 // Helper function to extract image features for similarity comparison
 const extractImageFeatures = (base64Image: string): Promise<string> => {
@@ -482,6 +483,9 @@ const DrugIdentify = () => {
               setIdentifiedDrug(formattedDrugData);
               setIsSaved(false);
               setProcessingProgress(100);
+              
+              // Play drug identification completion sound
+              playDrugIdentificationSound();
               
               // Enhanced success messaging based on processing method
               if (drugData.fromHistory) {

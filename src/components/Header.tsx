@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { playThemeSwitchSound } from '@/utils/audioService';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +47,7 @@ const Header = () => {
   const toggleTheme = () => {
     const currentTheme = resolvedTheme || theme;
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    playThemeSwitchSound();
   };
 
   const handleSignOut = async () => {
