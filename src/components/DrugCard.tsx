@@ -28,6 +28,19 @@ export interface DrugData {
   pregnancy?: string;
   storage?: string;
   similarDrugs?: {id: string, name: string}[];
+  // Layman's explanations for accessibility
+  laymanExplanations?: {
+    description?: string;           // Simple explanation of what the drug does
+    mechanism?: string;            // How it works in simple terms
+    indications?: string[];        // What conditions it treats (simple language)
+    contraindications?: string[];  // When NOT to use it (simple language)
+    sideEffects?: string[];       // Side effects in everyday language
+    interactions?: string[];      // Drug interactions explained simply
+    dosageAndAdmin?: string;      // How to take it (simplified)
+    warnings?: string[];          // Important warnings in plain English
+    pregnancy?: string;           // Pregnancy info in simple terms
+    storage?: string;             // Storage instructions simplified
+  };
 }
 
 interface DrugCardProps {

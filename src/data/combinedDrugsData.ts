@@ -75,8 +75,14 @@ export const combinedDrugsData: DrugData[] = allDrugsData.reduce((unique: DrugDa
       logEntry.replaced.push(existingSource);
     }
     
-    // Replace with current drug (additionalDrugsData takes precedence)
-    unique[existingIdIndex] = drug;
+    // Merge drugs, preserving laymanExplanations if it exists in either entry
+    const mergedDrug = {
+      ...drug, // Start with current drug (additionalDrugsData takes precedence)
+      laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
+    };
+    
+    // Replace with merged drug
+    unique[existingIdIndex] = mergedDrug;
     return unique;
   }
   
@@ -99,8 +105,14 @@ export const combinedDrugsData: DrugData[] = allDrugsData.reduce((unique: DrugDa
     };
     duplicateLog.push(logEntry);
     
-    // Replace with current drug (additionalDrugsData takes precedence)
-    unique[existingNameIndex] = drug;
+    // Merge drugs, preserving laymanExplanations if it exists in either entry
+    const mergedDrug = {
+      ...drug, // Start with current drug (additionalDrugsData takes precedence)
+      laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
+    };
+    
+    // Replace with merged drug
+    unique[existingNameIndex] = mergedDrug;
     return unique;
   }
   

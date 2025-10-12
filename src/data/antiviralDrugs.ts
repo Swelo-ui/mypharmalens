@@ -22,7 +22,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to oseltamivir or any component'],
     warnings: ['Neuropsychiatric events', 'especially in pediatric patients', 'renal impairment dosing'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture. Suspension stable 10 days refrigerated'
+    storage: 'Store at room temperature, protect from moisture. Suspension stable 10 days refrigerated',
+    laymanExplanations: {
+      description: 'A flu medicine that helps treat and prevent the flu by stopping the virus from spreading in your body.',
+      mechanism: 'Works by blocking a protein that flu viruses need to escape from infected cells and spread to healthy cells.',
+      indications: ['Used to treat flu symptoms or prevent getting the flu in people 1 year and older.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, milk proteins, or any of its ingredients.'],
+      sideEffects: ['May cause stomach upset, throwing up, headache, feeling dizzy or tired, stomach pain, or loose stools.'],
+      interactions: ['Should not be taken with the nasal flu vaccine spray, and may interact with probenecid (a gout medicine).'],
+      dosageAndAdmin: 'For treating flu: Take one 75mg pill twice a day for 5 days. For preventing flu: Take one 75mg pill once a day for 10 days. Dose may need to be lowered if you have kidney problems.',
+      warnings: ['May cause unusual behavior or mood changes, especially in children. Dose needs to be adjusted if you have kidney problems.'],
+      pregnancy: 'May be used during pregnancy only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from moisture. Liquid form stays good for 10 days when kept in the refrigerator.'
+    }
   },
   {
     id: '243',
@@ -43,7 +55,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to valacyclovir', 'acyclovir', 'or any component'],
     warnings: ['Thrombotic thrombocytopenic purpura', 'acute renal failure', 'CNS effects'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat herpes virus infections including cold sores, genital herpes, shingles, and chickenpox.',
+      mechanism: 'Stops the herpes virus from copying itself by blocking the virus\'s ability to build its DNA (genetic material) in infected cells.',
+      indications: ['Used to treat cold sores, genital herpes, shingles, chickenpox, serious brain infection caused by herpes virus, and herpes infection in newborn babies.'],
+      contraindications: ['Should not be used if you are allergic to acyclovir or valacyclovir.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, headache, dizziness, tiredness, or skin rash (with cream).'],
+      interactions: ['May interact with probenecid (gout medicine), zidovudine (HIV medicine), or medicines that can harm the kidneys.'],
+      dosageAndAdmin: 'By mouth: 200-800mg five times daily for 7-10 days. By IV: 5-10mg per kg of body weight every 8 hours. Cream: Apply 5 times daily for 4 days.',
+      warnings: ['Can cause kidney damage, brain/nervous system effects, or rarely serious blood clotting problems.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '244',
@@ -64,7 +88,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to famciclovir', 'penciclovir', 'or any component'],
     warnings: ['Renal impairment dosing', 'elderly patients', 'galactose intolerance'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat herpes virus infections including shingles and genital herpes.',
+      mechanism: 'Converts to penciclovir (another herpes medicine) in the body and stops the herpes virus from copying itself by blocking its DNA building process (genetic material copying).',
+      indications: ['Used to treat shingles (painful rash), genital herpes outbreaks (sores on private parts), and recurring cold sores.'],
+      contraindications: ['Should not be used if you are allergic to famciclovir, penciclovir (another herpes medicine), or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, nausea (feeling sick), tiredness, dizziness, stomach pain, or vomiting.'],
+      interactions: ['May interact with probenecid (increases drug levels - gout medicine), digoxin (heart medicine), or theophylline (asthma medicine).'],
+      dosageAndAdmin: 'For shingles: Take 500mg three times daily for 7 days. For genital herpes: Take 250mg three times daily for 7-10 days. For recurring episodes: Take 125mg twice daily for 5 days.',
+      warnings: ['Dose needs to be adjusted if you have kidney problems (renal impairment) or are elderly. Not suitable for people who cannot process galactose (a type of sugar - galactose intolerance).'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '245',
@@ -85,7 +121,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'unknown HIV status (for PrEP)', 'creatinine clearance <30 mL/min'],
     warnings: ['Lactic acidosis', 'hepatomegaly', 'renal toxicity', 'bone density loss', 'hepatitis B exacerbation'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'A combination HIV medicine that contains two drugs used to treat HIV infection (virus that causes AIDS) or prevent getting HIV.',
+      mechanism: 'Contains two medicines that work together to stop HIV from copying itself by blocking the virus\'s ability to build its DNA (genetic material).',
+      indications: ['Used to treat HIV infection (along with other HIV medicines) or to prevent getting HIV in high-risk people (PrEP - pre-exposure prophylaxis).'],
+      contraindications: ['Should not be used if you are allergic to the ingredients, don\'t know your HIV status (for prevention), or have severe kidney problems (creatinine clearance <30 mL/min).'],
+      sideEffects: ['May cause headache, diarrhea (loose stools), nausea (feeling sick), tiredness, dizziness, depression, trouble sleeping (insomnia), or unusual dreams.'],
+      interactions: ['May interact with medicines that can harm the kidneys or certain HIV medicines like didanosine, atazanavir, or lopinavir/ritonavir.'],
+      dosageAndAdmin: 'Take one tablet (200mg/300mg) once daily with or without food. Same dose whether treating HIV or preventing it.',
+      warnings: ['Can rarely cause dangerous buildup of acid in the blood, enlarged liver, kidney damage, thinning of bones that makes them weak, or worsen hepatitis B.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   {
     id: '306',
@@ -106,7 +154,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to acyclovir or valacyclovir'],
     warnings: ['Renal toxicity', 'CNS effects', 'thrombotic thrombocytopenic purpura'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat herpes virus infections including cold sores, genital herpes, shingles, and chickenpox.',
+      mechanism: 'Stops the herpes virus from copying itself by blocking the virus\'s ability to build its DNA (genetic material) in infected cells.',
+      indications: ['Used to treat cold sores, genital herpes, shingles, chickenpox, serious brain infection caused by herpes virus, and herpes infection in newborn babies.'],
+      contraindications: ['Should not be used if you are allergic to acyclovir or valacyclovir.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, headache, dizziness, tiredness, or skin rash (with cream).'],
+      interactions: ['May interact with probenecid (gout medicine), zidovudine (HIV medicine), or medicines that can harm the kidneys.'],
+      dosageAndAdmin: 'By mouth: 200-800mg five times daily for 7-10 days. By IV: 5-10mg per kg of body weight every 8 hours. Cream: Apply 5 times daily for 4 days.',
+      warnings: ['Can cause kidney damage, brain/nervous system effects, or rarely serious blood clotting problems.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '307',
@@ -127,7 +187,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Pregnancy', 'male partners of pregnant women', 'autoimmune hepatitis', 'severe cardiac disease'],
     warnings: ['Hemolytic anemia', 'cardiac effects', 'pulmonary toxicity', 'teratogenicity', 'depression/suicide'],
     pregnancy: 'Category X - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat hepatitis C (liver infection) and certain severe viral infections.',
+      mechanism: 'Stops viruses from copying themselves by blocking the virus\'s ability to build its genetic material (RNA).',
+      indications: ['Used to treat chronic hepatitis C (with interferon), severe lung infection (respiratory syncytial virus - a common lung infection in babies) in hospitalized babies, and deadly viral infections that cause severe bleeding.'],
+      contraindications: ['Must not be used during pregnancy, by male partners of pregnant women, people who have when your immune system attacks your liver, or severe heart disease.'],
+      sideEffects: ['May cause dangerous breakdown of red blood cells, extreme tiredness, headache, nausea, trouble sleeping, irritability, or depression.'],
+      interactions: ['Cannot be used with didanosine (HIV medicine). May interact with zidovudine (HIV medicine), warfarin (blood thinner), or theophylline (asthma medicine).'],
+      dosageAndAdmin: 'By mouth: 800-1200mg daily in divided doses with food (dose based on weight). By inhalation: 6g per day for 12-18 hours for 3-7 days.',
+      warnings: ['Can cause dangerous breakdown of red blood cells, heart problems, lung damage, ability to cause birth defects, or severe depression/suicide thoughts.'],
+      pregnancy: 'Absolutely forbidden during pregnancy - can cause severe birth defects.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '308',
@@ -148,7 +220,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to entecavir or any component'],
     warnings: ['Lactic acidosis', 'hepatomegaly', 'HIV resistance (if undiagnosed HIV)', 'renal impairment'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B, a long-term liver infection.',
+      mechanism: 'Stops the hepatitis B virus from copying itself by blocking the virus\'s ability to build its DNA.',
+      indications: ['Used to treat long-term hepatitis B infection when the virus is actively copying itself and causing liver inflammation.'],
+      contraindications: ['Should not be used if you are allergic to entecavir or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, tiredness, dizziness, nausea, diarrhea, stomach upset, or trouble sleeping.'],
+      interactions: ['May interact with medicines that can harm the kidneys, lamivudine, or adefovir (other hepatitis B medicines).'],
+      dosageAndAdmin: 'Take 0.5mg once daily on an empty stomach (2 hours before or after eating). If resistant to lamivudine: Take 1mg once daily.',
+      warnings: ['Can rarely cause dangerous acid buildup in blood, liver enlargement, HIV resistance (if you have undiagnosed HIV), or kidney problems.'],
+      pregnancy: 'May be used during pregnancy only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from light.'
+    }
   },
   {
     id: '309',
@@ -169,7 +253,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to zanamivir', 'milk proteins', 'or any component'],
     warnings: ['Bronchospasm risk in asthma/COPD patients', 'allergic reactions', 'neuropsychiatric events'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture, do not puncture blister until use'
+    storage: 'Store at room temperature, protect from moisture, do not puncture blister until use',
+    laymanExplanations: {
+      description: 'An inhaled flu medicine that helps treat and prevent the flu by stopping the virus from spreading in your body.',
+      mechanism: 'Works by blocking a protein that flu viruses need to escape from infected cells and spread to healthy cells.',
+      indications: ['Used to treat flu symptoms or prevent getting the flu in people 7 years and older.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, milk proteins, or any of its ingredients.'],
+      sideEffects: ['May cause diarrhea, nausea, sinus problems, nose symptoms, chest infection, cough, or headache.'],
+      interactions: ['Should not be used with the nasal flu vaccine spray.'],
+      dosageAndAdmin: 'For treating flu: Inhale 10mg (two puffs) twice daily for 5 days. For preventing flu: Inhale 10mg once daily for 10-28 days.',
+      warnings: ['Can cause breathing problems in people with asthma or lung disease, allergic reactions, or unusual behavior/mood changes.'],
+      pregnancy: 'May be used during pregnancy only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from moisture. Don\'t puncture the blister pack until ready to use.'
+    }
   },
   {
     id: '350',
@@ -190,7 +286,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to sofosbuvir', 'concurrent amiodarone use'],
     warnings: ['Bradycardia with amiodarone', 'hepatitis B reactivation', 'use with ribavirin'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis C, a long-term liver infection, always used with other hepatitis C medicines.',
+      mechanism: 'Stops the hepatitis C virus from copying itself by blocking the virus\'s ability to build its genetic material (RNA).',
+      indications: ['Used to treat long-term hepatitis C infection (all types 1-6) but must be combined with other antiviral medicines.'],
+      contraindications: ['Should not be used if you are allergic to sofosbuvir or if you take amiodarone (heart rhythm medicine).'],
+      sideEffects: ['May cause tiredness, headache, nausea, trouble sleeping, low red blood cell count, or decreased appetite.'],
+      interactions: ['Cannot be used with amiodarone (heart medicine). May interact with seizure medicines, rifampin (antibiotic), or St. John\'s wort (herbal supplement).'],
+      dosageAndAdmin: 'Take 400mg once daily with food for 12-24 weeks (must be used with other hepatitis C medicines).',
+      warnings: ['Can cause dangerous slow heart rate with amiodarone, reactivate hepatitis B, or cause problems when used with ribavirin.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   {
     id: '351',
@@ -211,7 +319,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to components', 'concurrent amiodarone'],
     warnings: ['Bradycardia risk', 'hepatitis B reactivation', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination medicine containing two drugs used to treat chronic hepatitis C, a long-term liver infection.',
+      mechanism: 'Contains two medicines that work together to stop the hepatitis C virus from copying itself by blocking two different virus processes.',
+      indications: ['Used to treat long-term hepatitis C infection types 1, 4, 5, and 6.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients or if you take amiodarone (heart rhythm medicine).'],
+      sideEffects: ['May cause tiredness, headache, weakness, nausea, trouble sleeping, or irritability.'],
+      interactions: ['May interact with amiodarone (heart medicine), seizure medicines, tuberculosis medicines, or stomach acid medicines.'],
+      dosageAndAdmin: 'Take one tablet (90mg/400mg) once daily with or without food for 8-24 weeks.',
+      warnings: ['Can cause dangerous slow heart rate, reactivate hepatitis B, or interact with many other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '352',
@@ -232,7 +352,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to daclatasvir or components'],
     warnings: ['Bradycardia with sofosbuvir and amiodarone', 'hepatitis B reactivation'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis C virus infection (a liver infection) by stopping the virus from copying itself.',
+      mechanism: 'Works by blocking NS5A, a protein that hepatitis C virus needs to copy itself and survive in liver cells.',
+      indications: ['Used to treat chronic hepatitis C genotypes 1 and 3 (specific types of hepatitis C virus) along with sofosbuvir (another hepatitis C medicine).'],
+      contraindications: ['Should not be used if you are allergic to daclatasvir or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, tiredness, nausea (feeling sick), or diarrhea (loose stools).'],
+      interactions: ['May interact with heart rhythm medicines (strong CYP3A inducers/inhibitors), amiodarone (heart medicine), or digoxin (heart medicine).'],
+      dosageAndAdmin: 'Take 60mg once daily with food for 12 weeks (along with sofosbuvir).',
+      warnings: ['Can cause slow heart rate when taken with sofosbuvir and amiodarone, or hepatitis B virus reactivation (another liver infection coming back).'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '353',
@@ -253,7 +385,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'moderate to severe hepatic impairment'],
     warnings: ['Photosensitivity reactions', 'rash', 'hepatic decompensation'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis C virus infection (a liver infection) by blocking a protein the virus needs to survive.',
+      mechanism: 'Works by blocking NS3/4A protease, a protein that hepatitis C virus needs to copy itself and survive in liver cells.',
+      indications: ['Used to treat chronic hepatitis C genotype 1 (a specific type of hepatitis C virus) along with peginterferon and ribavirin (other hepatitis C medicines).'],
+      contraindications: ['Should not be used if you are allergic to simeprevir or if you have moderate to severe liver problems.'],
+      sideEffects: ['May cause skin rash, itching, nausea (feeling sick), muscle aches, trouble breathing, or increased sensitivity to sunlight.'],
+      interactions: ['May interact with heart rhythm medicines, seizure medicines, or tuberculosis medicines.'],
+      dosageAndAdmin: 'Take 150mg once daily with food for 12 weeks (along with peginterferon and ribavirin).',
+      warnings: ['Can cause severe skin reactions from sunlight, rash, or liver problems getting worse.'],
+      pregnancy: 'Should only be used during pregnancy if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from light.'
+    }
   },
   {
     id: '354',
@@ -274,7 +418,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'pregnancy (in combination with ribavirin)'],
     warnings: ['Anemia', 'neutropenia', 'drug interactions', 'hepatic decompensation'],
     pregnancy: 'Category B - Generally considered safe (Category X with ribavirin)',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis C virus infection (a liver infection) by blocking a protein the virus needs to survive.',
+      mechanism: 'Works by blocking NS3 protease, a protein that hepatitis C virus needs to process its proteins and copy itself in liver cells.',
+      indications: ['Used to treat chronic hepatitis C genotype 1 (a specific type of hepatitis C virus) along with peginterferon and ribavirin (other hepatitis C medicines).'],
+      contraindications: ['Should not be used if you are allergic to boceprevir or if you are pregnant (when used with ribavirin).'],
+      sideEffects: ['May cause tiredness, low red blood cell count (anemia), nausea (feeling sick), headache, taste changes, or vomiting.'],
+      interactions: ['May interact with many medicines including heart medicines, cholesterol medicines, or seizure medicines.'],
+      dosageAndAdmin: 'Take 800mg three times daily with food (every 7-9 hours) for 24-48 weeks.',
+      warnings: ['Can cause low red blood cell count (anemia), low white blood cell count (neutropenia), dangerous interactions with other medicines, or liver problems getting worse.'],
+      pregnancy: 'Generally considered safe alone, but dangerous when combined with ribavirin during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '355',
@@ -295,7 +451,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'moderate to severe hepatic impairment'],
     warnings: ['Severe rash', 'anemia', 'drug interactions', 'hepatic decompensation'],
     pregnancy: 'Category B - Generally considered safe (Category X with ribavirin)',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis C virus infection (a liver infection) by blocking a protein the virus needs to survive.',
+      mechanism: 'Works by blocking NS3/4A protease, a protein that hepatitis C virus needs to process its proteins and copy itself in liver cells.',
+      indications: ['Used to treat chronic hepatitis C genotype 1 (a specific type of hepatitis C virus) along with peginterferon and ribavirin (other hepatitis C medicines).'],
+      contraindications: ['Should not be used if you are allergic to telaprevir or if you have moderate to severe liver problems.'],
+      sideEffects: ['May cause skin rash, tiredness, itching, nausea (feeling sick), diarrhea (loose stools), vomiting, or hemorrhoids (swollen veins around the anus).'],
+      interactions: ['May interact with many medicines including heart medicines, seizure medicines, or tuberculosis medicines.'],
+      dosageAndAdmin: 'Take 750mg three times daily with food (every 7-9 hours) for 12 weeks.',
+      warnings: ['Can cause severe skin rash, low red blood cell count (anemia), dangerous interactions with other medicines, or liver problems getting worse.'],
+      pregnancy: 'Generally considered safe alone, but dangerous when combined with ribavirin during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '356',
@@ -316,7 +484,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to components', 'concurrent amiodarone'],
     warnings: ['Bradycardia risk', 'hepatitis B reactivation', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination medicine used to treat chronic hepatitis C virus infection (a liver infection) that works against all major types of hepatitis C.',
+      mechanism: 'Contains two medicines that work together: one blocks NS5A (a protein hepatitis C needs to copy itself) and another blocks NS5B polymerase (an enzyme the virus needs to build its genetic material).',
+      indications: ['Used to treat chronic hepatitis C genotypes 1-6 (all major types of hepatitis C virus).'],
+      contraindications: ['Should not be used if you are allergic to the ingredients or if you take amiodarone (heart rhythm medicine).'],
+      sideEffects: ['May cause headache, tiredness, nausea (feeling sick), weakness, trouble sleeping (insomnia), or irritability.'],
+      interactions: ['May interact with amiodarone (heart medicine), seizure medicines, tuberculosis medicines, or stomach acid medicines (proton pump inhibitors).'],
+      dosageAndAdmin: 'Take one tablet (100mg/400mg) once daily with food for 12 weeks.',
+      warnings: ['Can cause slow heart rate (bradycardia risk), hepatitis B virus reactivation (another liver infection coming back), or dangerous interactions with other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '357',
@@ -337,7 +517,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'moderate to severe hepatic impairment'],
     warnings: ['Hepatitis B reactivation', 'ALT elevations', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A combination medicine that treats chronic hepatitis C (a liver infection caused by a virus) by combining two different drugs that work together.',
+      mechanism: 'Contains two medicines that work together to stop the hepatitis C virus from copying itself by blocking two different proteins the virus needs.',
+      indications: ['Used to treat chronic (long-term) hepatitis C virus infection of all major types (genotypes 1-6) in people with or without mild liver scarring.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients or have moderate to severe liver damage.'],
+      sideEffects: ['May cause headache, tiredness, nausea (feeling sick), diarrhea (loose stools), stomach pain, or weakness.'],
+      interactions: ['May interact with HIV medicines (atazanavir, darunavir, lopinavir), seizure medicine carbamazepine, or rifampin (antibiotic).'],
+      dosageAndAdmin: 'Take three tablets (100mg/40mg each) once daily with food for 8-16 weeks.',
+      warnings: ['Can cause hepatitis B virus to become active again, liver enzyme increases, or interactions with other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '358',
@@ -358,7 +550,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'moderate to severe hepatic impairment'],
     warnings: ['ALT elevations', 'hepatitis B reactivation', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A combination medicine that treats chronic hepatitis C (a liver infection caused by a virus) by combining two different drugs that work together.',
+      mechanism: 'Contains two medicines that work together to stop the hepatitis C virus from copying itself by blocking two different proteins the virus needs.',
+      indications: ['Used to treat chronic (long-term) hepatitis C virus infection types 1 and 4.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients or have moderate to severe liver damage.'],
+      sideEffects: ['May cause tiredness, headache, nausea (feeling sick), weakness, trouble sleeping, or diarrhea (loose stools).'],
+      interactions: ['May interact with HIV medicine efavirenz, seizure medicines (carbamazepine, phenytoin), rifampin (antibiotic), or St. Johns wort (herbal supplement).'],
+      dosageAndAdmin: 'Take one tablet (50mg/100mg) once daily with or without food for 12-16 weeks.',
+      warnings: ['Can cause liver enzyme increases, hepatitis B virus to become active again, or interactions with other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '359',
@@ -379,7 +583,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'moderate to severe hepatic impairment'],
     warnings: ['ALT elevations', 'drug interactions', 'hepatic decompensation'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination medicine that treats chronic hepatitis C (a liver infection caused by a virus) by combining three different drugs that work together.',
+      mechanism: 'Contains three medicines that work together to stop the hepatitis C virus from copying itself by blocking different proteins the virus needs and slowing down drug breakdown.',
+      indications: ['Used to treat chronic (long-term) hepatitis C virus infection type 4 in people with or without mild liver scarring.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients or have moderate to severe liver damage.'],
+      sideEffects: ['May cause nausea (feeling sick), tiredness, itching, other skin reactions, trouble sleeping, or weakness.'],
+      interactions: ['May interact with many medicines that are processed by the liver, including some heart medicines, blood thinners, and cholesterol medicines.'],
+      dosageAndAdmin: 'Take two tablets (75mg/50mg/12.5mg each) once daily with food for 12 weeks.',
+      warnings: ['Can cause liver enzyme increases, interactions with other medicines, or liver function worsening.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '360',
@@ -400,7 +616,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to adefovir or any component'],
     warnings: ['Nephrotoxicity', 'lactic acidosis', 'hepatomegaly', 'HIV resistance'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B (a liver infection caused by a virus) by stopping the virus from copying itself.',
+      mechanism: 'Works like a fake building block that gets incorporated into the virus\'s genetic material, causing the copying process to stop.',
+      indications: ['Used to treat chronic (long-term) hepatitis B virus infection in people with active virus reproduction.'],
+      contraindications: ['Should not be used if you are allergic to adefovir or any ingredients in the medicine.'],
+      sideEffects: ['May cause weakness, headache, stomach pain, nausea (feeling sick), gas, or diarrhea (loose stools).'],
+      interactions: ['May interact with medicines that can harm the kidneys or reduce kidney function.'],
+      dosageAndAdmin: 'Take 10mg once daily with or without food. Dose may need to be lowered if you have kidney problems.',
+      warnings: ['Can cause kidney damage, dangerous acid buildup in blood, liver enlargement, or HIV drug resistance if you have undiagnosed HIV.'],
+      pregnancy: 'Should only be used during pregnancy if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '361',
@@ -421,7 +649,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to lamivudine or any component'],
     warnings: ['Lactic acidosis', 'hepatomegaly', 'pancreatitis', 'immune reconstitution syndrome'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B (liver infection) and HIV infection (virus that causes AIDS).',
+      mechanism: 'Works by mimicking a building block that viruses need to copy themselves, but when the virus tries to use it, it stops the copying process.',
+      indications: ['Used to treat long-term hepatitis B infection (liver virus) or HIV infection (along with other HIV medicines).'],
+      contraindications: ['Should not be used if you are allergic to lamivudine or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, nausea (feeling sick), feeling unwell, tiredness, runny nose, or diarrhea (loose stools).'],
+      interactions: ['May interact with trimethoprim/sulfamethoxazole (antibiotic), zalcitabine (another HIV medicine), or interferon alfa (immune system medicine).'],
+      dosageAndAdmin: 'For hepatitis B: Take 100mg once daily. For HIV: Take 150mg twice daily or 300mg once daily.',
+      warnings: ['Can cause dangerous acid buildup in blood (lactic acidosis), enlarged liver (hepatomegaly), pancreas inflammation (pancreatitis), or immune system recovery syndrome.'],
+      pregnancy: 'Use only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '362',
@@ -442,7 +682,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to telbivudine or any component'],
     warnings: ['Lactic acidosis', 'hepatomegaly', 'myopathy', 'peripheral neuropathy'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B virus infection (long-term liver infection).',
+      mechanism: 'Works by mimicking a building block (thymidine) that the hepatitis B virus needs to copy itself, stopping the virus from multiplying.',
+      indications: ['Used to treat long-term hepatitis B infection when there is evidence the virus is actively copying itself and causing liver inflammation.'],
+      contraindications: ['Should not be used if you are allergic to telbivudine or any ingredients in the medicine.'],
+      sideEffects: ['May cause tiredness, headache, stomach pain, nausea (feeling sick), diarrhea (loose stools), or upper respiratory infection (cold-like symptoms).'],
+      interactions: ['May interact with medicines that affect kidney function or pegylated interferon alfa-2a (immune system medicine).'],
+      dosageAndAdmin: 'Take 600mg once daily with or without food. Dose may need to be lowered if you have kidney problems.',
+      warnings: ['Can cause dangerous acid buildup in blood (lactic acidosis), enlarged liver (hepatomegaly), muscle problems (myopathy), or nerve damage in arms/legs (peripheral neuropathy).'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from light.'
+    }
   },
   {
     id: '363',
@@ -463,7 +715,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to tenofovir alafenamide or components'],
     warnings: ['Lactic acidosis', 'hepatomegaly', 'immune reconstitution syndrome', 'bone effects'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B (liver infection) and HIV infection (virus that causes AIDS).',
+      mechanism: 'Works as a building block mimic (prodrug) that converts to tenofovir in the body and stops viruses from copying themselves by blocking their DNA building process.',
+      indications: ['Used to treat long-term hepatitis B infection with stable liver function or HIV infection (in combination with other medicines).'],
+      contraindications: ['Should not be used if you are allergic to tenofovir alafenamide or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, stomach pain, cough, back pain, tiredness, or nausea (feeling sick).'],
+      interactions: ['May interact with seizure medicines (carbamazepine, oxcarbazepine, phenobarbital, phenytoin) or rifampin (antibiotic).'],
+      dosageAndAdmin: 'For hepatitis B: Take 25mg once daily with food. For HIV: Various combination products available.',
+      warnings: ['Can cause dangerous acid buildup in blood (lactic acidosis), enlarged liver (hepatomegaly), immune system recovery syndrome, or bone problems.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   {
     id: '364',
@@ -484,7 +748,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to clevudine or any component'],
     warnings: ['Myopathy', 'lactic acidosis', 'hepatomegaly', 'limited long-term safety data'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A medicine used to treat chronic hepatitis B virus infection (long-term liver infection).',
+      mechanism: 'Works by mimicking a building block (pyrimidine nucleoside) that the hepatitis B virus needs to copy itself, stopping the virus from multiplying.',
+      indications: ['Used to treat long-term hepatitis B infection when the virus is actively copying itself.'],
+      contraindications: ['Should not be used if you are allergic to clevudine or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, tiredness, nausea (feeling sick), stomach pain, muscle aches, or dizziness.'],
+      interactions: ['Limited information available about drug interactions. Should be monitored carefully with medicines that can harm the kidneys.'],
+      dosageAndAdmin: 'Take 30mg once daily with or without food for up to 24 weeks.',
+      warnings: ['Can cause muscle problems (myopathy), dangerous acid buildup in blood (lactic acidosis), enlarged liver (hepatomegaly). Limited long-term safety information available.'],
+      pregnancy: 'Use only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '365',
@@ -505,7 +781,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to peramivir or any component'],
     warnings: ['Neuropsychiatric events', 'allergic reactions', 'renal impairment dosing'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store vials refrigerated, protect from light, single use only'
+    storage: 'Store vials refrigerated, protect from light, single use only',
+    laymanExplanations: {
+      description: 'A flu medicine given through IV (into a vein) to treat severe flu symptoms.',
+      mechanism: 'Works by blocking neuraminidase, a protein that flu viruses need to escape from infected cells and spread to healthy cells.',
+      indications: ['Used to treat severe flu (influenza) in adults 18 years and older.'],
+      contraindications: ['Should not be used if you are allergic to peramivir or any ingredients in the medicine.'],
+      sideEffects: ['May cause diarrhea, high blood pressure, trouble sleeping, increased liver enzymes, or low white blood cell count.'],
+      interactions: ['Should not be given with live flu vaccine nasal spray, and may interact with probenecid (gout medicine).'],
+      dosageAndAdmin: 'Given as a single 600mg dose through IV over 15-30 minutes. Dose may need to be lowered if you have kidney problems.',
+      warnings: ['May cause unusual behavior or mood changes, allergic reactions. Dose needs to be adjusted if you have kidney problems.'],
+      pregnancy: 'May be used during pregnancy only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep vials refrigerated away from light. For single use only.'
+    }
   },
   {
     id: '366',
@@ -526,7 +814,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to baloxavir marboxil or any component'],
     warnings: ['Bacterial infections', 'allergic reactions', 'drug interactions with cations'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A flu medicine taken by mouth that treats flu symptoms with a single dose.',
+      mechanism: 'Works by blocking cap-dependent endonuclease, a protein that flu viruses need to make their genetic material (mRNA).',
+      indications: ['Used to treat flu (influenza) in people 12 years and older.'],
+      contraindications: ['Should not be used if you are allergic to baloxavir marboxil or any ingredients in the medicine.'],
+      sideEffects: ['May cause diarrhea, bronchitis (chest infection), runny nose/sore throat, headache, nausea, or sinus infection.'],
+      interactions: ['Should be taken 2 hours apart from medicines containing calcium, magnesium, aluminum, iron, zinc, laxatives, or antacids.'],
+      dosageAndAdmin: 'Take as a single dose based on weight: 40mg (if you weigh 40-79kg/88-174lbs) or 80mg (if you weigh 80kg/176lbs or more). Can be taken with or without food.',
+      warnings: ['May not prevent bacterial infections that can happen with flu. Can cause allergic reactions. Separate from mineral-containing medicines by 2 hours.'],
+      pregnancy: 'May be used during pregnancy only if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '367',
@@ -547,7 +847,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to maraviroc or any component'],
     warnings: ['Hepatotoxicity', 'cardiovascular events', 'immune reconstitution syndrome'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An HIV medicine that blocks the virus from entering certain immune cells (CD4+ T cells).',
+      mechanism: 'Works by blocking CCR5 co-receptor, a doorway that certain types of HIV use to enter and infect immune cells.',
+      indications: ['Used to treat CCR5-tropic HIV infection in adults who have tried other HIV medicines before.'],
+      contraindications: ['Should not be used if you are allergic to maraviroc or any ingredients in the medicine.'],
+      sideEffects: ['May cause cough, fever, upper respiratory infections (cold-like symptoms), skin rash, or muscle/bone symptoms.'],
+      interactions: ['May interact with medicines that affect liver enzymes (CYP3A), St. John\'s wort (herbal supplement), or rifampin (antibiotic).'],
+      dosageAndAdmin: 'Take 150-600mg twice daily based on other medicines you\'re taking. Can be taken with or without food.',
+      warnings: ['Can cause liver problems, heart/blood vessel problems, or immune system recovery syndrome.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '368',
@@ -568,7 +880,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to enfuvirtide or any component'],
     warnings: ['Injection site reactions', 'hypersensitivity reactions', 'bacterial pneumonia'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store powder refrigerated, reconstituted solution stable 24 hours refrigerated'
+    storage: 'Store powder refrigerated, reconstituted solution stable 24 hours refrigerated',
+    laymanExplanations: {
+      description: 'An HIV medicine given by injection under the skin that prevents HIV from entering immune cells.',
+      mechanism: 'Works by attaching to gp41 protein on HIV and blocking the virus from fusing with and entering CD4+ T cells (immune cells).',
+      indications: ['Used to treat drug-resistant HIV infection in adults who have tried many other HIV medicines.'],
+      contraindications: ['Should not be used if you are allergic to enfuvirtide or any ingredients in the medicine.'],
+      sideEffects: ['May cause reactions at injection site, tiredness, nausea, diarrhea, or decreased appetite.'],
+      interactions: ['Has limited interactions with other medicines because it\'s given by injection under the skin.'],
+      dosageAndAdmin: 'Inject 90mg under the skin twice daily into upper arm, front of thigh, or abdomen.',
+      warnings: ['Can cause injection site reactions, allergic reactions, or bacterial lung infection (pneumonia).'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep powder refrigerated. Mixed solution stays good for 24 hours when refrigerated.'
+    }
   },
   {
     id: '369',
@@ -589,7 +913,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to raltegravir or any component'],
     warnings: ['Immune reconstitution syndrome', 'rhabdomyolysis', 'depression/suicidal ideation'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An HIV medicine that helps treat HIV infection by stopping the virus from inserting its genetic material into healthy cells.',
+      mechanism: 'Works by blocking integrase, a protein that HIV needs to insert its genetic material into your immune cells.',
+      indications: ['Used to treat HIV infection in adults and children who are new to HIV treatment or have tried other HIV medicines.'],
+      contraindications: ['Should not be used if you are allergic to raltegravir or any ingredients in the medicine.'],
+      sideEffects: ['May cause trouble sleeping, headache, dizziness, nausea, weakness, or tiredness.'],
+      interactions: ['May interact with certain liver enzyme medicines, rifampin (antibiotic), or some HIV medicines like tipranavir/ritonavir or atazanavir.'],
+      dosageAndAdmin: 'Take 400mg twice daily or 1200mg once daily (film-coated tablets) with or without food.',
+      warnings: ['Can cause immune system recovery syndrome, muscle breakdown (rhabdomyolysis), or depression/suicidal thoughts.'],
+      pregnancy: 'Should only be used during pregnancy if the benefits are greater than the risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '370',
@@ -610,7 +946,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to elvitegravir or any component'],
     warnings: ['Immune reconstitution syndrome', 'lactic acidosis', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'An HIV medicine that helps treat HIV infection by stopping the virus from inserting its genetic material into healthy cells.',
+      mechanism: 'Works by blocking integrase, a protein that HIV needs to insert its genetic material into your immune cells.',
+      indications: ['Used to treat HIV infection in adults who are new to HIV treatment or have tried other HIV medicines.'],
+      contraindications: ['Should not be used if you are allergic to elvitegravir or any ingredients in the medicine.'],
+      sideEffects: ['May cause nausea, diarrhea, headache, tiredness, dizziness, or trouble sleeping.'],
+      interactions: ['May interact with medicines that affect liver enzymes, stomach acid medicines (antacids, H2 blockers), or certain other medicines.'],
+      dosageAndAdmin: 'Take 85mg once daily with food (must be taken with cobicistat or ritonavir to boost effectiveness).',
+      warnings: ['Can cause immune system recovery syndrome, dangerous acid buildup in blood, or interactions with other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   {
     id: '371',
@@ -631,7 +979,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to dolutegravir', 'concurrent dofetilide'],
     warnings: ['Hypersensitivity reactions', 'immune reconstitution syndrome', 'neural tube defects'],
     pregnancy: 'Category B - Generally considered safe (avoid in first trimester)',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'An HIV medicine that helps treat HIV infection by stopping the virus from inserting its genetic material into healthy cells.',
+      mechanism: 'Works by blocking a protein (integrase) that HIV needs to insert its genetic material into your immune cells.',
+      indications: ['Used to treat HIV infection in adults and children weighing at least 30 kg (66 pounds).'],
+      contraindications: ['Should not be used if you are allergic to dolutegravir or if you take dofetilide (heart rhythm medicine).'],
+      sideEffects: ['May cause trouble sleeping, headache, tiredness, dizziness, nausea, or diarrhea.'],
+      interactions: ['May interact with certain medicines that affect liver enzymes, minerals (calcium, iron, magnesium), diabetes medicine metformin, or heart rhythm medicine dofetilide.'],
+      dosageAndAdmin: 'Take 50mg once daily if new to HIV treatment, or twice daily if you have drug-resistant HIV.',
+      warnings: ['Can cause allergic reactions, immune system recovery syndrome, or birth defects affecting the brain and spine.'],
+      pregnancy: 'Generally considered safe but should be avoided in the first 3 months of pregnancy due to birth defect risk.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   {
     id: '372',
@@ -652,7 +1012,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to bictegravir or any component'],
     warnings: ['Immune reconstitution syndrome', 'lactic acidosis', 'drug interactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An HIV medicine that helps treat HIV infection by stopping the virus from inserting its genetic material into healthy cells.',
+      mechanism: 'Works by blocking a protein (integrase) that HIV needs to insert its genetic material into your immune cells.',
+      indications: ['Used to treat HIV infection in adults and children weighing at least 25 kg (55 pounds).'],
+      contraindications: ['Should not be used if you are allergic to bictegravir or any ingredients in the medicine.'],
+      sideEffects: ['May cause headache, nausea, diarrhea, tiredness, dizziness, or trouble sleeping.'],
+      interactions: ['May interact with certain liver enzyme medicines, minerals (calcium, iron, magnesium), stomach ulcer medicine sucralfate, or rifampin (antibiotic).'],
+      dosageAndAdmin: 'Take 50mg once daily with food (usually available combined with other HIV medicines).',
+      warnings: ['Can cause immune system recovery syndrome, dangerous acid buildup in blood, or interactions with other medicines.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '373',
@@ -673,7 +1045,19 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to cabotegravir or any component'],
     warnings: ['Hypersensitivity reactions', 'hepatotoxicity', 'depressive disorders'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light (injection), room temperature (tablets)'
+    storage: 'Store at room temperature, protect from light (injection), room temperature (tablets)',
+    laymanExplanations: {
+      description: 'An HIV medicine available as pills or injections that helps treat HIV infection or prevent getting HIV.',
+      mechanism: 'Works by blocking a protein (integrase) that HIV needs to insert its genetic material into your immune cells.',
+      indications: ['Used to treat HIV infection or prevent getting HIV in adults at high risk.'],
+      contraindications: ['Should not be used if you are allergic to cabotegravir or any ingredients in the medicine.'],
+      sideEffects: ['May cause reactions at injection site, headache, fever, tiredness, back pain, or muscle aches.'],
+      interactions: ['May interact with seizure medicines (carbamazepine, oxcarbazepine, phenytoin) or rifampin (antibiotic).'],
+      dosageAndAdmin: 'Pills: Take 30mg once daily. Injections: 600mg monthly for treatment or every 2 months for prevention.',
+      warnings: ['Can cause allergic reactions, liver problems, or depression/mood changes.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep pills at room temperature. Keep injections at room temperature away from light.'
+    }
   },
   {
     id: '374',
@@ -694,6 +1078,18 @@ export const antiviralDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to rilpivirine or any component'],
     warnings: ['Depressive disorders', 'hepatotoxicity', 'immune reconstitution syndrome'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An HIV medicine available as pills or injections that helps treat HIV infection by stopping the virus from copying itself.',
+      mechanism: 'Works by attaching to and blocking reverse transcriptase, a protein HIV needs to copy its genetic material.',
+      indications: ['Used to treat HIV infection in adults and teenagers who have never taken HIV medicines before.'],
+      contraindications: ['Should not be used if you are allergic to rilpivirine or any ingredients in the medicine.'],
+      sideEffects: ['May cause trouble sleeping, headache, skin rash, depression/mood changes, tiredness, or nausea.'],
+      interactions: ['May interact with stomach acid medicines (proton pump inhibitors, H2 blockers, antacids), rifampin-type antibiotics, or seizure medicines.'],
+      dosageAndAdmin: 'Pills: Take 25mg once daily with food. Injections: 900mg monthly (combined with other HIV medicines).',
+      warnings: ['Can cause depression/mood disorders, liver problems, or immune system recovery syndrome.'],
+      pregnancy: 'Generally considered safe to use during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   }
 ];

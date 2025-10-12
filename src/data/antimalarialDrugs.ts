@@ -22,7 +22,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'active depression', 'anxiety disorders', 'psychosis', 'seizure disorders'],
     warnings: ['Neuropsychiatric reactions', 'seizures', 'cardiac conduction abnormalities', 'avoid in pilots/drivers'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to prevent and treat malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine works by interfering with how malaria parasites get their food and make proteins they need to survive.',
+      indications: ['Preventing and treating malaria caused by drug-resistant parasites'],
+      contraindications: ['You are allergic to this medicine', 'You have active depression', 'You have anxiety disorders', 'You have mental health conditions like psychosis', 'You have seizure disorders'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Dizziness', 'Headache', 'Trouble sleeping', 'Very vivid dreams', 'Anxiety', 'Depression'],
+      interactions: ['Seizure medicines', 'Heart medicines (beta-blockers)', 'Blood pressure medicines (calcium channel blockers)', 'Heart rhythm medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 250 milligrams once weekly starting 1-2 weeks before travel. Treatment: 1250 milligrams as single dose or divided over 6-8 hours.',
+      warnings: ['Be careful: Can cause serious mental health side effects', 'Be careful: Can cause seizures', 'Be careful: Can affect heart rhythm', 'Be careful: Avoid if you are a pilot or professional driver'],
+      pregnancy: 'Generally safe during pregnancy - no known risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '240',
@@ -43,7 +55,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to atovaquone or proguanil', 'severe renal impairment'],
     warnings: ['Take with food to enhance absorption', 'monitor in renal impairment', 'vomiting may reduce efficacy'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is a combination of two drugs used to prevent and treat malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine works by blocking two different processes that malaria parasites need to survive and multiply.',
+      indications: ['Prevention and treatment of acute, uncomplicated malaria'],
+      contraindications: ['You are allergic to either ingredient in this medicine', 'You have severe kidney problems'],
+      sideEffects: ['Stomach pain', 'Feeling sick to your stomach', 'Vomiting', 'Headache', 'Loose or watery stools', 'Weakness', 'Dizziness'],
+      interactions: ['Tuberculosis medicines (rifampin, rifabutin)', 'Antibiotic medicines (tetracycline)', 'Stomach medicines (metoclopramide)', 'Blood thinning medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 1 adult tablet once daily with food. Treatment: 4 adult tablets once daily for 3 days with food.',
+      warnings: ['Be careful: Must take with food for the medicine to work properly', 'Be careful: May need monitoring if you have kidney problems', 'Be careful: Vomiting may make the medicine less effective'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '241',
@@ -64,7 +88,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to tetracyclines', 'pregnancy', 'children <8 years'],
     warnings: ['Photosensitivity', 'esophageal ulceration', 'tooth discoloration in children', 'hepatotoxicity'],
     pregnancy: 'Category D - Avoid in pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is an antibiotic that can also prevent malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine works by stopping malaria parasites from making proteins they need to grow and survive.',
+      indications: ['Preventing malaria in areas where drug-resistant parasites are common'],
+      contraindications: ['You are allergic to tetracycline antibiotics', 'You are pregnant', 'Children under 8 years old'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Increased sensitivity to sunlight', 'Throat irritation', 'Yeast infections in women'],
+      interactions: ['Stomach acid reducers', 'Iron supplements', 'Calcium supplements', 'Blood thinning medicines', 'Acne medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 100 milligrams once daily starting 1-2 days before travel, continue 4 weeks after return. Take with food and water.',
+      warnings: ['Be careful: Makes you more sensitive to sunlight - use sunscreen', 'Be careful: Can cause throat irritation', 'Be careful: Can cause tooth discoloration in children', 'Be careful: Can cause liver damage'],
+      pregnancy: 'May harm your baby - avoid during pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '310',
@@ -85,7 +121,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'retinal or visual field changes', 'porphyria'],
     warnings: ['Retinal toxicity with long-term use', 'cardiac conduction abnormalities', 'seizures', 'blood dyscrasias'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is used to prevent and treat malaria (a serious disease spread by mosquitoes) and certain parasitic infections.',
+      mechanism: 'This medicine works by interfering with how malaria parasites digest blood and copy their genetic material.',
+      indications: ['Prevention and treatment of malaria caused by drug-sensitive parasites', 'Certain parasitic infections'],
+      contraindications: ['You are allergic to this medicine', 'You have eye problems or vision changes', 'You have a rare blood disorder called porphyria'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Dizziness', 'Blurred vision', 'Itching'],
+      interactions: ['Stomach acid reducers', 'Clay-based medicines', 'Antibiotic medicines', 'Immune system medicines', 'Other malaria medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 500 milligrams weekly starting 1-2 weeks before travel. Treatment: 1000 milligrams initially, then 500 milligrams at 6, 24, and 48 hours.',
+      warnings: ['Be careful: Can cause eye damage with long-term use', 'Be careful: Can affect heart rhythm', 'Be careful: Can cause seizures', 'Be careful: Can affect blood cells'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '311',
@@ -106,7 +154,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['G6PD deficiency', 'pregnancy', 'breastfeeding', 'systemic lupus erythematosus'],
     warnings: ['Hemolytic anemia in G6PD deficiency', 'methemoglobinemia', 'leukopenia', 'test G6PD before use'],
     pregnancy: 'Category C - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to treat and prevent malaria (a serious disease spread by mosquitoes), particularly for eliminating the liver stage (hidden form) of certain malaria parasites.',
+      mechanism: 'This medicine works by interfering with how parasites produce energy and creates harmful substances that damage the parasites.',
+      indications: ['Prevention of P. vivax and P. ovale relapse (preventing malaria from coming back)', 'Radical cure of liver stages (completely clearing parasites from the liver)'],
+      contraindications: ['You have G6PD deficiency (a genetic condition affecting red blood cells)', 'You are pregnant', 'You are breastfeeding', 'You have systemic lupus erythematosus (an autoimmune disease)'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Stomach cramps', 'Headache', 'Dizziness', 'Weakness', 'Itching'],
+      interactions: ['Quinacrine (another antimalarial medicine)', 'Dapsone (an antibiotic)', 'Other medicines that can damage red blood cells'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 30 milligrams daily starting 1-2 days before travel. Treatment: 15 milligrams daily for 14 days. Take with food.',
+      warnings: ['Be careful: Can cause hemolytic anemia (destruction of red blood cells) in people with G6PD deficiency', 'Be careful: Can cause methemoglobinemia (blood disorder affecting oxygen transport)', 'Be careful: Can cause leukopenia (low white blood cell count)', 'Be careful: Must test for G6PD deficiency before use'],
+      pregnancy: 'Harmful to your baby - do not use during pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '312',
@@ -127,7 +187,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe malaria', 'QT prolongation', 'family history of sudden death'],
     warnings: ['QT prolongation', 'take with fatty food for absorption', 'monitor cardiac function'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A combination medicine used to treat malaria (a serious disease spread by mosquitoes) that contains two different antimalarial drugs.',
+      mechanism: 'Artemether creates harmful substances that damage malaria parasites, while lumefantrine interferes with how parasites process iron from blood.',
+      indications: ['Treatment of acute, uncomplicated malaria caused by P. falciparum (the most dangerous type of malaria parasite)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe malaria', 'You have heart rhythm problems (QT prolongation)', 'Your family has a history of sudden death'],
+      sideEffects: ['Headache', 'Dizziness', 'Feeling sick to your stomach', 'Vomiting', 'Loss of appetite', 'Weakness', 'Joint pain', 'Muscle pain'],
+      interactions: ['Medicines that affect liver enzymes (CYP3A4)', 'Medicines that can affect heart rhythm', 'Grapefruit juice'],
+      dosageAndAdmin: 'Take by mouth: 4 tablets initially, then 4 tablets at 8, 24, 36, 48, and 60 hours (total 6 doses). Take with food.',
+      warnings: ['Be careful: Can affect heart rhythm (QT prolongation)', 'Be careful: Must take with fatty food for the medicine to work properly', 'Be careful: May need heart monitoring'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '313',
@@ -148,7 +220,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'G6PD deficiency', 'myasthenia gravis', 'optic neuritis', 'tinnitus'],
     warnings: ['Cardiac arrhythmias', 'hypoglycemia', 'thrombocytopenia', 'blackwater fever', 'cinchonism'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A natural medicine derived from tree bark used to treat severe malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'Interferes with how malaria parasites copy their genetic material (DNA) and affects how they process nutrients in infected blood cells.',
+      indications: ['Treatment of severe malaria', 'Treatment of malaria that doesn\'t respond to other medicines'],
+      contraindications: ['You are allergic to quinine or quinidine', 'You have certain heart rhythm problems', 'You have a rare blood disorder called G6PD deficiency', 'You have myasthenia gravis (muscle weakness disease)'],
+      sideEffects: ['Cinchonism (ringing in ears, headache, nausea)', 'Low platelet count (thrombocytopenia)', 'Breakdown of red blood cells (hemolysis)', 'Low blood sugar (hypoglycemia)', 'Heart rhythm problems (arrhythmias)'],
+      interactions: ['Heart medicines (digoxin)', 'Blood thinning medicines (warfarin)', 'Tuberculosis medicines (rifampin)', 'Seizure medicines (phenytoin)', 'Stomach acid medicines (cimetidine)', 'Aluminum-containing antacids'],
+      dosageAndAdmin: 'By mouth: 648mg every 8 hours for 3-7 days. By IV (intravenous - through a vein): 20mg per kg of body weight as loading dose, then 10mg per kg every 8 hours.',
+      warnings: ['Be careful: Can cause cinchonism (ringing in ears, headache, nausea)', 'Be careful: Can cause low platelet count', 'Be careful: Can cause breakdown of red blood cells', 'Be careful: Can cause low blood sugar', 'Be careful: Can cause heart rhythm problems', 'Be careful: Avoid if you have G6PD deficiency'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '314',
@@ -169,7 +253,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'retinal or visual field changes', 'porphyria'],
     warnings: ['Retinal toxicity', 'cardiomyopathy', 'hypoglycemia', 'hemolysis in G6PD deficiency'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine prevents and treats malaria (a serious disease spread by mosquitoes) and is also used for autoimmune conditions (when your immune system attacks your own body).',
+      mechanism: 'This medicine works by concentrating in the malaria parasite\'s food area, interfering with how it digests blood and processes nutrients.',
+      indications: ['Malaria prevention and treatment', 'rheumatoid arthritis (joint inflammation)', 'systemic lupus erythematosus (autoimmune disease affecting multiple organs)'],
+      contraindications: ['You are allergic to this medicine', 'You have eye problems (retinal or vision changes)', 'You have porphyria (a rare blood disorder)'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Dizziness', 'Eye damage (retinal toxicity)', 'Heart muscle problems'],
+      interactions: ['Heart medicines (digoxin)', 'Diabetes medicines (insulin)', 'Stomach acid reducers', 'Clay-based medicines', 'Antibiotics (ampicillin)', 'Immune system medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 400 milligrams weekly starting 1-2 weeks before travel. Treatment: 800 milligrams initially, then 400 milligrams at 6, 24, and 48 hours.',
+      warnings: ['Be careful: Can cause serious eye damage', 'Be careful: Can cause heart muscle problems', 'Be careful: Can cause low blood sugar', 'Be careful: Can cause blood cell breakdown in people with G6PD deficiency'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '315',
@@ -190,7 +286,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to artemisinins', 'first trimester pregnancy'],
     warnings: ['Delayed hemolytic anemia', 'neurotoxicity with high doses', 'monitor hemoglobin post-treatment'],
     pregnancy: 'Category C - Avoid in first trimester',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This is a fast-acting medicine used to treat severe malaria (a life-threatening disease spread by mosquitoes).',
+      mechanism: 'This medicine works by creating harmful substances that damage malaria parasites\' proteins and outer layers, causing them to die quickly.',
+      indications: ['Severe malaria', 'uncomplicated malaria caused by drug-resistant parasites (used with other medicines)'],
+      contraindications: ['You are allergic to artemisinin medicines', 'You are in your first three months of pregnancy'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Dizziness', 'delayed breakdown of red blood cells', 'low white blood cell count'],
+      interactions: ['Medicines that affect liver enzymes', 'Tuberculosis medicines (rifampin)', 'Antifungal medicines (ketoconazole)'],
+      dosageAndAdmin: 'Given through IV: 2.4 milligrams per kilogram of body weight at 0, 12, and 24 hours, then daily. By mouth: 4 milligrams per kilogram daily for 3 days (with partner medicine).',
+      warnings: ['Be careful: Can cause delayed breakdown of red blood cells', 'Be careful: Can cause nerve damage with high doses', 'Be careful: Need to monitor blood levels after treatment'],
+      pregnancy: 'Avoid during first three months of pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '316',
@@ -211,7 +319,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe malaria', 'QT prolongation', 'family history of sudden death'],
     warnings: ['QT prolongation', 'avoid food around dosing', 'monitor cardiac function'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This is a combination medicine used to treat uncomplicated malaria (a disease spread by mosquitoes that hasn\'t become severe yet).',
+      mechanism: 'This medicine has two parts: one provides rapid killing of malaria parasites; the other provides long-lasting protection against the parasites.',
+      indications: ['Uncomplicated malaria caused by drug-resistant parasites', 'mixed malaria infections (more than one type of parasite)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe malaria', 'You have heart rhythm problems (QT prolongation)', 'Your family has a history of sudden death'],
+      sideEffects: ['Headache', 'Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Dizziness', 'heart rhythm changes'],
+      interactions: ['Heart rhythm medicines', 'Medicines that affect liver enzymes', 'Tuberculosis medicines (rifampin)', 'Antifungal medicines (ketoconazole)'],
+      dosageAndAdmin: 'Take by mouth: Weight-based dosing, 3 tablets once daily for 3 days. Take with water, avoid food 3 hours before and after taking.',
+      warnings: ['Be careful: Can cause dangerous heart rhythm changes', 'Be careful: Must avoid food around the time you take this medicine', 'Be careful: Need heart monitoring'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '317',
@@ -232,7 +352,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to sulfonamides', 'severe renal/hepatic impairment', 'megaloblastic anemia'],
     warnings: ['Stevens-Johnson syndrome', 'toxic epidermal necrolysis', 'blood dyscrasias', 'folate deficiency'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This is a combination medicine used to treat and prevent malaria (a disease spread by mosquitoes).',
+      mechanism: 'This medicine has two parts that work together to block different processes that malaria parasites need to make essential nutrients.',
+      indications: ['Malaria treatment caused by drug-resistant parasites', 'preventing malaria during pregnancy (intermittent treatment)'],
+      contraindications: ['You are allergic to sulfa medicines', 'You have severe kidney or liver problems', 'You have a type of anemia (megaloblastic anemia)'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loss of appetite', 'Skin rash', 'serious skin reactions (Stevens-Johnson syndrome)', 'a type of anemia (megaloblastic anemia)'],
+      interactions: ['Medicines that block folate', 'Urinary tract infection medicines (trimethoprim)', 'Cancer medicines (methotrexate)', 'Blood thinning medicines (warfarin)'],
+      dosageAndAdmin: 'Take by mouth: Treatment: 3 tablets as single dose. Prevention: 1 tablet weekly. Take with food.',
+      warnings: ['Be careful: Can cause serious, life-threatening skin reactions', 'Be careful: Can cause dangerous skin peeling', 'Be careful: Can cause blood problems', 'Be careful: Can cause folate deficiency'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '318',
@@ -253,7 +385,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe hepatic impairment', 'history of amodiaquine-induced hepatitis'],
     warnings: ['Hepatotoxicity', 'agranulocytosis', 'monitor liver function', 'avoid monotherapy'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is used in combination with other medicines to treat uncomplicated malaria (a disease spread by mosquitoes that hasn\'t become severe yet).',
+      mechanism: 'This medicine works by concentrating in the malaria parasite\'s food area, interfering with how it digests blood.',
+      indications: ['Uncomplicated malaria caused by drug-resistant parasites (used with other medicines)', 'malaria caused by P. vivax parasites'],
+      contraindications: ['You are allergic to this medicine', 'You have severe liver problems', 'You have had liver inflammation from this medicine before'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Dizziness', 'liver damage', 'dangerous drop in white blood cells'],
+      interactions: ['Other malaria medicines (mefloquine, halofantrine)', 'Medicines that affect liver enzymes'],
+      dosageAndAdmin: 'Take by mouth: 10 milligrams per kilogram of body weight daily for 3 days (usually combined with artesunate). Take with food.',
+      warnings: ['Be careful: Can cause serious liver damage', 'Be careful: Can cause dangerous drop in white blood cells', 'Be careful: Need liver function monitoring', 'Be careful: Should not be used alone'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '319',
@@ -274,7 +418,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'cardiac conduction abnormalities', 'QT prolongation'],
     warnings: ['Cardiac arrhythmias', 'QT prolongation', 'avoid with food', 'ECG monitoring recommended'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to treat malaria (a serious disease spread by mosquitoes) that doesn\'t respond to other medicines.',
+      mechanism: 'This medicine works by interfering with how malaria parasites process food and digest blood proteins.',
+      indications: ['Treatment of malaria that doesn\'t respond to chloroquine', 'Treatment of certain types of malaria'],
+      contraindications: ['You are allergic to this medicine', 'You have heart rhythm problems', 'You have heart conduction problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Headache', 'Dizziness', 'Heart rhythm problems'],
+      interactions: ['Heart rhythm medicines', 'Malaria medicine (mefloquine)', 'Antifungal medicines', 'Tuberculosis medicines'],
+      dosageAndAdmin: 'Take by mouth: 500 milligrams every 6 hours for 3 doses, repeat after 1 week. Take on empty stomach.',
+      warnings: ['Be careful: Can cause serious heart rhythm problems', 'Be careful: Can cause irregular heartbeat', 'Be careful: Must take on empty stomach', 'Be careful: Heart monitoring may be needed'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '320',
@@ -295,7 +451,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe renal impairment'],
     warnings: ['Renal impairment dosing', 'folate deficiency', 'mouth ulcers'],
     pregnancy: 'Category C - Generally considered safe for prevention',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to prevent and treat malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine is changed in your body to a form that stops malaria parasites from making substances they need to survive.',
+      indications: ['Preventing malaria', 'Treating malaria (when combined with another medicine)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe kidney problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Headache', 'Mouth sores'],
+      interactions: ['Blood thinning medicines', 'Medicine that helps malaria (atovaquone)', 'Tuberculosis medicines'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 200 milligrams daily with food. Treatment: 400 milligrams daily for 3 days (with atovaquone).',
+      warnings: ['Be careful: May need dose adjustment if you have kidney problems', 'Be careful: May cause folate deficiency', 'Be careful: May cause mouth sores'],
+      pregnancy: 'Generally considered safe for preventing malaria during pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '321',
@@ -316,7 +484,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to artemisinins', 'first trimester pregnancy'],
     warnings: ['Neurotoxicity with high doses', 'avoid monotherapy', 'monitor blood counts'],
     pregnancy: 'Category C - Avoid in first trimester',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is a natural compound used to treat malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine works by creating harmful substances when it contacts iron in malaria parasites, which damages and kills the parasites.',
+      indications: ['Treating uncomplicated malaria (combined with other medicines)', 'Treating severe malaria'],
+      contraindications: ['You are allergic to artemisinin medicines', 'You are in the first 3 months of pregnancy'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Dizziness', 'Low red blood cell count', 'Low white blood cell count'],
+      interactions: ['Medicines that affect liver enzymes', 'Tuberculosis medicines'],
+      dosageAndAdmin: 'Take by mouth: 500 milligrams twice daily for 5-7 days (usually combined with other malaria medicines).',
+      warnings: ['Be careful: Can cause nerve damage with high doses', 'Be careful: Should not be used alone', 'Be careful: Blood tests may be needed'],
+      pregnancy: 'Avoid during the first 3 months of pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '322',
@@ -337,7 +517,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to artemisinins', 'first trimester pregnancy'],
     warnings: ['Neurotoxicity', 'delayed hemolytic anemia', 'monitor neurological status'],
     pregnancy: 'Category C - Avoid in first trimester',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is a water-soluble form of artemisinin used to treat severe malaria (a serious disease spread by mosquitoes) through IV injection.',
+      mechanism: 'This medicine works by creating harmful substances that damage malaria parasite proteins and cell walls.',
+      indications: ['Treating severe malaria', 'Treating brain malaria (cerebral malaria)', 'Treating complicated malaria'],
+      contraindications: ['You are allergic to artemisinin medicines', 'You are in the first 3 months of pregnancy'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Dizziness', 'Pain or reactions at injection site', 'Delayed breakdown of red blood cells'],
+      interactions: ['Liver enzyme medicines (CYP enzymes)', 'Tuberculosis medicines (rifampin)'],
+      dosageAndAdmin: 'Given through IV: 8 milligrams per kilogram of body weight as loading dose, then 4 milligrams per kilogram daily for 3-5 days.',
+      warnings: ['Be careful: Can cause nerve damage', 'Be careful: Can cause delayed breakdown of red blood cells', 'Be careful: Need to monitor brain and nerve function'],
+      pregnancy: 'Avoid during first 3 months of pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '323',
@@ -358,7 +550,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to artemisinins', 'first trimester pregnancy'],
     warnings: ['Neurotoxicity', 'monitor neurological function', 'avoid monotherapy'],
     pregnancy: 'Category C - Avoid in first trimester',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is derived from a plant and is used to treat severe and uncomplicated malaria (a serious disease spread by mosquitoes).',
+      mechanism: 'This medicine works by creating harmful substances that damage and kill malaria parasites.',
+      indications: ['Severe malaria', 'Uncomplicated malaria', 'Brain malaria (cerebral malaria)'],
+      contraindications: ['You are allergic to artemisinin medicines', 'You are in your first 3 months of pregnancy'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Dizziness', 'Pain or swelling at injection site'],
+      interactions: ['Liver processing enzymes', 'Tuberculosis medicines', 'Antifungal medicines'],
+      dosageAndAdmin: 'By injection or IV: 8 milligrams per kilogram of body weight first, then 4 milligrams per kilogram daily. By mouth: 40 milligrams per kilogram over 5 days.',
+      warnings: ['Be careful: Can affect the nervous system', 'Be careful: Doctor will monitor your brain function', 'Be careful: Should not be used alone'],
+      pregnancy: 'Avoid during first 3 months of pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '324',
@@ -379,7 +583,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'complete heart block', 'myasthenia gravis', 'digitalis toxicity'],
     warnings: ['Cardiac monitoring required', 'hypoglycemia', 'thrombocytopenia', 'cinchonism'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is a heart rhythm drug that can also be used to treat severe malaria (a serious disease spread by mosquitoes) when quinine is not available.',
+      mechanism: 'This medicine works similarly to quinine by interfering with how malaria parasites copy their DNA and function.',
+      indications: ['Treating severe malaria (when quinine is not available)', 'Treating malaria that doesn\'t respond to chloroquine'],
+      contraindications: ['You are allergic to this medicine', 'You have complete heart block', 'You have muscle weakness disease (myasthenia gravis)', 'You have digitalis poisoning'],
+      sideEffects: ['Ringing in ears and hearing problems', 'Low blood pressure', 'Heart rhythm problems', 'Low platelet count', 'Breakdown of red blood cells'],
+      interactions: ['Heart medicines (digoxin)', 'Blood thinning medicines', 'Seizure medicines', 'Tuberculosis medicines', 'Heart medicines (verapamil)'],
+      dosageAndAdmin: 'Given through IV: 10 milligrams per kilogram of body weight over 1-2 hours, then continuous drip at 0.02 milligrams per kilogram per minute.',
+      warnings: ['Be careful: Heart monitoring is required', 'Be careful: Can cause low blood sugar', 'Be careful: Can cause low platelet count', 'Be careful: Can cause ringing in ears'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   },
   {
     id: '325',
@@ -400,7 +616,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['G6PD deficiency', 'pregnancy', 'breastfeeding', 'severe renal/hepatic impairment'],
     warnings: ['Hemolytic anemia in G6PD deficiency', 'test G6PD before use', 'psychiatric effects'],
     pregnancy: 'Category C - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is a long-acting drug used to prevent malaria (a serious disease spread by mosquitoes) and to completely cure certain types of malaria.',
+      mechanism: 'This medicine works by interfering with how malaria parasites use energy and by creating harmful substances that kill the parasites.',
+      indications: ['Preventing malaria', 'Completely curing certain types of malaria (P. vivax)', 'Completely curing certain types of malaria (P. ovale)'],
+      contraindications: ['You have G6PD deficiency (a blood disorder)', 'You are pregnant', 'You are breastfeeding', 'You have severe kidney or liver problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Dizziness', 'Decreased red blood cell count'],
+      interactions: ['Medicines processed by liver enzyme CYP2D6', 'Stomach medicines (metoclopramide)'],
+      dosageAndAdmin: 'Take by mouth: Prevention: 200 milligrams weekly. Complete cure: 300 milligrams single dose (after chloroquine). Take with food.',
+      warnings: ['Be careful: Can cause severe blood breakdown in people with G6PD deficiency', 'Be careful: Must test for G6PD deficiency before use', 'Be careful: Can cause mental health effects'],
+      pregnancy: 'Do not use during pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '326',
@@ -421,7 +649,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe hepatic impairment', 'severe malaria'],
     warnings: ['Hepatotoxicity', 'monitor liver function', 'QT prolongation risk'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is a combination drug used to treat malaria (a serious disease spread by mosquitoes), especially when other medicines don\'t work.',
+      mechanism: 'This medicine contains two drugs that work together - one provides quick parasite killing, and the other provides longer-lasting protection.',
+      indications: ['Treating uncomplicated malaria (P. falciparum)', 'Treating uncomplicated malaria (P. vivax)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe liver problems', 'You have severe malaria'],
+      sideEffects: ['Headache', 'Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Liver problems'],
+      interactions: ['Liver enzyme medicines (CYP3A4 inhibitors)', 'Tuberculosis medicines (rifampin)', 'Antifungal medicines (ketoconazole)'],
+      dosageAndAdmin: 'Take by mouth: Dose based on body weight, once daily for 3 days. Take with food.',
+      warnings: ['Be careful: Can cause liver damage', 'Be careful: Need to monitor liver function', 'Be careful: Can cause heart rhythm problems'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '327',
@@ -442,7 +682,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe hepatic/renal impairment'],
     warnings: ['Investigational drug', 'limited safety data', 'use only in clinical trials'],
     pregnancy: 'Category C - Limited data available',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is an experimental drug being studied to treat malaria (a serious disease spread by mosquitoes). It contains iron and is only available in research studies.',
+      mechanism: 'This medicine works by interfering with how malaria parasites process iron and by creating harmful substances that kill the parasites.',
+      indications: ['Treating uncomplicated malaria (experimental use only in clinical trials)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe liver or kidney problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Stomach pain'],
+      interactions: ['Liver enzyme medicines (CYP enzymes)', 'Other malaria medicines'],
+      dosageAndAdmin: 'Take by mouth: Experimental dosing, usually combined with artesunate. Take with food.',
+      warnings: ['Be careful: This is an experimental drug', 'Be careful: Limited safety information available', 'Be careful: Only use in clinical trials'],
+      pregnancy: 'Limited information available - use only in research studies',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '328',
@@ -484,7 +736,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to sulfonamides', 'G6PD deficiency', 'severe anemia'],
     warnings: ['Hemolytic anemia', 'methemoglobinemia', 'agranulocytosis', 'monitor blood counts'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is a combination of two drugs used to prevent malaria (a serious disease spread by mosquitoes) in areas where other medicines don\'t work.',
+      mechanism: 'This medicine works by blocking two different processes that malaria parasites need to make essential nutrients for survival.',
+      indications: ['Preventing malaria in areas where chloroquine doesn\'t work'],
+      contraindications: ['You are allergic to sulfa medicines', 'You have G6PD deficiency (a genetic condition)', 'You have severe anemia (low red blood cells)'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Breakdown of red blood cells', 'Blue-colored skin or lips', 'Skin rash', 'Dangerous drop in white blood cells'],
+      interactions: ['Folate-blocking medicines', 'Tuberculosis medicines (rifampin)', 'Urinary tract infection medicines (trimethoprim)'],
+      dosageAndAdmin: 'Take by mouth: 1 tablet once weekly for prevention. Take with food.',
+      warnings: ['Be careful: Can cause breakdown of red blood cells', 'Be careful: Can cause blue-colored skin or lips', 'Be careful: Can cause dangerous drop in white blood cells', 'Be careful: Need regular blood tests'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '330',
@@ -505,7 +769,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to sulfonamides', 'G6PD deficiency', 'severe renal impairment'],
     warnings: ['Hemolytic anemia in G6PD deficiency', 'methemoglobinemia', 'monitor blood counts'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is a combination of two drugs used to treat and prevent malaria (a serious disease spread by mosquitoes) in areas where other medicines don\'t work.',
+      mechanism: 'This medicine works by blocking two different processes that malaria parasites need to make essential nutrients for survival.',
+      indications: ['Treating uncomplicated malaria', 'Preventing malaria'],
+      contraindications: ['You are allergic to sulfa medicines', 'You have G6PD deficiency (a genetic condition)', 'You have severe kidney problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Headache', 'Breakdown of red blood cells', 'Blue-colored skin or lips'],
+      interactions: ['Folate-blocking medicines', 'Tuberculosis medicines (rifampin)', 'Urinary tract infection medicines (trimethoprim)'],
+      dosageAndAdmin: 'Take by mouth: Weight-based dosing, once daily for 3 days for treatment. Take with food.',
+      warnings: ['Be careful: Can cause breakdown of red blood cells if you have G6PD deficiency', 'Be careful: Can cause blue-colored skin or lips', 'Be careful: Need regular blood tests'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '331',
@@ -526,7 +802,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to macrolides', 'history of cholestatic jaundice'],
     warnings: ['QT prolongation', 'hepatotoxicity', 'Clostridioides difficile colitis'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is an antibiotic that can also be used to treat malaria (a serious disease spread by mosquitoes) when combined with other medicines.',
+      mechanism: 'This medicine works by stopping malaria parasites from making proteins they need to survive.',
+      indications: ['Treating uncomplicated malaria (combined with other medicines)', 'Preventing malaria'],
+      contraindications: ['You are allergic to macrolide antibiotics', 'You have a history of liver problems from antibiotics'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Headache', 'Heart rhythm changes'],
+      interactions: ['Heart rhythm medicines', 'Blood thinning medicines', 'Heart medicines (digoxin)', 'Migraine medicines (ergot alkaloids)'],
+      dosageAndAdmin: 'Take by mouth: 500 milligrams once daily for 3 days (combined with artesunate or chloroquine).',
+      warnings: ['Be careful: Can affect heart rhythm', 'Be careful: Can cause liver damage', 'Be careful: Can cause serious intestinal infection'],
+      pregnancy: 'Generally safe during pregnancy - no known risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '332',
@@ -547,7 +835,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe renal impairment'],
     warnings: ['Take on empty stomach', 'avoid metal-containing supplements', 'renal impairment dosing'],
     pregnancy: 'Category C - Limited data available',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is an antibiotic that can also treat malaria (a serious disease spread by mosquitoes) by targeting a special pathway that parasites use.',
+      mechanism: 'This medicine works by blocking a specific process that malaria parasites need to make essential building blocks for survival.',
+      indications: ['Treating uncomplicated malaria (combined with other medicines)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe kidney problems'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Headache', 'Dizziness'],
+      interactions: ['Metal supplements (iron, calcium, magnesium) - reduce absorption', 'Gout medicines (probenecid)'],
+      dosageAndAdmin: 'Take by mouth: 1200 milligrams every 8 hours for 7 days (usually combined with clindamycin).',
+      warnings: ['Be careful: Must take on empty stomach for best absorption', 'Be careful: Avoid metal-containing supplements', 'Be careful: May need dose adjustment if you have kidney problems'],
+      pregnancy: 'Limited information available - discuss with your doctor',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '333',
@@ -568,7 +868,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to lincosamides', 'history of antibiotic-associated colitis'],
     warnings: ['Clostridioides difficile colitis', 'monitor for diarrhea', 'hepatotoxicity'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is an antibiotic that can also treat severe malaria (a serious disease spread by mosquitoes) when combined with other medicines.',
+      mechanism: 'This medicine works by stopping malaria parasites from making proteins they need to survive.',
+      indications: ['Treating severe malaria (combined with other medicines)', 'Treating uncomplicated malaria in pregnant women'],
+      contraindications: ['You are allergic to lincosamide antibiotics', 'You have a history of serious intestinal infection from antibiotics'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Stomach pain', 'Serious intestinal infection'],
+      interactions: ['Muscle relaxant medicines', 'Blood thinning medicines', 'Other antibiotics (erythromycin)'],
+      dosageAndAdmin: 'Take by mouth: 20 milligrams per kilogram of body weight per day divided every 8 hours for 7 days (with quinine or artesunate).',
+      warnings: ['Be careful: Can cause serious intestinal infection', 'Be careful: Watch for persistent diarrhea', 'Be careful: Can cause liver damage'],
+      pregnancy: 'Generally safe during pregnancy - no known risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '334',
@@ -589,7 +901,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to tetracyclines', 'pregnancy', 'children <8 years'],
     warnings: ['Photosensitivity', 'tooth discoloration', 'esophageal ulceration', 'hepatotoxicity'],
     pregnancy: 'Category D - Avoid in pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'This medicine is an antibiotic that can also treat severe malaria (a serious disease spread by mosquitoes) when combined with other medicines.',
+      mechanism: 'This medicine works by stopping malaria parasites from making proteins they need to survive.',
+      indications: ['Treating severe malaria (combined with quinine)', 'Treating chloroquine-resistant malaria'],
+      contraindications: ['You are allergic to tetracycline antibiotics', 'You are pregnant', 'Children under 8 years old'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Increased sensitivity to sunlight', 'Tooth discoloration', 'Throat irritation'],
+      interactions: ['Stomach acid reducers', 'Iron supplements', 'Calcium supplements', 'Blood thinning medicines', 'Anesthesia medicines'],
+      dosageAndAdmin: 'Take by mouth: 250 milligrams four times daily for 7 days (with quinine). Take on empty stomach.',
+      warnings: ['Be careful: Makes you more sensitive to sunlight - use sunscreen', 'Be careful: Can cause tooth discoloration', 'Be careful: Can cause throat irritation', 'Be careful: Can cause liver damage'],
+      pregnancy: 'May harm your baby - avoid during pregnancy',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light and keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '335',
@@ -610,7 +934,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe malaria', 'QT prolongation'],
     warnings: ['QT prolongation', 'take with fatty food', 'avoid as monotherapy'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to treat malaria (a serious disease spread by mosquitoes) and is always combined with artemether for better effectiveness.',
+      mechanism: 'This medicine works by interfering with how malaria parasites process waste products and survive in red blood cells.',
+      indications: ['Treating uncomplicated malaria (combined with artemether)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe malaria', 'You have heart rhythm problems'],
+      sideEffects: ['Headache', 'Dizziness', 'Feeling sick to your stomach', 'Vomiting', 'Loss of appetite', 'Weakness'],
+      interactions: ['Heart rhythm medicines', 'Medicines that affect liver enzymes', 'Grapefruit juice'],
+      dosageAndAdmin: 'Take by mouth: Always used in combination with artemether. Take with fatty food for better absorption.',
+      warnings: ['Be careful: Can affect heart rhythm', 'Be careful: Must take with fatty food', 'Be careful: Never use alone - always with artemether'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '336',
@@ -631,7 +967,19 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe malaria', 'QT prolongation', 'family history of sudden death'],
     warnings: ['QT prolongation', 'avoid food around dosing', 'cardiac monitoring'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'This medicine is used to treat malaria (a serious disease spread by mosquitoes) and is always combined with dihydroartemisinin for better effectiveness.',
+      mechanism: 'This medicine works by interfering with how malaria parasites process waste products and copy their genetic material.',
+      indications: ['Treating uncomplicated malaria (combined with dihydroartemisinin)'],
+      contraindications: ['You are allergic to this medicine', 'You have severe malaria', 'You have heart rhythm problems', 'You have family history of sudden death'],
+      sideEffects: ['Headache', 'Feeling sick to your stomach', 'Vomiting', 'Loose or watery stools', 'Heart rhythm changes', 'Dizziness'],
+      interactions: ['Heart rhythm medicines', 'Medicines that affect liver enzymes', 'Tuberculosis medicines (rifampin)'],
+      dosageAndAdmin: 'Take by mouth: Always used in combination with dihydroartemisinin. Avoid food 3 hours before and after taking.',
+      warnings: ['Be careful: Can affect heart rhythm', 'Be careful: Avoid food around dosing time', 'Be careful: May need heart monitoring'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep dry - don\'t store in bathroom'
+    }
   },
   {
     id: '337',
@@ -652,6 +1000,18 @@ export const antimalarialDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity', 'megaloblastic anemia', 'folate deficiency'],
     warnings: ['Megaloblastic anemia', 'thrombocytopenia', 'folate supplementation may be needed'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'This medicine is used to treat and prevent malaria (a serious disease spread by mosquitoes) and certain parasitic infections, usually combined with other medicines.',
+      mechanism: 'This medicine works by blocking a process that malaria parasites need to make essential nutrients for survival.',
+      indications: ['Preventing and treating malaria (combined with other medicines)', 'Treating toxoplasmosis'],
+      contraindications: ['You are allergic to this medicine', 'You have a type of anemia with large red blood cells', 'You have folate deficiency'],
+      sideEffects: ['Feeling sick to your stomach', 'Vomiting', 'Loss of appetite', 'Anemia with large red blood cells', 'Low platelet count', 'Skin rash'],
+      interactions: ['Folate-blocking medicines', 'Urinary tract infection medicines (trimethoprim)', 'Cancer medicines (methotrexate)', 'Seizure medicines (phenytoin)'],
+      dosageAndAdmin: 'Take by mouth: Usually combined with sulfadoxine or dapsone. 25 milligrams weekly for prevention.',
+      warnings: ['Be careful: Can cause anemia with large red blood cells', 'Be careful: Can cause low platelet count', 'Be careful: May need folate supplements'],
+      pregnancy: 'Use only if your doctor says benefits outweigh risks',
+      storage: 'Keep at normal room temperature (68-77°F), keep away from bright light'
+    }
   }
 ];

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
   Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
-  AlertTriangle, Package, Tag
+  AlertTriangle, Package, Tag, BookOpen, GraduationCap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +33,18 @@ export interface DetailedDrugData {
     id: string;
     name: string;
   }[];
+  laymanExplanations?: {
+    description?: string;
+    mechanism?: string;
+    indications?: string[];
+    contraindications?: string[];
+    sideEffects?: string[];
+    interactions?: string[];
+    dosageAndAdmin?: string;
+    warnings?: string[];
+    pregnancy?: string;
+    storage?: string;
+  };
 }
 
 interface DrugDetailsProps {
@@ -41,15 +53,9 @@ interface DrugDetailsProps {
 }
 
 const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
-  const [activeTab, setActiveTab] = useState('general');
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    description: true,
-    dosage: true,
-    sideEffects: false,
-    warnings: false,
-    interactions: false,
-    mechanism: false,
-  });
+  const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives'>('general');
+  const [showLaymanTerms, setShowLaymanTerms] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   
   const toggleSection = (section: string) => {
     setExpandedSections({
@@ -69,7 +75,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('description')}
               content={
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {drug.description}
+                  {showLaymanTerms && drug.laymanExplanations?.description 
+                    ? drug.laymanExplanations.description 
+                    : drug.description}
                 </p>
               }
             />
@@ -80,7 +88,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('dosage')}
               content={
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {drug.dosageAndAdmin}
+                  {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin 
+                    ? drug.laymanExplanations.dosageAndAdmin 
+                    : drug.dosageAndAdmin}
                 </p>
               }
             />
@@ -91,7 +101,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('mechanism')}
               content={
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {drug.mechanism}
+                  {showLaymanTerms && drug.laymanExplanations?.mechanism 
+                    ? drug.laymanExplanations.mechanism 
+                    : drug.mechanism}
                 </p>
               }
             />
@@ -102,7 +114,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('sideEffects')}
               content={
                 <ul className="space-y-2">
-                  {drug.sideEffects.map((effect, i) => (
+                  {(showLaymanTerms && drug.laymanExplanations?.sideEffects 
+                    ? drug.laymanExplanations.sideEffects 
+                    : drug.sideEffects).map((effect, i) => (
                     <li key={i} className="flex items-start">
                       <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
@@ -118,7 +132,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('warnings')}
               content={
                 <ul className="space-y-2">
-                  {drug.warnings.map((warning, i) => (
+                  {(showLaymanTerms && drug.laymanExplanations?.warnings 
+                    ? drug.laymanExplanations.warnings 
+                    : drug.warnings).map((warning, i) => (
                     <li key={i} className="flex items-start">
                       <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
@@ -134,7 +150,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               onToggle={() => toggleSection('interactions')}
               content={
                 <ul className="space-y-2">
-                  {drug.interactions.map((interaction, i) => (
+                  {(showLaymanTerms && drug.laymanExplanations?.interactions 
+                    ? drug.laymanExplanations.interactions 
+                    : drug.interactions).map((interaction, i) => (
                     <li key={i} className="flex items-start">
                       <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
@@ -152,7 +170,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Indications</h3>
               <ul className="space-y-2">
-                {drug.indications.map((indication, i) => (
+                {(showLaymanTerms && drug.laymanExplanations?.indications 
+                  ? drug.laymanExplanations.indications 
+                  : drug.indications).map((indication, i) => (
                   <li key={i} className="flex items-start">
                     <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
@@ -164,7 +184,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Contraindications</h3>
               <ul className="space-y-2">
-                {drug.contraindications.map((contraindication, i) => (
+                {(showLaymanTerms && drug.laymanExplanations?.contraindications 
+                  ? drug.laymanExplanations.contraindications 
+                  : drug.contraindications).map((contraindication, i) => (
                   <li key={i} className="flex items-start">
                     <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
@@ -176,7 +198,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Pregnancy & Lactation</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
-                {drug.pregnancy}
+                {showLaymanTerms && drug.laymanExplanations?.pregnancy 
+                  ? drug.laymanExplanations.pregnancy 
+                  : drug.pregnancy}
               </p>
             </div>
             
@@ -184,7 +208,11 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <h3 className="text-sm font-medium mb-3">Storage Information</h3>
               <div className="flex items-start">
                 <History className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
-                <span className="text-gray-700 dark:text-gray-300 text-sm">{drug.storage}</span>
+                <span className="text-gray-700 dark:text-gray-300 text-sm">
+                  {showLaymanTerms && drug.laymanExplanations?.storage 
+                    ? drug.laymanExplanations.storage 
+                    : drug.storage}
+                </span>
               </div>
             </div>
           </div>
@@ -316,8 +344,40 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
         </div>
       )}
       
-      {/* Tabs */}
+      {/* Language Toggle and Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+          {/* Language Toggle */}
+          {drug.laymanExplanations && (
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => setShowLaymanTerms(false)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all",
+                  !showLaymanTerms
+                    ? "bg-white dark:bg-gray-700 text-pharma-600 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                )}
+              >
+                <GraduationCap className="h-4 w-4" />
+                Professional
+              </button>
+              <button
+                onClick={() => setShowLaymanTerms(true)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all",
+                  showLaymanTerms
+                    ? "bg-white dark:bg-gray-700 text-pharma-600 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                )}
+              >
+                <BookOpen className="h-4 w-4" />
+                Simple Terms
+              </button>
+            </div>
+          )}
+        </div>
+        
         <div className="flex space-x-8">
           <button
             onClick={() => setActiveTab('general')}

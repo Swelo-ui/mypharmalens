@@ -26,6 +26,18 @@ export interface DetailedDrugData {
   packageImage?: string;
   brandNames?: string[];
   similarDrugs?: {id: string, name: string}[];
+  laymanExplanations?: {
+    description?: string;
+    mechanism?: string;
+    indications?: string[];
+    contraindications?: string[];
+    sideEffects?: string[];
+    interactions?: string[];
+    dosageAndAdmin?: string;
+    warnings?: string[];
+    pregnancy?: string;
+    storage?: string;
+  };
 }
 
 // Centralized detailed drug data repository
@@ -131,7 +143,7 @@ export const getDetailedDrugData = (id: string, allDrugs: DrugData[]): DetailedD
     
     if (hasComprehensiveData) {
       // Use the comprehensive data directly from the drug files
-      return {
+      const result = {
         id: basicDrugData.id,
         name: basicDrugData.name,
         genericName: basicDrugData.genericName || basicDrugData.name,
@@ -151,8 +163,10 @@ export const getDetailedDrugData = (id: string, allDrugs: DrugData[]): DetailedD
         pregnancy: basicDrugData.pregnancy,
         storage: basicDrugData.storage,
         brandNames: basicDrugData.brandNames || [],
-        similarDrugs: []
+        similarDrugs: [],
+        laymanExplanations: basicDrugData.laymanExplanations
       };
+      return result;
     } else {
       // Create a minimum viable DetailedDrugData object from the basic drug data
       return {
@@ -175,7 +189,8 @@ export const getDetailedDrugData = (id: string, allDrugs: DrugData[]): DetailedD
         pregnancy: 'Safety during pregnancy not established. Consult your healthcare provider.',
         storage: 'Store at room temperature away from moisture and heat.',
         brandNames: basicDrugData.brandNames || [],
-        similarDrugs: []
+        similarDrugs: [],
+        laymanExplanations: basicDrugData.laymanExplanations
       };
     }
   }
