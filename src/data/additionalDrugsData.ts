@@ -21,7 +21,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'bilateral renal artery stenosis'],
     warnings: ['Angioedema', 'hyperkalemia', 'renal impairment', 'hypotension', 'neutropenia'],
     pregnancy: 'Category D - Avoid in pregnancy',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A blood pressure medicine that helps treat high blood pressure, heart failure, and protects the kidneys in people with diabetes.',
+      mechanism: 'Works by blocking an enzyme that makes blood vessels tighten, helping blood vessels relax and lowering blood pressure.',
+      indications: ['Used to treat high blood pressure, heart failure (when the heart doesn\'t pump well), and to protect heart function even when there are no symptoms.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, have had severe swelling of face/throat, are pregnant, or have blocked arteries to both kidneys.'],
+      sideEffects: ['May cause dry cough, high potassium levels, low blood pressure, dizziness, headache, tiredness, or nausea.'],
+      interactions: ['May interact with potassium supplements, water pills, pain medicines (NSAIDs), lithium (mood medicine), or aliskiren (another blood pressure medicine).'],
+      dosageAndAdmin: 'Start with 2.5-5mg twice daily. Maintenance dose: 10-40mg daily in 1-2 divided doses. Maximum: 40mg per day. Can be taken with or without food.',
+      warnings: ['Can cause severe swelling of face/throat, high potassium levels, kidney problems, low blood pressure, or low white blood cell count.'],
+      pregnancy: 'Category D - Must be avoided during pregnancy as it can harm the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '102',
@@ -42,7 +54,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Sinus bradycardia', 'heart block', 'cardiogenic shock', 'severe heart failure'],
     warnings: ['Abrupt withdrawal', 'diabetes masking', 'bronchospasm', 'peripheral vascular disease'],
     pregnancy: 'Category D - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A heart medicine (beta-blocker) that slows down the heart and lowers blood pressure. Used to treat chest pain and high blood pressure.',
+      mechanism: 'Works by blocking certain signals to the heart, making it beat slower and with less force, which lowers blood pressure.',
+      indications: ['Used to treat high blood pressure, chest pain (angina), and to protect the heart after a heart attack.'],
+      contraindications: ['Should not be used if you have very slow heart rate, heart block (electrical problems), shock from heart problems, or severe heart failure.'],
+      sideEffects: ['May cause slow heart rate, low blood pressure, tiredness, dizziness, cold hands/feet, or depression.'],
+      interactions: ['May interact with calcium channel blockers (heart medicines), digoxin (heart medicine), insulin (diabetes medicine), clonidine (blood pressure medicine), or NSAIDs (pain medicines).'],
+      dosageAndAdmin: 'For high blood pressure: 25-50mg once daily, maximum 100mg per day. For chest pain: 50mg once daily, maximum 200mg per day. Can be taken with or without food.',
+      warnings: ['Do not stop suddenly (can cause heart problems), may hide signs of low blood sugar in diabetics, can cause breathing problems, or worsen poor circulation.'],
+      pregnancy: 'Category D - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '103',
@@ -63,7 +87,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Sick sinus syndrome', 'second/third-degree AV block', 'hypotension', 'acute MI with pulmonary congestion'],
     warnings: ['Heart failure', 'hepatic impairment', 'elderly patients', 'abrupt withdrawal'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A heart and blood pressure medicine (calcium channel blocker) that relaxes blood vessels and slows the heart. Used to treat high blood pressure, chest pain, and irregular heart rhythms.',
+      mechanism: 'Works by blocking calcium from entering heart and blood vessel cells, making blood vessels relax and the heart beat less forcefully.',
+      indications: ['Used to treat high blood pressure, chest pain (angina), and to control fast heart rhythms like atrial fibrillation.'],
+      contraindications: ['Should not be used if you have sick sinus syndrome (heart rhythm problem), heart block (electrical problems), very low blood pressure, or recent heart attack with lung congestion.'],
+      sideEffects: ['May cause dizziness, headache, swelling (especially ankles), slow heart rate, constipation, nausea, or tiredness.'],
+      interactions: ['May interact with beta-blockers (heart medicines), digoxin (heart medicine), cyclosporine (immune medicine), statins (cholesterol medicines), warfarin (blood thinner), or other medicines processed by the liver.'],
+      dosageAndAdmin: 'Immediate-release: 30mg four times daily, can be increased to 180-360mg per day. Extended-release: 120-540mg once daily.',
+      warnings: ['Can worsen heart failure, may need dose adjustment with liver problems, use caution in elderly patients, do not stop suddenly.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '104',
@@ -84,7 +120,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Severe left ventricular dysfunction', 'hypotension', 'sick sinus syndrome', 'second/third-degree AV block'],
     warnings: ['Heart failure', 'hepatic impairment', 'neuromuscular transmission disorders'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A heart and blood pressure medicine (calcium channel blocker) that relaxes blood vessels and slows the heart. Used to treat high blood pressure, chest pain, and fast heart rhythms.',
+      mechanism: 'Works by blocking calcium from entering heart and blood vessel cells, making blood vessels relax and the heart beat less forcefully.',
+      indications: ['Used to treat high blood pressure, chest pain (angina), fast heart rhythms from the upper heart chambers, and to control atrial fibrillation heart rate.'],
+      contraindications: ['Should not be used if you have severe heart pumping problems, very low blood pressure, sick sinus syndrome (heart rhythm problem), or heart block (electrical problems).'],
+      sideEffects: ['May cause constipation, dizziness, headache, nausea, low blood pressure, slow heart rate, or swelling.'],
+      interactions: ['May interact with beta-blockers (heart medicines), digoxin (heart medicine), lithium (mood medicine), carbamazepine (seizure medicine), cyclosporine (immune medicine), or statins (cholesterol medicines).'],
+      dosageAndAdmin: 'Immediate-release: 80-120mg three times daily. Extended-release: 120-480mg once daily. Take with food.',
+      warnings: ['Can worsen heart failure, may need dose adjustment with liver problems, can affect muscle and nerve function.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   
   // Gastrointestinal drugs
@@ -107,7 +155,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to ranitidine or H2 antagonists'],
     warnings: ['WITHDRAWN: Contains NDMA impurity (probable carcinogen). Use alternatives.'],
     pregnancy: 'Category B - Previously considered safe',
-    storage: 'Product withdrawn - not available for storage'
+    storage: 'Product withdrawn - not available for storage',
+    laymanExplanations: {
+      description: 'A stomach acid reducer (H2 blocker) that was used to treat ulcers and heartburn. IMPORTANT: This medicine has been withdrawn from the market due to cancer-causing contamination.',
+      mechanism: 'Worked by blocking histamine signals that tell the stomach to make acid, reducing stomach acid production.',
+      indications: ['Previously used to treat stomach ulcers, acid reflux (GERD), and excessive stomach acid conditions.'],
+      contraindications: ['Should not be used if allergic to ranitidine or similar stomach acid medicines.'],
+      sideEffects: ['Could cause headache, dizziness, constipation, diarrhea, nausea, or stomach pain.'],
+      interactions: ['Could interact with warfarin (blood thinner), phenytoin (seizure medicine), theophylline (breathing medicine), midazolam (sedative), or glipizide (diabetes medicine).'],
+      dosageAndAdmin: 'WITHDRAWN FROM MARKET: Previously 150mg twice daily or 300mg at bedtime.',
+      warnings: ['WITHDRAWN: Contains NDMA contamination (probable cancer-causing substance). Use alternative medicines.'],
+      pregnancy: 'Category B - Previously considered safe during pregnancy.',
+      storage: 'Product withdrawn - not available for storage.'
+    }
   },
   {
     id: '106',
@@ -128,7 +188,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to famotidine or H2 antagonists'],
     warnings: ['Renal impairment dosing', 'CNS effects in elderly', 'gastric malignancy exclusion'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A stomach acid reducer (H2 blocker) that helps treat ulcers, acid reflux (GERD), and heartburn. Available over-the-counter and by prescription.',
+      mechanism: 'Works by blocking histamine signals that tell the stomach to make acid, reducing stomach acid production.',
+      indications: ['Used to treat stomach ulcers, acid reflux (GERD), excessive stomach acid conditions, and to prevent heartburn.'],
+      contraindications: ['Should not be used if you are allergic to famotidine or similar stomach acid medicines.'],
+      sideEffects: ['May cause headache, dizziness, constipation, diarrhea, tiredness, or dry mouth.'],
+      interactions: ['May interact with atazanavir (HIV medicine), dasatinib (cancer medicine), delavirdine (HIV medicine), ketoconazole (antifungal), or itraconazole (antifungal).'],
+      dosageAndAdmin: 'For acid reflux: 20mg twice daily. For ulcers: 40mg at bedtime or 20mg twice daily. Over-the-counter: 10-20mg for heartburn.',
+      warnings: ['May need dose adjustment with kidney problems, can cause confusion in elderly patients, should rule out stomach cancer before use.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '107',
@@ -149,7 +221,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to lansoprazole or benzimidazoles', 'rilpivirine co-administration'],
     warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'vitamin B12 deficiency'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A strong stomach acid reducer (proton pump inhibitor) that treats ulcers, acid reflux (GERD), and excessive stomach acid conditions. Available over-the-counter and by prescription.',
+      mechanism: 'Works by permanently blocking the stomach\'s acid pumps, stopping the final step of acid production in the stomach.',
+      indications: ['Used to treat acid reflux (GERD), stomach ulcers, excessive stomach acid conditions, and to help eliminate H. pylori bacteria.'],
+      contraindications: ['Should not be used if you are allergic to lansoprazole or similar medicines, or if taking rilpivirine (HIV medicine).'],
+      sideEffects: ['May cause headache, diarrhea, nausea, stomach pain, constipation, or dizziness.'],
+      interactions: ['May interact with atazanavir (HIV medicine), rilpivirine (HIV medicine), warfarin (blood thinner), digoxin (heart medicine), methotrexate (immune medicine), or clopidogrel (blood thinner).'],
+      dosageAndAdmin: 'For acid reflux: 15-30mg once daily. For ulcers: 15-30mg once daily. Take 30-60 minutes before eating.',
+      warnings: ['Can increase risk of serious intestinal infections, bone fractures, low magnesium levels, or vitamin B12 deficiency with long-term use.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '108',
@@ -170,7 +254,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to esomeprazole', 'omeprazole', 'or benzimidazoles'],
     warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'acute interstitial nephritis'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A stomach acid reducer (proton pump inhibitor) that helps treat heartburn, stomach ulcers, and a condition where the stomach makes too much acid.',
+      mechanism: 'Works by permanently blocking the pumps in the stomach that make acid, providing long-lasting acid reduction.',
+      indications: ['Used to treat heartburn (GERD), damage to the food pipe from acid, stomach ulcers, Zollinger-Ellison syndrome (too much stomach acid), and to help eliminate H. pylori bacteria.'],
+      contraindications: ['Should not be used if you are allergic to esomeprazole, omeprazole, or similar acid-reducing medicines.'],
+      sideEffects: ['May cause headache, diarrhea, nausea, gas, stomach pain, or dry mouth.'],
+      interactions: ['May interact with atazanavir (HIV medicine), nelfinavir (HIV medicine), warfarin (blood thinner), digoxin (heart medicine), methotrexate (arthritis/cancer medicine), or clopidogrel (blood thinner).'],
+      dosageAndAdmin: 'For heartburn: 20-40mg once daily. For stomach ulcers: 40mg once daily. Take 1 hour before meals.',
+      warnings: ['Can increase risk of serious bowel infection (C. difficile), bone fractures, low magnesium levels, or kidney inflammation.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
 
   // Note: Respiratory drugs with IDs 109-112 removed to prevent duplicates with respiratoryDrugs.ts
@@ -195,7 +291,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal/hepatic impairment', 'hypersensitivity'],
     warnings: ['Hypoglycemia', 'cardiovascular mortality', 'G6PD deficiency', 'elderly patients'],
     pregnancy: 'Category C - Use insulin during pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A diabetes medicine (sulfonylurea) that helps control blood sugar levels in people with type 2 diabetes by helping the body make more insulin.',
+      mechanism: 'Works by stimulating the pancreas to release more insulin by blocking certain channels in insulin-producing cells.',
+      indications: ['Used to treat type 2 diabetes along with diet and exercise to help control blood sugar levels.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), severe kidney or liver problems, or are allergic to this medicine.'],
+      sideEffects: ['May cause low blood sugar, weight gain, dizziness, headache, nausea, or diarrhea.'],
+      interactions: ['May interact with beta-blockers (heart medicines), warfarin (blood thinner), NSAIDs (pain medicines), alcohol, miconazole (antifungal), or fluconazole (antifungal).'],
+      dosageAndAdmin: 'Start with 1-2mg once daily with breakfast. Maintenance: 1-4mg once daily. Maximum: 8mg per day.',
+      warnings: ['Can cause dangerously low blood sugar, may increase heart disease risk, use caution with G6PD deficiency or in elderly patients.'],
+      pregnancy: 'Category C - Should use insulin instead during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '114',
@@ -216,7 +324,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal/hepatic impairment', 'hypersensitivity'],
     warnings: ['Hypoglycemia', 'cardiovascular mortality', 'renal impairment', 'elderly patients'],
     pregnancy: 'Category B - Use insulin during pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A diabetes medicine (sulfonylurea) that helps control blood sugar levels in people with type 2 diabetes.',
+      mechanism: 'Works by making the pancreas release more insulin by closing special channels in insulin-producing cells.',
+      indications: ['Used to treat type 2 diabetes along with diet and exercise.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), severe kidney/liver problems, or are allergic to this medicine.'],
+      sideEffects: ['May cause low blood sugar, weight gain, nausea, heartburn, dizziness, or skin reactions.'],
+      interactions: ['May interact with beta-blockers (heart medicines), warfarin (blood thinner), NSAIDs (pain medicines), alcohol, fluconazole (antifungal), or clarithromycin (antibiotic).'],
+      dosageAndAdmin: 'Start with 2.5-5mg once daily with breakfast. Maintenance: 1.25-20mg daily in 1-2 divided doses. Maximum: 20mg per day.',
+      warnings: ['Can cause dangerously low blood sugar, may increase heart disease risk, use caution with kidney problems, and be extra careful in elderly patients.'],
+      pregnancy: 'Category B - Use insulin instead during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '115',
@@ -237,7 +357,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to sitagliptin', 'type 1 diabetes', 'diabetic ketoacidosis'],
     warnings: ['Pancreatitis', 'heart failure', 'severe joint pain', 'bullous pemphidoid'],
     pregnancy: 'Category B - Use only if clearly needed',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A diabetes medicine (DPP-4 inhibitor) that helps improve blood sugar control in adults with type 2 diabetes.',
+      mechanism: 'Works by blocking an enzyme (DPP-4) that breaks down hormones that help control blood sugar, keeping these helpful hormones active longer.',
+      indications: ['Used to treat type 2 diabetes either alone or with other diabetes medicines.'],
+      contraindications: ['Should not be used if you are allergic to sitagliptin, have type 1 diabetes, or diabetic ketoacidosis (dangerous high blood sugar).'],
+      sideEffects: ['May cause upper respiratory infection, headache, diarrhea, nausea, or stomach pain.'],
+      interactions: ['May interact with digoxin (heart medicine) - levels need monitoring. Has very few drug interactions.'],
+      dosageAndAdmin: '100mg once daily. For kidney problems: 50mg (moderate kidney disease) or 25mg (severe kidney disease) once daily. Can be taken with or without food.',
+      warnings: ['Can cause pancreas inflammation, heart failure, severe joint pain, or a rare skin condition called bullous pemphigoid.'],
+      pregnancy: 'Category B - Use only if clearly needed during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '116',
@@ -258,7 +390,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to linagliptin', 'type 1 diabetes', 'diabetic ketoacidosis'],
     warnings: ['Pancreatitis', 'heart failure', 'severe joint pain', 'bullous pemphidoid'],
     pregnancy: 'Category B - Use only if clearly needed',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A diabetes medicine (DPP-4 inhibitor) that helps improve blood sugar control in adults with type 2 diabetes.',
+      mechanism: 'Works by blocking an enzyme (DPP-4) that breaks down hormones that help control blood sugar, keeping these helpful hormones active longer.',
+      indications: ['Used to treat type 2 diabetes either alone or with other diabetes medicines.'],
+      contraindications: ['Should not be used if you are allergic to linagliptin, have type 1 diabetes, or diabetic ketoacidosis (dangerous high blood sugar).'],
+      sideEffects: ['May cause nose/throat infection, diarrhea, cough, headache, back pain, or joint pain.'],
+      interactions: ['May interact with rifampin (TB medicine) which reduces effectiveness, or other medicines that affect drug transport. Has very few drug interactions.'],
+      dosageAndAdmin: '5mg once daily. No dose adjustment needed for kidney or liver problems. Can be taken with or without food.',
+      warnings: ['Can cause pancreas inflammation, heart failure, severe joint pain, or a rare skin condition called bullous pemphigoid.'],
+      pregnancy: 'Category B - Use only if clearly needed during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
 
   // CNS drugs - Antidepressants
@@ -281,7 +425,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'hypertension', 'withdrawal syndrome', 'bleeding risk'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antidepressant medicine (SNRI) that treats depression, anxiety, and panic disorder by balancing brain chemicals.',
+      mechanism: 'Works by preventing the brain from removing two important mood chemicals (serotonin and norepinephrine), keeping more available to improve mood.',
+      indications: ['Used to treat major depression, generalized anxiety disorder, social anxiety disorder, and panic disorder.'],
+      contraindications: ['Should not be used if you are allergic to venlafaxine, taking MAOIs (certain antidepressants), or have uncontrolled narrow-angle glaucoma (eye pressure problem).'],
+      sideEffects: ['May cause nausea, dizziness, dry mouth, constipation, decreased appetite, sweating, sexual problems, or high blood pressure.'],
+      interactions: ['Dangerous interaction with MAOIs (certain antidepressants). May interact with warfarin (blood thinner), NSAIDs (pain medicines), other mood medicines, or certain liver enzyme inhibitors.'],
+      dosageAndAdmin: '37.5-375mg daily in divided doses. Extended-release: 75-225mg once daily. Take with food.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, high blood pressure, withdrawal symptoms if stopped suddenly, or increased bleeding risk.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '118',
@@ -302,7 +458,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma', 'severe hepatic impairment'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'hepatotoxicity', 'orthostatic hypotension', 'withdrawal syndrome'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antidepressant medicine (SNRI) that treats depression, anxiety, nerve pain from diabetes, and fibromyalgia by balancing brain chemicals.',
+      mechanism: 'Works by preventing the brain from removing two important chemicals (serotonin and norepinephrine), which helps improve mood and reduce pain signals.',
+      indications: ['Used to treat major depression, generalized anxiety disorder, diabetic nerve pain, fibromyalgia, and chronic muscle/bone pain.'],
+      contraindications: ['Should not be used if you are allergic to duloxetine, taking MAOIs (certain antidepressants), have uncontrolled narrow-angle glaucoma (eye pressure problem), or severe liver disease.'],
+      sideEffects: ['May cause nausea, dry mouth, constipation, decreased appetite, tiredness, dizziness, increased sweating, or sexual problems.'],
+      interactions: ['Dangerous interaction with MAOIs (certain antidepressants) or thioridazine (antipsychotic). May interact with warfarin (blood thinner), NSAIDs (pain medicines), other mood medicines, or certain liver enzyme inhibitors.'],
+      dosageAndAdmin: '20-120mg daily. Depression: 40-60mg daily. Diabetic nerve pain: 60mg daily. Can be taken with or without food.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, liver damage, low blood pressure when standing, or withdrawal symptoms if stopped suddenly.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '119',
@@ -323,7 +491,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'concurrent MAOI', 'thioridazine', 'or pimozide use'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'withdrawal syndrome', 'bleeding risk', 'bone fractures'],
     pregnancy: 'Category D - Avoid use, especially in first trimester',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antidepressant medicine (SSRI) that treats depression, panic disorder, social anxiety, and other anxiety conditions by balancing brain chemicals.',
+      mechanism: 'Works by preventing the brain from removing serotonin (a mood chemical), keeping more available to improve mood and reduce anxiety.',
+      indications: ['Used to treat major depression, panic disorder, social anxiety disorder, generalized anxiety disorder, PTSD (trauma stress), and OCD (obsessive-compulsive disorder).'],
+      contraindications: ['Should not be used if you are allergic to paroxetine, taking MAOIs (certain antidepressants), thioridazine, or pimozide (antipsychotics).'],
+      sideEffects: ['May cause nausea, drowsiness, dizziness, dry mouth, constipation, decreased appetite, sweating, sexual problems, or weight gain.'],
+      interactions: ['Dangerous interaction with MAOIs (certain antidepressants), thioridazine, or pimozide (antipsychotics). May interact with warfarin (blood thinner), NSAIDs (pain medicines), other mood medicines, or certain heart medicines.'],
+      dosageAndAdmin: '10-60mg daily. Depression: start with 20mg daily. Panic disorder: start with 10mg daily. Take with food.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, withdrawal symptoms if stopped suddenly, increased bleeding risk, or bone fractures.'],
+      pregnancy: 'Category D - Avoid use, especially in first three months of pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '120',
@@ -344,7 +524,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'seizure disorder', 'eating disorders', 'concurrent MAOI use', 'abrupt alcohol/sedative discontinuation'],
     warnings: ['Seizure risk', 'suicidal thoughts', 'hypertension', 'angle-closure glaucoma', 'neuropsychiatric events'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antidepressant medicine that works differently from other antidepressants and is also used to help people quit smoking.',
+      mechanism: 'Works by preventing the brain from removing dopamine and norepinephrine (brain chemicals that affect mood and motivation), with minimal effect on serotonin.',
+      indications: ['Used to treat major depression, seasonal depression (winter blues), and to help with smoking cessation.'],
+      contraindications: ['Should not be used if you are allergic to bupropion, have seizure disorder, eating disorders (anorexia/bulimia), taking MAOIs (certain antidepressants), or suddenly stopping alcohol/sedatives.'],
+      sideEffects: ['May cause dry mouth, nausea, trouble sleeping, dizziness, constipation, tremor, weight loss, headache, or anxiety.'],
+      interactions: ['Dangerous interaction with MAOIs (certain antidepressants). May interact with medicines that affect liver enzymes, medicines that lower seizure threshold, or alcohol.'],
+      dosageAndAdmin: '150-450mg daily in divided doses. For smoking cessation: 150mg twice daily. Can be taken with or without food.',
+      warnings: ['Can cause seizures (especially at high doses), may increase suicidal thoughts (especially in young people), can raise blood pressure, may trigger glaucoma, or cause mental health changes.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
 
   // CNS drugs - Antipsychotics
@@ -367,7 +559,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to olanzapine'],
     warnings: ['Increased mortality in elderly with dementia', 'metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antipsychotic medicine used to treat schizophrenia, bipolar disorder, and severe agitation by balancing brain chemicals.',
+      mechanism: 'Works by blocking certain brain chemical receptors (dopamine and serotonin) that are overactive in mental health conditions, helping to restore balance.',
+      indications: ['Used to treat schizophrenia, bipolar disorder (manic/mixed episodes), and as add-on treatment for treatment-resistant depression.'],
+      contraindications: ['Should not be used if you are allergic to olanzapine.'],
+      sideEffects: ['May cause significant weight gain, drowsiness, dizziness, dry mouth, constipation, increased appetite, low blood pressure when standing, or metabolic changes (diabetes/cholesterol).'],
+      interactions: ['May interact with CNS depressants (sedatives), anticholinergics (certain medicines), blood pressure medicines, certain liver enzyme inhibitors/inducers, or alcohol.'],
+      dosageAndAdmin: '5-20mg daily. Schizophrenia: start with 10mg daily. Bipolar: 10-15mg daily. Can be taken with or without food.',
+      warnings: ['Increased death risk in elderly with dementia, can cause metabolic changes (diabetes/weight gain), tardive dyskinesia (involuntary movements), or neuroleptic malignant syndrome (life-threatening reaction).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '122',
@@ -388,7 +592,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to quetiapine'],
     warnings: ['Increased mortality in elderly with dementia', 'metabolic changes', 'tardive dyskinesia', 'cataracts', 'seizures'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antipsychotic medicine used to treat schizophrenia and bipolar disorder by balancing brain chemicals that affect mood and behavior.',
+      mechanism: 'Works by blocking certain brain chemical receptors (dopamine and serotonin) that are overactive in mental health conditions, helping to restore balance.',
+      indications: ['Used to treat schizophrenia, bipolar disorder (manic/depressive episodes), and as add-on treatment for treatment-resistant depression.'],
+      contraindications: ['Should not be used if you are allergic to quetiapine.'],
+      sideEffects: ['May cause drowsiness, dizziness, dry mouth, constipation, weight gain, low blood pressure when standing, blurred vision, or stomach upset.'],
+      interactions: ['May interact with CNS depressants (sedatives), blood pressure medicines, certain liver enzyme inhibitors/inducers, seizure medicines, or alcohol.'],
+      dosageAndAdmin: '25-800mg daily in divided doses. Schizophrenia: 300-400mg daily. Bipolar: 400-800mg daily. Can be taken with or without food.',
+      warnings: ['Increased death risk in elderly with dementia, can cause metabolic changes (diabetes/weight gain), tardive dyskinesia (involuntary movements), cataracts, or seizures.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '123',
@@ -409,7 +625,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to aripiprazole'],
     warnings: ['Increased mortality in elderly with dementia', 'suicidal thoughts', 'neuroleptic malignant syndrome', 'tardive dyskinesia'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antipsychotic medicine used to treat schizophrenia, bipolar disorder, depression, and irritability in autism by balancing brain chemicals.',
+      mechanism: 'Works as a partial agonist at dopamine and serotonin receptors, helping to stabilize brain chemical levels rather than completely blocking them.',
+      indications: ['Used to treat schizophrenia, bipolar I disorder, as add-on treatment for depression, autism-related irritability, and Tourette syndrome.'],
+      contraindications: ['Should not be used if you are allergic to aripiprazole.'],
+      sideEffects: ['May cause nausea, vomiting, constipation, headache, dizziness, anxiety, trouble sleeping, restlessness, or weight gain.'],
+      interactions: ['May interact with certain liver enzyme inhibitors/inducers, CNS depressants (sedatives), or blood pressure medicines.'],
+      dosageAndAdmin: '2-30mg daily. Schizophrenia: 10-15mg daily. Bipolar: 15mg daily. Depression add-on: 2-15mg daily.',
+      warnings: ['Increased death risk in elderly with dementia, may increase suicidal thoughts (especially in young people), neuroleptic malignant syndrome (life-threatening reaction), or tardive dyskinesia (involuntary movements).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '124',
@@ -430,7 +658,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'QT prolongation', 'recent MI', 'uncompensated heart failure', 'concurrent QT-prolonging drugs'],
     warnings: ['QT prolongation', 'increased mortality in elderly with dementia', 'neuroleptic malignant syndrome', 'tardive dyskinesia'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antipsychotic medicine used to treat schizophrenia and bipolar disorder by blocking certain brain chemicals that cause symptoms.',
+      mechanism: 'Works by blocking dopamine and serotonin receptors in the brain, helping to reduce hallucinations, delusions, and mood swings.',
+      indications: ['Used to treat schizophrenia and acute manic or mixed episodes of bipolar I disorder.'],
+      contraindications: ['Should not be used if you are allergic to ziprasidone, have certain heart rhythm problems, or are taking medicines that affect heart rhythm.'],
+      sideEffects: ['May cause drowsiness, dizziness, nausea, constipation, headache, weakness, or abnormal muscle movements.'],
+      interactions: ['Should not be taken with medicines that affect heart rhythm, certain antibiotics, antifungals, or other psychiatric medicines.'],
+      dosageAndAdmin: '40-160mg daily in divided doses with food (improves absorption). Injectable: 10-20mg every 4 hours.',
+      warnings: ['May cause dangerous heart rhythm changes (QT prolongation), increased death risk in elderly with dementia, life-threatening neuroleptic malignant syndrome, or tardive dyskinesia (involuntary movements).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
 
   // CNS drugs - Anxiolytics
@@ -453,7 +693,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'acute narrow-angle glaucoma', 'severe respiratory insufficiency', 'sleep apnea syndrome'],
     warnings: ['Physical dependence', 'withdrawal syndrome', 'respiratory depression', 'cognitive impairment', 'falls risk in elderly'],
     pregnancy: 'Category D - Avoid use, risk of congenital malformations and withdrawal in newborns',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A benzodiazepine medicine used to treat anxiety disorders, trouble sleeping, and seizures by calming the brain.',
+      mechanism: 'Works by enhancing GABA, a natural brain chemical that has a calming effect, helping to reduce anxiety and promote sleep.',
+      indications: ['Used to treat anxiety disorders, trouble sleeping (insomnia), seizures (status epilepticus), and for sedation before surgery.'],
+      contraindications: ['Should not be used if you are allergic to lorazepam, have acute narrow-angle glaucoma, severe breathing problems, or sleep apnea.'],
+      sideEffects: ['May cause drowsiness, dizziness, weakness, unsteadiness, memory problems, confusion, depression, or nausea.'],
+      interactions: ['May interact with other sedatives, alcohol, opioid pain medicines, muscle relaxants, antihistamines, or certain liver enzyme inhibitors.'],
+      dosageAndAdmin: '0.5-6mg daily in divided doses. Anxiety: 2-3mg daily. Insomnia: 2-4mg at bedtime. Can be taken with or without food.',
+      warnings: ['Can cause physical dependence, withdrawal symptoms when stopped suddenly, breathing problems, memory/thinking problems, or increased fall risk in elderly.'],
+      pregnancy: 'Category D - Avoid use as it may cause birth defects and withdrawal symptoms in newborns.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '126',
@@ -474,7 +726,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'severe liver disease', 'acute narrow-angle glaucoma', 'severe respiratory insufficiency'],
     warnings: ['Physical dependence', 'withdrawal syndrome', 'respiratory depression', 'suicidal thoughts', 'cognitive impairment'],
     pregnancy: 'Category D - Avoid use, risk of congenital malformations and withdrawal in newborns',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A benzodiazepine medicine used to treat panic disorder, seizure disorders, and anxiety by calming the brain.',
+      mechanism: 'Works by enhancing GABA, a natural brain chemical that has a calming effect, helping to reduce anxiety and prevent seizures.',
+      indications: ['Used to treat panic disorder, seizure disorders (like Lennox-Gastaut syndrome and akinetic seizures), and anxiety.'],
+      contraindications: ['Should not be used if you are allergic to clonazepam, have severe liver disease, acute narrow-angle glaucoma, or severe breathing problems.'],
+      sideEffects: ['May cause drowsiness, dizziness, tiredness, coordination problems, memory problems, depression, or increased saliva production.'],
+      interactions: ['May interact with other sedatives, alcohol, opioid pain medicines, muscle relaxants, or certain liver enzyme inhibitors/inducers.'],
+      dosageAndAdmin: '0.25-4mg daily in divided doses. Panic disorder: 0.25mg twice daily initially. Seizures: 1.5mg daily in 3 divided doses.',
+      warnings: ['Can cause physical dependence, withdrawal symptoms when stopped suddenly, breathing problems, suicidal thoughts, or memory/thinking problems.'],
+      pregnancy: 'Category D - Avoid use as it may cause birth defects and withdrawal symptoms in newborns.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '127',
@@ -495,7 +759,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to buspirone', 'concurrent MAOI use'],
     warnings: ['Not effective for benzodiazepine withdrawal', 'may cause dizziness', 'avoid abrupt discontinuation'],
     pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An anti-anxiety medicine used to treat generalized anxiety disorder by affecting brain chemicals that control mood.',
+      mechanism: 'Works as a partial agonist at serotonin 5-HT1A receptors, with some activity at dopamine receptors, helping to reduce anxiety without sedation.',
+      indications: ['Used to treat generalized anxiety disorder (persistent, excessive worry about everyday things).'],
+      contraindications: ['Should not be used if you are allergic to buspirone or are taking MAOIs (certain antidepressants).'],
+      sideEffects: ['May cause dizziness, nausea, headache, nervousness, lightheadedness, excitement, tiredness, trouble sleeping, or dry mouth.'],
+      interactions: ['May interact with MAOIs (certain antidepressants), certain liver enzyme inhibitors/inducers, grapefruit juice, alcohol, or other sedatives.'],
+      dosageAndAdmin: '15-60mg daily in divided doses. Start with 7.5mg twice daily. Take consistently with or without food.',
+      warnings: ['Not effective for stopping benzodiazepine withdrawal, may cause dizziness, avoid stopping suddenly.'],
+      pregnancy: 'Category B - Generally considered safe but use only if clearly needed.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '128',
@@ -516,7 +792,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'early pregnancy', 'prolonged QT interval', 'concurrent QT-prolonging drugs'],
     warnings: ['QT prolongation', 'anticholinergic effects', 'sedation', 'falls risk in elderly', 'avoid in dementia patients'],
     pregnancy: 'Category N - Contraindicated in early pregnancy, may be used later if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antihistamine medicine with anti-anxiety properties used to treat anxiety, nausea and vomiting, and severe itching.',
+      mechanism: 'Works by blocking histamine H1 receptors and has anticholinergic and sedative properties, helping to reduce anxiety and itching.',
+      indications: ['Used to treat anxiety, tension, severe itching, sedation before surgery, and nausea and vomiting.'],
+      contraindications: ['Should not be used if you are allergic to hydroxyzine, in early pregnancy, have prolonged QT interval, or are taking other QT-prolonging drugs.'],
+      sideEffects: ['May cause sedation, dizziness, dry mouth, blurred vision, constipation, difficulty urinating, or confusion (especially in elderly).'],
+      interactions: ['May interact with CNS depressants, anticholinergics, alcohol, MAOIs, or QT-prolonging drugs.'],
+      dosageAndAdmin: '25-100mg 3-4 times daily. For anxiety: 50-100mg 4 times daily. For itching: 25mg 3-4 times daily. Can be taken with or without food.',
+      warnings: ['Can cause QT prolongation (heart rhythm problems), anticholinergic effects, sedation, increased fall risk in elderly, avoid in dementia patients.'],
+      pregnancy: 'Category N - Not recommended in early pregnancy, may be used later if benefits outweigh risks.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   
   // Analgesics - NSAIDs
@@ -539,7 +827,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'severe kidney disease', 'third trimester pregnancy'],
     warnings: ['GI bleeding risk', 'cardiovascular thrombotic events', 'kidney damage', 'liver toxicity', 'hypertension', 'heart failure'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A nonsteroidal anti-inflammatory drug (NSAID) used to treat pain, fever, inflammation, and stiffness.',
+      mechanism: 'Works by blocking cyclooxygenase (COX-1 and COX-2) enzymes, which reduces prostaglandin production and decreases inflammation and pain.',
+      indications: ['Used for pain relief, fever reduction, inflammation, arthritis, menstrual cramps, and headaches.'],
+      contraindications: ['Should not be used if you are allergic to NSAIDs, have active stomach bleeding, severe heart failure, severe kidney disease, or are in the third trimester of pregnancy.'],
+      sideEffects: ['May cause nausea, heartburn, stomach pain, dizziness, headache, drowsiness, fluid retention, or increased blood pressure.'],
+      interactions: ['May interact with warfarin (blood thinner), ACE inhibitors (blood pressure medicines), diuretics (water pills), lithium (mood medicine), methotrexate (arthritis medicine), aspirin, or corticosteroids (steroids).'],
+      dosageAndAdmin: '220-440mg every 8-12 hours. Maximum: 660mg per day (over-the-counter), 1500mg per day (prescription). Take with food to reduce stomach irritation.',
+      warnings: ['Risk of stomach bleeding, heart attack or stroke, kidney damage, liver toxicity, high blood pressure, or heart failure.'],
+      pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester as it can harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '130',
@@ -560,7 +860,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'severe kidney disease', 'CABG surgery'],
     warnings: ['GI bleeding risk', 'cardiovascular thrombotic events', 'kidney damage', 'liver toxicity', 'skin reactions', 'hypertension'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A nonsteroidal anti-inflammatory drug (NSAID) used to treat pain and inflammation caused by osteoarthritis and rheumatoid arthritis.',
+      mechanism: 'Works by preferentially blocking cyclooxygenase-2 (COX-2) over COX-1, reducing inflammation with potentially less stomach irritation than other NSAIDs.',
+      indications: ['Used to treat osteoarthritis (joint wear and tear), rheumatoid arthritis (autoimmune joint disease), and juvenile rheumatoid arthritis in children.'],
+      contraindications: ['Should not be used if you are allergic to NSAIDs, have active stomach bleeding, severe heart failure, severe kidney disease, or recent heart bypass surgery.'],
+      sideEffects: ['May cause nausea, diarrhea, stomach upset, flu-like symptoms, headache, dizziness, swelling, or high blood pressure.'],
+      interactions: ['May interact with warfarin (blood thinner), ACE inhibitors (blood pressure medicines), diuretics (water pills), lithium (mood medicine), methotrexate (arthritis medicine), aspirin, or cholestyramine (cholesterol medicine).'],
+      dosageAndAdmin: '7.5-15mg once daily. Maximum: 15mg per day. Can be taken with or without food, but preferably with food to reduce stomach irritation.',
+      warnings: ['Risk of stomach bleeding, heart attack or stroke, kidney damage, liver toxicity, serious skin reactions, or high blood pressure.'],
+      pregnancy: 'Category C (first/second trimester), Category D (third trimester) - Avoid in third trimester as it can harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   
   // Adding more WHO essential medicines (extending what we already have)
@@ -583,7 +895,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Cardiogenic shock', 'severe bradycardia', 'second/third-degree AV block', 'severe asthma', 'severe COPD'],
     warnings: ['Abrupt withdrawal may cause rebound hypertension', 'mask hypoglycemia symptoms', 'worsen heart failure initially', 'bronchospasm risk'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A beta-blocker medicine used to treat high blood pressure and heart failure by slowing the heart and reducing blood pressure.',
+      mechanism: 'Works by selectively blocking beta-1 adrenergic receptors, which reduces heart rate, cardiac output, and blood pressure.',
+      indications: ['Used to treat high blood pressure, heart failure, and chest pain (angina).'],
+      contraindications: ['Should not be used if you have cardiogenic shock (heart can\'t pump blood), severe slow heart rate, heart block (electrical problems), severe asthma, or severe COPD.'],
+      sideEffects: ['May cause slow heart rate, low blood pressure, tiredness, dizziness, cold hands/feet, depression, trouble sleeping, or nausea.'],
+      interactions: ['May interact with calcium channel blockers (heart medicines), digoxin (heart medicine), insulin (diabetes medicine), clonidine (blood pressure medicine), NSAIDs (pain medicines), or certain liver enzyme inhibitors.'],
+      dosageAndAdmin: 'For high blood pressure: 2.5-10mg once daily. For heart failure: Start with 1.25mg once daily, gradually increase up to 10mg daily. Can be taken with or without food.',
+      warnings: ['Do not stop suddenly (can cause dangerous blood pressure spike), may hide signs of low blood sugar in diabetics, may worsen heart failure initially, can cause breathing problems.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '201',
@@ -604,7 +928,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'bilateral renal artery stenosis', 'hyperkalemia'],
     warnings: ['Angioedema', 'hyperkalemia', 'renal impairment', 'hypotension', 'neutropenia', 'fetal toxicity'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A blood pressure medicine (ACE inhibitor) that helps treat high blood pressure, heart failure, and reduces the risk of heart problems.',
+      mechanism: 'Works by blocking an enzyme that makes blood vessels tighten, helping blood vessels relax and lowering blood pressure.',
+      indications: ['Used to treat high blood pressure, heart failure (when the heart doesn\'t pump well), after a heart attack, and to reduce the risk of heart problems.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, have had severe swelling of face/throat, are pregnant, have blocked arteries to both kidneys, or have high potassium levels.'],
+      sideEffects: ['May cause dry cough, high potassium levels, low blood pressure, dizziness, headache, tiredness, nausea, or severe swelling of face/throat (rare but serious).'],
+      interactions: ['May interact with potassium supplements, water pills, pain medicines (NSAIDs), lithium (mood medicine), aliskiren (blood pressure medicine), or ARBs (other blood pressure medicines).'],
+      dosageAndAdmin: 'For high blood pressure: 2.5-20mg daily in 1-2 divided doses. For heart failure: 1.25-10mg twice daily. Can be taken with or without food.',
+      warnings: ['Can cause severe swelling of face/throat, high potassium levels, kidney problems, low blood pressure, low white blood cell count, or harm to unborn baby.'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '202',
@@ -625,7 +961,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
     warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A blood pressure medicine (ARB) that helps treat high blood pressure and heart failure by blocking certain receptors.',
+      mechanism: 'Works by blocking receptors that make blood vessels tighten, helping blood vessels relax and lowering blood pressure.',
+      indications: ['Used to treat high blood pressure, heart failure (when the heart doesn\'t pump well), and kidney problems caused by diabetes.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, are pregnant, have blocked arteries to both kidneys, or have severe liver problems.'],
+      sideEffects: ['May cause dizziness, headache, tiredness, high potassium levels, low blood pressure, back pain, or upper respiratory infections.'],
+      interactions: ['May interact with potassium supplements, water pills, pain medicines (NSAIDs), lithium (mood medicine), ACE inhibitors (other blood pressure medicines), or aliskiren (blood pressure medicine).'],
+      dosageAndAdmin: 'For high blood pressure: 8-32mg once daily. For heart failure: 4-32mg once daily. Can be taken with or without food.',
+      warnings: ['Can harm unborn baby, cause high potassium levels, low blood pressure, kidney problems, or severe swelling of face/throat (rare).'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '203',
@@ -646,7 +994,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
     warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A blood pressure medicine (ARB) that helps treat high blood pressure and kidney problems caused by diabetes.',
+      mechanism: 'Works by blocking receptors that make blood vessels tighten, helping blood vessels relax and lowering blood pressure.',
+      indications: ['Used to treat high blood pressure and kidney problems in people with type 2 diabetes.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, are pregnant, have blocked arteries to both kidneys, or have severe liver problems.'],
+      sideEffects: ['May cause dizziness, tiredness, headache, high potassium levels, low blood pressure, diarrhea, or stomach upset.'],
+      interactions: ['May interact with potassium supplements, water pills, pain medicines (NSAIDs), lithium (mood medicine), ACE inhibitors (other blood pressure medicines), or aliskiren (blood pressure medicine).'],
+      dosageAndAdmin: 'For high blood pressure: 150-300mg once daily. For diabetic kidney problems: 300mg once daily. Can be taken with or without food.',
+      warnings: ['Can harm unborn baby, cause high potassium levels, low blood pressure, kidney problems, or severe swelling of face/throat (rare).'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '204',
@@ -667,7 +1027,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment'],
     warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'renal impairment', 'angioedema (rare)'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A blood pressure medicine (ARB) that helps treat high blood pressure and reduces the risk of heart problems.',
+      mechanism: 'Works by blocking receptors that make blood vessels tighten, helping blood vessels relax and lowering blood pressure.',
+      indications: ['Used to treat high blood pressure and to reduce the risk of heart problems in people who cannot take ACE inhibitors.'],
+      contraindications: ['Should not be used if you are allergic to this medicine, are pregnant, have blocked arteries to both kidneys, or have severe liver problems.'],
+      sideEffects: ['May cause dizziness, headache, tiredness, high potassium levels, low blood pressure, back pain, or sinus infections.'],
+      interactions: ['May interact with potassium supplements, water pills, pain medicines (NSAIDs), lithium (mood medicine), ACE inhibitors (other blood pressure medicines), aliskiren (blood pressure medicine), or digoxin (heart medicine).'],
+      dosageAndAdmin: 'For high blood pressure: 20-80mg once daily. For heart protection: 80mg once daily. Can be taken with or without food.',
+      warnings: ['Can harm unborn baby, cause high potassium levels, low blood pressure, kidney problems, or severe swelling of face/throat (rare).'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '205',
@@ -688,7 +1060,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'angioedema history', 'pregnancy', 'anuria', 'severe renal/hepatic impairment'],
     warnings: ['Angioedema', 'hyperkalemia', 'hypotension', 'renal impairment', 'electrolyte imbalances', 'photosensitivity'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination blood pressure medicine that contains both an ACE inhibitor and a water pill to help treat high blood pressure.',
+      mechanism: 'Works by blocking an enzyme that tightens blood vessels (ACE inhibitor) and by helping the kidneys remove extra water and salt (water pill).',
+      indications: ['Used to treat high blood pressure when combination therapy is needed.'],
+      contraindications: ['Should not be used if you are allergic to these medicines, have had severe swelling of face/throat, are pregnant, cannot urinate, or have severe kidney/liver problems.'],
+      sideEffects: ['May cause dry cough, dizziness, low blood pressure, high potassium levels, low sodium levels, headache, tiredness, or nausea.'],
+      interactions: ['May interact with potassium supplements, pain medicines (NSAIDs), lithium (mood medicine), digoxin (heart medicine), diabetes medicines, or cholestyramine (cholesterol medicine).'],
+      dosageAndAdmin: '10/12.5mg to 20/25mg once daily. Take in the morning with or without food. Dose adjusted based on blood pressure response.',
+      warnings: ['Can cause severe swelling of face/throat, high potassium levels, low blood pressure, kidney problems, electrolyte imbalances, or increased sun sensitivity.'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '206',
@@ -709,7 +1093,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity', 'pregnancy', 'severe aortic stenosis', 'cardiogenic shock', 'severe hepatic impairment'],
     warnings: ['Fetal toxicity', 'hyperkalemia', 'hypotension', 'peripheral edema', 'renal impairment'],
     pregnancy: 'Category D - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination blood pressure medicine that contains two different types of medications (calcium channel blocker and ARB) to treat high blood pressure.',
+      mechanism: 'Amlodipine relaxes blood vessels by blocking calcium; Valsartan blocks hormones that tighten blood vessels, working together to lower blood pressure.',
+      indications: ['Used to treat high blood pressure when combination therapy is needed (when one medicine alone is not enough).'],
+      contraindications: ['Should not be used if you are allergic to these medicines, are pregnant, have severe heart valve narrowing, heart shock, or severe liver problems.'],
+      sideEffects: ['May cause ankle swelling, dizziness, headache, tiredness, flushing, high potassium levels, or low blood pressure.'],
+      interactions: ['May interact with potassium supplements, NSAIDs (pain medicines), lithium (mood medicine), certain liver medicines, simvastatin (cholesterol medicine), or cyclosporine (immune medicine).'],
+      dosageAndAdmin: '5/80 mg to 10/320 mg once daily. Can be taken with or without food. Dose adjusted based on blood pressure response.',
+      warnings: ['Can harm unborn babies, may cause high potassium levels, low blood pressure, ankle swelling, or kidney problems.'],
+      pregnancy: 'Category D - Must not be used during pregnancy as it can seriously harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   
   // Additional Antibiotics
@@ -732,7 +1128,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to macrolides', 'concurrent use with ergot alkaloids', 'history of QT prolongation', 'severe hepatic impairment'],
     warnings: ['QT prolongation', 'hepatotoxicity', 'C. difficile-associated diarrhea', 'drug interactions', 'myasthenia gravis exacerbation'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antibiotic medicine (macrolide) used to treat various bacterial infections including respiratory, skin, and stomach infections.',
+      mechanism: 'Works by stopping bacteria from making proteins they need to survive and grow, which kills the bacteria.',
+      indications: ['Used to treat respiratory tract infections (lung/throat), skin/soft tissue infections, H. pylori stomach infections, and atypical bacterial infections.'],
+      contraindications: ['Should not be used if you are allergic to macrolide antibiotics, taking ergot medicines, have heart rhythm problems (QT prolongation), or severe liver problems.'],
+      sideEffects: ['May cause nausea, diarrhea, stomach pain, headache, metallic taste, heart rhythm problems, or liver problems.'],
+      interactions: ['May interact with warfarin (blood thinner), digoxin (heart medicine), theophylline (asthma medicine), carbamazepine (seizure medicine), statins (cholesterol medicines), liver-processed medicines, or heart rhythm medicines.'],
+      dosageAndAdmin: '250-500 mg twice daily for 7-14 days. For H. pylori: 500 mg twice daily for 10-14 days. Can be taken with or without food.',
+      warnings: ['Can cause heart rhythm problems, liver damage, severe diarrhea (C. diff), drug interactions, or worsen muscle weakness (myasthenia gravis).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '208',
@@ -753,7 +1161,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to macrolides', 'concurrent use with ergot alkaloids', 'history of QT prolongation', 'severe hepatic impairment'],
     warnings: ['QT prolongation', 'hepatotoxicity', 'C. difficile-associated diarrhea', 'drug interactions', 'ototoxicity'],
     pregnancy: 'Category B - Generally considered safe but use only if clearly needed',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'An antibiotic medicine (macrolide) used to treat various bacterial infections.',
+      mechanism: 'Works by stopping bacteria from making proteins they need to survive and grow, which kills the bacteria.',
+      indications: ['Used to treat respiratory tract infections (lung/throat), skin/soft tissue infections, whooping cough (pertussis), chlamydial infections, and diphtheria.'],
+      contraindications: ['Should not be used if you are allergic to macrolide antibiotics, taking ergot medicines, have heart rhythm problems (QT prolongation), or severe liver problems.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, stomach cramping, heart rhythm problems, liver problems, or hearing loss (with high doses).'],
+      interactions: ['May interact with warfarin (blood thinner), digoxin (heart medicine), theophylline (asthma medicine), carbamazepine (seizure medicine), statins (cholesterol medicines), liver-processed medicines, or heart rhythm medicines.'],
+      dosageAndAdmin: '250-500 mg every 6 hours or 333-500 mg every 8 hours. Take on empty stomach 1 hour before or 2 hours after meals.',
+      warnings: ['Can cause heart rhythm problems, liver damage, severe diarrhea (C. diff), drug interactions, or hearing problems.'],
+      pregnancy: 'Category B - Generally considered safe but use only if clearly needed during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '209',
@@ -774,7 +1194,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to sulfonamides', 'megaloblastic anemia due to folate deficiency', 'severe renal/hepatic impairment', 'pregnancy (near term)'],
     warnings: ['Severe skin reactions', 'blood dyscrasias', 'hyperkalemia', 'folate deficiency', 'C. difficile-associated diarrhea'],
     pregnancy: 'Category C (first trimester), Category D (near term) - Avoid near term',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A combination antibiotic medicine used to treat various bacterial infections.',
+      mechanism: 'Contains two medicines (trimethoprim and sulfamethoxazole) that work together to stop bacteria from making essential nutrients they need to survive.',
+      indications: ['Used to treat urinary tract infections (UTIs), pneumocystis pneumonia, traveler\'s diarrhea, MRSA skin infections, and nocardiosis.'],
+      contraindications: ['Should not be used if you are allergic to sulfonamide medicines, have certain types of anemia due to folate deficiency, severe kidney/liver problems, or are near the end of pregnancy.'],
+      sideEffects: ['May cause nausea, vomiting, loss of appetite, rash, high potassium levels, sun sensitivity, or severe skin reactions (rare).'],
+      interactions: ['May interact with warfarin (blood thinner), phenytoin (seizure medicine), methotrexate (cancer/arthritis medicine), digoxin (heart medicine), ACE inhibitors (blood pressure medicines), diuretics (water pills), or diabetes medicines.'],
+      dosageAndAdmin: '160/800 mg (1 DS tablet) twice daily for 10-14 days. For UTI: 160/800 mg twice daily for 3 days. Take with plenty of water.',
+      warnings: ['Can cause severe skin reactions, blood problems, high potassium levels, folate deficiency, or severe diarrhea (C. diff).'],
+      pregnancy: 'Category C (first trimester), Category D (near term) - Must be avoided near the end of pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '210',
@@ -795,7 +1227,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to fluoroquinolones', 'myasthenia gravis', 'history of tendon disorders with fluoroquinolones'],
     warnings: ['Tendon rupture', 'peripheral neuropathy', 'CNS effects', 'QT prolongation', 'C. difficile-associated diarrhea', 'aortic dissection'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A strong antibiotic (fluoroquinolone) used to treat various bacterial infections including lung, urinary tract, and skin infections.',
+      mechanism: 'Works by stopping bacteria from copying their DNA, which prevents them from multiplying and spreading.',
+      indications: ['Used to treat pneumonia (lung infection), urinary tract infections, skin/soft tissue infections, sinus infections, chronic bronchitis flare-ups, and anthrax exposure.'],
+      contraindications: ['Should not be used if you are allergic to fluoroquinolone antibiotics, have myasthenia gravis (muscle weakness disease), or have had tendon problems with similar antibiotics before.'],
+      sideEffects: ['May cause nausea, diarrhea, headache, dizziness, trouble sleeping, tendon rupture, heart rhythm changes, or increased sun sensitivity.'],
+      interactions: ['May interact with antacids, iron supplements, warfarin (blood thinner), NSAIDs (pain medicines), theophylline (breathing medicine), heart rhythm medicines, or steroids.'],
+      dosageAndAdmin: 'Take 250-750mg once daily for 3-14 days depending on the infection. Take with plenty of water, avoid dairy products and antacids.',
+      warnings: ['Can cause tendon rupture, nerve damage, brain/nervous system effects, heart rhythm problems, severe diarrhea (C. difficile), or aortic dissection (tear in major blood vessel).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '211',
@@ -816,7 +1260,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to cephalosporins', 'severe penicillin allergy (cross-reactivity)'],
     warnings: ['C. difficile-associated diarrhea', 'allergic reactions', 'renal impairment dosing', 'superinfection'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture. Suspension: refrigerate, discard after 14 days'
+    storage: 'Store at room temperature, protect from moisture. Suspension: refrigerate, discard after 14 days',
+    laymanExplanations: {
+      description: 'A first-generation antibiotic (cephalosporin) used to treat bacterial infections including upper respiratory, ear, skin, and urinary tract infections.',
+      mechanism: 'Works by breaking down the protective wall around bacteria, causing them to die.',
+      indications: ['Used to treat skin/soft tissue infections, respiratory tract infections, urinary tract infections, ear infections (otitis media), and bone infections.'],
+      contraindications: ['Should not be used if you are allergic to cephalosporin antibiotics or have a severe penicillin allergy (due to cross-reactivity).'],
+      sideEffects: ['May cause diarrhea, nausea, vomiting, stomach pain, indigestion, allergic reactions, or severe diarrhea (C. difficile colitis).'],
+      interactions: ['May interact with probenecid (increases levels), metformin (diabetes medicine), warfarin (blood thinner - monitor blood tests), or birth control pills.'],
+      dosageAndAdmin: 'Take 250-500mg every 6 hours or 500mg every 12 hours. Maximum: 4g per day. Can be taken with or without food.',
+      warnings: ['Can cause severe diarrhea (C. difficile-associated), allergic reactions, may need dose adjustment with kidney problems, or superinfection (new infections).'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture. Liquid form: refrigerate and throw away after 14 days.'
+    }
   },
   {
     id: '212',
@@ -837,7 +1293,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to cephalosporins', 'neonates with hyperbilirubinemia', 'calcium-containing IV solutions'],
     warnings: ['C. difficile-associated diarrhea', 'biliary precipitation', 'hemolytic anemia', 'bleeding disorders'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store powder at room temperature. Reconstituted solution stable 24 hours at room temperature'
+    storage: 'Store powder at room temperature. Reconstituted solution stable 24 hours at room temperature',
+    laymanExplanations: {
+      description: 'A powerful third-generation antibiotic (cephalosporin) given by injection to treat serious bacterial infections.',
+      mechanism: 'Works by breaking down the protective wall around bacteria, causing them to die.',
+      indications: ['Used to treat pneumonia (lung infection), meningitis (brain/spinal cord infection), sepsis (blood infection), gonorrhea (sexually transmitted infection), pelvic inflammatory disease, and to prevent infections during surgery.'],
+      contraindications: ['Should not be used if you are allergic to cephalosporin antibiotics, in newborns with high bilirubin levels, or with calcium-containing IV solutions (can cause dangerous precipitation).'],
+      sideEffects: ['May cause injection site reactions, diarrhea, nausea, rash, increased certain blood cells (eosinophils, platelets), or gallbladder sludge.'],
+      interactions: ['May interact with calcium-containing solutions (dangerous precipitation), warfarin (blood thinner), probenecid (gout medicine), or loop diuretics (water pills).'],
+      dosageAndAdmin: 'Given by IV or injection: 1-2g once daily or 0.5-1g every 12 hours. Maximum: 4g per day. Severe infections: 2g every 12 hours.',
+      warnings: ['Can cause severe diarrhea (C. difficile-associated), gallbladder precipitation, blood cell destruction (hemolytic anemia), or bleeding disorders.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep powder at room temperature. Mixed solution stays good for 24 hours at room temperature.'
+    }
   },
   
   // Additional Antidiabetic medications
@@ -860,7 +1328,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis'],
     warnings: ['Ketoacidosis', 'necrotizing fasciitis of perineum', 'genital infections', 'hypotension', 'acute kidney injury'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A diabetes medicine (SGLT2 inhibitor) used to treat type 2 diabetes and reduce the risk of heart problems in people with type 2 diabetes and heart disease.',
+      mechanism: 'Works by blocking a protein in the kidneys that reabsorbs sugar, causing excess sugar to be removed through urine.',
+      indications: ['Used to treat type 2 diabetes, reduce cardiovascular risk in type 2 diabetes patients, and treat heart failure with reduced pumping ability.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), severe kidney problems (eGFR <30), or are on dialysis.'],
+      sideEffects: ['May cause genital yeast infections, urinary tract infections, increased urination, low blood pressure, ketoacidosis (rare), or necrotizing fasciitis (severe skin infection).'],
+      interactions: ['May interact with diuretics (water pills - increased low blood pressure risk), insulin/sulfonylureas (diabetes medicines - increased low blood sugar risk), or lithium (mood medicine).'],
+      dosageAndAdmin: 'Take 10mg once daily in the morning, may increase to 25mg once daily. Can be taken with or without food.',
+      warnings: ['Can cause ketoacidosis (dangerous acid buildup), necrotizing fasciitis of perineum (severe genital/rectal skin infection), genital infections, low blood pressure, or acute kidney injury.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '214',
@@ -881,7 +1361,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis', 'hypersensitivity'],
     warnings: ['Ketoacidosis', 'acute kidney injury', 'hypotension', 'genital infections', 'Fournier gangrene', 'amputation risk'],
     pregnancy: 'Category C - Not recommended during pregnancy',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A diabetes medicine (SGLT2 inhibitor) that helps lower blood sugar and can also help with heart failure by making the kidneys remove extra sugar through urine.',
+      mechanism: 'Works by blocking a protein in the kidneys that normally keeps sugar in the body, so more sugar gets removed through urine instead of staying in the blood.',
+      indications: ['Used to treat type 2 diabetes, heart failure (when the heart doesn\'t pump well), and chronic kidney disease.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), severe kidney problems, are on dialysis, or are allergic to this medicine.'],
+      sideEffects: ['May cause genital yeast infections, urinary tract infections, increased urination, low blood pressure, dehydration, or low blood sugar (when used with insulin or sulfonylureas).'],
+      interactions: ['May interact with insulin, sulfonylureas (diabetes medicines), water pills, lithium (mood medicine), or digoxin (heart medicine).'],
+      dosageAndAdmin: 'For type 2 diabetes: 5mg once daily, may increase to 10mg once daily. For heart failure: 10mg once daily. Can be taken with or without food.',
+      warnings: ['Can cause ketoacidosis (dangerous acid buildup), sudden kidney injury, low blood pressure, genital infections, Fournier gangrene (serious genital infection), or increased amputation risk.'],
+      pregnancy: 'Category C - Not recommended during pregnancy as it may harm the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '215',
@@ -902,7 +1394,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'Multiple Endocrine Neoplasia syndrome type 2'],
     warnings: ['Thyroid C-cell tumors', 'pancreatitis', 'gallbladder disease', 'renal impairment', 'hypoglycemia', 'suicidal thoughts'],
     pregnancy: 'Category C - Discontinue before planned pregnancy',
-    storage: 'Refrigerate unopened pens. Once opened, store at room temperature for up to 30 days'
+    storage: 'Refrigerate unopened pens. Once opened, store at room temperature for up to 30 days',
+    laymanExplanations: {
+      description: 'A diabetes and weight loss medicine (GLP-1 receptor agonist) given by injection that helps control blood sugar and can help with weight loss.',
+      mechanism: 'Works like a natural hormone in your body that helps release insulin when blood sugar is high, reduces appetite, slows stomach emptying, and makes you feel full longer.',
+      indications: ['Used to treat type 2 diabetes, help with weight loss in obese people, and reduce heart disease risk.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), or personal/family history of thyroid cancer or Multiple Endocrine Neoplasia syndrome type 2.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, constipation, stomach pain, headache, injection site reactions, or low blood sugar.'],
+      interactions: ['May interact with insulin, sulfonylureas (diabetes medicines), warfarin (blood thinner), digoxin (heart medicine), or delay absorption of oral medicines.'],
+      dosageAndAdmin: 'For diabetes (Victoza): Start 0.6mg daily, increase to 1.2-1.8mg daily. For weight loss (Saxenda): Start 0.6mg daily, increase weekly to 3mg daily. Given as injection under the skin.',
+      warnings: ['Can cause thyroid tumors, pancreatitis (pancreas inflammation), gallbladder problems, kidney problems, low blood sugar, or suicidal thoughts.'],
+      pregnancy: 'Category C - Stop before trying to get pregnant as it may harm the baby.',
+      storage: 'Keep unopened pens in refrigerator. Once opened, can be kept at room temperature for up to 30 days.'
+    }
   },
   {
     id: '216',
@@ -923,7 +1427,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'Multiple Endocrine Neoplasia syndrome type 2'],
     warnings: ['Thyroid C-cell tumors', 'pancreatitis', 'diabetic retinopathy complications', 'hypoglycemia', 'acute gallbladder disease'],
     pregnancy: 'Category C - Discontinue before planned pregnancy',
-    storage: 'Refrigerate. Do not freeze or shake. Use within 14 days if stored at room temperature'
+    storage: 'Refrigerate. Do not freeze or shake. Use within 14 days if stored at room temperature',
+    laymanExplanations: {
+      description: 'A diabetes medicine (GLP-1 receptor agonist) given by weekly injection that helps control blood sugar and can reduce heart disease risk.',
+      mechanism: 'Works like a natural hormone in your body that helps release insulin when blood sugar is high, reduces appetite, slows stomach emptying, and makes you feel full longer.',
+      indications: ['Used to treat type 2 diabetes and reduce the risk of heart problems in adults with type 2 diabetes.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), or personal/family history of thyroid cancer or Multiple Endocrine Neoplasia syndrome type 2.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, stomach pain, decreased appetite, tiredness, or injection site reactions.'],
+      interactions: ['May interact with insulin, sulfonylureas (diabetes medicines), warfarin (blood thinner), or delay absorption of oral medicines due to slower stomach emptying.'],
+      dosageAndAdmin: 'Start with 0.75mg once weekly, may increase to 1.5mg once weekly. Maximum: 4.5mg once weekly. Inject under the skin in thigh, stomach, or upper arm.',
+      warnings: ['Can cause thyroid tumors, pancreatitis (pancreas inflammation), diabetic eye problems, low blood sugar, or sudden gallbladder disease.'],
+      pregnancy: 'Category C - Stop before trying to get pregnant as it may harm the baby.',
+      storage: 'Keep in refrigerator. Do not freeze or shake. Can be kept at room temperature for up to 14 days.'
+    }
   },
   {
     id: '217',
@@ -944,7 +1460,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe renal impairment (eGFR <30)', 'dialysis', 'hypersensitivity'],
     warnings: ['Lower limb amputation risk', 'ketoacidosis', 'acute kidney injury', 'hypotension', 'bone fractures', 'Fournier gangrene'],
     pregnancy: 'Category C - Not recommended during pregnancy',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A diabetes medicine (SGLT2 inhibitor) that helps lower blood sugar and can reduce the risk of heart problems and kidney disease by making the kidneys remove extra sugar through urine.',
+      mechanism: 'Works by blocking a protein in the kidneys that normally keeps sugar in the body, so more sugar gets removed through urine instead of staying in the blood.',
+      indications: ['Used to treat type 2 diabetes, reduce heart disease risk, and help protect the kidneys in people with diabetes.'],
+      contraindications: ['Should not be used if you have type 1 diabetes, diabetic ketoacidosis (dangerous high blood sugar), severe kidney problems, are on dialysis, or are allergic to this medicine.'],
+      sideEffects: ['May cause genital yeast infections, urinary tract infections, increased urination, low blood pressure, high potassium levels, or bone fractures.'],
+      interactions: ['May interact with digoxin (heart medicine), rifampin (antibiotic), phenytoin (seizure medicine), ritonavir (HIV medicine), phenobarbital (seizure medicine), or other medicines that affect liver enzymes.'],
+      dosageAndAdmin: 'Start with 100mg once daily before first meal. May increase to 300mg once daily if kidney function is good (eGFR ≥60).',
+      warnings: ['Can increase risk of leg/foot amputation, ketoacidosis (dangerous acid buildup), sudden kidney injury, low blood pressure, bone fractures, or Fournier gangrene (serious genital infection).'],
+      pregnancy: 'Category C - Not recommended during pregnancy as it may harm the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   
   // Additional Anti-inflammatory drugs
@@ -967,7 +1495,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to sulfonamides', 'aspirin/NSAID allergy', 'CABG surgery', 'severe heart failure'],
     warnings: ['Cardiovascular thrombotic events', 'GI bleeding', 'hepatotoxicity', 'renal toxicity', 'hypertension', 'heart failure'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A pain and inflammation medicine (COX-2 inhibitor) that helps reduce pain and swelling while being gentler on the stomach than other pain medicines.',
+      mechanism: 'Works by blocking a specific enzyme (COX-2) that causes inflammation and pain, while leaving the stomach-protecting enzyme (COX-1) mostly alone.',
+      indications: ['Used to treat arthritis pain (osteoarthritis and rheumatoid arthritis), sudden pain, menstrual cramps, and spine arthritis (ankylosing spondylitis).'],
+      contraindications: ['Should not be used if you are allergic to sulfa drugs, aspirin/pain medicines, having heart bypass surgery, or have severe heart failure.'],
+      sideEffects: ['May cause stomach pain, diarrhea, indigestion, gas, ankle swelling, dizziness, or headache.'],
+      interactions: ['May interact with warfarin (blood thinner), lithium (mood medicine), ACE inhibitors (blood pressure medicines), water pills, methotrexate (arthritis medicine), or fluconazole (antifungal medicine).'],
+      dosageAndAdmin: 'For arthritis: 200mg daily or 100mg twice daily. For rheumatoid arthritis: 100-200mg twice daily. For sudden pain: 400mg first, then 200mg twice daily.',
+      warnings: ['Can increase risk of heart attack/stroke, stomach bleeding, liver damage, kidney problems, high blood pressure, or heart failure.'],
+      pregnancy: 'Category C (first/second trimester) - Use only if benefits outweigh risks. Category D (third trimester) - Avoid in late pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '219',
@@ -988,7 +1528,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'CABG surgery'],
     warnings: ['GI bleeding', 'cardiovascular thrombotic events', 'renal toxicity', 'hepatotoxicity', 'hypertension'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A pain and inflammation medicine (NSAID) that helps reduce pain, swelling, and fever. Available as pills and topical gel.',
+      mechanism: 'Works by blocking enzymes (COX-1 and COX-2) that cause inflammation, pain, and fever in the body.',
+      indications: ['Used to treat arthritis pain (osteoarthritis, rheumatoid arthritis, spine arthritis), sudden pain, and menstrual cramps.'],
+      contraindications: ['Should not be used if you are allergic to pain medicines (NSAIDs), have active stomach bleeding, severe heart failure, or having heart bypass surgery.'],
+      sideEffects: ['May cause stomach upset, nausea, diarrhea, dizziness, headache, skin rash, or elevated liver enzymes.'],
+      interactions: ['May interact with warfarin (blood thinner), ACE inhibitors (blood pressure medicines), water pills, lithium (mood medicine), methotrexate (arthritis medicine), or cyclosporine (immune medicine).'],
+      dosageAndAdmin: 'Pills: 50mg 2-3 times daily or 75mg twice daily. Maximum: 150mg per day. Topical gel: Apply thin layer 2-4 times daily. Take pills with food.',
+      warnings: ['Can cause stomach bleeding, increase risk of heart attack/stroke, kidney damage, liver damage, or high blood pressure.'],
+      pregnancy: 'Category C (first/second trimester) - Use only if benefits outweigh risks. Category D (third trimester) - Avoid in late pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '220',
@@ -1009,7 +1561,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'severe heart failure', 'necrotizing enterocolitis'],
     warnings: ['GI bleeding', 'cardiovascular events', 'CNS effects', 'renal toxicity', 'hepatotoxicity'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A strong pain and inflammation medicine (NSAID) that helps reduce pain, swelling, and fever. Used for severe arthritis and other painful conditions.',
+      mechanism: 'Works by strongly blocking enzymes that cause inflammation and pain in the body.',
+      indications: ['Used to treat rheumatoid arthritis, osteoarthritis, spine arthritis (ankylosing spondylitis), gout attacks, and to close a heart vessel in premature babies.'],
+      contraindications: ['Should not be used if you are allergic to pain medicines (NSAIDs), have active stomach bleeding, severe heart failure, or severe bowel inflammation in babies.'],
+      sideEffects: ['May cause headache, dizziness, nausea, stomach upset, diarrhea, brain effects (confusion), or fluid retention.'],
+      interactions: ['May interact with warfarin (blood thinner), ACE inhibitors (blood pressure medicines), water pills, lithium (mood medicine), methotrexate (arthritis medicine), or probenecid (gout medicine).'],
+      dosageAndAdmin: 'Regular pills: 25-50mg 2-3 times daily. Maximum: 200mg per day. Extended-release: 75mg once or twice daily. Take with food.',
+      warnings: ['Can cause stomach bleeding, heart problems, brain effects (confusion/dizziness), kidney damage, or liver damage.'],
+      pregnancy: 'Category C (first/second trimester) - Use only if benefits outweigh risks. Category D (third trimester) - Avoid in late pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '221',
@@ -1030,7 +1594,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to NSAIDs', 'active GI bleeding', 'renal impairment', 'CABG surgery', 'labor and delivery'],
     warnings: ['GI bleeding', 'renal toxicity', 'cardiovascular events', 'bleeding risk', 'limited to 5 days use'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A very strong pain medicine (NSAID) used for short-term treatment of moderate to severe pain. As effective as morphine for pain relief.',
+      mechanism: 'Works by strongly blocking enzymes that cause pain and inflammation, providing powerful pain relief similar to narcotic pain medicines.',
+      indications: ['Used for short-term management of moderate to severe sudden pain and after-surgery pain.'],
+      contraindications: ['Should not be used if you are allergic to pain medicines (NSAIDs), have active stomach bleeding, kidney problems, having heart bypass surgery, or during labor and delivery.'],
+      sideEffects: ['May cause stomach upset, nausea, dizziness, headache, drowsiness, injection site pain, or swelling.'],
+      interactions: ['May interact with warfarin (blood thinner), ACE inhibitors (blood pressure medicines), water pills, lithium (mood medicine), methotrexate (arthritis medicine), or probenecid (gout medicine).'],
+      dosageAndAdmin: 'Pills: 10mg every 4-6 hours. Maximum: 40mg per day for 5 days or less. Injection: 15-30mg every 6 hours. Nasal spray: 15.75mg every 6-8 hours.',
+      warnings: ['Can cause stomach bleeding, kidney damage, heart problems, bleeding risk. Must be limited to 5 days of use only.'],
+      pregnancy: 'Category C (first/second trimester) - Use only if benefits outweigh risks. Category D (third trimester) - Avoid in late pregnancy.',
+      storage: 'Keep at room temperature away from light.'
+    }
   },
   
   // Additional Respiratory medications
@@ -1053,7 +1629,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to salmeterol', 'acute bronchospasm', 'monotherapy for asthma'],
     warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'hypokalemia'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and freezing'
+    storage: 'Store at room temperature, protect from moisture and freezing',
+    laymanExplanations: {
+      description: 'A long-acting inhaler medicine that helps prevent breathing problems in asthma and COPD by keeping airways open for about 12 hours.',
+      mechanism: 'Works by relaxing the muscles around the airways in the lungs, making it easier to breathe for a long time.',
+      indications: ['Used for long-term control of asthma, COPD (chronic lung disease), and to prevent exercise-induced breathing problems.'],
+      contraindications: ['Should not be used if you are allergic to salmeterol, having a sudden asthma attack, or as the only asthma medicine.'],
+      sideEffects: ['May cause headache, shaking, nervousness, throat irritation, muscle cramps, or fast heartbeat.'],
+      interactions: ['May interact with beta-blockers (heart medicines), MAOIs (certain antidepressants), tricyclic antidepressants (mood medicines), water pills, or medicines processed by certain liver enzymes.'],
+      dosageAndAdmin: 'Inhale 50mcg (2 puffs) twice daily, about 12 hours apart. This is not for sudden breathing problems - use a rescue inhaler instead.',
+      warnings: ['May increase risk of asthma-related death, can cause opposite effect (worsening breathing), heart effects, or low potassium levels.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and freezing.'
+    }
   },
   {
     id: '223',
@@ -1074,7 +1662,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to formoterol', 'acute bronchospasm', 'monotherapy for asthma'],
     warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'hypokalemia'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and heat'
+    storage: 'Store at room temperature, protect from moisture and heat',
+    laymanExplanations: {
+      description: 'A long-acting inhaler medicine that helps prevent breathing problems in asthma and COPD, with faster onset than some other long-acting inhalers.',
+      mechanism: 'Works by relaxing the muscles around the airways in the lungs quickly and for a long time, making it easier to breathe.',
+      indications: ['Used for long-term control of asthma, COPD (chronic lung disease), and to prevent exercise-induced breathing problems.'],
+      contraindications: ['Should not be used if you are allergic to formoterol, having a sudden asthma attack, or as the only asthma medicine.'],
+      sideEffects: ['May cause shaking, headache, fast heartbeat, muscle cramps, nervousness, or throat irritation.'],
+      interactions: ['May interact with beta-blockers (heart medicines), MAOIs (certain antidepressants), tricyclic antidepressants (mood medicines), water pills, or xanthine medicines (like theophylline).'],
+      dosageAndAdmin: 'Inhale 12mcg twice daily. Nebulizer: 20mcg twice daily. Maximum: 24mcg per day. This is not for sudden symptoms - use a rescue inhaler instead.',
+      warnings: ['May increase risk of asthma-related death, can cause opposite effect (worsening breathing), heart effects, or low potassium levels.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and heat.'
+    }
   },
   {
     id: '224',
@@ -1095,7 +1695,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to components', 'acute bronchospasm', 'severe milk protein allergy'],
     warnings: ['Increased infection risk', 'adrenal suppression', 'growth suppression in children', 'asthma-related death risk'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and freezing'
+    storage: 'Store at room temperature, protect from moisture and freezing',
+    laymanExplanations: {
+      description: 'A combination inhaler medicine that contains both a steroid (to reduce inflammation) and a long-acting bronchodilator (to keep airways open) for asthma and COPD.',
+      mechanism: 'Budesonide reduces swelling and inflammation in the airways; formoterol relaxes the muscles around the airways for long-lasting relief.',
+      indications: ['Used for long-term control of asthma and COPD (chronic lung disease) to prevent breathing problems.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients, having a sudden asthma attack, or have severe milk protein allergy.'],
+      sideEffects: ['May cause oral thrush (mouth infection), hoarseness, headache, shaking, fast heartbeat, or upper respiratory infections.'],
+      interactions: ['May interact with medicines processed by certain liver enzymes, beta-blockers (heart medicines), MAOIs (certain antidepressants), tricyclic antidepressants (mood medicines), or water pills.'],
+      dosageAndAdmin: 'Inhale 2 puffs twice daily. For asthma: 80/4.5mcg or 160/4.5mcg. For COPD: 160/4.5mcg. Always rinse mouth after use to prevent thrush.',
+      warnings: ['May increase infection risk, suppress adrenal glands, slow growth in children, or increase risk of asthma-related death.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and freezing.'
+    }
   },
   {
     id: '225',
@@ -1116,7 +1728,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to umeclidinium', 'severe milk protein allergy', 'acute bronchospasm'],
     warnings: ['Paradoxical bronchospasm', 'worsening of narrow-angle glaucoma', 'urinary retention', 'hypersensitivity reactions'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and heat'
+    storage: 'Store at room temperature, protect from moisture and heat',
+    laymanExplanations: {
+      description: 'A long-acting inhaler medicine that helps keep airways open in COPD by blocking certain nerve signals that cause airway tightening.',
+      mechanism: 'Works by blocking acetylcholine (a nerve chemical) at receptors in the airway muscles, preventing them from tightening.',
+      indications: ['Used for long-term daily treatment of COPD (chronic lung disease), chronic bronchitis, and emphysema.'],
+      contraindications: ['Should not be used if you are allergic to umeclidinium, have severe milk protein allergy, or are having a sudden breathing attack.'],
+      sideEffects: ['May cause nose/throat infections, upper respiratory infections, cough, joint pain, or back pain.'],
+      interactions: ['May interact with other anticholinergic medicines (like atropine), certain enzyme inhibitors, or medicines that affect drug transport in the body.'],
+      dosageAndAdmin: 'Inhale 62.5mcg once daily at the same time each day. This is not for sudden breathing problems - use a rescue inhaler instead.',
+      warnings: ['Can cause opposite effect (worsening breathing), may worsen narrow-angle glaucoma, can cause difficulty urinating, or allergic reactions.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and heat.'
+    }
   },
   {
     id: '226',
@@ -1137,7 +1761,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to components', 'severe milk protein allergy', 'acute bronchospasm', 'asthma monotherapy'],
     warnings: ['Increased risk of asthma-related death', 'paradoxical bronchospasm', 'cardiovascular effects', 'narrow-angle glaucoma'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and heat'
+    storage: 'Store at room temperature, protect from moisture and heat',
+    laymanExplanations: {
+      description: 'A combination inhaler medicine that contains two long-acting bronchodilators (one blocks nerve signals, one relaxes airway muscles) for COPD.',
+      mechanism: 'Umeclidinium blocks nerve signals that tighten airways; vilanterol relaxes the muscles around airways for long-lasting relief.',
+      indications: ['Used for long-term daily treatment of COPD (chronic lung disease), chronic bronchitis, and emphysema.'],
+      contraindications: ['Should not be used if you are allergic to the ingredients, have severe milk protein allergy, are having a sudden breathing attack, or have asthma without other medicines.'],
+      sideEffects: ['May cause nose/throat infections, upper respiratory infections, chest pain, constipation, or diarrhea.'],
+      interactions: ['May interact with beta-blockers (heart medicines), other anticholinergic medicines, certain enzyme inhibitors, MAOIs (certain antidepressants), or tricyclic antidepressants (mood medicines).'],
+      dosageAndAdmin: 'Inhale 62.5/25mcg once daily at the same time each day. This is not for sudden breathing problems - use a rescue inhaler instead.',
+      warnings: ['May increase risk of asthma-related death, can cause opposite effect (worsening breathing), may affect heart, or worsen narrow-angle glaucoma.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and heat.'
+    }
   },
   
   // Additional Anti-allergy medications
@@ -1160,7 +1796,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to fexofenadine', 'severe renal impairment'],
     warnings: ['Renal impairment dosing', 'avoid with fruit juices', 'elderly patients'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A non-drowsy allergy medicine (antihistamine) used to relieve symptoms like sneezing, runny nose, and itchy eyes from allergies.',
+      mechanism: 'Works by blocking histamine (a chemical that causes allergy symptoms) without making you drowsy like older allergy medicines.',
+      indications: ['Used to treat seasonal allergies (hay fever), year-round allergies, and chronic hives (itchy skin bumps).'],
+      contraindications: ['Should not be used if you are allergic to fexofenadine or have severe kidney problems.'],
+      sideEffects: ['May cause headache, drowsiness, dizziness, nausea, upset stomach, or tiredness.'],
+      interactions: ['May interact with antacids containing aluminum/magnesium, fruit juices (grapefruit, orange, apple), ketoconazole (antifungal), or erythromycin (antibiotic).'],
+      dosageAndAdmin: 'Adults: 60mg twice daily or 180mg once daily. Children 6-11 years: 30mg twice daily. Take on empty stomach (1 hour before or 2 hours after meals).',
+      warnings: ['May need dose adjustment with kidney problems, avoid taking with fruit juices, use caution in elderly patients.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '228',
@@ -1181,7 +1829,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to desloratadine or loratadine'],
     warnings: ['Renal/hepatic impairment dosing', 'elderly patients', 'phenylketonuria (orally disintegrating tablets)'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A non-drowsy allergy medicine (antihistamine) used to relieve symptoms like sneezing, runny nose, and itchy eyes from allergies.',
+      mechanism: 'Works by blocking histamine (a chemical that causes allergy symptoms) and has anti-inflammatory effects without making you drowsy.',
+      indications: ['Used to treat seasonal allergies (hay fever), year-round allergies, and chronic hives (itchy skin bumps).'],
+      contraindications: ['Should not be used if you are allergic to desloratadine or loratadine (Claritin).'],
+      sideEffects: ['May cause headache, dry mouth, tiredness, sleepiness, dizziness, or nausea.'],
+      interactions: ['May interact with ketoconazole (antifungal), erythromycin (antibiotic), azithromycin (antibiotic), fluoxetine (antidepressant), or cimetidine (stomach medicine).'],
+      dosageAndAdmin: 'Adults: 5mg once daily. Children 6-11 years: 2.5mg once daily. Can be taken with or without food.',
+      warnings: ['May need dose adjustment with kidney/liver problems, use caution in elderly patients, contains phenylalanine in dissolving tablets (important for people with PKU).'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '229',
@@ -1202,7 +1862,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to levocetirizine or cetirizine', 'end-stage renal disease', 'hemodialysis patients'],
     warnings: ['Renal impairment dosing', 'elderly patients', 'avoid alcohol', 'driving impairment'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A non-drowsy allergy medicine (antihistamine) used to relieve symptoms like sneezing, runny nose, and itchy eyes from allergies.',
+      mechanism: 'Works by blocking histamine (a chemical that causes allergy symptoms) without making you drowsy.',
+      indications: ['Used to treat seasonal allergies (hay fever), year-round allergies, and chronic hives (itchy skin bumps).'],
+      contraindications: ['Should not be used if you are allergic to levocetirizine or cetirizine (Zyrtec), have end-stage kidney disease, or are on dialysis.'],
+      sideEffects: ['May cause drowsiness, tiredness, dry mouth, sore throat, nosebleeds, or fever.'],
+      interactions: ['May interact with theophylline (asthma medicine), ritonavir (HIV medicine), sedatives, or alcohol.'],
+      dosageAndAdmin: 'Adults: 5mg once daily in the evening. Children 6-11 years: 2.5mg once daily. Can be taken with or without food.',
+      warnings: ['May need dose adjustment with kidney problems, use caution in elderly patients, avoid drinking alcohol, may affect driving ability.'],
+      pregnancy: 'Category B - Generally considered safe but always consult your doctor.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '230',
@@ -1223,7 +1895,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to azelastine', 'children under 5 years (nasal)', 'children under 3 years (ophthalmic)'],
     warnings: ['Drowsiness', 'avoid alcohol', 'driving impairment', 'nasal septum perforation (rare)'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store upright at room temperature, protect from freezing'
+    storage: 'Store upright at room temperature, protect from freezing',
+    laymanExplanations: {
+      description: 'An allergy medicine (antihistamine) available as nasal spray and eye drops to treat allergy symptoms in the nose and eyes.',
+      mechanism: 'Works by blocking histamine (a chemical that causes allergy symptoms) and reducing inflammation without making you very drowsy.',
+      indications: ['Used to treat seasonal allergies (hay fever), year-round allergies, and allergic eye irritation.'],
+      contraindications: ['Should not be used if you are allergic to azelastine, in children under 5 years for nasal spray, or children under 3 years for eye drops.'],
+      sideEffects: ['May cause bitter taste, drowsiness, nose irritation, headache, nosebleeds, or eye irritation (with eye drops).'],
+      interactions: ['May interact with sedatives, alcohol, cimetidine (stomach medicine), or ketoconazole (antifungal).'],
+      dosageAndAdmin: 'Nasal spray: 1-2 sprays per nostril twice daily. Eye drops: 1 drop in each affected eye twice daily.',
+      warnings: ['May cause drowsiness, avoid drinking alcohol, may affect driving ability, rarely can cause hole in nasal wall.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep upright at room temperature, do not freeze.'
+    }
   },
   
   // Additional Antilipemic medications
@@ -1246,7 +1930,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Active liver disease', 'unexplained persistent elevations of serum transaminases', 'pregnancy', 'nursing mothers'],
     warnings: ['Myopathy/rhabdomyolysis', 'liver enzyme elevations', 'diabetes mellitus', 'cognitive impairment'],
     pregnancy: 'Category X - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A cholesterol-lowering medicine (statin) used to reduce bad cholesterol and prevent heart disease and stroke.',
+      mechanism: 'Works by blocking an enzyme that makes cholesterol in the liver, reducing the amount of bad cholesterol (LDL) in the blood.',
+      indications: ['Used to treat high cholesterol, mixed cholesterol problems, high triglycerides, and to prevent heart disease in people at risk.'],
+      contraindications: ['Should not be used if you have active liver disease, unexplained high liver enzymes, are pregnant, or are breastfeeding.'],
+      sideEffects: ['May cause headache, muscle pain, stomach pain, weakness, nausea, or dizziness.'],
+      interactions: ['May interact with cyclosporine (immune medicine), warfarin (blood thinner), gemfibrozil (cholesterol medicine), niacin (vitamin B3), antacids, or HIV medicines.'],
+      dosageAndAdmin: 'Start with 10-20mg once daily. Range: 5-40mg once daily. Maximum: 40mg per day. Can be taken with or without food.',
+      warnings: ['Can cause muscle problems/breakdown, liver enzyme increases, may increase diabetes risk, or cause memory problems.'],
+      pregnancy: 'Category X - Must not be used during pregnancy as it can harm the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '232',
@@ -1267,7 +1963,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Active liver disease', 'unexplained persistent elevations of serum transaminases', 'pregnancy', 'nursing mothers'],
     warnings: ['Myopathy/rhabdomyolysis', 'liver dysfunction', 'diabetes mellitus', 'renal impairment'],
     pregnancy: 'Category X - Contraindicated in pregnancy',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A cholesterol-lowering medicine (statin) that helps reduce bad cholesterol and prevent heart disease and strokes.',
+      mechanism: 'Works by blocking an enzyme that makes cholesterol in the liver, forcing the liver to remove more cholesterol from the blood.',
+      indications: ['Used to treat high cholesterol, mixed fat disorders in blood, and to prevent heart attacks and strokes in people at risk.'],
+      contraindications: ['Should not be used if you have active liver disease, unexplained high liver enzymes, are pregnant, or are breastfeeding.'],
+      sideEffects: ['May cause headache, dizziness, chest pain, nausea, vomiting, diarrhea, or muscle pain.'],
+      interactions: ['May interact with cyclosporine (immune medicine), gemfibrozil (cholesterol medicine), niacin (vitamin B3), erythromycin (antibiotic), clarithromycin (antibiotic), or colestipol (cholesterol medicine).'],
+      dosageAndAdmin: 'Start with 40mg once daily at bedtime. Can range from 10-80mg once daily. Maximum: 80mg per day. Can be taken with or without food.',
+      warnings: ['Can cause muscle problems including muscle breakdown, liver problems, may worsen diabetes, or cause kidney problems.'],
+      pregnancy: 'Category X - Dangerous to unborn babies - never use during pregnancy.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   {
     id: '233',
@@ -1288,7 +1996,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to ezetimibe', 'active liver disease (when used with statin)', 'pregnancy (with statin)'],
     warnings: ['Liver enzyme monitoring (with statin)', 'myopathy (with statin)', 'gallbladder disease'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A cholesterol medicine that works by blocking cholesterol absorption in the intestines, helping to lower bad cholesterol levels.',
+      mechanism: 'Works by preventing the intestines from absorbing cholesterol from food, forcing the body to use stored cholesterol instead.',
+      indications: ['Used to treat high cholesterol, mixed fat disorders in blood, and a rare condition where the body absorbs too much plant cholesterol.'],
+      contraindications: ['Should not be used if you are allergic to ezetimibe, have active liver disease when combined with statin medicines, or are pregnant when used with statins.'],
+      sideEffects: ['May cause upper respiratory infections, diarrhea, joint pain, sinus infections, or pain in arms/legs.'],
+      interactions: ['May interact with cyclosporine (immune medicine - increases ezetimibe levels), fibrates (cholesterol medicines), or cholestyramine (cholesterol medicine - decreases absorption).'],
+      dosageAndAdmin: 'Take 10mg once daily with or without food. Can be taken together with statin medicines.',
+      warnings: ['Need liver enzyme monitoring when used with statins, may cause muscle problems when used with statins, or gallbladder disease.'],
+      pregnancy: 'Category C - Use only if benefits outweigh risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '234',
@@ -1309,7 +2029,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hepatic dysfunction', 'severe renal dysfunction', 'preexisting gallbladder disease', 'nursing mothers'],
     warnings: ['Myopathy/rhabdomyolysis', 'hepatotoxicity', 'cholelithiasis', 'pulmonary embolism', 'deep vein thrombosis'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture and light'
+    storage: 'Store at room temperature, protect from moisture and light',
+    laymanExplanations: {
+      description: 'A cholesterol and triglyceride-lowering medicine (fibrate) that helps reduce fats in the blood, especially triglycerides.',
+      mechanism: 'Works by activating a special receptor that increases enzymes that break down fats and reduces production of bad fats by the liver.',
+      indications: ['Used to treat high cholesterol, mixed fat disorders in blood, high triglycerides, and very high triglycerides.'],
+      contraindications: ['Should not be used if you have liver problems, severe kidney problems, existing gallbladder disease, or are breastfeeding.'],
+      sideEffects: ['May cause stomach pain, back pain, headache, abnormal liver tests, breathing problems, or increased muscle enzyme levels.'],
+      interactions: ['May interact with warfarin (blood thinner), statins (cholesterol medicines), cyclosporine (immune medicine), bile acid sequestrants (cholesterol medicines), or colchicine (gout medicine).'],
+      dosageAndAdmin: 'Take 48-145mg once daily with meals. Different brands have different doses: Tricor: 48-145mg daily, Fenoglide: 40-120mg daily, Antara: 43-130mg daily. Must take with food for better absorption.',
+      warnings: ['Can cause muscle problems including muscle breakdown, liver damage, gallstones, blood clots in lungs, or blood clots in leg veins.'],
+      pregnancy: 'Category C - Use only if benefits outweigh risks to the baby.',
+      storage: 'Keep at room temperature away from moisture and light.'
+    }
   },
   
   // Additional Psychotropic medications
@@ -1332,7 +2064,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to mirtazapine', 'concurrent MAO inhibitor use', 'within 14 days of MAO inhibitor'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'angle-closure glaucoma', 'urinary retention', 'seizures'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antidepressant medicine that helps treat depression and can also help with sleep problems and appetite.',
+      mechanism: 'Works by blocking certain brain receptors and increasing levels of mood-improving chemicals (norepinephrine and serotonin) in the brain.',
+      indications: ['Used to treat major depression, sometimes used for sleep problems, to increase appetite, and for PTSD (post-traumatic stress disorder).'],
+      contraindications: ['Should not be used if you are allergic to mirtazapine, are taking MAO inhibitor medicines, or have taken MAO inhibitors within the past 14 days.'],
+      sideEffects: ['May cause drowsiness, increased appetite, weight gain, dizziness, dry mouth, constipation, or confusion.'],
+      interactions: ['May interact with MAO inhibitors (certain antidepressants), warfarin (blood thinner), phenytoin (seizure medicine), carbamazepine (seizure/mood medicine), rifampin (antibiotic), or cimetidine (stomach acid medicine).'],
+      dosageAndAdmin: 'Start with 15mg at bedtime. Maintenance dose: 15-45mg daily at bedtime. Maximum: 45mg per day. Can be taken with or without food.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, may worsen narrow-angle glaucoma, can cause difficulty urinating, or may trigger seizures.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '236',
@@ -1353,7 +2097,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to trazodone', 'concurrent MAO inhibitor use', 'recovery phase of myocardial infarction'],
     warnings: ['Suicidal thoughts', 'priapism', 'cardiac arrhythmias', 'orthostatic hypotension', 'serotonin syndrome'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antidepressant medicine that helps treat depression and sleep problems (insomnia) by affecting brain chemicals.',
+      mechanism: 'Works by increasing serotonin (a mood chemical) in the brain and blocking certain receptors that affect mood, sleep, and blood pressure.',
+      indications: ['Used to treat major depression, sleep problems (insomnia), and sometimes anxiety disorders.'],
+      contraindications: ['Should not be used if you are allergic to trazodone, are taking MAO inhibitor medicines, or are recovering from a recent heart attack.'],
+      sideEffects: ['May cause drowsiness, dizziness, dry mouth, blurred vision, constipation, nausea, or headache.'],
+      interactions: ['May interact with MAO inhibitors (certain antidepressants), warfarin (blood thinner), digoxin (heart medicine), phenytoin (seizure medicine), carbamazepine (seizure/mood medicine), or ketoconazole (antifungal medicine).'],
+      dosageAndAdmin: 'For depression: Start with 150mg daily in divided doses. Maximum: 400mg per day. For sleep: 25-100mg at bedtime. Must be taken with food.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause prolonged painful erection (priapism), heart rhythm problems, sudden drop in blood pressure when standing, or serotonin syndrome.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '237',
@@ -1374,7 +2130,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to desvenlafaxine or venlafaxine', 'concurrent MAO inhibitor use'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'elevated blood pressure', 'mydriasis', 'hyponatremia'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antidepressant medicine that helps treat depression by affecting brain chemicals (serotonin and norepinephrine).',
+      mechanism: 'Works by preventing the brain from reabsorbing serotonin and norepinephrine (mood chemicals), keeping more available to improve mood.',
+      indications: ['Used to treat major depression (severe sadness and loss of interest in daily activities).'],
+      contraindications: ['Should not be used if you are allergic to desvenlafaxine or venlafaxine, or are taking MAO inhibitor medicines.'],
+      sideEffects: ['May cause nausea, dizziness, trouble sleeping, excessive sweating, constipation, sleepiness, or decreased appetite.'],
+      interactions: ['May interact with MAO inhibitors (certain antidepressants), linezolid (antibiotic), methylene blue (medical dye), triptans (migraine medicines), warfarin (blood thinner), aspirin, or NSAIDs (pain medicines).'],
+      dosageAndAdmin: '50mg once daily with or without food. Range: 50-100mg daily. Maximum: 100mg per day. Do not crush or chew extended-release tablets.',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, high blood pressure, dilated pupils, or low sodium levels.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '238',
@@ -1395,7 +2163,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to vilazodone', 'concurrent MAO inhibitor use', 'within 14 days of MAO inhibitor'],
     warnings: ['Suicidal thoughts', 'serotonin syndrome', 'abnormal bleeding', 'activation of mania', 'discontinuation syndrome'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antidepressant medicine that helps treat depression by affecting serotonin (a mood chemical) in the brain.',
+      mechanism: 'Works by preventing the brain from reabsorbing serotonin and also acts on serotonin receptors, providing antidepressant effects with fewer sexual side effects.',
+      indications: ['Used to treat major depression (severe sadness and loss of interest in daily activities).'],
+      contraindications: ['Should not be used if you are allergic to vilazodone, are taking MAO inhibitor medicines, or have taken MAO inhibitors within 14 days.'],
+      sideEffects: ['May cause diarrhea, nausea, vomiting, trouble sleeping, dizziness, dry mouth, or sleepiness.'],
+      interactions: ['May interact with MAO inhibitors (certain antidepressants), linezolid (antibiotic), methylene blue (medical dye), strong CYP3A4 inhibitors (certain medicines processed by the liver), aspirin, or warfarin (blood thinner).'],
+      dosageAndAdmin: 'Start with 10mg daily for 7 days, then 20mg daily for 7 days, then 40mg daily. Must be taken with food (at least 500 calories).',
+      warnings: ['May increase suicidal thoughts (especially in young people), can cause serotonin syndrome, abnormal bleeding, trigger manic episodes, or cause withdrawal symptoms if stopped suddenly.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   
   // Additional Antimalarial medications
@@ -1418,7 +2198,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to mefloquine', 'active depression', 'anxiety disorders', 'psychosis', 'schizophrenia'],
     warnings: ['Neuropsychiatric reactions', 'seizures', 'cardiac conduction disorders', 'hepatic impairment'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antimalarial medicine used to prevent and treat malaria (a serious infection spread by mosquitoes).',
+      mechanism: 'Works by interfering with the malaria parasite\'s ability to digest food and process iron, leading to parasite death.',
+      indications: ['Used to prevent malaria when traveling to areas with malaria-resistant parasites, and to treat malaria infections.'],
+      contraindications: ['Should not be used if you are allergic to mefloquine, have active depression, anxiety disorders, psychosis, or schizophrenia.'],
+      sideEffects: ['May cause nausea, vomiting, dizziness, loss of balance, headache, trouble sleeping, or vivid dreams.'],
+      interactions: ['May interact with halofantrine (heart medicine), ketoconazole (antifungal), quinidine (heart medicine), quinine (antimalarial), chloroquine (antimalarial), or seizure medicines.'],
+      dosageAndAdmin: 'For prevention: 250mg weekly, start 1-2 weeks before travel. For treatment: 1250mg as single dose or 750mg followed by 500mg 6-12 hours later.',
+      warnings: ['Can cause serious mental health problems, seizures, heart rhythm problems, or liver problems.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '240',
@@ -1439,7 +2231,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to atovaquone or proguanil', 'severe renal impairment (CrCl <30 mL/min)'],
     warnings: ['Renal impairment', 'hepatic impairment', 'severe or complicated malaria', 'vomiting'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'A combination antimalarial medicine used to prevent and treat malaria (a serious infection spread by mosquitoes).',
+      mechanism: 'Contains two medicines: atovaquone stops the malaria parasite\'s energy production, while proguanil prevents the parasite from making DNA needed for reproduction.',
+      indications: ['Used to prevent malaria when traveling to areas with malaria, and to treat uncomplicated malaria infections.'],
+      contraindications: ['Should not be used if you are allergic to atovaquone or proguanil, or have severe kidney problems.'],
+      sideEffects: ['May cause stomach pain, nausea, vomiting, headache, diarrhea, weakness, or dizziness.'],
+      interactions: ['May interact with probenecid (gout medicine), digoxin (heart medicine), theophylline (breathing medicine), tetracycline (antibiotic), metoclopramide (nausea medicine), or warfarin (blood thinner).'],
+      dosageAndAdmin: 'For prevention: 1 adult tablet daily with food, start 1-2 days before travel. For treatment: 4 adult tablets daily for 3 days with food.',
+      warnings: ['May need dose adjustment with kidney or liver problems, not suitable for severe malaria, vomiting may reduce effectiveness.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   {
     id: '241',
@@ -1460,7 +2264,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to tetracyclines', 'pregnancy', 'children <8 years', 'severe hepatic impairment'],
     warnings: ['Photosensitivity', 'esophageal ulceration', 'intracranial hypertension', 'tooth discoloration in children'],
     pregnancy: 'Category D - Avoid in pregnancy',
-    storage: 'Store at room temperature, protect from light and moisture'
+    storage: 'Store at room temperature, protect from light and moisture',
+    laymanExplanations: {
+      description: 'An antibiotic medicine used to prevent malaria when traveling to areas where malaria is common.',
+      mechanism: 'Works by stopping the malaria parasite from making proteins it needs to survive and grow in your liver and blood.',
+      indications: ['Used to prevent malaria when traveling, treat malaria (with other medicines), and treat various bacterial infections.'],
+      contraindications: ['Should not be used if you are allergic to tetracycline antibiotics, are pregnant, are a child under 8 years old, or have severe liver problems.'],
+      sideEffects: ['May cause nausea, vomiting, diarrhea, increased sun sensitivity, throat irritation, or vaginal yeast infections.'],
+      interactions: ['May interact with antacids, iron supplements, warfarin (blood thinner), digoxin (heart medicine), methoxyflurane (anesthetic), or penicillin antibiotics.'],
+      dosageAndAdmin: 'For malaria prevention: 100mg daily, start 1-2 days before travel, continue 4 weeks after return. Take with food and plenty of water.',
+      warnings: ['Can make you very sensitive to sunlight, may cause throat sores, can increase pressure in the head, and may stain teeth in children.'],
+      pregnancy: 'Category D - Must be avoided during pregnancy as it can harm the baby.',
+      storage: 'Keep at room temperature away from light and moisture.'
+    }
   },
   
   // Additional Antivirals
@@ -1483,7 +2299,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to oseltamivir', 'severe renal impairment (CrCl <10 mL/min)'],
     warnings: ['Neuropsychiatric events', 'renal impairment dosing', 'resistance development', 'allergic reactions'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An antiviral medicine used to treat and prevent the flu (influenza).',
+      mechanism: 'Works by blocking an enzyme that flu viruses need to spread from infected cells to healthy cells in your body.',
+      indications: ['Used to treat flu A and B infections, and to prevent flu in people at high risk of complications.'],
+      contraindications: ['Should not be used if you are allergic to oseltamivir or have severe kidney problems (kidney clearance less than 10 mL/min).'],
+      sideEffects: ['May cause nausea, vomiting, headache, diarrhea, stomach pain, dizziness, or tiredness.'],
+      interactions: ['May interact with live flu vaccine (nasal spray), probenecid (gout medicine), or warfarin (blood thinner - monitor blood clotting).'],
+      dosageAndAdmin: 'For treatment: 75mg twice daily for 5 days (start within 48 hours of symptoms). For prevention: 75mg once daily for 10 days. Can be taken with or without food.',
+      warnings: ['May cause unusual behavior or mental changes, may need dose adjustment with kidney problems, flu viruses can become resistant, may cause allergic reactions.'],
+      pregnancy: 'Category C - Use only if benefits are greater than risks to the baby.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '243',
@@ -1504,7 +2332,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to valacyclovir or acyclovir', 'immunocompromised patients with TTP/HUS history'],
     warnings: ['Renal impairment', 'CNS effects', 'thrombotic thrombocytopenic purpura', 'acute renal failure'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An antiviral medicine used to treat herpes virus infections including shingles, genital herpes, and cold sores.',
+      mechanism: 'Works by being converted to acyclovir in the body, which then stops herpes viruses from making copies of themselves.',
+      indications: ['Used to treat shingles (herpes zoster), genital herpes, cold sores (herpes labialis), and to prevent cytomegalovirus infections.'],
+      contraindications: ['Should not be used if you are allergic to valacyclovir or acyclovir, or if you have a history of blood clotting disorders (TTP/HUS) and weakened immune system.'],
+      sideEffects: ['May cause headache, nausea, stomach pain, dizziness, tiredness, constipation, or skin rash.'],
+      interactions: ['May interact with probenecid (gout medicine), cimetidine (stomach acid medicine), mycophenolate mofetil (immune medicine), or medicines that can harm the kidneys.'],
+      dosageAndAdmin: 'For shingles: 1g three times daily for 7 days. For genital herpes: 1g twice daily for 10 days (first episode) or 500mg twice daily for 3 days (recurrent). Can be taken with or without food.',
+      warnings: ['May cause kidney problems, nervous system effects, blood clotting disorders, or sudden kidney failure.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '244',
@@ -1525,7 +2365,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to famciclovir or penciclovir'],
     warnings: ['Renal impairment dosing', 'elderly patients', 'galactose intolerance', 'lactase deficiency'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An antiviral medicine used to treat herpes virus infections including shingles, genital herpes, and cold sores.',
+      mechanism: 'Works by being converted to penciclovir in the body, which then stops herpes viruses from making copies of themselves.',
+      indications: ['Used to treat shingles (herpes zoster), genital herpes, cold sores (herpes labialis), and for long-term suppressive therapy.'],
+      contraindications: ['Should not be used if you are allergic to famciclovir or penciclovir.'],
+      sideEffects: ['May cause headache, nausea, diarrhea, tiredness, dizziness, stomach pain, or vomiting.'],
+      interactions: ['May interact with probenecid (gout medicine), digoxin (heart medicine), theophylline (breathing medicine), or raloxifene (bone medicine).'],
+      dosageAndAdmin: 'For shingles: 500mg three times daily for 7 days. For genital herpes: 1000mg twice daily for 1 day (recurrent) or 250mg three times daily for 7-10 days (first episode). Can be taken with or without food.',
+      warnings: ['May need dose adjustment with kidney problems, use caution in elderly patients, contains lactose (may cause problems if lactose intolerant).'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '245',
@@ -1546,7 +2398,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to emtricitabine or tenofovir', 'CrCl <30 mL/min for PrEP', 'unknown HIV status for PrEP'],
     warnings: ['Renal toxicity', 'bone density loss', 'lactic acidosis', 'hepatomegaly with steatosis', 'immune reconstitution syndrome'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture, keep in original container'
+    storage: 'Store at room temperature, protect from moisture, keep in original container',
+    laymanExplanations: {
+      description: 'A combination of two antiviral medicines used to treat HIV infection and prevent HIV infection in high-risk people (PrEP).',
+      mechanism: 'Both medicines work by blocking an enzyme (reverse transcriptase) that HIV needs to make copies of itself, preventing the virus from multiplying.',
+      indications: ['Used to treat HIV-1 infection (with other HIV medicines) and to prevent HIV-1 infection in people at high risk (pre-exposure prophylaxis or PrEP).'],
+      contraindications: ['Should not be used if you are allergic to emtricitabine or tenofovir, have severe kidney problems (kidney clearance less than 30 mL/min for PrEP), or have unknown HIV status when using for prevention.'],
+      sideEffects: ['May cause nausea, diarrhea, headache, tiredness, dizziness, depression, trouble sleeping, or skin rash.'],
+      interactions: ['May interact with medicines that harm the kidneys, didanosine (HIV medicine), atazanavir (HIV medicine), lopinavir/ritonavir (HIV medicines), or ledipasvir/sofosbuvir (hepatitis C medicines).'],
+      dosageAndAdmin: 'For HIV treatment: 1 tablet once daily with or without food. For PrEP (prevention): 1 tablet once daily with or without food. Must be used with other HIV medicines for treatment.',
+      warnings: ['Can cause kidney damage, bone thinning, lactic acidosis (dangerous acid buildup), liver enlargement with fat buildup, or immune system recovery syndrome.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture in the original container.'
+    }
   },
   
   // Additional Gastrointestinal medications
@@ -1569,7 +2433,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to rabeprazole or benzimidazoles', 'rilpivirine co-administration'],
     warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'vitamin B12 deficiency', 'acute interstitial nephritis'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A stomach acid reducer (proton pump inhibitor) used to treat acid reflux and ulcers.',
+      mechanism: 'Works by permanently blocking the pumps in the stomach that make acid, reducing the amount of acid produced.',
+      indications: ['Used to treat GERD (acid reflux), erosive esophagitis (acid damage to food pipe), peptic ulcers, Zollinger-Ellison syndrome (excess acid condition), and to help eliminate H. pylori bacteria.'],
+      contraindications: ['Should not be used if you are allergic to rabeprazole or similar medicines (benzimidazoles), or if taking rilpivirine (HIV medicine).'],
+      sideEffects: ['May cause headache, diarrhea, nausea, stomach pain, vomiting, gas, or constipation.'],
+      interactions: ['May interact with atazanavir (HIV medicine), rilpivirine (HIV medicine), warfarin (blood thinner), digoxin (heart medicine), methotrexate (cancer/arthritis medicine), or ketoconazole (antifungal).'],
+      dosageAndAdmin: 'For GERD: 20mg once daily for 4-8 weeks. For peptic ulcer: 20mg once daily for 4-8 weeks. Take 30-60 minutes before eating.',
+      warnings: ['May increase risk of C. difficile infection (severe diarrhea), bone fractures, low magnesium levels, vitamin B12 deficiency, or acute kidney inflammation.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '247',
@@ -1590,7 +2466,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to dexlansoprazole', 'lansoprazole', 'or benzimidazoles'],
     warnings: ['C. difficile infection', 'bone fractures', 'hypomagnesemia', 'acute interstitial nephritis', 'fundic gland polyps'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'A stomach acid reducer (proton pump inhibitor) used to treat acid reflux.',
+      mechanism: 'Works by permanently blocking the pumps in the stomach that make acid, with a special dual delayed-release formula for longer acid control.',
+      indications: ['Used to treat GERD (acid reflux) and erosive esophagitis (acid damage to food pipe), and to maintain healing.'],
+      contraindications: ['Should not be used if you are allergic to dexlansoprazole, lansoprazole, or similar medicines (benzimidazoles).'],
+      sideEffects: ['May cause diarrhea, stomach pain, nausea, upper respiratory tract infection, vomiting, or gas.'],
+      interactions: ['May interact with atazanavir (HIV medicine), rilpivirine (HIV medicine), warfarin (blood thinner), tacrolimus (immune medicine), methotrexate (cancer/arthritis medicine), or digoxin (heart medicine).'],
+      dosageAndAdmin: 'For GERD: 30mg once daily for 4 weeks. For erosive esophagitis: 60mg once daily for up to 8 weeks. Can be taken with or without food.',
+      warnings: ['May increase risk of C. difficile infection (severe diarrhea), bone fractures, low magnesium levels, acute kidney inflammation, or stomach polyps.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '248',
@@ -1611,7 +2499,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to ondansetron', 'concomitant apomorphine use', 'congenital long QT syndrome'],
     warnings: ['QT prolongation', 'serotonin syndrome', 'masking of ileus', 'hypersensitivity reactions'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'An anti-nausea medicine used to prevent nausea and vomiting caused by chemotherapy, radiation, or surgery.',
+      mechanism: 'Works by blocking serotonin receptors in the brain and gut that trigger nausea and vomiting.',
+      indications: ['Used to prevent nausea and vomiting caused by chemotherapy, radiation therapy, and after surgery.'],
+      contraindications: ['Should not be used if you are allergic to ondansetron, taking apomorphine (Parkinson\'s medicine), or have congenital long QT syndrome (heart rhythm condition).'],
+      sideEffects: ['May cause headache, constipation, diarrhea, tiredness, dizziness, drowsiness, or fever.'],
+      interactions: ['May interact with apomorphine (Parkinson\'s medicine), tramadol (pain medicine), medicines that affect heart rhythm, medicines that affect liver enzymes, or serotonin medicines.'],
+      dosageAndAdmin: 'For chemotherapy nausea: 8mg 30 minutes before chemotherapy, then 8mg every 8 hours. For post-surgery: 16mg 1 hour before anesthesia. Can be taken with or without food.',
+      warnings: ['May cause heart rhythm problems, serotonin syndrome (with other serotonin medicines), may hide bowel blockage symptoms, or cause allergic reactions.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from light.'
+    }
   },
   {
     id: '249',
@@ -1632,7 +2532,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['Hypersensitivity to loperamide', 'acute dysentery', 'bacterial enterocolitis', 'pseudomembranous colitis'],
     warnings: ['Cardiac arrhythmias at high doses', 'toxic megacolon', 'CNS depression', 'abuse potential'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from moisture'
+    storage: 'Store at room temperature, protect from moisture',
+    laymanExplanations: {
+      description: 'An anti-diarrheal medicine used to treat diarrhea by slowing down bowel movements.',
+      mechanism: 'Works by slowing down the movement of the intestines, allowing more time for water to be absorbed and making stools firmer.',
+      indications: ['Used to treat acute diarrhea, chronic diarrhea, traveler\'s diarrhea, and to reduce discharge from ileostomy (surgical opening).'],
+      contraindications: ['Should not be used if you are allergic to loperamide, have acute dysentery (bloody diarrhea), bacterial gut infections, or pseudomembranous colitis (severe colon inflammation).'],
+      sideEffects: ['May cause constipation, dizziness, drowsiness, nausea, dry mouth, stomach pain, or tiredness.'],
+      interactions: ['May interact with P-glycoprotein inhibitors, quinidine (heart medicine), ritonavir (HIV medicine), itraconazole (antifungal), or gemfibrozil (cholesterol medicine).'],
+      dosageAndAdmin: 'Start with 4mg, then 2mg after each loose stool. Maximum: 16mg per day for over-the-counter use, 8mg per day for more than 2 days. Take with water.',
+      warnings: ['Can cause heart rhythm problems at high doses, toxic megacolon (dangerous colon swelling), central nervous system depression, or potential for abuse.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from moisture.'
+    }
   },
   {
     id: '250',
@@ -1653,7 +2565,19 @@ export const additionalDrugsData: DrugData[] = [
     contraindications: ['GI obstruction', 'perforation', 'hemorrhage', 'pheochromocytoma', 'tardive dyskinesia history'],
     warnings: ['Tardive dyskinesia', 'neuroleptic malignant syndrome', 'depression', 'Parkinson\'s disease', 'seizures'],
     pregnancy: 'Category B - Generally considered safe',
-    storage: 'Store at room temperature, protect from light'
+    storage: 'Store at room temperature, protect from light',
+    laymanExplanations: {
+      description: 'A medicine used to treat nausea, vomiting, and gastroparesis (delayed stomach emptying).',
+      mechanism: 'Works by blocking dopamine receptors in the brain that trigger nausea and by helping the stomach and intestines move food along faster.',
+      indications: ['Used to treat gastroparesis (delayed stomach emptying), GERD (acid reflux), nausea and vomiting, and to help with small bowel procedures.'],
+      contraindications: ['Should not be used if you have gastrointestinal blockage, perforation, bleeding, pheochromocytoma (adrenal gland tumor), or history of tardive dyskinesia (movement disorder).'],
+      sideEffects: ['May cause drowsiness, restlessness, tiredness, diarrhea, nausea, trouble sleeping, or headache.'],
+      interactions: ['May interact with levodopa (Parkinson\'s medicine), digoxin (heart medicine), cyclosporine (immune medicine), tetracycline (antibiotic), MAO inhibitors (depression medicines), or sedatives.'],
+      dosageAndAdmin: 'For gastroparesis: 10mg 30 minutes before meals and at bedtime. For GERD: 10-15mg up to 4 times daily. Maximum treatment duration: 12 weeks.',
+      warnings: ['Can cause tardive dyskinesia (permanent movement disorder), neuroleptic malignant syndrome (dangerous reaction), depression, worsening of Parkinson\'s disease, or seizures.'],
+      pregnancy: 'Category B - Generally considered safe during pregnancy.',
+      storage: 'Keep at room temperature away from light.'
+    }
   }
 ];
 

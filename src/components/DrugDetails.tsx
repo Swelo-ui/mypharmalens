@@ -2,8 +2,11 @@
 import React, { useState } from 'react';
 import { 
   Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
-  Calendar, FileText, Clock, Search, ChevronDown, ChevronUp,
-  AlertTriangle, Package, Tag, BookOpen, GraduationCap
+  Calendar, FileText, Clock, Search,
+  AlertTriangle, Package, Tag, BookOpen, GraduationCap,
+  Info,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -55,112 +58,80 @@ interface DrugDetailsProps {
 const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
   const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives'>('general');
   const [showLaymanTerms, setShowLaymanTerms] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  
-  const toggleSection = (section: string) => {
-    setExpandedSections({
-      ...expandedSections,
-      [section]: !expandedSections[section]
-    });
-  };
   
   const renderTabContent = () => {
     switch (activeTab) {
       case 'general':
         return (
           <div className="space-y-6">
-            <InfoSection
-              title="Description"
-              expanded={expandedSections.description}
-              onToggle={() => toggleSection('description')}
-              content={
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {showLaymanTerms && drug.laymanExplanations?.description 
-                    ? drug.laymanExplanations.description 
-                    : drug.description}
-                </p>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Description</h3>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                {showLaymanTerms && drug.laymanExplanations?.description 
+                  ? drug.laymanExplanations.description 
+                  : drug.description}
+              </p>
+            </div>
             
-            <InfoSection
-              title="Dosage & Administration"
-              expanded={expandedSections.dosage}
-              onToggle={() => toggleSection('dosage')}
-              content={
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin 
-                    ? drug.laymanExplanations.dosageAndAdmin 
-                    : drug.dosageAndAdmin}
-                </p>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Dosage & Administration</h3>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin 
+                  ? drug.laymanExplanations.dosageAndAdmin 
+                  : drug.dosageAndAdmin}
+              </p>
+            </div>
             
-            <InfoSection
-              title="Mechanism of Action"
-              expanded={expandedSections.mechanism}
-              onToggle={() => toggleSection('mechanism')}
-              content={
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {showLaymanTerms && drug.laymanExplanations?.mechanism 
-                    ? drug.laymanExplanations.mechanism 
-                    : drug.mechanism}
-                </p>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Mechanism of Action</h3>
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                {showLaymanTerms && drug.laymanExplanations?.mechanism 
+                  ? drug.laymanExplanations.mechanism 
+                  : drug.mechanism}
+              </p>
+            </div>
             
-            <InfoSection
-              title="Side Effects"
-              expanded={expandedSections.sideEffects}
-              onToggle={() => toggleSection('sideEffects')}
-              content={
-                <ul className="space-y-2">
-                  {(showLaymanTerms && drug.laymanExplanations?.sideEffects 
-                    ? drug.laymanExplanations.sideEffects 
-                    : drug.sideEffects).map((effect, i) => (
-                    <li key={i} className="flex items-start">
-                      <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
-                    </li>
-                  ))}
-                </ul>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Side Effects</h3>
+              <ul className="space-y-2">
+                {(showLaymanTerms && drug.laymanExplanations?.sideEffects 
+                  ? drug.laymanExplanations.sideEffects 
+                  : drug.sideEffects).map((effect, i) => (
+                  <li key={i} className="flex items-start">
+                    <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             
-            <InfoSection
-              title="Warnings & Precautions"
-              expanded={expandedSections.warnings}
-              onToggle={() => toggleSection('warnings')}
-              content={
-                <ul className="space-y-2">
-                  {(showLaymanTerms && drug.laymanExplanations?.warnings 
-                    ? drug.laymanExplanations.warnings 
-                    : drug.warnings).map((warning, i) => (
-                    <li key={i} className="flex items-start">
-                      <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
-                    </li>
-                  ))}
-                </ul>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Warnings & Precautions</h3>
+              <ul className="space-y-2">
+                {(showLaymanTerms && drug.laymanExplanations?.warnings 
+                  ? drug.laymanExplanations.warnings 
+                  : drug.warnings).map((warning, i) => (
+                  <li key={i} className="flex items-start">
+                    <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             
-            <InfoSection
-              title="Drug Interactions"
-              expanded={expandedSections.interactions}
-              onToggle={() => toggleSection('interactions')}
-              content={
-                <ul className="space-y-2">
-                  {(showLaymanTerms && drug.laymanExplanations?.interactions 
-                    ? drug.laymanExplanations.interactions 
-                    : drug.interactions).map((interaction, i) => (
-                    <li key={i} className="flex items-start">
-                      <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
-                    </li>
-                  ))}
-                </ul>
-              }
-            />
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-medium mb-3">Drug Interactions</h3>
+              <ul className="space-y-2">
+                {(showLaymanTerms && drug.laymanExplanations?.interactions 
+                  ? drug.laymanExplanations.interactions 
+                  : drug.interactions).map((interaction, i) => (
+                  <li key={i} className="flex items-start">
+                    <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         );
         
@@ -425,35 +396,19 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
   );
 };
 
-// Helper component for collapsible sections
+// Helper component for non-collapsible sections
 interface InfoSectionProps {
   title: string;
-  expanded: boolean;
-  onToggle: () => void;
   content: React.ReactNode;
 }
 
-const InfoSection = ({ title, expanded, onToggle, content }: InfoSectionProps) => {
+const InfoSection = ({ title, content }: InfoSectionProps) => {
   return (
-    <div className="glass-card overflow-hidden transition-all duration-300">
-      <button
-        onClick={onToggle}
-        className="flex items-center justify-between w-full p-4 text-left"
-      >
-        <h3 className="text-sm font-medium">{title}</h3>
-        {expanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
-        )}
-      </button>
-      
-      <div 
-        className={cn(
-          "px-4 pb-4 transition-all duration-300",
-          expanded ? "block animate-accordion-down" : "hidden animate-accordion-up"
-        )}
-      >
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+      </div>
+      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-600">
         {content}
       </div>
     </div>
