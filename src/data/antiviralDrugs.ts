@@ -4,7 +4,7 @@ import { DrugData } from "@/components/DrugCard";
 // Antiviral drugs
 export const antiviralDrugs: DrugData[] = [
   {
-    id: '242',
+    id: 'AVD001',
     name: 'Oseltamivir',
     genericName: 'Oseltamivir phosphate',
     manufacturer: 'Various',
@@ -37,7 +37,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '243',
+    id: 'AVD002',
     name: 'Valacyclovir',
     genericName: 'Valacyclovir hydrochloride',
     manufacturer: 'Various',
@@ -70,7 +70,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '244',
+    id: 'AVD003',
     name: 'Famciclovir',
     genericName: 'Famciclovir',
     manufacturer: 'Various',
@@ -103,7 +103,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '245',
+    id: 'AVD004',
     name: 'Emtricitabine/Tenofovir',
     genericName: 'Emtricitabine/Tenofovir disoproxil fumarate',
     manufacturer: 'Various',
@@ -136,7 +136,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '306',
+    id: 'AVD005',
     name: 'Acyclovir',
     genericName: 'Acyclovir',
     manufacturer: 'Various',
@@ -169,7 +169,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '307',
+    id: 'AVD006',
     name: 'Ribavirin',
     genericName: 'Ribavirin',
     manufacturer: 'Various',
@@ -202,7 +202,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '308',
+    id: 'AVD007',
     name: 'Entecavir',
     genericName: 'Entecavir',
     manufacturer: 'Various',
@@ -235,7 +235,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '309',
+    id: 'AVD008',
     name: 'Zanamivir',
     genericName: 'Zanamivir',
     manufacturer: 'Various',
@@ -268,7 +268,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '350',
+    id: 'AVD009',
     name: 'Sofosbuvir',
     genericName: 'Sofosbuvir',
     manufacturer: 'Gilead Sciences',
@@ -301,7 +301,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '351',
+    id: 'AVD010',
     name: 'Ledipasvir/Sofosbuvir',
     genericName: 'Ledipasvir/Sofosbuvir',
     manufacturer: 'Gilead Sciences',
@@ -334,7 +334,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '352',
+    id: 'AVD011',
     name: 'Daclatasvir',
     genericName: 'Daclatasvir dihydrochloride',
     manufacturer: 'Bristol-Myers Squibb',
@@ -367,7 +367,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '353',
+    id: 'AVD012',
     name: 'Simeprevir',
     genericName: 'Simeprevir sodium',
     manufacturer: 'Janssen',
@@ -400,7 +400,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '354',
+    id: 'AVD013',
     name: 'Boceprevir',
     genericName: 'Boceprevir',
     manufacturer: 'Merck',
@@ -433,7 +433,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '355',
+    id: 'AVD014',
     name: 'Telaprevir',
     genericName: 'Telaprevir',
     manufacturer: 'Vertex Pharmaceuticals',
@@ -466,7 +466,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '356',
+    id: 'AVD015',
     name: 'Velpatasvir/Sofosbuvir',
     genericName: 'Velpatasvir/Sofosbuvir',
     manufacturer: 'Gilead Sciences',
@@ -499,7 +499,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '357',
+    id: 'AVD016',
     name: 'Glecaprevir/Pibrentasvir',
     genericName: 'Glecaprevir/Pibrentasvir',
     manufacturer: 'AbbVie',
@@ -532,7 +532,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '358',
+    id: 'AVD017',
     name: 'Elbasvir/Grazoprevir',
     genericName: 'Elbasvir/Grazoprevir',
     manufacturer: 'Merck',
@@ -565,7 +565,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '359',
+    id: 'AVD018',
     name: 'Paritaprevir/Ritonavir/Ombitasvir',
     genericName: 'Paritaprevir/Ritonavir/Ombitasvir',
     manufacturer: 'AbbVie',
@@ -598,7 +598,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '360',
+    id: 'AVD019',
     name: 'Adefovir',
     genericName: 'Adefovir dipivoxil',
     manufacturer: 'Gilead Sciences',
@@ -631,7 +631,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '361',
+    id: 'AVD020',
     name: 'Lamivudine',
     genericName: 'Lamivudine',
     manufacturer: 'Various',
@@ -664,7 +664,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '362',
+    id: 'AVD021',
     name: 'Telbivudine',
     genericName: 'Telbivudine',
     manufacturer: 'Novartis',
@@ -697,7 +697,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '363',
+    id: 'AVD022',
     name: 'Tenofovir Alafenamide',
     genericName: 'Tenofovir alafenamide fumarate',
     manufacturer: 'Gilead Sciences',
@@ -730,7 +730,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '364',
+    id: 'AVD023',
     name: 'Clevudine',
     genericName: 'Clevudine',
     manufacturer: 'Bukwang Pharmaceutical',
@@ -763,7 +763,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '365',
+    id: 'AVD024',
     name: 'Peramivir',
     genericName: 'Peramivir',
     manufacturer: 'BioCryst Pharmaceuticals',
@@ -796,7 +796,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '366',
+    id: 'AVD025',
     name: 'Baloxavir Marboxil',
     genericName: 'Baloxavir marboxil',
     manufacturer: 'Shionogi',
@@ -829,7 +829,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '367',
+    id: 'AVD026',
     name: 'Maraviroc',
     genericName: 'Maraviroc',
     manufacturer: 'ViiV Healthcare',
@@ -862,7 +862,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '368',
+    id: 'AVD027',
     name: 'Enfuvirtide',
     genericName: 'Enfuvirtide',
     manufacturer: 'Hoffmann-La Roche',
@@ -895,7 +895,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '369',
+    id: 'AVD028',
     name: 'Raltegravir',
     genericName: 'Raltegravir potassium',
     manufacturer: 'Merck',
@@ -928,7 +928,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '370',
+    id: 'AVD029',
     name: 'Elvitegravir',
     genericName: 'Elvitegravir',
     manufacturer: 'Gilead Sciences',
@@ -961,7 +961,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '371',
+    id: 'AVD030',
     name: 'Dolutegravir',
     genericName: 'Dolutegravir sodium',
     manufacturer: 'ViiV Healthcare',
@@ -994,7 +994,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '372',
+    id: 'AVD031',
     name: 'Bictegravir',
     genericName: 'Bictegravir sodium',
     manufacturer: 'Gilead Sciences',
@@ -1027,7 +1027,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '373',
+    id: 'AVD032',
     name: 'Cabotegravir',
     genericName: 'Cabotegravir sodium',
     manufacturer: 'ViiV Healthcare',
@@ -1060,7 +1060,7 @@ export const antiviralDrugs: DrugData[] = [
     }
   },
   {
-    id: '374',
+    id: 'AVD033',
     name: 'Rilpivirine',
     genericName: 'Rilpivirine hydrochloride',
     manufacturer: 'Janssen',

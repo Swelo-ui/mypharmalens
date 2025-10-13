@@ -5,7 +5,7 @@ export const otherDrugs: DrugData[] = [
   // Additional drugs to meet the 500 requirement
   // Dermatology medications
   {
-    id: '401',
+    id: 'OTD001',
     name: 'Tretinoin',
     genericName: 'Tretinoin',
     manufacturer: 'Various',
@@ -26,7 +26,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and heat'
   },
   {
-    id: '402',
+    id: 'OTD002',
     name: 'Adapalene',
     genericName: 'Adapalene',
     manufacturer: 'Various',
@@ -47,7 +47,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from freezing'
   },
   {
-    id: '403',
+    id: 'OTD003',
     name: 'Clotrimazole',
     genericName: 'Clotrimazole',
     manufacturer: 'Various',
@@ -68,7 +68,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '404',
+    id: 'OTD004',
     name: 'Ketoconazole',
     genericName: 'Ketoconazole',
     manufacturer: 'Various',
@@ -89,7 +89,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '405',
+    id: 'OTD005',
     name: 'Fluconazole',
     genericName: 'Fluconazole',
     manufacturer: 'Various',
@@ -112,7 +112,7 @@ export const otherDrugs: DrugData[] = [
   
   // Ophthalmology medications
   {
-    id: '406',
+    id: 'OTD006',
     name: 'Latanoprost',
     genericName: 'Latanoprost',
     manufacturer: 'Various',
@@ -133,7 +133,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Refrigerate unopened bottles, store at room temperature once opened, use within 6 weeks'
   },
   {
-    id: '407',
+    id: 'OTD007',
     name: 'Timolol Maleate',
     genericName: 'Timolol Maleate',
     manufacturer: 'Various',
@@ -154,7 +154,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '408',
+    id: 'OTD008',
     name: 'Brimonidine',
     genericName: 'Brimonidine tartrate',
     manufacturer: 'Various',
@@ -177,7 +177,7 @@ export const otherDrugs: DrugData[] = [
   
   // Immunosuppressants
   {
-    id: '409',
+    id: 'OTD009',
     name: 'Tacrolimus',
     genericName: 'Tacrolimus',
     manufacturer: 'Various',
@@ -198,7 +198,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '410',
+    id: 'OTD010',
     name: 'Mycophenolate Mofetil',
     genericName: 'Mycophenolate Mofetil',
     manufacturer: 'Various',
@@ -219,7 +219,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '411',
+    id: 'OTD011',
     name: 'Cyclosporine',
     genericName: 'Cyclosporine',
     manufacturer: 'Various',
@@ -242,7 +242,7 @@ export const otherDrugs: DrugData[] = [
   
   // Additional WHO essential medicines
   {
-    id: '412',
+    id: 'OTD012',
     name: 'Misoprostol',
     genericName: 'Misoprostol',
     manufacturer: 'Various',
@@ -263,7 +263,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '413',
+    id: 'OTD013',
     name: 'Oxytocin',
     genericName: 'Oxytocin',
     manufacturer: 'Various',
@@ -284,7 +284,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Refrigerate, protect from freezing and light'
   },
   {
-    id: '414',
+    id: 'OTD014',
     name: 'Methyldopa',
     genericName: 'Methyldopa',
     manufacturer: 'Various',
@@ -305,7 +305,7 @@ export const otherDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '415',
+    id: 'OTD015',
     name: 'Magnesium Sulfate',
     genericName: 'Magnesium Sulfate',
     manufacturer: 'Various',
@@ -317,6 +317,115 @@ export const otherDrugs: DrugData[] = [
     prescriptionStatus: 'Prescription Only',
     dosageAndAdmin: 'IV: Preeclampsia: Loading dose 4-6 g over 15-20 min, then 1-2 g/hr maintenance. Tocolysis: 4-6 g loading dose, then 2-4 g/hr.',
     mechanism: 'Blocks neuromuscular transmission, has anticonvulsant properties, and causes uterine muscle relaxation',
+    sideEffects: ['Flushing', 'sweating', 'hypotension', 'depressed reflexes', 'respiratory depression', 'cardiac arrest'],
+    interactions: ['Neuromuscular blocking agents', 'CNS depressants', 'calcium channel blockers'],
+    indications: ['Preeclampsia/eclampsia seizure prevention', 'tocolysis for preterm labor', 'hypomagnesemia'],
+    contraindications: ['Heart block', 'myocardial damage', 'renal failure', 'within 2 hours of delivery'],
+    warnings: ['Respiratory depression', 'loss of deep tendon reflexes', 'cardiac conduction abnormalities'],
+    pregnancy: 'Category A - Safe and effective in pregnancy',
+    storage: 'Store at room temperature, protect from freezing'
+  },
+  
+  // Additional Antifungal medications
+  {
+    id: 'OTD016',
+    name: 'Amphotericin B',
+    genericName: 'Amphotericin B',
+    manufacturer: 'Various',
+    category: 'Antifungal',
+    description: 'A powerful antifungal medicine used to treat serious fungal infections throughout the body. It works like a strong cleaner that destroys harmful fungi.',
+    drugClass: 'Polyene antifungal',
+    verified: true,
+    brandNames: ['Fungizone', 'AmBisome', 'Abelcet'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV infusion: 0.25-1.5 mg/kg daily, infused slowly over 2-6 hours. Dose depends on infection type and patient tolerance. Must be given in hospital.',
+    mechanism: 'Binds to ergosterol in fungal cell membranes, creating pores that cause cell death - like poking holes in a balloon',
+    sideEffects: ['Fever and chills during infusion', 'kidney damage', 'low potassium', 'anemia', 'nausea', 'headache', 'muscle pain'],
+    interactions: ['Kidney-damaging medicines (aminoglycosides, cyclosporine)', 'digoxin', 'muscle relaxants', 'corticosteroids'],
+    indications: ['Life-threatening fungal infections', 'cryptococcal meningitis', 'histoplasmosis', 'blastomycosis', 'aspergillosis'],
+    contraindications: ['Known allergy to amphotericin B', 'unless life-threatening infection with no alternatives'],
+    warnings: ['Can cause serious kidney damage', 'requires frequent blood tests', 'infusion reactions common', 'electrolyte monitoring needed'],
+    pregnancy: 'Category B - Generally safe but use only when necessary',
+    storage: 'Refrigerate powder, protect from light, use reconstituted solution immediately'
+  },
+  {
+    id: 'OTD017',
+    name: 'Flucytosine',
+    genericName: 'Flucytosine',
+    manufacturer: 'Various',
+    category: 'Antifungal',
+    description: 'An antifungal medicine that works inside fungal cells to stop their growth. Often used with other antifungal medicines for better results.',
+    drugClass: 'Antimetabolite antifungal',
+    verified: true,
+    brandNames: ['Ancobon'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 50-150 mg/kg daily divided into 4 doses every 6 hours. Take with food to reduce stomach upset. Usually given with amphotericin B.',
+    mechanism: 'Converted to 5-fluorouracil inside fungal cells, disrupting DNA and RNA synthesis - like sabotaging the fungus from within',
+    sideEffects: ['Nausea and vomiting', 'diarrhea', 'rash', 'low blood counts', 'liver problems', 'confusion', 'hallucinations'],
+    interactions: ['Amphotericin B (increases flucytosine levels)', 'cytarabine', 'other bone marrow suppressants'],
+    indications: ['Cryptococcal meningitis (with amphotericin B)', 'serious Candida infections', 'chromoblastomycosis'],
+    contraindications: ['Known allergy to flucytosine', 'severe kidney or liver disease'],
+    warnings: ['Can cause dangerous drops in blood cell counts', 'requires frequent blood monitoring', 'kidney function monitoring needed'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
+  },
+  {
+    id: 'OTD018',
+    name: 'Griseofulvin',
+    genericName: 'Griseofulvin',
+    manufacturer: 'Various',
+    category: 'Antifungal',
+    description: 'An antifungal medicine that treats fungal infections of skin, hair, and nails. It works by stopping fungi from making new cells.',
+    drugClass: 'Antifungal antibiotic',
+    verified: true,
+    brandNames: ['Grifulvin V', 'Gris-PEG'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Adults: 500-1000 mg daily with fatty meal. Children: 10-20 mg/kg daily. Treatment may take weeks to months for nail infections.',
+    mechanism: 'Disrupts fungal cell division by interfering with microtubule function - like jamming the machinery that helps fungi reproduce',
+    sideEffects: ['Headache', 'nausea', 'vomiting', 'diarrhea', 'fatigue', 'dizziness', 'skin rash', 'sun sensitivity'],
+    interactions: ['Warfarin (reduces effectiveness)', 'birth control pills (may reduce effectiveness)', 'alcohol', 'barbiturates'],
+    indications: ['Ringworm of scalp, body, groin, feet', 'fungal nail infections', 'tinea capitis in children'],
+    contraindications: ['Severe liver disease', 'porphyria', 'pregnancy', 'allergy to griseofulvin'],
+    warnings: ['May cause liver problems', 'can make birth control less effective', 'avoid sun exposure', 'long treatment needed'],
+    pregnancy: 'Category X - Do not use during pregnancy',
+    storage: 'Store at room temperature, protect from light and moisture'
+  },
+  {
+    id: 'OTD019',
+    name: 'Nystatin',
+    genericName: 'Nystatin',
+    manufacturer: 'Various',
+    category: 'Antifungal',
+    description: 'An antifungal medicine used to treat yeast infections in the mouth, throat, and intestines. It works like a targeted destroyer of yeast cells.',
+    drugClass: 'Polyene antifungal',
+    verified: true,
+    brandNames: ['Mycostatin', 'Nilstat'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral suspension: 4-6 ml (400,000-600,000 units) 4 times daily, swish and swallow. Tablets: 1-2 tablets 3-4 times daily. Continue for 48 hours after symptoms clear.',
+    mechanism: 'Binds to ergosterol in fungal cell membranes, causing cell contents to leak out and cell death',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'stomach pain', 'mouth irritation (with oral forms)', 'rarely allergic reactions'],
+    interactions: ['Very few interactions due to poor absorption from gut'],
+    indications: ['Oral thrush (mouth yeast infection)', 'intestinal candidiasis', 'prevention of fungal overgrowth with antibiotics'],
+    contraindications: ['Known allergy to nystatin'],
+    warnings: ['Not effective for systemic fungal infections', 'complete full course even if feeling better'],
+    pregnancy: 'Category A - Safe to use during pregnancy',
+    storage: 'Store oral suspension in refrigerator, tablets at room temperature, protect from moisture'
+  },
+
+  // Existing Magnesium sulfate entry
+  {
+    id: 'OTD020',
+    name: 'Magnesium sulfate',
+    genericName: 'Magnesium sulfate',
+    manufacturer: 'Various',
+    category: 'Electrolyte/Mineral',
+    description: 'Magnesium supplement used to treat magnesium deficiency and prevent seizures in pregnancy.',
+    drugClass: 'Electrolyte supplement',
+    verified: true,
+    brandNames: ['Epsom Salt (topical)'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV: 1-2 g in 50-100 ml over 15-20 minutes for acute deficiency. Preeclampsia: 4-6 g loading dose, then 1-2 g/hour maintenance.',
+    mechanism: 'Essential cofactor for numerous enzymatic reactions, stabilizes cell membranes, affects neuromuscular transmission',
     sideEffects: ['Flushing', 'sweating', 'hypotension', 'depressed reflexes', 'respiratory depression', 'cardiac arrest'],
     interactions: ['Neuromuscular blocking agents', 'CNS depressants', 'calcium channel blockers'],
     indications: ['Preeclampsia/eclampsia seizure prevention', 'tocolysis for preterm labor', 'hypomagnesemia'],

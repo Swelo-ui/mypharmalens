@@ -87,36 +87,43 @@ const SearchResults = () => {
         console.log("Searching for:", searchQuery);
         console.log("Active filters:", activeFilters);
         
+        let useLocalData = true;
+        
         if (searchQuery) {
           // Try to fetch from Supabase first
-          const supabaseDrugs = await fetchDrugs({ 
-            searchTerm: searchQuery,
-            category: activeFilters.length > 0 ? activeFilters[0] : undefined,
-            limit: 200 // Increase limit to get more results
-          });
-          
-          if (supabaseDrugs && supabaseDrugs.length > 0) {
-            console.log("Found drugs in Supabase:", supabaseDrugs.length);
-            // Map Supabase drugs to DrugData format
-            const formattedDrugs = supabaseDrugs.map(drug => ({
-              id: drug.id,
-              name: drug.name,
-              genericName: drug.generic_name,
-              manufacturer: drug.manufacturer,
-              category: drug.category,
-              description: drug.description,
-              drugClass: drug.drug_class,
-              verified: drug.verified,
-              brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
-            }));
+          try {
+            const supabaseDrugs = await fetchDrugs({ 
+              searchTerm: searchQuery,
+              category: activeFilters.length > 0 ? activeFilters[0] : undefined,
+              limit: 200 // Increase limit to get more results
+            });
             
-            setAllResults(formattedDrugs);
-            setIsLoading(false);
-            return;
-          } else {
-            console.log("No results found in Supabase, falling back to local data");
+            if (supabaseDrugs && supabaseDrugs.length > 0) {
+              console.log("Found drugs in Supabase:", supabaseDrugs.length);
+              // Map Supabase drugs to DrugData format
+              const formattedDrugs = supabaseDrugs.map(drug => ({
+                id: drug.id,
+                name: drug.name,
+                genericName: drug.generic_name,
+                manufacturer: drug.manufacturer,
+                category: drug.category,
+                description: drug.description,
+                drugClass: drug.drug_class,
+                verified: drug.verified,
+                brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
+              }));
+              
+              setAllResults(formattedDrugs);
+              useLocalData = false; // Don't use local data if Supabase found results
+            } else {
+              console.log("No results found in Supabase, falling back to local data");
+            }
+          } catch (supabaseError) {
+            console.log("Supabase search failed, falling back to local data:", supabaseError);
           }
         }
+        
+        if (useLocalData) {
         
         console.log("Searching local data with total entries:", combinedDrugsData.length);
         // Fall back to combined data if no Supabase results
@@ -160,6 +167,7 @@ const SearchResults = () => {
         
         console.log(`After filtering: ${finalResults.length} drugs`);
         setAllResults(finalResults);
+        }
       } catch (error) {
         console.error("Error fetching drugs:", error);
         // Fall back to local data on error with same enhanced search

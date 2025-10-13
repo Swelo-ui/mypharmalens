@@ -5,7 +5,7 @@ import { DrugData } from "@/components/DrugCard";
 export const endocrineDrugs: DrugData[] = [
   // Thyroid and endocrine
   {
-    id: '8',
+    id: 'ED001',
     name: 'Levothyroxine',
     genericName: 'Levothyroxine',
     manufacturer: 'Various',
@@ -28,7 +28,7 @@ export const endocrineDrugs: DrugData[] = [
   
   // Antidiabetics
   {
-    id: '11',
+    id: 'ED002',
     name: 'Metformin',
     genericName: 'Metformin',
     manufacturer: 'Various',
@@ -49,7 +49,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '12',
+    id: 'ED003',
     name: 'Insulin Glargine',
     genericName: 'Insulin Glargine',
     manufacturer: 'Various',
@@ -70,7 +70,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials, room temperature after opening for 28 days'
   },
   {
-    id: '113',
+    id: 'ED004',
     name: 'Glimepiride',
     genericName: 'Glimepiride',
     manufacturer: 'Various',
@@ -91,7 +91,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '114',
+    id: 'ED005',
     name: 'Glyburide',
     genericName: 'Glyburide',
     manufacturer: 'Various',
@@ -112,7 +112,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '115',
+    id: 'ED006',
     name: 'Sitagliptin',
     genericName: 'Sitagliptin phosphate',
     manufacturer: 'Various',
@@ -133,7 +133,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '116',
+    id: 'ED007',
     name: 'Linagliptin',
     genericName: 'Linagliptin',
     manufacturer: 'Various',
@@ -154,7 +154,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '117',
+    id: 'ED008',
     name: 'Empagliflozin',
     genericName: 'Empagliflozin',
     manufacturer: 'Various',
@@ -175,7 +175,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '118',
+    id: 'ED009',
     name: 'Dapagliflozin',
     genericName: 'Dapagliflozin propanediol',
     manufacturer: 'Various',
@@ -196,7 +196,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '119',
+    id: 'ED010',
     name: 'Liraglutide',
     genericName: 'Liraglutide',
     manufacturer: 'Various',
@@ -217,7 +217,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate, do not freeze. Room temperature for 30 days after first use'
   },
   {
-    id: '120',
+    id: 'ED011',
     name: 'Dulaglutide',
     genericName: 'Dulaglutide',
     manufacturer: 'Various',
@@ -238,7 +238,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate, do not freeze. Room temperature for 14 days'
   },
   {
-    id: '121',
+    id: 'ED012',
     name: 'Canagliflozin',
     genericName: 'Canagliflozin',
     manufacturer: 'Various',
@@ -261,7 +261,7 @@ export const endocrineDrugs: DrugData[] = [
 
   // Supplements and vitamins
   {
-    id: '122',
+    id: 'ED013',
     name: 'Melatonin',
     genericName: 'Melatonin',
     manufacturer: 'Various',
@@ -282,7 +282,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '123',
+    id: 'ED014',
     name: 'Vitamin D',
     genericName: 'Cholecalciferol (Vitamin D3)',
     manufacturer: 'Various',
@@ -303,7 +303,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '124',
+    id: 'ED015',
     name: 'Vitamin B12',
     genericName: 'Cyanocobalamin',
     manufacturer: 'Various',
@@ -324,7 +324,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '125',
+    id: 'ED016',
     name: 'Potassium Chloride',
     genericName: 'Potassium Chloride',
     manufacturer: 'Various',
@@ -345,7 +345,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '126',
+    id: 'ED017',
     name: 'Calcium Carbonate',
     genericName: 'Calcium Carbonate',
     manufacturer: 'Various',
@@ -366,7 +366,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '127',
+    id: 'ED018',
     name: 'Iron Sulfate',
     genericName: 'Ferrous Sulfate',
     manufacturer: 'Various',
@@ -387,7 +387,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture, keep away from children'
   },
   {
-    id: '128',
+    id: 'ED019',
     name: 'Magnesium Oxide',
     genericName: 'Magnesium Oxide',
     manufacturer: 'Various',
@@ -408,7 +408,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '326',
+    id: 'ED020',
     name: 'Pioglitazone',
     genericName: 'Pioglitazone hydrochloride',
     manufacturer: 'Various',
@@ -429,7 +429,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '327',
+    id: 'ED021',
     name: 'Acarbose',
     genericName: 'Acarbose',
     manufacturer: 'Various',
@@ -450,7 +450,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from moisture.'
   },
   {
-    id: '328',
+    id: 'ED022',
     name: 'Repaglinide',
     genericName: 'Repaglinide',
     manufacturer: 'Various',
@@ -471,7 +471,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from moisture.'
   },
   {
-    id: '329',
+    id: 'ED023',
     name: 'Nateglinide',
     genericName: 'Nateglinide',
     manufacturer: 'Various',
@@ -492,7 +492,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '330',
+    id: 'ED024',
     name: 'Exenatide',
     genericName: 'Exenatide',
     manufacturer: 'Various',
@@ -513,7 +513,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate. Do not freeze. Discard after 30 days at room temperature.'
   },
   {
-    id: '331',
+    id: 'ED025',
     name: 'Pramlintide',
     genericName: 'Pramlintide acetate',
     manufacturer: 'Various',
@@ -534,7 +534,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials. Room temperature for 28 days after opening.'
   },
   {
-    id: '332',
+    id: 'ED026',
     name: 'Liothyronine',
     genericName: 'Liothyronine sodium',
     manufacturer: 'Various',
@@ -555,7 +555,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from light and moisture.'
   },
   {
-    id: '333',
+    id: 'ED027',
     name: 'Desiccated Thyroid',
     genericName: 'Thyroid USP',
     manufacturer: 'Various',
@@ -576,7 +576,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from light and moisture.'
   },
   {
-    id: '334',
+    id: 'ED028',
     name: 'Methimazole',
     genericName: 'Methimazole',
     manufacturer: 'Various',
@@ -597,7 +597,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: '335',
+    id: 'ED029',
     name: 'Propylthiouracil',
     genericName: 'Propylthiouracil',
     manufacturer: 'Various',
@@ -611,14 +611,14 @@ export const endocrineDrugs: DrugData[] = [
     mechanism: 'Inhibits thyroid peroxidase and blocks peripheral conversion of T4 to T3.',
     sideEffects: ['Skin rash', 'urticaria', 'nausea', 'vomiting', 'arthralgia', 'myalgia', 'headache', 'drowsiness.'],
     interactions: ['Warfarin (enhanced anticoagulant effect)', 'digoxin', 'theophylline', 'beta-blockers.'],
-    indications: ['Hyperthyroidism', 'thyrotoxic crisis', 'pregnancy-associated hyperthyroidism.'],
+    indications: ['Hyperthyroidism', 'thyrotoxic Crisis', 'pregnancy-associated hyperthyroidism.'],
     contraindications: ['Hypersensitivity', 'severe hepatic disease.'],
     warnings: ['Severe hepatotoxicity risk. Agranulocytosis. Monitor liver function and CBC. Preferred in pregnancy.'],
     pregnancy: 'Category D - Preferred over methimazole in first trimester.',
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '336',
+    id: 'ED030',
     name: 'Hydrocortisone',
     genericName: 'Hydrocortisone',
     manufacturer: 'Various',
@@ -639,7 +639,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: '337',
+    id: 'ED031',
     name: 'Prednisone',
     genericName: 'Prednisone',
     manufacturer: 'Various',
@@ -660,7 +660,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture and light.'
   },
   {
-    id: '338',
+    id: 'ED032',
     name: 'Fludrocortisone',
     genericName: 'Fludrocortisone acetate',
     manufacturer: 'Various',
@@ -681,7 +681,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '339',
+    id: 'ED033',
     name: 'Testosterone Cypionate',
     genericName: 'Testosterone cypionate',
     manufacturer: 'Various',
@@ -702,7 +702,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: '340',
+    id: 'ED034',
     name: 'Estradiol',
     genericName: 'Estradiol',
     manufacturer: 'Various',
@@ -721,5 +721,133 @@ export const endocrineDrugs: DrugData[] = [
     warnings: ['Breast cancer risk. Cardiovascular events. Stroke risk. Gallbladder disease. Dementia risk in elderly.'],
     pregnancy: 'Category X - Contraindicated in pregnancy.',
     storage: 'Store at room temperature below 25°C. Protect from light and moisture.'
-  }
+  },
+  
+  // Additional endocrine/diabetes medications
+  {
+  id: 'ED035',
+  name: 'Gliclazide',
+  genericName: 'Gliclazide',
+  manufacturer: 'Various',
+  category: 'Antidiabetic',
+  description: 'A diabetes medicine that helps your pancreas make more insulin to lower blood sugar. It works like encouraging your body to produce its own sugar-lowering hormone.',
+  drugClass: 'Sulfonylurea',
+  verified: true,
+  brandNames: ['Diamicron', 'Glizid'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'Oral: 40-320 mg daily, usually taken with breakfast. Start with 40-80 mg daily and adjust based on blood sugar levels. Take with food to reduce stomach upset.',
+  mechanism: 'Stimulates insulin release from pancreatic beta cells by blocking potassium channels, increasing calcium influx',
+  sideEffects: ['Low blood sugar', 'weight gain', 'nausea', 'diarrhea', 'skin rash', 'dizziness', 'headache'],
+  interactions: ['Alcohol (increases low blood sugar risk)', 'warfarin', 'NSAIDs', 'beta-blockers', 'ACE inhibitors', 'clarithromycin'],
+  indications: ['Type 2 diabetes mellitus', 'when diet and exercise alone are insufficient'],
+  contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'severe kidney or liver disease', 'pregnancy', 'breastfeeding'],
+  warnings: ['Risk of severe low blood sugar', 'may cause weight gain', 'monitor blood sugar regularly', 'avoid alcohol'],
+  pregnancy: 'Category C - Not recommended, use insulin instead',
+  storage: 'Store at room temperature, protect from moisture and light'
+},
+{
+  id: 'ED036',
+  name: 'Glucagon',
+  genericName: 'Glucagon',
+  manufacturer: 'Various',
+  category: 'Emergency Antidiabetic',
+  description: 'An emergency hormone injection used to treat severe low blood sugar. It works like your body\'s natural alarm system to quickly raise blood sugar levels.',
+  drugClass: 'Pancreatic hormone',
+  verified: true,
+  brandNames: ['GlucaGen', 'Baqsimi'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'IM/SC injection: 1 mg for adults and children >25 kg, 0.5 mg for children <25 kg. Nasal spray: 3 mg in one nostril. Give when person cannot swallow.',
+  mechanism: 'Stimulates hepatic glucose production by activating glycogen phosphorylase, rapidly increasing blood glucose levels',
+  sideEffects: ['Nausea and vomiting', 'headache', 'dizziness', 'injection site reactions', 'temporary high blood sugar'],
+  interactions: ['Warfarin (may increase anticoagulant effect)', 'insulin (opposing effects)', 'beta-blockers'],
+  indications: ['Severe hypoglycemia (low blood sugar)', 'diagnostic procedures requiring bowel relaxation'],
+  contraindications: ['Pheochromocytoma', 'insulinoma', 'known hypersensitivity to glucagon'],
+  warnings: ['Not effective in prolonged fasting or adrenal insufficiency', 'give carbohydrates after recovery', 'seek medical attention'],
+  pregnancy: 'Category B - Generally safe when medically necessary',
+  storage: 'Store in refrigerator, do not freeze, protect from light, check expiration date'
+},
+{
+  id: 'ED037',
+  name: 'Insulin (Human)',
+  genericName: 'Human Insulin',
+  manufacturer: 'Various',
+  category: 'Antidiabetic',
+  description: 'The main hormone that controls blood sugar levels. This is identical to the insulin your body makes naturally, used when your body doesn\'t make enough.',
+  drugClass: 'Insulin hormone',
+  verified: true,
+  brandNames: ['Humulin', 'Novolin', 'Actrapid'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'SC injection: Dose varies greatly by individual needs, typically 0.5-1 unit/kg/day divided into multiple doses. Rotate injection sites.',
+  mechanism: 'Facilitates glucose uptake by cells, promotes glycogen synthesis, and inhibits glucose production by the liver',
+  sideEffects: ['Low blood sugar', 'injection site reactions', 'weight gain', 'swelling', 'rarely severe allergic reactions'],
+  interactions: ['Alcohol', 'beta-blockers', 'ACE inhibitors', 'oral diabetes medicines', 'corticosteroids', 'thyroid hormones'],
+  indications: ['Type 1 diabetes', 'Type 2 diabetes requiring insulin', 'diabetic ketoacidosis', 'gestational diabetes'],
+  contraindications: ['Hypoglycemia', 'hypersensitivity to insulin or components'],
+  warnings: ['Never share insulin pens or needles', 'monitor blood sugar regularly', 'adjust for illness/stress', 'rotate injection sites'],
+  pregnancy: 'Category B - Safe and often necessary during pregnancy',
+  storage: 'Unopened: refrigerate. In use: room temperature up to 28 days. Never freeze or overheat.'
+},
+{
+  id: 'ED038',
+  name: 'Liraglutide',
+  genericName: 'Liraglutide',
+  manufacturer: 'Novo Nordisk',
+  category: 'Antidiabetic',
+  description: 'A diabetes medicine that mimics a natural hormone to help control blood sugar and may help with weight loss. It works like a helpful messenger telling your body to make insulin when needed.',
+  drugClass: 'GLP-1 receptor agonist',
+  verified: true,
+  brandNames: ['Victoza', 'Saxenda'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'SC injection: Start 0.6 mg daily for 1 week, then 1.2 mg daily. May increase to 1.8 mg daily if needed. Inject same time each day, rotate sites.',
+  mechanism: 'Mimics incretin hormone GLP-1, stimulating insulin release, suppressing glucagon, slowing gastric emptying, and promoting satiety',
+  sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'decreased appetite', 'headache', 'dizziness', 'injection site reactions'],
+  interactions: ['Oral medications (may delay absorption)', 'warfarin', 'digoxin', 'insulin (increased low blood sugar risk)'],
+  indications: ['Type 2 diabetes (as add-on therapy)', 'weight management in obesity (higher dose)'],
+  contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of thyroid cancer', 'pregnancy'],
+  warnings: ['Risk of thyroid tumors', 'pancreatitis risk', 'kidney problems', 'severe stomach problems', 'gallbladder disease'],
+  pregnancy: 'Category C - Not recommended during pregnancy',
+  storage: 'Refrigerate unopened pens. In use: store at room temperature up to 30 days. Protect from light.'
+},
+{
+  id: 'ED039',
+  name: 'Semaglutide',
+  genericName: 'Semaglutide',
+  manufacturer: 'Novo Nordisk',
+  category: 'Antidiabetic',
+  description: 'A once-weekly diabetes injection that helps control blood sugar and promotes weight loss. It works like a weekly reminder to your body to manage sugar better.',
+  drugClass: 'GLP-1 receptor agonist',
+  verified: true,
+  brandNames: ['Ozempic', 'Wegovy', 'Rybelsus'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'SC injection: Start 0.25 mg weekly for 4 weeks, then 0.5 mg weekly. May increase to 1 mg weekly if needed. Oral: 3-14 mg daily on empty stomach.',
+  mechanism: 'Long-acting GLP-1 receptor agonist that enhances insulin secretion, suppresses glucagon, delays gastric emptying, and reduces appetite',
+  sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'constipation', 'headache'],
+  interactions: ['Oral medications (may delay absorption)', 'insulin', 'sulfonylureas (increased hypoglycemia risk)', 'warfarin'],
+  indications: ['Type 2 diabetes', 'cardiovascular risk reduction in diabetes', 'chronic weight management (higher dose)'],
+  contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'pregnancy'],
+  warnings: ['Thyroid C-cell tumor risk', 'pancreatitis', 'diabetic retinopathy complications', 'kidney problems', 'gallbladder disease'],
+  pregnancy: 'Category C - Discontinue before planned pregnancy',
+  storage: 'Refrigerate. In use pen: room temperature up to 56 days. Protect from light and heat.'
+},
+{
+  id: 'ED040',
+  name: 'Propylthiouracil',
+  genericName: 'Propylthiouracil',
+  manufacturer: 'Various',
+  category: 'Antithyroid',
+  description: 'A medicine that slows down an overactive thyroid gland. It works like putting brakes on your thyroid when it\'s working too fast and making too much hormone.',
+  drugClass: 'Antithyroid agent',
+  verified: true,
+  brandNames: ['PTU'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'Oral: Initial: 300-450 mg daily in 3 divided doses. Maintenance: 100-150 mg daily. Take with food to reduce stomach upset.',
+  mechanism: 'Inhibits thyroid peroxidase enzyme, blocking thyroid hormone synthesis, and peripherally blocks conversion of T4 to T3',
+  sideEffects: ['Nausea', 'vomiting', 'stomach upset', 'headache', 'dizziness', 'joint pain', 'muscle aches', 'skin rash'],
+  interactions: ['Warfarin (increases anticoagulant effect)', 'digoxin', 'theophylline', 'beta-blockers'],
+  indications: ['Hyperthyroidism (overactive thyroid)', 'thyroid storm', 'preparation for thyroid surgery', 'pregnancy (preferred over methimazole)'],
+  contraindications: ['Severe liver disease', 'known hypersensitivity to propylthiouracil'],
+  warnings: ['Severe liver damage risk', 'low white blood cell count', 'requires regular blood monitoring', 'report sore throat or fever immediately'],
+  pregnancy: 'Category D - Preferred antithyroid drug in pregnancy despite risks',
+  storage: 'Store at room temperature, protect from light and moisture'
+ }
 ];

@@ -4,7 +4,7 @@ import { DrugData } from "@/components/DrugCard";
 // Supplements, vitamins, and minerals
 export const supplementDrugs: DrugData[] = [
   {
-    id: '43',
+    id: 'SUP001',
     name: 'Cyanocobalamin',
     genericName: 'Cyanocobalamin',
     manufacturer: 'Various',
@@ -25,7 +25,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '44',
+    id: 'SUP002',
     name: 'Cholecalciferol',
     genericName: 'Cholecalciferol',
     manufacturer: 'Various',
@@ -46,7 +46,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '45',
+    id: 'SUP003',
     name: 'Ergocalciferol',
     genericName: 'Ergocalciferol',
     manufacturer: 'Various',
@@ -67,7 +67,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '46',
+    id: 'SUP004',
     name: 'Folic Acid',
     genericName: 'Folic Acid',
     manufacturer: 'Various',
@@ -88,7 +88,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '47',
+    id: 'SUP005',
     name: 'Niacin',
     genericName: 'Niacin',
     manufacturer: 'Various',
@@ -109,7 +109,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '48',
+    id: 'SUP006',
     name: 'Riboflavin',
     genericName: 'Riboflavin',
     manufacturer: 'Various',
@@ -130,7 +130,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '49',
+    id: 'SUP007',
     name: 'Thiamine',
     genericName: 'Thiamine',
     manufacturer: 'Various',
@@ -151,7 +151,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '50',
+    id: 'SUP008',
     name: 'Pyridoxine',
     genericName: 'Pyridoxine',
     manufacturer: 'Various',
@@ -172,7 +172,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '51',
+    id: 'SUP009',
     name: 'Ascorbic Acid',
     genericName: 'Ascorbic Acid',
     manufacturer: 'Various',
@@ -193,7 +193,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '52',
+    id: 'SUP010',
     name: 'Retinol',
     genericName: 'Retinol',
     manufacturer: 'Various',
@@ -214,7 +214,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and air'
   },
   {
-    id: '53',
+    id: 'SUP011',
     name: 'Tocopherol',
     genericName: 'Tocopherol',
     manufacturer: 'Various',
@@ -235,7 +235,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and heat'
   },
   {
-    id: '54',
+    id: 'SUP012',
     name: 'Phytonadione',
     genericName: 'Phytonadione',
     manufacturer: 'Various',
@@ -256,7 +256,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '55',
+    id: 'SUP013',
     name: 'Zinc Sulfate',
     genericName: 'Zinc Sulfate',
     manufacturer: 'Various',
@@ -277,7 +277,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep dry'
   },
   {
-    id: '56',
+    id: 'SUP014',
     name: 'Copper Sulfate',
     genericName: 'Copper Sulfate',
     manufacturer: 'Various',
@@ -298,7 +298,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '57',
+    id: 'SUP015',
     name: 'Selenium',
     genericName: 'Selenium',
     manufacturer: 'Various',
@@ -319,7 +319,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '58',
+    id: 'SUP016',
     name: 'Chromium',
     genericName: 'Chromium',
     manufacturer: 'Various',
@@ -340,7 +340,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep dry'
   },
   {
-    id: '59',
+    id: 'SUP017',
     name: 'Molybdenum',
     genericName: 'Molybdenum',
     manufacturer: 'Various',
@@ -361,7 +361,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep dry'
   },
   {
-    id: '60',
+    id: 'SUP018',
     name: 'Manganese',
     genericName: 'Manganese',
     manufacturer: 'Various',
@@ -382,7 +382,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '61',
+    id: 'SUP019',
     name: 'Fluoride',
     genericName: 'Fluoride',
     manufacturer: 'Various',
@@ -403,7 +403,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep away from children'
   },
   {
-    id: '62',
+    id: 'SUP020',
     name: 'Iodide',
     genericName: 'Iodide',
     manufacturer: 'Various',
@@ -424,7 +424,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '63',
+    id: 'SUP021',
     name: 'Omega-3 Fatty Acids',
     genericName: 'Omega-3 Fatty Acids',
     manufacturer: 'Various',
@@ -445,7 +445,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store in refrigerator, protect from light and heat'
   },
   {
-    id: '64',
+    id: 'SUP022',
     name: 'Coenzyme Q10',
     genericName: 'Coenzyme Q10',
     manufacturer: 'Various',
@@ -466,7 +466,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '65',
+    id: 'SUP023',
     name: 'Glucosamine',
     genericName: 'Glucosamine',
     manufacturer: 'Various',
@@ -487,7 +487,7 @@ export const supplementDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep dry'
   },
   {
-    id: '66',
+    id: 'SUP024',
     name: 'Chondroitin',
     genericName: 'Chondroitin',
     manufacturer: 'Various',

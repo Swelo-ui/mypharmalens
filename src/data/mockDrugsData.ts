@@ -1,10 +1,10 @@
 import { DetailedDrugData } from '@/components/DrugDetails';
-import { generateUniqueId } from '@/lib/utils';
+import { generateStructuredDrugId } from '@/lib/drugIdGenerator';
 
 // Mock data for drugs
 export const mockDrugsData: DetailedDrugData[] = [
   {
-    id: generateUniqueId(),
+    id: 'ABT001',
     name: 'Amoxicillin',
     genericName: 'Amoxicillin',
     manufacturer: 'Aurobindo Pharma',
@@ -26,12 +26,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Penicillin',
     brandNames: ['Amoxil', 'Moxatag', 'Larotid'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Penicillin' },
-      { id: generateUniqueId(), name: 'Cephalexin' },
+      { id: 'ABT002', name: 'Penicillin' },
+      { id: 'ACE001', name: 'Cephalexin' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'ACE001',
     name: 'Lisinopril',
     genericName: 'Lisinopril',
     manufacturer: 'Merck',
@@ -53,12 +53,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'ACE Inhibitor',
     brandNames: ['Prinivil', 'Zestril'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Enalapril' },
-      { id: generateUniqueId(), name: 'Ramipril' },
+      { id: 'ACE002', name: 'Enalapril' },
+      { id: 'STA001', name: 'Ramipril' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'STA001',
     name: 'Simvastatin',
     genericName: 'Simvastatin',
     manufacturer: 'Teva Pharmaceuticals',
@@ -80,12 +80,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Statin',
     brandNames: ['Zocor'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Atorvastatin' },
-      { id: generateUniqueId(), name: 'Rosuvastatin' },
+      { id: 'STA002', name: 'Atorvastatin' },
+      { id: 'BIG001', name: 'Rosuvastatin' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'BIG001',
     name: 'Metformin',
     genericName: 'Metformin',
     manufacturer: 'Bristol-Myers Squibb',
@@ -107,12 +107,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Biguanide',
     brandNames: ['Glucophage', 'Riomet', 'Fortamet'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Glipizide' },
-      { id: generateUniqueId(), name: 'Sitagliptin' },
+      { id: 'BIG002', name: 'Glipizide' },
+      { id: 'NSA001', name: 'Sitagliptin' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'NSA001',
     name: 'Aspirin',
     genericName: 'Acetylsalicylic Acid',
     manufacturer: 'Bayer',
@@ -134,12 +134,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Salicylate',
     brandNames: ['Bayer', 'Ecotrin', 'Bufferin'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Ibuprofen' },
-      { id: generateUniqueId(), name: 'Naproxen' },
+      { id: 'NSA002', name: 'Ibuprofen' },
+      { id: 'PPI001', name: 'Naproxen' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'PPI001',
     name: 'Omeprazole',
     genericName: 'Omeprazole',
     manufacturer: 'AstraZeneca',
@@ -161,12 +161,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Proton Pump Inhibitor',
     brandNames: ['Prilosec', 'Losec'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Pantoprazole' },
-      { id: generateUniqueId(), name: 'Esomeprazole' },
+      { id: 'PPI002', name: 'Pantoprazole' },
+      { id: 'THY001', name: 'Esomeprazole' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'THY001',
     name: 'Levothyroxine',
     genericName: 'Levothyroxine Sodium',
     manufacturer: 'AbbVie',
@@ -188,12 +188,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Thyroid Hormone',
     brandNames: ['Synthroid', 'Levoxyl', 'Unithroid'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Liothyronine' },
-      { id: generateUniqueId(), name: 'Thyroid, Desiccated' },
+      { id: 'THY002', name: 'Liothyronine' },
+      { id: 'BRO001', name: 'Thyroid, Desiccated' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'BRO001',
     name: 'Albuterol',
     genericName: 'Albuterol Sulfate',
     manufacturer: 'Mylan',
@@ -215,12 +215,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Beta-2 Agonist',
     brandNames: ['Ventolin', 'ProAir', 'AccuNeb'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Levalbuterol' },
-      { id: generateUniqueId(), name: 'Ipratropium' },
+      { id: 'BRO002', name: 'Levalbuterol' },
+      { id: 'SSR001', name: 'Ipratropium' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'SSR001',
     name: 'Sertraline',
     genericName: 'Sertraline Hydrochloride',
     manufacturer: 'Pfizer',
@@ -242,12 +242,12 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'SSRI',
     brandNames: ['Zoloft'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Fluoxetine' },
-      { id: generateUniqueId(), name: 'Paroxetine' },
+      { id: 'SSR002', name: 'Fluoxetine' },
+      { id: 'TDI001', name: 'Paroxetine' },
     ],
   },
   {
-    id: generateUniqueId(),
+    id: 'TDI001',
     name: 'Hydrochlorothiazide',
     genericName: 'Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -269,8 +269,8 @@ export const mockDrugsData: DetailedDrugData[] = [
     drugClass: 'Thiazide Diuretic',
     brandNames: ['Microzide', 'Oretic'],
     similarDrugs: [
-      { id: generateUniqueId(), name: 'Chlorthalidone' },
-      { id: generateUniqueId(), name: 'Indapamide' },
+      { id: 'TDI002', name: 'Chlorthalidone' },
+      { id: 'TDI003', name: 'Indapamide' },
     ],
   },
 ];

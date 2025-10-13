@@ -5,7 +5,7 @@ import { DrugData } from "@/components/DrugCard";
 export const respiratoryDrugs: DrugData[] = [
   // Bronchodilators and respiratory medications
   {
-    id: '13',
+    id: 'RD001',
     name: 'Albuterol',
     genericName: 'Albuterol',
     manufacturer: 'Various',
@@ -26,7 +26,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-25°C (59-77°F). Protect from light and excessive heat. Do not puncture or incinerate inhaler.'
   },
   {
-    id: '109',
+    id: 'RD002',
     name: 'Fluticasone',
     genericName: 'Fluticasone propionate',
     manufacturer: 'Various',
@@ -47,7 +47,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Keep away from heat and direct light. Do not freeze nasal spray.'
   },
   {
-    id: '110',
+    id: 'RD003',
     name: 'Montelukast',
     genericName: 'Montelukast sodium',
     manufacturer: 'Various',
@@ -68,7 +68,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture. Keep in original container.'
   },
   {
-    id: '111',
+    id: 'RD004',
     name: 'Tiotropium',
     genericName: 'Tiotropium bromide',
     manufacturer: 'Various',
@@ -89,7 +89,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 25°C (77°F). Do not expose to extreme temperatures. Keep capsules in sealed blister until use.'
   },
   {
-    id: '112',
+    id: 'RD005',
     name: 'Ipratropium',
     genericName: 'Ipratropium bromide',
     manufacturer: 'Various',
@@ -110,7 +110,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Do not expose to temperatures above 49°C (120°F). Protect from freezing.'
   },
   {
-    id: '222',
+    id: 'RD006',
     name: 'Salmeterol',
     genericName: 'Salmeterol xinafoate',
     manufacturer: 'Various',
@@ -131,7 +131,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Keep in dry place. Discard after expiration date or when counter reads 000.'
   },
   {
-    id: '223',
+    id: 'RD007',
     name: 'Formoterol',
     genericName: 'Formoterol fumarate',
     manufacturer: 'Various',
@@ -152,7 +152,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store capsules at room temperature 20-25°C (68-77°F). Keep in original packaging. Use immediately after opening capsule.'
   },
   {
-    id: '224',
+    id: 'RD008',
     name: 'Budesonide/Formoterol',
     genericName: 'Budesonide/Formoterol fumarate',
     manufacturer: 'Various',
@@ -173,7 +173,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Keep mouthpiece clean and dry. Discard after expiration or when counter reads 000.'
   },
   {
-    id: '225',
+    id: 'RD009',
     name: 'Umeclidinium',
     genericName: 'Umeclidinium bromide',
     manufacturer: 'Various',
@@ -194,7 +194,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Keep in original foil tray until ready to use. Discard 6 weeks after opening.'
   },
   {
-    id: '226',
+    id: 'RD010',
     name: 'Umeclidinium/Vilanterol',
     genericName: 'Umeclidinium bromide/Vilanterol trifenatate',
     manufacturer: 'Various',
@@ -216,7 +216,7 @@ export const respiratoryDrugs: DrugData[] = [
   },
   // Antihistamines
   {
-    id: '26',
+    id: 'RD011',
     name: 'Diphenhydramine',
     genericName: 'Diphenhydramine',
     manufacturer: 'Various',
@@ -237,7 +237,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture. Keep out of reach of children.'
   },
   {
-    id: '27',
+    id: 'RD012',
     name: 'Loratadine',
     genericName: 'Loratadine',
     manufacturer: 'Various',
@@ -258,7 +258,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Keep in dry place. Protect from light.'
   },
   {
-    id: '28',
+    id: 'RD013',
     name: 'Cetirizine',
     genericName: 'Cetirizine',
     manufacturer: 'Various',
@@ -279,7 +279,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light and moisture.'
   },
   {
-    id: '227',
+    id: 'RD014',
     name: 'Fexofenadine',
     genericName: 'Fexofenadine hydrochloride',
     manufacturer: 'Various',
@@ -300,7 +300,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Protect from excessive moisture.'
   },
   {
-    id: '228',
+    id: 'RD015',
     name: 'Desloratadine',
     genericName: 'Desloratadine',
     manufacturer: 'Various',
@@ -321,7 +321,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: '229',
+    id: 'RD016',
     name: 'Levocetirizine',
     genericName: 'Levocetirizine dihydrochloride',
     manufacturer: 'Various',
@@ -342,7 +342,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light.'
   },
   {
-    id: '230',
+    id: 'RD017',
     name: 'Azelastine',
     genericName: 'Azelastine hydrochloride',
     manufacturer: 'Various',
@@ -363,7 +363,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store upright at room temperature 15-30°C (59-86°F). Do not freeze. Replace cap after each use.'
   },
   {
-    id: '342',
+    id: 'RD018',
     name: 'Salmeterol',
     genericName: 'Salmeterol xinafoate',
     manufacturer: 'Various',
@@ -384,7 +384,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from direct sunlight and moisture.'
   },
   {
-    id: '343',
+    id: 'RD019',
     name: 'Tiotropium',
     genericName: 'Tiotropium bromide',
     manufacturer: 'Various',
@@ -405,7 +405,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from moisture and extreme temperatures.'
   },
   {
-    id: '344',
+    id: 'RD020',
     name: 'Budesonide',
     genericName: 'Budesonide',
     manufacturer: 'Various',
@@ -426,7 +426,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from light and moisture.'
   },
   {
-    id: '345',
+    id: 'RD021',
     name: 'Fluticasone',
     genericName: 'Fluticasone propionate',
     manufacturer: 'Various',
@@ -447,7 +447,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from freezing and direct sunlight.'
   },
   {
-    id: '346',
+    id: 'RD022',
     name: 'Mometasone',
     genericName: 'Mometasone furoate',
     manufacturer: 'Various',
@@ -468,7 +468,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Do not puncture or incinerate canister.'
   },
   {
-    id: '347',
+    id: 'RD023',
     name: 'Montelukast',
     genericName: 'Montelukast sodium',
     manufacturer: 'Various',
@@ -489,7 +489,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture and light.'
   },
   {
-    id: '348',
+    id: 'RD024',
     name: 'Zafirlukast',
     genericName: 'Zafirlukast',
     manufacturer: 'Various',
@@ -510,7 +510,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture and light.'
   },
   {
-    id: '349',
+    id: 'RD025',
     name: 'Theophylline',
     genericName: 'Theophylline',
     manufacturer: 'Various',
@@ -531,7 +531,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Protect from moisture.'
   },
   {
-    id: '350',
+    id: 'RD026',
     name: 'Cromolyn',
     genericName: 'Cromolyn sodium',
     manufacturer: 'Various',
@@ -552,7 +552,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '351',
+    id: 'RD027',
     name: 'Nedocromil',
     genericName: 'Nedocromil sodium',
     manufacturer: 'Various',
@@ -573,7 +573,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Do not puncture or incinerate canister.'
   },
   {
-    id: '352',
+    id: 'RD028',
     name: 'Omalizumab',
     genericName: 'Omalizumab',
     manufacturer: 'Genentech/Novartis',
@@ -594,7 +594,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Refrigerate at 2-8°C. Do not freeze or shake. Protect from light.'
   },
   {
-    id: '353',
+    id: 'RD029',
     name: 'Roflumilast',
     genericName: 'Roflumilast',
     manufacturer: 'Various',
@@ -615,7 +615,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '354',
+    id: 'RD030',
     name: 'Pirfenidone',
     genericName: 'Pirfenidone',
     manufacturer: 'Various',
@@ -636,7 +636,7 @@ export const respiratoryDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: '355',
+    id: 'RD031',
     name: 'Nintedanib',
     genericName: 'Nintedanib esylate',
     manufacturer: 'Boehringer Ingelheim',
@@ -655,5 +655,90 @@ export const respiratoryDrugs: DrugData[] = [
     warnings: ['Hepatotoxicity. GI perforation risk. Arterial thromboembolic events. Bleeding risk. Embryo-fetal toxicity.'],
     pregnancy: 'Category D - Contraindicated in pregnancy.',
     storage: 'Store at room temperature below 25°C. Protect from moisture and light.'
+  },
+  // Additional respiratory medications
+  {
+    id: 'RD032',
+    name: 'Atropine',
+    genericName: 'Atropine',
+    manufacturer: 'Various',
+    category: 'Anticholinergic/Antispasmodic',
+    description: 'A medicine that blocks certain nerve signals to help with breathing problems and poisoning. It works like turning off switches that make breathing muscles tight.',
+    drugClass: 'Anticholinergic agent',
+    verified: true,
+    brandNames: ['AtroPen', 'Atropine Sulfate'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'IV/IM: 0.5-2 mg every 5-10 minutes for organophosphate poisoning. Respiratory: 0.4-0.6 mg IV/IM. Dose varies by indication and severity.',
+    mechanism: 'Blocks acetylcholine at muscarinic receptors, reducing secretions and bronchospasm - like unplugging signals that cause breathing problems',
+    sideEffects: ['Dry mouth', 'blurred vision', 'fast heart rate', 'confusion', 'difficulty urinating', 'constipation', 'skin flushing'],
+    interactions: ['Other anticholinergic medicines', 'tricyclic antidepressants', 'antihistamines', 'phenothiazines'],
+    indications: ['Organophosphate poisoning', 'bradycardia (slow heart rate)', 'reducing respiratory secretions', 'eye examinations'],
+    contraindications: ['Narrow-angle glaucoma', 'obstructive uropathy', 'severe ulcerative colitis', 'myasthenia gravis'],
+    warnings: ['Can cause dangerous fast heart rate', 'may worsen glaucoma', 'heat stroke risk', 'confusion in elderly'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light'
+  },
+  {
+    id: 'RD033',
+    name: 'Beclometasone',
+    genericName: 'Beclometasone dipropionate',
+    manufacturer: 'Various',
+    category: 'Corticosteroid',
+    description: 'A steroid medicine inhaled to prevent asthma attacks and reduce lung inflammation. It works like a gentle anti-inflammatory spray for your lungs.',
+    drugClass: 'Inhaled corticosteroid',
+    verified: true,
+    brandNames: ['Qvar', 'Becotide', 'Clenil'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhaled: Adults: 200-800 mcg daily in divided doses. Children: 100-400 mcg daily. Rinse mouth after use to prevent thrush.',
+    mechanism: 'Reduces inflammation in airways by suppressing immune response and decreasing inflammatory mediators',
+    sideEffects: ['Oral thrush', 'hoarse voice', 'cough', 'throat irritation', 'rarely growth suppression in children'],
+    interactions: ['Few significant interactions due to low systemic absorption', 'CYP3A4 inhibitors may increase levels'],
+    indications: ['Asthma prevention', 'chronic obstructive pulmonary disease (COPD)', 'allergic rhinitis (nasal spray)'],
+    contraindications: ['Untreated fungal, bacterial, or viral respiratory infections', 'hypersensitivity'],
+    warnings: ['Not for acute asthma attacks', 'may suppress growth in children', 'increased infection risk', 'adrenal suppression with high doses'],
+    pregnancy: 'Category C - Generally considered safe for asthma control',
+    storage: 'Store at room temperature, do not puncture or burn canister'
+  },
+  {
+    id: 'RD034',
+    name: 'Epinephrine',
+    genericName: 'Epinephrine',
+    manufacturer: 'Various',
+    category: 'Bronchodilator/Emergency',
+    description: 'A life-saving medicine used for severe allergic reactions and breathing emergencies. It works like your body\'s natural "fight or flight" hormone but much stronger.',
+    drugClass: 'Adrenergic agonist',
+    verified: true,
+    brandNames: ['EpiPen', 'Adrenalin', 'Auvi-Q'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Anaphylaxis: 0.3-0.5 mg IM (auto-injector). Severe asthma: 0.3-0.5 mg subcutaneous. May repeat every 5-15 minutes if needed.',
+    mechanism: 'Stimulates alpha and beta-adrenergic receptors, causing bronchodilation, vasoconstriction, and increased heart rate',
+    sideEffects: ['Fast heart rate', 'tremor', 'anxiety', 'headache', 'dizziness', 'nausea', 'sweating', 'chest pain'],
+    interactions: ['Beta-blockers (may worsen bronchospasm)', 'MAO inhibitors', 'tricyclic antidepressants', 'digoxin'],
+    indications: ['Anaphylaxis (severe allergic reactions)', 'severe asthma attacks', 'cardiac arrest', 'local anesthesia adjunct'],
+    contraindications: ['No absolute contraindications in life-threatening situations', 'relative: severe heart disease'],
+    warnings: ['Can cause dangerous heart rhythms', 'may worsen diabetes', 'use with caution in heart disease', 'check expiration dates'],
+    pregnancy: 'Category C - Use in life-threatening situations',
+    storage: 'Store at room temperature, protect from light and freezing, replace if solution turns brown'
+  },
+  {
+    id: 'RD035',
+    name: 'Salbutamol',
+    genericName: 'Salbutamol',
+    manufacturer: 'Various',
+    category: 'Bronchodilator',
+    description: 'A quick-relief inhaler medicine that opens up breathing passages during asthma attacks. It works like opening windows to let more air flow through your lungs.',
+    drugClass: 'Short-acting beta-2 agonist (SABA)',
+    verified: true,
+    brandNames: ['Ventolin', 'ProAir', 'Albuterol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Inhaled: 1-2 puffs every 4-6 hours as needed. Nebulizer: 2.5-5 mg every 4-6 hours. Oral: 2-4 mg 3-4 times daily.',
+    mechanism: 'Selectively stimulates beta-2 adrenergic receptors in bronchial smooth muscle, causing relaxation and bronchodilation',
+    sideEffects: ['Tremor', 'nervousness', 'headache', 'fast heart rate', 'dizziness', 'throat irritation', 'muscle cramps'],
+    interactions: ['Beta-blockers (oppose effects)', 'MAO inhibitors', 'tricyclic antidepressants', 'digoxin', 'diuretics'],
+    indications: ['Acute asthma attacks', 'exercise-induced bronchospasm', 'COPD exacerbations', 'prevention of asthma symptoms'],
+    contraindications: ['Hypersensitivity to salbutamol', 'use with caution in severe heart disease'],
+    warnings: ['Overuse may worsen asthma', 'may cause low potassium', 'paradoxical bronchospasm possible', 'tolerance may develop'],
+    pregnancy: 'Category C - Generally considered safe for asthma treatment',
+    storage: 'Store at room temperature, do not puncture inhaler, prime before first use'
   }
 ];

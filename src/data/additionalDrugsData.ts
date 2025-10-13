@@ -3,7 +3,7 @@ import { DrugData } from "@/components/DrugCard";
 export const additionalDrugsData: DrugData[] = [
   // Cardiovascular drugs
   {
-    id: '101',
+    id: 'ADD001',
     name: 'Enalapril',
     genericName: 'Enalapril maleate',
     manufacturer: 'Various',
@@ -36,7 +36,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '102',
+    id: 'ADD002',
     name: 'Atenolol',
     genericName: 'Atenolol',
     manufacturer: 'Various',
@@ -69,7 +69,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '103',
+    id: 'ADD003',
     name: 'Diltiazem',
     genericName: 'Diltiazem hydrochloride',
     manufacturer: 'Various',
@@ -102,7 +102,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '104',
+    id: 'ADD004',
     name: 'Verapamil',
     genericName: 'Verapamil hydrochloride',
     manufacturer: 'Various',
@@ -137,7 +137,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Gastrointestinal drugs
   {
-    id: '105',
+    id: 'ADD005',
     name: 'Ranitidine',
     genericName: 'Ranitidine hydrochloride',
     manufacturer: 'Various',
@@ -170,7 +170,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '106',
+    id: 'ADD006',
     name: 'Famotidine',
     genericName: 'Famotidine',
     manufacturer: 'Various',
@@ -203,7 +203,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '107',
+    id: 'ADD007',
     name: 'Lansoprazole',
     genericName: 'Lansoprazole',
     manufacturer: 'Various',
@@ -236,7 +236,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '108',
+    id: 'ADD008',
     name: 'Esomeprazole',
     genericName: 'Esomeprazole magnesium',
     manufacturer: 'Various',
@@ -273,7 +273,7 @@ export const additionalDrugsData: DrugData[] = [
 
   // Antidiabetic drugs
   {
-    id: '113',
+    id: 'ADD009',
     name: 'Glimepiride',
     genericName: 'Glimepiride',
     manufacturer: 'Various',
@@ -306,7 +306,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '114',
+    id: 'ADD010',
     name: 'Glyburide',
     genericName: 'Glyburide',
     manufacturer: 'Various',
@@ -339,7 +339,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '115',
+    id: 'ADD011',
     name: 'Sitagliptin',
     genericName: 'Sitagliptin phosphate',
     manufacturer: 'Various',
@@ -372,7 +372,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '116',
+    id: 'ADD012',
     name: 'Linagliptin',
     genericName: 'Linagliptin',
     manufacturer: 'Various',
@@ -407,7 +407,7 @@ export const additionalDrugsData: DrugData[] = [
 
   // CNS drugs - Antidepressants
   {
-    id: '117',
+    id: 'ADD013',
     name: 'Venlafaxine',
     genericName: 'Venlafaxine hydrochloride',
     manufacturer: 'Various',
@@ -440,7 +440,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '118',
+    id: 'ADD014',
     name: 'Duloxetine',
     genericName: 'Duloxetine hydrochloride',
     manufacturer: 'Various',
@@ -473,7 +473,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '119',
+    id: 'ADD015',
     name: 'Paroxetine',
     genericName: 'Paroxetine hydrochloride',
     manufacturer: 'Various',
@@ -506,7 +506,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '120',
+    id: 'ADD016',
     name: 'Bupropion',
     genericName: 'Bupropion hydrochloride',
     manufacturer: 'Various',
@@ -541,7 +541,7 @@ export const additionalDrugsData: DrugData[] = [
 
   // CNS drugs - Antipsychotics
   {
-    id: '121',
+    id: 'ADD017',
     name: 'Olanzapine',
     genericName: 'Olanzapine',
     manufacturer: 'Various',
@@ -574,7 +574,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '122',
+    id: 'ADD018',
     name: 'Quetiapine',
     genericName: 'Quetiapine fumarate',
     manufacturer: 'Various',
@@ -607,7 +607,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '123',
+    id: 'ADD019',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
@@ -640,7 +640,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '124',
+    id: 'ADD020',
     name: 'Ziprasidone',
     genericName: 'Ziprasidone hydrochloride',
     manufacturer: 'Various',
@@ -675,7 +675,7 @@ export const additionalDrugsData: DrugData[] = [
 
   // CNS drugs - Anxiolytics
   {
-    id: '125',
+    id: 'ADD021',
     name: 'Lorazepam',
     genericName: 'Lorazepam',
     manufacturer: 'Various',
@@ -708,7 +708,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '126',
+    id: 'ADD022',
     name: 'Clonazepam',
     genericName: 'Clonazepam',
     manufacturer: 'Various',
@@ -741,7 +741,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '127',
+    id: 'ADD023',
     name: 'Buspirone',
     genericName: 'Buspirone hydrochloride',
     manufacturer: 'Various',
@@ -774,7 +774,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '128',
+    id: 'ADD024',
     name: 'Hydroxyzine',
     genericName: 'Hydroxyzine hydrochloride',
     manufacturer: 'Various',
@@ -809,7 +809,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Analgesics - NSAIDs
   {
-    id: '129',
+    id: 'ADD025',
     name: 'Naproxen',
     genericName: 'Naproxen',
     manufacturer: 'Various',
@@ -842,7 +842,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '130',
+    id: 'ADD026',
     name: 'Meloxicam',
     genericName: 'Meloxicam',
     manufacturer: 'Various',
@@ -877,7 +877,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Adding more WHO essential medicines (extending what we already have)
   {
-    id: '200',
+    id: 'ADD027',
     name: 'Bisoprolol',
     genericName: 'Bisoprolol fumarate',
     manufacturer: 'Various',
@@ -910,7 +910,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '201',
+    id: 'ADD028',
     name: 'Ramipril',
     genericName: 'Ramipril',
     manufacturer: 'Various',
@@ -943,7 +943,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '202',
+    id: 'ADD029',
     name: 'Candesartan',
     genericName: 'Candesartan cilexetil',
     manufacturer: 'Various',
@@ -976,7 +976,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '203',
+    id: 'ADD030',
     name: 'Irbesartan',
     genericName: 'Irbesartan',
     manufacturer: 'Various',
@@ -1009,7 +1009,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '204',
+    id: 'ADD031',
     name: 'Telmisartan',
     genericName: 'Telmisartan',
     manufacturer: 'Various',
@@ -1042,7 +1042,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '205',
+    id: 'ADD032',
     name: 'Hydrochlorothiazide/Lisinopril',
     genericName: 'Hydrochlorothiazide/Lisinopril',
     manufacturer: 'Various',
@@ -1075,7 +1075,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '206',
+    id: 'ADD033',
     name: 'Amlodipine/Valsartan',
     genericName: 'Amlodipine/Valsartan',
     manufacturer: 'Various',
@@ -1110,7 +1110,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Antibiotics
   {
-    id: '207',
+    id: 'ADD034',
     name: 'Clarithromycin',
     genericName: 'Clarithromycin',
     manufacturer: 'Various',
@@ -1143,7 +1143,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '208',
+    id: 'ADD035',
     name: 'Erythromycin',
     genericName: 'Erythromycin',
     manufacturer: 'Various',
@@ -1176,7 +1176,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '209',
+    id: 'ADD036',
     name: 'Trimethoprim/Sulfamethoxazole',
     genericName: 'Trimethoprim/Sulfamethoxazole',
     manufacturer: 'Various',
@@ -1209,7 +1209,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '210',
+    id: 'ADD037',
     name: 'Levofloxacin',
     genericName: 'Levofloxacin',
     manufacturer: 'Various',
@@ -1242,7 +1242,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '211',
+    id: 'ADD038',
     name: 'Cephalexin',
     genericName: 'Cephalexin',
     manufacturer: 'Various',
@@ -1275,7 +1275,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '212',
+    id: 'ADD039',
     name: 'Ceftriaxone Sodium',
     genericName: 'Ceftriaxone Sodium',
     manufacturer: 'Various',
@@ -1310,7 +1310,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Antidiabetic medications
   {
-    id: '213',
+    id: 'ADD040',
     name: 'Empagliflozin',
     genericName: 'Empagliflozin',
     manufacturer: 'Various',
@@ -1343,7 +1343,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '214',
+    id: 'ADD041',
     name: 'Dapagliflozin',
     genericName: 'Dapagliflozin',
     manufacturer: 'Various',
@@ -1376,7 +1376,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '215',
+    id: 'ADD042',
     name: 'Liraglutide',
     genericName: 'Liraglutide',
     manufacturer: 'Various',
@@ -1409,7 +1409,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '216',
+    id: 'ADD043',
     name: 'Dulaglutide',
     genericName: 'Dulaglutide',
     manufacturer: 'Various',
@@ -1442,7 +1442,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '217',
+    id: 'ADD044',
     name: 'Canagliflozin',
     genericName: 'Canagliflozin',
     manufacturer: 'Various',
@@ -1477,7 +1477,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Anti-inflammatory drugs
   {
-    id: '218',
+    id: 'ADD045',
     name: 'Celecoxib',
     genericName: 'Celecoxib',
     manufacturer: 'Various',
@@ -1510,7 +1510,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '219',
+    id: 'ADD046',
     name: 'Diclofenac',
     genericName: 'Diclofenac sodium',
     manufacturer: 'Various',
@@ -1543,7 +1543,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '220',
+    id: 'ADD047',
     name: 'Indomethacin',
     genericName: 'Indomethacin',
     manufacturer: 'Various',
@@ -1576,7 +1576,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '221',
+    id: 'ADD048',
     name: 'Ketorolac',
     genericName: 'Ketorolac tromethamine',
     manufacturer: 'Various',
@@ -1611,7 +1611,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Respiratory medications
   {
-    id: '222',
+    id: 'ADD049',
     name: 'Salmeterol',
     genericName: 'Salmeterol xinafoate',
     manufacturer: 'Various',
@@ -1644,7 +1644,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '223',
+    id: 'ADD050',
     name: 'Formoterol',
     genericName: 'Formoterol fumarate',
     manufacturer: 'Various',
@@ -1677,7 +1677,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '224',
+    id: 'ADD051',
     name: 'Budesonide/Formoterol',
     genericName: 'Budesonide/Formoterol fumarate',
     manufacturer: 'Various',
@@ -1710,7 +1710,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '225',
+    id: 'ADD052',
     name: 'Umeclidinium',
     genericName: 'Umeclidinium bromide',
     manufacturer: 'Various',
@@ -1743,7 +1743,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '226',
+    id: 'ADD053',
     name: 'Umeclidinium/Vilanterol',
     genericName: 'Umeclidinium bromide/Vilanterol trifenatate',
     manufacturer: 'Various',
@@ -1778,7 +1778,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Anti-allergy medications
   {
-    id: '227',
+    id: 'ADD054',
     name: 'Fexofenadine',
     genericName: 'Fexofenadine hydrochloride',
     manufacturer: 'Various',
@@ -1811,7 +1811,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '228',
+    id: 'ADD055',
     name: 'Desloratadine',
     genericName: 'Desloratadine',
     manufacturer: 'Various',
@@ -1844,7 +1844,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '229',
+    id: 'ADD056',
     name: 'Levocetirizine',
     genericName: 'Levocetirizine dihydrochloride',
     manufacturer: 'Various',
@@ -1877,7 +1877,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '230',
+    id: 'ADD057',
     name: 'Azelastine',
     genericName: 'Azelastine hydrochloride',
     manufacturer: 'Various',
@@ -1912,7 +1912,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Antilipemic medications
   {
-    id: '231',
+    id: 'ADD058',
     name: 'Rosuvastatin',
     genericName: 'Rosuvastatin calcium',
     manufacturer: 'Various',
@@ -1945,7 +1945,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '232',
+    id: 'ADD059',
     name: 'Pravastatin',
     genericName: 'Pravastatin sodium',
     manufacturer: 'Various',
@@ -1978,7 +1978,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '233',
+    id: 'ADD060',
     name: 'Ezetimibe',
     genericName: 'Ezetimibe',
     manufacturer: 'Various',
@@ -2011,7 +2011,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '234',
+    id: 'ADD061',
     name: 'Fenofibrate',
     genericName: 'Fenofibrate',
     manufacturer: 'Various',
@@ -2046,7 +2046,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Psychotropic medications
   {
-    id: '235',
+    id: 'ADD062',
     name: 'Mirtazapine',
     genericName: 'Mirtazapine',
     manufacturer: 'Various',
@@ -2079,7 +2079,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '236',
+    id: 'ADD063',
     name: 'Trazodone',
     genericName: 'Trazodone hydrochloride',
     manufacturer: 'Various',
@@ -2112,7 +2112,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '237',
+    id: 'ADD064',
     name: 'Desvenlafaxine',
     genericName: 'Desvenlafaxine succinate',
     manufacturer: 'Various',
@@ -2145,7 +2145,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '238',
+    id: 'ADD065',
     name: 'Vilazodone',
     genericName: 'Vilazodone hydrochloride',
     manufacturer: 'Various',
@@ -2180,7 +2180,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Antimalarial medications
   {
-    id: '239',
+    id: 'ADD066',
     name: 'Mefloquine',
     genericName: 'Mefloquine hydrochloride',
     manufacturer: 'Various',
@@ -2213,7 +2213,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '240',
+    id: 'ADD067',
     name: 'Atovaquone/Proguanil',
     genericName: 'Atovaquone/Proguanil',
     manufacturer: 'Various',
@@ -2246,7 +2246,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '241',
+    id: 'ADD068',
     name: 'Doxycycline for Malaria',
     genericName: 'Doxycycline hyclate',
     manufacturer: 'Various',
@@ -2281,7 +2281,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Antivirals
   {
-    id: '242',
+    id: 'ADD069',
     name: 'Oseltamivir',
     genericName: 'Oseltamivir phosphate',
     manufacturer: 'Various',
@@ -2314,7 +2314,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '243',
+    id: 'ADD070',
     name: 'Valacyclovir',
     genericName: 'Valacyclovir hydrochloride',
     manufacturer: 'Various',
@@ -2347,7 +2347,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '244',
+    id: 'ADD071',
     name: 'Famciclovir',
     genericName: 'Famciclovir',
     manufacturer: 'Various',
@@ -2380,7 +2380,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '245',
+    id: 'ADD072',
     name: 'Emtricitabine/Tenofovir',
     genericName: 'Emtricitabine/Tenofovir disoproxil fumarate',
     manufacturer: 'Various',
@@ -2415,7 +2415,7 @@ export const additionalDrugsData: DrugData[] = [
   
   // Additional Gastrointestinal medications
   {
-    id: '246',
+    id: 'ADD073',
     name: 'Rabeprazole',
     genericName: 'Rabeprazole sodium',
     manufacturer: 'Various',
@@ -2448,7 +2448,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '247',
+    id: 'ADD074',
     name: 'Dexlansoprazole',
     genericName: 'Dexlansoprazole',
     manufacturer: 'Various',
@@ -2481,7 +2481,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '248',
+    id: 'ADD075',
     name: 'Ondansetron',
     genericName: 'Ondansetron hydrochloride',
     manufacturer: 'Various',
@@ -2514,7 +2514,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '249',
+    id: 'ADD076',
     name: 'Loperamide',
     genericName: 'Loperamide hydrochloride',
     manufacturer: 'Various',
@@ -2547,7 +2547,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '250',
+    id: 'ADD077',
     name: 'Metoclopramide',
     genericName: 'Metoclopramide hydrochloride',
     manufacturer: 'Various',
@@ -2580,7 +2580,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '251',
+    id: 'ADD078',
     name: 'Paracetamol',
     genericName: 'Acetaminophen',
     manufacturer: 'Various',
@@ -2613,7 +2613,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '252',
+    id: 'ADD079',
     name: 'Dextromethorphan',
     genericName: 'Dextromethorphan hydrobromide',
     manufacturer: 'Various',
@@ -2646,7 +2646,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '253',
+    id: 'ADD080',
     name: 'Guaifenesin',
     genericName: 'Guaifenesin',
     manufacturer: 'Various',
@@ -2679,7 +2679,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '254',
+    id: 'ADD081',
     name: 'Pseudoephedrine',
     genericName: 'Pseudoephedrine hydrochloride',
     manufacturer: 'Various',
@@ -2712,7 +2712,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '255',
+    id: 'ADD082',
     name: 'Phenylephrine',
     genericName: 'Phenylephrine hydrochloride',
     manufacturer: 'Various',
@@ -2745,7 +2745,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '256',
+    id: 'ADD083',
     name: 'Calamine',
     genericName: 'Calamine lotion',
     manufacturer: 'Various',
@@ -2778,7 +2778,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '257',
+    id: 'ADD084',
     name: 'Zinc Oxide',
     genericName: 'Zinc oxide',
     manufacturer: 'Various',
@@ -2811,7 +2811,7 @@ export const additionalDrugsData: DrugData[] = [
     }
   },
   {
-    id: '258',
+    id: 'ADD085',
     name: 'Benzocaine',
     genericName: 'Benzocaine',
     manufacturer: 'Various',

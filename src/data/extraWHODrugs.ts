@@ -5,7 +5,7 @@ import { DrugData } from "@/components/DrugCard";
 export const extraWHODrugs: DrugData[] = [
   // Mental health drugs
   {
-    id: '501',
+    id: 'EWD001',
     name: 'Lithium',
     genericName: 'Lithium carbonate',
     manufacturer: 'Various',
@@ -26,7 +26,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '502',
+    id: 'EWD002',
     name: 'Haloperidol',
     genericName: 'Haloperidol',
     manufacturer: 'Various',
@@ -47,7 +47,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '503',
+    id: 'EWD003',
     name: 'Risperidone',
     genericName: 'Risperidone',
     manufacturer: 'Various',
@@ -70,7 +70,7 @@ export const extraWHODrugs: DrugData[] = [
   
   // Additional antiparasitics
   {
-    id: '504',
+    id: 'EWD004',
     name: 'Ivermectin',
     genericName: 'Ivermectin',
     manufacturer: 'Various',
@@ -91,7 +91,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '505',
+    id: 'EWD005',
     name: 'Praziquantel',
     genericName: 'Praziquantel',
     manufacturer: 'Various',
@@ -112,7 +112,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '506',
+    id: 'EWD006',
     name: 'Mebendazole',
     genericName: 'Mebendazole',
     manufacturer: 'Various',
@@ -133,7 +133,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '507',
+    id: 'EWD007',
     name: 'Albendazole',
     genericName: 'Albendazole',
     manufacturer: 'Various',
@@ -156,7 +156,7 @@ export const extraWHODrugs: DrugData[] = [
   
   // Additional antituberculosis drugs
   {
-    id: '508',
+    id: 'EWD008',
     name: 'Isoniazid',
     genericName: 'Isoniazid',
     manufacturer: 'Various',
@@ -177,7 +177,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '509',
+    id: 'EWD009',
     name: 'Rifampicin',
     genericName: 'Rifampicin',
     manufacturer: 'Various',
@@ -198,7 +198,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '510',
+    id: 'EWD010',
     name: 'Ethambutol',
     genericName: 'Ethambutol hydrochloride',
     manufacturer: 'Various',
@@ -219,7 +219,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '511',
+    id: 'EWD011',
     name: 'Pyrazinamide',
     genericName: 'Pyrazinamide',
     manufacturer: 'Various',
@@ -242,7 +242,7 @@ export const extraWHODrugs: DrugData[] = [
   
   // Additional anticonvulsants
   {
-    id: '512',
+    id: 'EWD012',
     name: 'Carbamazepine',
     genericName: 'Carbamazepine',
     manufacturer: 'Various',
@@ -263,7 +263,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '513',
+    id: 'EWD013',
     name: 'Valproic Acid',
     genericName: 'Valproic Acid',
     manufacturer: 'Various',
@@ -284,7 +284,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '514',
+    id: 'EWD014',
     name: 'Phenytoin',
     genericName: 'Phenytoin',
     manufacturer: 'Various',
@@ -305,7 +305,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '515',
+    id: 'EWD015',
     name: 'Phenobarbital',
     genericName: 'Phenobarbital',
     manufacturer: 'Various',
@@ -329,7 +329,7 @@ export const extraWHODrugs: DrugData[] = [
   // Remaining entries to reach over 500 drugs
   // Additional unique drugs for various conditions
   {
-    id: '516',
+    id: 'EWD016',
     name: 'Tamsulosin',
     genericName: 'Tamsulosin hydrochloride',
     manufacturer: 'Various',
@@ -350,7 +350,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '517',
+    id: 'EWD017',
     name: 'Finasteride',
     genericName: 'Finasteride',
     manufacturer: 'Various',
@@ -371,7 +371,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '518',
+    id: 'EWD018',
     name: 'Sildenafil',
     genericName: 'Sildenafil citrate',
     manufacturer: 'Various',
@@ -392,7 +392,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '519',
+    id: 'EWD019',
     name: 'Tadalafil',
     genericName: 'Tadalafil',
     manufacturer: 'Various',
@@ -413,7 +413,7 @@ export const extraWHODrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '520',
+    id: 'EWD020',
     name: 'Vardenafil',
     genericName: 'Vardenafil hydrochloride',
     manufacturer: 'Various',

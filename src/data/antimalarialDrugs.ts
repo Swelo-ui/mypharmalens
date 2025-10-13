@@ -4,7 +4,7 @@ import { DrugData } from "@/components/DrugCard";
 // Antimalarial drugs
 export const antimalarialDrugs: DrugData[] = [
   {
-    id: '239',
+    id: 'AMD001',
     name: 'Mefloquine',
     genericName: 'Mefloquine hydrochloride',
     manufacturer: 'Various',
@@ -37,7 +37,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '240',
+    id: 'AMD002',
     name: 'Atovaquone/Proguanil',
     genericName: 'Atovaquone/Proguanil',
     manufacturer: 'Various',
@@ -70,7 +70,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '241',
+    id: 'AMD003',
     name: 'Doxycycline for Malaria',
     genericName: 'Doxycycline hyclate',
     manufacturer: 'Various',
@@ -103,7 +103,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '310',
+    id: 'AMD004',
     name: 'Chloroquine',
     genericName: 'Chloroquine phosphate',
     manufacturer: 'Various',
@@ -136,7 +136,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '311',
+    id: 'AMD005',
     name: 'Primaquine',
     genericName: 'Primaquine phosphate',
     manufacturer: 'Various',
@@ -169,7 +169,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '312',
+    id: 'AMD006',
     name: 'Artemether/Lumefantrine',
     genericName: 'Artemether/Lumefantrine',
     manufacturer: 'Various',
@@ -202,7 +202,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '313',
+    id: 'AMD007',
     name: 'Quinine',
     genericName: 'Quinine sulfate',
     manufacturer: 'Various',
@@ -235,7 +235,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '314',
+    id: 'AMD008',
     name: 'Hydroxychloroquine',
     genericName: 'Hydroxychloroquine sulfate',
     manufacturer: 'Various',
@@ -268,7 +268,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '315',
+    id: 'AMD009',
     name: 'Artesunate',
     genericName: 'Artesunate',
     manufacturer: 'Various',
@@ -301,7 +301,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '316',
+    id: 'AMD010',
     name: 'Dihydroartemisinin/Piperaquine',
     genericName: 'Dihydroartemisinin/Piperaquine phosphate',
     manufacturer: 'Various',
@@ -334,7 +334,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '317',
+    id: 'AMD011',
     name: 'Sulfadoxine/Pyrimethamine',
     genericName: 'Sulfadoxine/Pyrimethamine',
     manufacturer: 'Various',
@@ -367,7 +367,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '318',
+    id: 'AMD012',
     name: 'Amodiaquine',
     genericName: 'Amodiaquine hydrochloride',
     manufacturer: 'Various',
@@ -400,7 +400,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '319',
+    id: 'AMD013',
     name: 'Halofantrine',
     genericName: 'Halofantrine hydrochloride',
     manufacturer: 'Various',
@@ -433,7 +433,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '320',
+    id: 'AMD014',
     name: 'Proguanil',
     genericName: 'Proguanil hydrochloride',
     manufacturer: 'Various',
@@ -466,7 +466,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '321',
+    id: 'AMD015',
     name: 'Artemisinin',
     genericName: 'Artemisinin',
     manufacturer: 'Various',
@@ -499,7 +499,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '322',
+    id: 'AMD016',
     name: 'Arteether',
     genericName: 'Arteether',
     manufacturer: 'Various',
@@ -532,7 +532,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '323',
+    id: 'AMD017',
     name: 'Artemotil',
     genericName: 'Artemotil',
     manufacturer: 'Various',
@@ -565,7 +565,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '324',
+    id: 'AMD018',
     name: 'Quinidine',
     genericName: 'Quinidine gluconate',
     manufacturer: 'Various',
@@ -598,7 +598,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '325',
+    id: 'AMD019',
     name: 'Tafenoquine',
     genericName: 'Tafenoquine succinate',
     manufacturer: 'Various',
@@ -631,7 +631,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '326',
+    id: 'AMD020',
     name: 'Pyronaridine/Artesunate',
     genericName: 'Pyronaridine tetraphosphate/Artesunate',
     manufacturer: 'Various',
@@ -664,7 +664,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '327',
+    id: 'AMD021',
     name: 'Ferroquine',
     genericName: 'Ferroquine',
     manufacturer: 'Various',
@@ -697,7 +697,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '328',
+    id: 'AMD022',
     name: 'Artelinic Acid',
     genericName: 'Artelinic acid',
     manufacturer: 'Various',
@@ -718,7 +718,7 @@ export const antimalarialDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '329',
+    id: 'AMD023',
     name: 'Dapsone/Pyrimethamine',
     genericName: 'Dapsone/Pyrimethamine',
     manufacturer: 'Various',
@@ -751,7 +751,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '330',
+    id: 'AMD024',
     name: 'Chlorproguanil/Dapsone',
     genericName: 'Chlorproguanil hydrochloride/Dapsone',
     manufacturer: 'Various',
@@ -784,7 +784,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '331',
+    id: 'AMD025',
     name: 'Azithromycin for Malaria',
     genericName: 'Azithromycin',
     manufacturer: 'Various',
@@ -817,7 +817,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '332',
+    id: 'AMD026',
     name: 'Fosmidomycin',
     genericName: 'Fosmidomycin sodium',
     manufacturer: 'Various',
@@ -850,7 +850,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '333',
+    id: 'AMD027',
     name: 'Clindamycin for Malaria',
     genericName: 'Clindamycin hydrochloride',
     manufacturer: 'Various',
@@ -883,7 +883,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '334',
+    id: 'AMD028',
     name: 'Tetracycline for Malaria',
     genericName: 'Tetracycline hydrochloride',
     manufacturer: 'Various',
@@ -916,7 +916,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '335',
+    id: 'AMD029',
     name: 'Lumefantrine',
     genericName: 'Lumefantrine',
     manufacturer: 'Various',
@@ -949,7 +949,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '336',
+    id: 'AMD030',
     name: 'Piperaquine',
     genericName: 'Piperaquine phosphate',
     manufacturer: 'Various',
@@ -982,7 +982,7 @@ export const antimalarialDrugs: DrugData[] = [
     }
   },
   {
-    id: '337',
+    id: 'AMD031',
     name: 'Pyrimethamine',
     genericName: 'Pyrimethamine',
     manufacturer: 'Various',

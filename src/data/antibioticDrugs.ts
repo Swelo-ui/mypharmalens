@@ -4,7 +4,7 @@ import { DrugData } from "@/components/DrugCard";
 // Antibiotic drugs
 export const antibioticDrugs: DrugData[] = [
   {
-    id: '15',
+    id: 'ABD001',
     name: 'Amoxicillin',
     genericName: 'Amoxicillin',
     manufacturer: 'Various',
@@ -25,7 +25,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store capsules/tablets at room temperature 20-25°C. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
-    id: '16',
+    id: 'ABD002',
     name: 'Azithromycin',
     genericName: 'Azithromycin',
     manufacturer: 'Various',
@@ -46,7 +46,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature 15-30°C. Oral suspension: store at room temperature, use within 10 days after reconstitution.'
   },
   {
-    id: '207',
+    id: 'ABD003',
     name: 'Clarithromycin',
     genericName: 'Clarithromycin',
     manufacturer: 'Various',
@@ -67,7 +67,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature 15-30°C. Oral suspension: refrigerate and use within 14 days after reconstitution.'
   },
   {
-    id: '208',
+    id: 'ABD004',
     name: 'Erythromycin',
     genericName: 'Erythromycin',
     manufacturer: 'Various',
@@ -88,7 +88,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Protect from light and moisture. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
-    id: '209',
+    id: 'ABD005',
     name: 'Trimethoprim/Sulfamethoxazole',
     genericName: 'Trimethoprim/Sulfamethoxazole',
     manufacturer: 'Various',
@@ -109,7 +109,7 @@ export const antibioticDrugs: DrugData[] = [
     verified: true
   },
   {
-    id: '210',
+    id: 'ABD006',
     name: 'Levofloxacin',
     genericName: 'Levofloxacin',
     manufacturer: 'Various',
@@ -130,7 +130,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature 15-30°C. Protect from light. Oral solution: store at room temperature, discard after 14 days.'
   },
   {
-    id: '211',
+    id: 'ABD007',
     name: 'Cephalexin',
     genericName: 'Cephalexin',
     manufacturer: 'Various',
@@ -151,7 +151,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store capsules at room temperature 15-30°C. Oral suspension: refrigerate and discard after 14 days.'
   },
   {
-    id: '212',
+    id: 'ABD008',
     name: 'Ceftriaxone Sodium',
     genericName: 'Ceftriaxone Sodium',
     manufacturer: 'Various',
@@ -172,7 +172,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store vials at room temperature. Reconstituted solution stable for 24 hours at room temperature or 3 days refrigerated.'
   },
   {
-    id: '301',
+    id: 'ABD009',
     name: 'Ciprofloxacin',
     genericName: 'Ciprofloxacin',
     manufacturer: 'Various',
@@ -193,7 +193,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature 15-30°C. Oral suspension: store at room temperature, discard after 14 days.'
   },
   {
-    id: '302',
+    id: 'ABD010',
     name: 'Doxycycline',
     genericName: 'Doxycycline hyclate',
     manufacturer: 'Various',
@@ -214,7 +214,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Protect from light and moisture. Discard expired medication (nephrotoxic).'
   },
   {
-    id: '303',
+    id: 'ABD011',
     name: 'Metronidazole',
     genericName: 'Metronidazole',
     manufacturer: 'Various',
@@ -235,7 +235,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature 15-30°C. Protect from light. Topical preparations: store at room temperature.'
   },
   {
-    id: '304',
+    id: 'ABD012',
     name: 'Vancomycin',
     genericName: 'Vancomycin hydrochloride',
     manufacturer: 'Various',
@@ -256,7 +256,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store vials at room temperature. Reconstituted solution stable for 14 days refrigerated. Oral solution: refrigerate, discard after 14 days.'
   },
   {
-    id: '305',
+    id: 'ABD013',
     name: 'Clindamycin',
     genericName: 'Clindamycin hydrochloride',
     manufacturer: 'Various',
@@ -277,7 +277,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store capsules at room temperature 15-30°C. Topical preparations: store at room temperature. Oral solution: do not refrigerate.'
   },
   {
-    id: '281',
+    id: 'ABD014',
     name: 'Penicillin V',
     genericName: 'Penicillin V potassium',
     manufacturer: 'Various',
@@ -298,7 +298,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Keep in tightly closed container. Protect from moisture.'
   },
   {
-    id: '282',
+    id: 'ABD015',
     name: 'Ampicillin',
     genericName: 'Ampicillin',
     manufacturer: 'Various',
@@ -319,7 +319,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store capsules at room temperature. Reconstituted suspension refrigerated 2-8°C, stable for 14 days.'
   },
   {
-    id: '283',
+    id: 'ABD016',
     name: 'Cefazolin',
     genericName: 'Cefazolin sodium',
     manufacturer: 'Various',
@@ -340,7 +340,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstituted solution stable 24 hours at room temperature, 10 days refrigerated.'
   },
   {
-    id: '284',
+    id: 'ABD017',
     name: 'Cefuroxime',
     genericName: 'Cefuroxime axetil',
     manufacturer: 'Various',
@@ -361,7 +361,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store tablets at room temperature. Oral suspension refrigerated, stable 10 days after reconstitution.'
   },
   {
-    id: '285',
+    id: 'ABD018',
     name: 'Ceftazidime',
     genericName: 'Ceftazidime',
     manufacturer: 'Various',
@@ -382,7 +382,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstituted solution stable 18-24 hours at room temperature.'
   },
   {
-    id: '286',
+    id: 'ABD019',
     name: 'Meropenem',
     genericName: 'Meropenem',
     manufacturer: 'Various',
@@ -403,7 +403,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store vials at room temperature. Reconstituted solution stable 2-4 hours at room temperature, 24 hours refrigerated.'
   },
   {
-    id: '287',
+    id: 'ABD020',
     name: 'Gentamicin',
     genericName: 'Gentamicin sulfate',
     manufacturer: 'Various',
@@ -424,7 +424,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Do not freeze. Protect from light.'
   },
   {
-    id: '288',
+    id: 'ABD021',
     name: 'Tobramycin',
     genericName: 'Tobramycin sulfate',
     manufacturer: 'Various',
@@ -445,7 +445,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store at room temperature. Inhalation solution refrigerated 2-8°C. Do not mix with other medications.'
   },
   {
-    id: '289',
+    id: 'ABD022',
     name: 'Lincomycin',
     genericName: 'Lincomycin hydrochloride',
     manufacturer: 'Various',
@@ -466,7 +466,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store capsules at room temperature. Injectable form at room temperature, protect from freezing.'
   },
   {
-    id: '290',
+    id: 'ABD023',
     name: 'Rifampin',
     genericName: 'Rifampin',
     manufacturer: 'Various',
@@ -487,7 +487,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store in tight, light-resistant containers at room temperature. Protect from excessive heat and moisture.'
   },
   {
-    id: '291',
+    id: 'ABD024',
     name: 'Nitrofurantoin',
     genericName: 'Nitrofurantoin',
     manufacturer: 'Various',
@@ -508,7 +508,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store in tight, light-resistant containers at room temperature. Protect from moisture.'
   },
   {
-    id: '292',
+    id: 'ABD025',
     name: 'Fosfomycin',
     genericName: 'Fosfomycin tromethamine',
     manufacturer: 'Various',
@@ -529,7 +529,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store sachets at room temperature in dry place. Use immediately after dissolving in water.'
   },
   {
-    id: '293',
+    id: 'ABD026',
     name: 'Colistin',
     genericName: 'Colistin sulfate',
     manufacturer: 'Various',
@@ -543,14 +543,14 @@ export const antibioticDrugs: DrugData[] = [
     mechanism: 'Disrupts bacterial cell membrane by binding to lipopolysaccharides, causing cell lysis and death.',
     sideEffects: ['Nephrotoxicity', 'neurotoxicity', 'respiratory paralysis', 'dizziness', 'confusion', 'paresthesias', 'muscle weakness.'],
     interactions: ['Aminoglycosides (increased nephrotoxicity)', 'neuromuscular blocking agents', 'vancomycin', 'amphotericin B.'],
-    indications: ['Multidrug-resistant Pseudomonas', 'Acinetobacter', 'Klebsiella infections', 'cystic fibrosis pulmonary infections.'],
+    indications: ['Multidrug-resistant Pseudomonas', 'Acinetobacter', 'Klebsiella infections', 'cystic fibrosis pulmonary infections', 'septicemia.'],
     contraindications: ['Hypersensitivity to polymyxins', 'myasthenia gravis', 'severe renal impairment without monitoring.'],
     warnings: ['Nephrotoxicity and neurotoxicity risk. Monitor renal function closely. Reserved for resistant infections only.'],
     pregnancy: 'Category C - Limited data. Use only when benefits clearly outweigh risks.',
     storage: 'Store powder at room temperature. Reconstituted solution stable 7 days refrigerated.'
   },
   {
-    id: '294',
+    id: 'ABD027',
     name: 'Tigecycline',
     genericName: 'Tigecycline',
     manufacturer: 'Various',
@@ -571,7 +571,7 @@ export const antibioticDrugs: DrugData[] = [
     storage: 'Store vials at room temperature. Reconstituted solution stable 6 hours at room temperature, 48 hours refrigerated.'
   },
   {
-    id: '295',
+    id: 'ABD028',
     name: 'Chloramphenicol',
     genericName: 'Chloramphenicol',
     manufacturer: 'Various',
@@ -590,5 +590,153 @@ export const antibioticDrugs: DrugData[] = [
     warnings: ['Serious bone marrow toxicity. Monitor CBC regularly. Gray baby syndrome in neonates. Reserved for serious infections.'],
     pregnancy: 'Category C - Crosses placenta. Risk of gray baby syndrome. Use only when clearly needed.',
     storage: 'Store capsules at room temperature in tight containers. Injectable form refrigerated, protect from light.'
+  },
+  {
+    id: 'ABD029',
+    name: 'Amoxicillin/Clavulanic acid',
+    genericName: 'Amoxicillin trihydrate/Clavulanic acid',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Beta-lactam antibiotic combination that treats bacterial infections resistant to amoxicillin alone.',
+    drugClass: 'Penicillin/Beta-lactamase inhibitor combination',
+    verified: true,
+    brandNames: ['Augmentin', 'Co-amoxiclav', 'Clavamox'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 500/125mg every 8 hours or 875/125mg every 12 hours. Children: 25-45mg/kg/day divided every 8-12 hours. Take with food to reduce stomach upset.',
+    mechanism: 'Amoxicillin inhibits bacterial cell wall synthesis; clavulanic acid inhibits beta-lactamase enzymes that would destroy amoxicillin.',
+    sideEffects: ['Diarrhea', 'nausea', 'vomiting', 'abdominal pain', 'skin rash', 'vaginal yeast infections', 'headache.'],
+    interactions: ['Warfarin (increased bleeding risk)', 'methotrexate', 'allopurinol (increased rash risk)', 'oral contraceptives.'],
+    indications: ['Respiratory tract infections', 'urinary tract infections', 'skin and soft tissue infections', 'dental infections', 'sinusitis.'],
+    contraindications: ['Penicillin allergy', 'history of cholestatic jaundice with amoxicillin/clavulanic acid', 'severe renal impairment.'],
+    warnings: ['Clostridioides difficile-associated diarrhea. Hepatotoxicity. Increased rash risk with viral infections. Complete full course.'],
+    pregnancy: 'Category B - Generally safe. Crosses placenta but no evidence of harm.',
+    storage: 'Store tablets at room temperature. Reconstituted suspension refrigerated for 10 days.'
+  },
+  {
+    id: 'ABD030',
+    name: 'Benzylpenicillin',
+    genericName: 'Benzylpenicillin sodium',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Natural penicillin antibiotic used for serious bacterial infections, especially streptococcal and pneumococcal infections.',
+    drugClass: 'Natural penicillin',
+    verified: true,
+    brandNames: ['Penicillin G', 'Crystapen'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 1.2-2.4g IV/IM every 4-6 hours. Severe infections: up to 24g daily. Children: 25-50mg/kg every 4-6 hours. Given by injection only.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing cell wall weakening and bacterial death.',
+    sideEffects: ['Injection site pain', 'allergic reactions', 'diarrhea', 'nausea', 'skin rash', 'thrombophlebitis.'],
+    interactions: ['Probenecid (increases penicillin levels)', 'methotrexate', 'warfarin', 'oral contraceptives.'],
+    indications: ['Pneumonia', 'meningitis', 'endocarditis', 'septicemia', 'streptococcal infections', 'syphilis.'],
+    contraindications: ['Penicillin allergy', 'history of severe allergic reactions to beta-lactam antibiotics.'],
+    warnings: ['Anaphylaxis risk. Monitor for allergic reactions. Clostridioides difficile-associated diarrhea. Electrolyte imbalance with high doses.'],
+    pregnancy: 'Category B - Safe during pregnancy. Crosses placenta but no evidence of harm.',
+    storage: 'Store powder at room temperature. Reconstituted solution stable for 24 hours at room temperature, 7 days refrigerated.'
+  },
+  {
+    id: 'ABD031',
+    name: 'Cloxacillin',
+    genericName: 'Cloxacillin sodium',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Penicillinase-resistant penicillin used to treat staphylococcal infections.',
+    drugClass: 'Penicillinase-resistant penicillin',
+    verified: true,
+    brandNames: ['Cloxapen', 'Tegopen'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 6 hours orally, or 250mg-2g IV/IM every 4-6 hours. Children: 25-50mg/kg/day divided every 6 hours. Take on empty stomach.',
+    mechanism: 'Inhibits bacterial cell wall synthesis and is resistant to penicillinase enzymes produced by staphylococci.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'skin rash', 'injection site reactions', 'headache.'],
+    interactions: ['Probenecid (increases cloxacillin levels)', 'warfarin', 'methotrexate', 'oral contraceptives.'],
+    indications: ['Staphylococcal infections', 'skin and soft tissue infections', 'bone and joint infections', 'pneumonia', 'endocarditis.'],
+    contraindications: ['Penicillin allergy', 'history of cloxacillin-associated hepatitis.'],
+    warnings: ['Hepatotoxicity (especially with IV use). Monitor liver function. Clostridioides difficile-associated diarrhea. Complete full course.'],
+    pregnancy: 'Category B - Generally safe during pregnancy.',
+    storage: 'Store capsules at room temperature. Reconstituted oral solution refrigerated for 14 days. IV solution stable 6 hours at room temperature.'
+  },
+  {
+    id: 'ABD032',
+    name: 'Co-trimoxazole',
+    genericName: 'Sulfamethoxazole/Trimethoprim',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Combination antibiotic used to treat various bacterial infections and prevent Pneumocystis pneumonia.',
+    drugClass: 'Sulfonamide/Dihydrofolate reductase inhibitor combination',
+    verified: true,
+    brandNames: ['Bactrim', 'Septra', 'Cotrimoxazole'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 800/160mg every 12 hours or 400/80mg every 12 hours. Children: 8-12mg/kg trimethoprim component daily divided every 12 hours. Take with plenty of water.',
+    mechanism: 'Sulfamethoxazole inhibits folate synthesis; trimethoprim blocks dihydrofolate reductase, together preventing bacterial DNA synthesis.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'skin rash', 'photosensitivity', 'hyperkalemia', 'bone marrow suppression.'],
+    interactions: ['Warfarin (increased bleeding)', 'methotrexate', 'phenytoin', 'digoxin', 'ACE inhibitors', 'diuretics.'],
+    indications: ['Urinary tract infections', 'Pneumocystis pneumonia', 'traveler\'s diarrhea', 'MRSA infections', 'nocardiosis.'],
+    contraindications: ['Sulfonamide allergy', 'severe renal/hepatic impairment', 'megaloblastic anemia', 'pregnancy (first trimester).'],
+    warnings: ['Stevens-Johnson syndrome risk. Hyperkalemia. Bone marrow suppression. Monitor CBC and electrolytes. Maintain adequate hydration.'],
+    pregnancy: 'Category C/D - Avoid in first trimester and near term. May cause kernicterus in newborns.',
+    storage: 'Store tablets at room temperature. Protect from light and moisture.'
+  },
+  {
+    id: 'ABD033',
+    name: 'Penicillin V',
+    genericName: 'Phenoxymethylpenicillin',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Oral penicillin antibiotic used to treat mild to moderate bacterial infections.',
+    drugClass: 'Natural penicillin',
+    verified: true,
+    brandNames: ['Pen-VK', 'V-Cillin K', 'Phenoxymethylpenicillin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 250-500mg every 6 hours. Children: 25-50mg/kg/day divided every 6-8 hours. Take on empty stomach 1 hour before or 2 hours after meals.',
+    mechanism: 'Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins, causing bacterial cell death.',
+    sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'skin rash', 'allergic reactions.'],
+    interactions: ['Probenecid (increases penicillin levels)', 'methotrexate', 'warfarin', 'oral contraceptives.'],
+    indications: ['Streptococcal pharyngitis', 'dental infections', 'skin infections', 'rheumatic fever prevention', 'mild pneumonia.'],
+    contraindications: ['Penicillin allergy', 'history of severe allergic reactions to beta-lactam antibiotics.'],
+    warnings: ['Anaphylaxis risk. Monitor for allergic reactions. Clostridioides difficile-associated diarrhea. Complete full course.'],
+    pregnancy: 'Category B - Safe during pregnancy. No evidence of harm to fetus.',
+    storage: 'Store tablets at room temperature. Reconstituted oral solution refrigerated for 14 days.'
+  },
+  {
+    id: 'ABD034',
+    name: 'Procaine benzylpenicillin',
+    genericName: 'Procaine penicillin G',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Long-acting penicillin injection used for bacterial infections requiring sustained penicillin levels.',
+    drugClass: 'Natural penicillin (depot formulation)',
+    verified: true,
+    brandNames: ['Procaine Penicillin G', 'Wycillin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 600,000-1.2 million units IM daily. Syphilis: 600,000 units daily for 8-10 days. Children: 25,000-50,000 units/kg daily. Deep IM injection only.',
+    mechanism: 'Inhibits bacterial cell wall synthesis; procaine provides sustained release for prolonged antibiotic effect.',
+    sideEffects: ['Injection site pain', 'allergic reactions', 'procaine toxicity (anxiety, confusion)', 'sterile abscess formation.'],
+    interactions: ['Probenecid (increases penicillin levels)', 'aminoglycosides (antagonistic effect)', 'warfarin.'],
+    indications: ['Syphilis', 'streptococcal infections', 'pneumococcal pneumonia', 'diphtheria', 'anthrax (post-exposure).'],
+    contraindications: ['Penicillin allergy', 'procaine allergy', 'heart block', 'severe cardiac disease.'],
+    warnings: ['Anaphylaxis risk. Procaine toxicity (Hoigne syndrome). Inadvertent IV injection can be fatal. Monitor injection site.'],
+    pregnancy: 'Category B - Safe during pregnancy. Preferred treatment for syphilis in pregnancy.',
+    storage: 'Store in refrigerator. Do not freeze. Protect from light.'
+  },
+  {
+    id: 'ABD035',
+    name: 'Spectinomycin',
+    genericName: 'Spectinomycin hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antibiotic',
+    description: 'Aminocyclitol antibiotic used primarily for gonorrhea treatment, especially in penicillin-allergic patients.',
+    drugClass: 'Aminocyclitol antibiotic',
+    verified: true,
+    brandNames: ['Trobicin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 2g IM single dose for uncomplicated gonorrhea. 4g IM for disseminated gonococcal infection. Deep IM injection into upper outer quadrant of buttock.',
+    mechanism: 'Inhibits bacterial protein synthesis by binding to 30S ribosomal subunit, preventing translation.',
+    sideEffects: ['Injection site pain', 'nausea', 'dizziness', 'fever', 'chills', 'urticaria', 'insomnia.'],
+    interactions: ['Limited drug interactions due to single-dose use and IM administration.'],
+    indications: ['Uncomplicated gonorrhea (urethral, cervical, rectal)', 'disseminated gonococcal infection', 'penicillin-allergic patients.'],
+    contraindications: ['Hypersensitivity to spectinomycin.'],
+    warnings: ['Not effective against syphilis. May mask syphilis symptoms. Single-dose treatment reduces resistance development.'],
+    pregnancy: 'Category B - Generally safe. Limited data but no evidence of harm.',
+    storage: 'Store powder at room temperature. Reconstituted solution stable for 24 hours at room temperature.'
   }
 ];
+

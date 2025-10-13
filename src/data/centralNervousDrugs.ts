@@ -5,7 +5,7 @@ import { DrugData } from "@/components/DrugCard";
 export const centralNervousDrugs: DrugData[] = [
   // Antidepressants
   {
-    id: '17',
+    id: 'CNS001',
     name: 'Citalopram',
     genericName: 'Citalopram',
     manufacturer: 'Various',
@@ -26,7 +26,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '18',
+    id: 'CNS002',
     name: 'Sertraline',
     genericName: 'Sertraline',
     manufacturer: 'Various',
@@ -47,7 +47,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep container tightly closed'
   },
   {
-    id: '29',
+    id: 'CNS003',
     name: 'Fluoxetine',
     genericName: 'Fluoxetine',
     manufacturer: 'Various',
@@ -68,7 +68,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '30',
+    id: 'CNS004',
     name: 'Trazodone',
     genericName: 'Trazodone',
     manufacturer: 'Various',
@@ -89,7 +89,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '117',
+    id: 'CNS005',
     name: 'Venlafaxine',
     genericName: 'Venlafaxine hydrochloride',
     manufacturer: 'Various',
@@ -110,7 +110,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, keep container tightly closed'
   },
   {
-    id: '118',
+    id: 'CNS006',
     name: 'Duloxetine',
     genericName: 'Duloxetine hydrochloride',
     manufacturer: 'Various',
@@ -131,7 +131,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '119',
+    id: 'CNS007',
     name: 'Paroxetine',
     genericName: 'Paroxetine hydrochloride',
     manufacturer: 'Various',
@@ -152,7 +152,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture and light'
   },
   {
-    id: '120',
+    id: 'CNS008',
     name: 'Bupropion',
     genericName: 'Bupropion hydrochloride',
     manufacturer: 'Various',
@@ -173,7 +173,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '235',
+    id: 'CNS009',
     name: 'Mirtazapine',
     genericName: 'Mirtazapine',
     manufacturer: 'Various',
@@ -194,7 +194,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '236',
+    id: 'CNS010',
     name: 'Trazodone',
     genericName: 'Trazodone hydrochloride',
     manufacturer: 'Various',
@@ -215,7 +215,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '237',
+    id: 'CNS011',
     name: 'Desvenlafaxine',
     genericName: 'Desvenlafaxine succinate',
     manufacturer: 'Various',
@@ -236,7 +236,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '238',
+    id: 'CNS012',
     name: 'Vilazodone',
     genericName: 'Vilazodone hydrochloride',
     manufacturer: 'Various',
@@ -259,7 +259,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Antipsychotics
   {
-    id: '121',
+    id: 'CNS013',
     name: 'Olanzapine',
     genericName: 'Olanzapine',
     manufacturer: 'Various',
@@ -280,7 +280,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '122',
+    id: 'CNS014',
     name: 'Quetiapine',
     genericName: 'Quetiapine fumarate',
     manufacturer: 'Various',
@@ -301,7 +301,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '123',
+    id: 'CNS015',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
@@ -322,7 +322,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '124',
+    id: 'CNS016',
     name: 'Ziprasidone',
     genericName: 'Ziprasidone hydrochloride',
     manufacturer: 'Various',
@@ -345,7 +345,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Anxiolytics
   {
-    id: '31',
+    id: 'CNS017',
     name: 'Clonazepam',
     genericName: 'Clonazepam',
     manufacturer: 'Various',
@@ -366,7 +366,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: '32',
+    id: 'CNS018',
     name: 'Alprazolam',
     genericName: 'Alprazolam',
     manufacturer: 'Various',
@@ -387,7 +387,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture, secure storage required'
   },
   {
-    id: '125',
+    id: 'CNS019',
     name: 'Lorazepam',
     genericName: 'Lorazepam',
     manufacturer: 'Various',
@@ -408,7 +408,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: '126',
+    id: 'CNS020',
     name: 'Clonazepam',
     genericName: 'Clonazepam',
     manufacturer: 'Various',
@@ -429,7 +429,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: '127',
+    id: 'CNS021',
     name: 'Buspirone',
     genericName: 'Buspirone hydrochloride',
     manufacturer: 'Various',
@@ -450,7 +450,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '128',
+    id: 'CNS022',
     name: 'Hydroxyzine',
     genericName: 'Hydroxyzine hydrochloride',
     manufacturer: 'Various',
@@ -473,7 +473,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Sedatives and sleep aids
   {
-    id: '33',
+    id: 'CNS023',
     name: 'Zolpidem',
     genericName: 'Zolpidem',
     manufacturer: 'Various',
@@ -496,7 +496,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Analgesics
   {
-    id: '34',
+    id: 'CNS024',
     name: 'Ibuprofen',
     genericName: 'Ibuprofen',
     manufacturer: 'Various',
@@ -517,7 +517,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '35',
+    id: 'CNS025',
     name: 'Acetaminophen',
     genericName: 'Acetaminophen',
     manufacturer: 'Various',
@@ -538,7 +538,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '36',
+    id: 'CNS026',
     name: 'Hydrocodone/Acetaminophen',
     genericName: 'Hydrocodone bitartrate and acetaminophen',
     manufacturer: 'Various',
@@ -559,7 +559,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: '37',
+    id: 'CNS027',
     name: 'Tramadol',
     genericName: 'Tramadol hydrochloride',
     manufacturer: 'Various',
@@ -580,7 +580,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required'
   },
   {
-    id: '38',
+    id: 'CNS028',
     name: 'Meloxicam',
     genericName: 'Meloxicam',
     manufacturer: 'Various',
@@ -601,7 +601,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '39',
+    id: 'CNS029',
     name: 'Gabapentin',
     genericName: 'Gabapentin',
     manufacturer: 'Various',
@@ -622,7 +622,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '40',
+    id: 'CNS030',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
     manufacturer: 'Various',
@@ -643,7 +643,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '41',
+    id: 'CNS031',
     name: 'Cyclobenzaprine',
     genericName: 'Cyclobenzaprine hydrochloride',
     manufacturer: 'Various',
@@ -664,7 +664,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '71',
+    id: 'CNS032',
     name: 'Tizanidine',
     genericName: 'Tizanidine hydrochloride',
     manufacturer: 'Various',
@@ -685,7 +685,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '72',
+    id: 'CNS033',
     name: 'Oxycodone',
     genericName: 'Oxycodone hydrochloride',
     manufacturer: 'Various',
@@ -706,7 +706,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: '73',
+    id: 'CNS034',
     name: 'Morphine',
     genericName: 'Morphine sulfate',
     manufacturer: 'Various',
@@ -727,7 +727,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: '74',
+    id: 'CNS035',
     name: 'Codeine',
     genericName: 'Codeine phosphate',
     manufacturer: 'Various',
@@ -748,7 +748,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required'
   },
   {
-    id: '75',
+    id: 'CNS036',
     name: 'Naproxen',
     genericName: 'Naproxen sodium',
     manufacturer: 'Various',
@@ -769,7 +769,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '76',
+    id: 'CNS037',
     name: 'Celecoxib',
     genericName: 'Celecoxib',
     manufacturer: 'Various',
@@ -790,7 +790,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '77',
+    id: 'CNS038',
     name: 'Diclofenac',
     genericName: 'Diclofenac sodium',
     manufacturer: 'Various',
@@ -811,7 +811,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: '78',
+    id: 'CNS039',
     name: 'Indomethacin',
     genericName: 'Indomethacin',
     manufacturer: 'Various',
@@ -832,7 +832,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: '79',
+    id: 'CNS040',
     name: 'Ketorolac',
     genericName: 'Ketorolac tromethamine',
     manufacturer: 'Various',
@@ -853,7 +853,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: '311',
+    id: 'CNS041',
     name: 'Escitalopram',
     genericName: 'Escitalopram oxalate',
     manufacturer: 'Various',
@@ -874,7 +874,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Protect from moisture and light.'
   },
   {
-    id: '312',
+    id: 'CNS042',
     name: 'Venlafaxine',
     genericName: 'Venlafaxine hydrochloride',
     manufacturer: 'Various',
@@ -895,7 +895,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: '313',
+    id: 'CNS043',
     name: 'Bupropion',
     genericName: 'Bupropion hydrochloride',
     manufacturer: 'Various',
@@ -916,7 +916,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '314',
+    id: 'CNS044',
     name: 'Duloxetine',
     genericName: 'Duloxetine hydrochloride',
     manufacturer: 'Various',
@@ -937,7 +937,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '315',
+    id: 'CNS045',
     name: 'Mirtazapine',
     genericName: 'Mirtazapine',
     manufacturer: 'Various',
@@ -958,7 +958,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original package.'
   },
   {
-    id: '316',
+    id: 'CNS046',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
@@ -979,7 +979,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '317',
+    id: 'CNS047',
     name: 'Quetiapine',
     genericName: 'Quetiapine fumarate',
     manufacturer: 'Various',
@@ -1000,7 +1000,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '318',
+    id: 'CNS048',
     name: 'Olanzapine',
     genericName: 'Olanzapine',
     manufacturer: 'Various',
@@ -1021,7 +1021,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '319',
+    id: 'CNS049',
     name: 'Risperidone',
     genericName: 'Risperidone',
     manufacturer: 'Various',
@@ -1042,7 +1042,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: '320',
+    id: 'CNS050',
     name: 'Lamotrigine',
     genericName: 'Lamotrigine',
     manufacturer: 'Various',
@@ -1063,7 +1063,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: '321',
+    id: 'CNS051',
     name: 'Levetiracetam',
     genericName: 'Levetiracetam',
     manufacturer: 'Various',
@@ -1084,7 +1084,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Oral solution should be used within 7 months of opening.'
   },
   {
-    id: '322',
+    id: 'CNS052',
     name: 'Topiramate',
     genericName: 'Topiramate',
     manufacturer: 'Various',
@@ -1105,7 +1105,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '323',
+    id: 'CNS053',
     name: 'Gabapentin',
     genericName: 'Gabapentin',
     manufacturer: 'Various',
@@ -1126,7 +1126,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: '324',
+    id: 'CNS054',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
     manufacturer: 'Various',
@@ -1147,7 +1147,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: '325',
+    id: 'CNS055',
     name: 'Zolpidem',
     genericName: 'Zolpidem tartrate',
     manufacturer: 'Various',
@@ -1166,5 +1166,237 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['Complex sleep behaviors (sleep-driving). Next-day impairment. Abuse potential. Limit to 7-10 days use.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
     storage: 'Store at room temperature below 30°C. Keep in original container.'
+  },
+  {
+    id: 'CNS056',
+    name: 'Amitriptyline',
+    genericName: 'Amitriptyline hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'Tricyclic antidepressant used to treat depression, chronic pain, and prevent migraines.',
+    drugClass: 'Tricyclic antidepressant',
+    verified: true,
+    brandNames: ['Elavil', 'Endep', 'Tryptanol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: Depression: 75mg daily in divided doses, may increase to 150-300mg daily. Chronic pain: 10-75mg at bedtime. Take with food to reduce stomach upset.',
+    mechanism: 'Blocks reuptake of norepinephrine and serotonin in the brain, increasing levels of these mood-regulating chemicals.',
+    sideEffects: ['Drowsiness', 'dry mouth', 'blurred vision', 'constipation', 'weight gain', 'dizziness', 'difficulty urinating', 'confusion in elderly.'],
+    interactions: ['MAO inhibitors (dangerous combination)', 'anticholinergic drugs', 'sympathomimetics', 'alcohol', 'sedatives', 'warfarin.'],
+    indications: ['Major depression', 'chronic pain conditions', 'migraine prevention', 'fibromyalgia', 'neuropathic pain.'],
+    contraindications: ['Recent heart attack', 'severe heart disease', 'glaucoma', 'urinary retention', 'MAO inhibitor use within 14 days.'],
+    warnings: ['Increased suicide risk in young adults. Heart rhythm problems. Anticholinergic effects. Withdrawal symptoms if stopped suddenly.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause withdrawal symptoms in newborns.',
+    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+  },
+  {
+    id: 'CNS057',
+    name: 'Chlorpromazine',
+    genericName: 'Chlorpromazine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'First-generation antipsychotic used to treat schizophrenia, bipolar disorder, and severe behavioral problems.',
+    drugClass: 'Phenothiazine antipsychotic',
+    verified: true,
+    brandNames: ['Thorazine', 'Largactil'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 10-25mg 2-4 times daily initially, may increase gradually. Maximum 2000mg daily. Take with food or milk to reduce stomach upset.',
+    mechanism: 'Blocks dopamine receptors in the brain, reducing abnormal brain activity that causes psychotic symptoms.',
+    sideEffects: ['Drowsiness', 'dizziness', 'dry mouth', 'constipation', 'blurred vision', 'weight gain', 'muscle stiffness', 'tremor', 'skin sensitivity to sun.'],
+    interactions: ['CNS depressants', 'anticholinergic drugs', 'lithium', 'anticonvulsants', 'antihypertensives', 'alcohol.'],
+    indications: ['Schizophrenia', 'bipolar disorder', 'severe behavioral disorders', 'nausea and vomiting', 'hiccups (severe cases).'],
+    contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'Parkinson\'s disease.'],
+    warnings: ['Tardive dyskinesia (involuntary movements). Neuroleptic malignant syndrome. Blood disorders. Liver toxicity. Photosensitivity.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause movement disorders in newborns.',
+    storage: 'Store at room temperature below 30°C. Protect from light.'
+  },
+  {
+    id: 'CNS058',
+    name: 'Clonidine',
+    genericName: 'Clonidine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antihypertensive',
+    description: 'Alpha-2 agonist used to treat high blood pressure, ADHD, and certain pain conditions.',
+    drugClass: 'Alpha-2 adrenergic agonist',
+    verified: true,
+    brandNames: ['Catapres', 'Kapvay', 'Duraclon'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: Hypertension: 0.1mg twice daily initially, may increase gradually. ADHD: 0.1mg at bedtime initially. Take with or without food.',
+    mechanism: 'Stimulates alpha-2 receptors in the brain, reducing nerve signals that cause blood vessels to constrict and heart rate to increase.',
+    sideEffects: ['Drowsiness', 'dry mouth', 'dizziness', 'constipation', 'fatigue', 'headache', 'nausea', 'skin reactions with patches.'],
+    interactions: ['Beta-blockers', 'tricyclic antidepressants', 'alcohol', 'sedatives', 'digoxin', 'calcium channel blockers.'],
+    indications: ['Hypertension', 'ADHD in children', 'opioid withdrawal', 'chronic pain', 'menopausal hot flashes.'],
+    contraindications: ['Hypersensitivity to clonidine', 'severe bradycardia', 'heart block.'],
+    warnings: ['Rebound hypertension if stopped suddenly. Sedation affects driving. Withdrawal syndrome. Cardiac conduction abnormalities.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks.',
+    storage: 'Store at room temperature below 30°C. Keep patches in original pouch until use.'
+  },
+  {
+    id: 'CNS059',
+    name: 'Diazepam',
+    genericName: 'Diazepam',
+    manufacturer: 'Various',
+    category: 'Anxiolytic',
+    description: 'Benzodiazepine used to treat anxiety, seizures, muscle spasms, and alcohol withdrawal.',
+    drugClass: 'Benzodiazepine',
+    verified: true,
+    brandNames: ['Valium', 'Diastat', 'Valrelease'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Adults: Anxiety: 2-10mg 2-4 times daily. Seizures: 5-10mg IV/IM. Muscle spasms: 2-10mg 3-4 times daily. Take with or without food.',
+    mechanism: 'Enhances the effect of GABA, a calming neurotransmitter in the brain, reducing anxiety and muscle tension.',
+    sideEffects: ['Drowsiness', 'dizziness', 'fatigue', 'muscle weakness', 'ataxia', 'confusion', 'memory problems', 'depression.'],
+    interactions: ['CNS depressants', 'alcohol', 'opioids', 'anticonvulsants', 'cimetidine', 'omeprazole', 'CYP3A4 inhibitors.'],
+    indications: ['Anxiety disorders', 'seizures', 'muscle spasms', 'alcohol withdrawal', 'preoperative sedation.'],
+    contraindications: ['Severe respiratory depression', 'sleep apnea', 'severe liver disease', 'myasthenia gravis', 'narrow-angle glaucoma.'],
+    warnings: ['Physical dependence and withdrawal. Respiratory depression with other depressants. Cognitive impairment. Abuse potential.'],
+    pregnancy: 'Category D - Avoid use. May cause fetal harm and withdrawal in newborns.',
+    storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
+  },
+  {
+    id: 'CNS060',
+    name: 'Escitalopram',
+    genericName: 'Escitalopram oxalate',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'SSRI antidepressant used to treat depression and generalized anxiety disorder.',
+    drugClass: 'Selective serotonin reuptake inhibitor (SSRI)',
+    verified: true,
+    brandNames: ['Lexapro', 'Cipralex'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 10mg once daily initially, may increase to 20mg daily after 1 week. Take with or without food, preferably at the same time each day.',
+    mechanism: 'Selectively blocks the reuptake of serotonin in the brain, increasing serotonin levels to improve mood and reduce anxiety.',
+    sideEffects: ['Nausea', 'headache', 'drowsiness', 'insomnia', 'diarrhea', 'dry mouth', 'sexual dysfunction', 'fatigue', 'increased sweating.'],
+    interactions: ['MAO inhibitors', 'pimozide', 'linezolid', 'methylene blue', 'NSAIDs', 'warfarin', 'lithium', 'triptans.'],
+    indications: ['Major depressive disorder', 'generalized anxiety disorder', 'panic disorder (off-label).'],
+    contraindications: ['Hypersensitivity to escitalopram or citalopram', 'concurrent MAO inhibitor use', 'pimozide use.'],
+    warnings: ['Increased suicide risk in young adults. Serotonin syndrome. QT prolongation. Withdrawal syndrome. Hyponatremia.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause neonatal complications.',
+    storage: 'Store at room temperature below 30°C. Protect from moisture.'
+  },
+  {
+    id: 'CNS061',
+    name: 'Fluphenazine',
+    genericName: 'Fluphenazine hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'First-generation antipsychotic used to treat schizophrenia and other psychotic disorders.',
+    drugClass: 'Phenothiazine antipsychotic',
+    verified: true,
+    brandNames: ['Prolixin', 'Modecate'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: Oral: 2.5-10mg daily in divided doses. IM depot: 12.5-25mg every 3-4 weeks. Take oral form with food to reduce stomach upset.',
+    mechanism: 'Blocks dopamine D2 receptors in the brain, reducing abnormal dopamine activity that causes psychotic symptoms.',
+    sideEffects: ['Drowsiness', 'dizziness', 'dry mouth', 'constipation', 'blurred vision', 'muscle stiffness', 'tremor', 'restlessness', 'weight gain.'],
+    interactions: ['CNS depressants', 'anticholinergic drugs', 'lithium', 'anticonvulsants', 'antihypertensives', 'alcohol.'],
+    indications: ['Schizophrenia', 'other psychotic disorders', 'severe behavioral problems.'],
+    contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'subcortical brain damage.'],
+    warnings: ['Tardive dyskinesia risk. Neuroleptic malignant syndrome. Extrapyramidal symptoms. Blood disorders. Photosensitivity.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
+    storage: 'Store at room temperature below 30°C. Protect from light. Injectable forms require refrigeration.'
+  },
+  {
+    id: 'CNS062',
+    name: 'Levomepromazine',
+    genericName: 'Levomepromazine maleate',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Phenothiazine antipsychotic used for schizophrenia, severe pain, and terminal care sedation.',
+    drugClass: 'Phenothiazine antipsychotic',
+    verified: true,
+    brandNames: ['Nozinan', 'Methotrimeprazine'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: Psychosis: 25-50mg daily in divided doses. Pain/sedation: 6.25-25mg every 4-8 hours. Take with food to reduce stomach upset.',
+    mechanism: 'Blocks multiple neurotransmitter receptors including dopamine, serotonin, histamine, and adrenergic receptors.',
+    sideEffects: ['Severe sedation', 'hypotension', 'dry mouth', 'constipation', 'blurred vision', 'weight gain', 'extrapyramidal symptoms', 'photosensitivity.'],
+    interactions: ['CNS depressants', 'antihypertensives', 'anticholinergics', 'alcohol', 'opioids', 'anticonvulsants.'],
+    indications: ['Schizophrenia', 'severe pain (especially in terminal care)', 'sedation in palliative care', 'intractable hiccups.'],
+    contraindications: ['Severe CNS depression', 'coma', 'phaeochromocytoma', 'severe cardiac disease', 'bone marrow depression.'],
+    warnings: ['Severe hypotension risk. Tardive dyskinesia. Neuroleptic malignant syndrome. Respiratory depression. Blood disorders.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
+    storage: 'Store at room temperature below 30°C. Protect from light.'
+  },
+  {
+    id: 'CNS063',
+    name: 'Midazolam',
+    genericName: 'Midazolam hydrochloride',
+    manufacturer: 'Various',
+    category: 'Sedative',
+    description: 'Short-acting benzodiazepine used for sedation, anxiety, and seizures.',
+    drugClass: 'Benzodiazepine',
+    verified: true,
+    brandNames: ['Versed', 'Dormicum'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Adults: IV: 1-2.5mg slowly. IM: 5mg. Oral: 7.5-15mg. Pediatric seizures: 0.2mg/kg buccal/nasal. Dose varies by route and indication.',
+    mechanism: 'Enhances GABA neurotransmitter activity in the brain, producing sedation, anxiolysis, and anticonvulsant effects.',
+    sideEffects: ['Sedation', 'respiratory depression', 'hypotension', 'amnesia', 'confusion', 'headache', 'nausea', 'injection site reactions.'],
+    interactions: ['CNS depressants', 'opioids', 'alcohol', 'CYP3A4 inhibitors/inducers', 'rifampin', 'phenytoin.'],
+    indications: ['Preoperative sedation', 'conscious sedation', 'induction of anesthesia', 'status epilepticus', 'anxiety.'],
+    contraindications: ['Severe respiratory depression', 'acute narrow-angle glaucoma', 'shock', 'coma', 'alcohol intoxication.'],
+    warnings: ['Respiratory depression risk, especially with opioids. Paradoxical reactions in children/elderly. Withdrawal syndrome. Amnesia.'],
+    pregnancy: 'Category D - Avoid use. May cause fetal harm and neonatal withdrawal.',
+    storage: 'Store at room temperature below 30°C. Protect from light. Controlled substance - secure storage required.'
+  },
+  {
+    id: 'CNS064',
+    name: 'Nortriptyline',
+    genericName: 'Nortriptyline hydrochloride',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'Tricyclic antidepressant used to treat depression and chronic pain conditions.',
+    drugClass: 'Tricyclic antidepressant',
+    verified: true,
+    brandNames: ['Pamelor', 'Aventyl'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 25mg 3-4 times daily initially, may increase to 75-100mg daily. Elderly: 30-50mg daily. Take with food to reduce stomach upset.',
+    mechanism: 'Blocks reuptake of norepinephrine and serotonin in the brain, increasing levels of these mood-regulating neurotransmitters.',
+    sideEffects: ['Dry mouth', 'constipation', 'blurred vision', 'drowsiness', 'dizziness', 'weight gain', 'urinary retention', 'confusion in elderly.'],
+    interactions: ['MAO inhibitors', 'anticholinergic drugs', 'sympathomimetics', 'alcohol', 'cimetidine', 'quinidine', 'SSRIs.'],
+    indications: ['Major depression', 'chronic pain', 'migraine prevention', 'neuropathic pain', 'fibromyalgia.'],
+    contraindications: ['Recent myocardial infarction', 'severe heart disease', 'glaucoma', 'urinary retention', 'MAO inhibitor use within 14 days.'],
+    warnings: ['Increased suicide risk in young adults. Cardiac arrhythmias. Anticholinergic effects. Withdrawal syndrome if stopped abruptly.'],
+    pregnancy: 'Category D - Avoid use. May cause fetal harm and neonatal withdrawal.',
+    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+  },
+  {
+    id: 'CNS065',
+    name: 'Prochlorperazine',
+    genericName: 'Prochlorperazine maleate',
+    manufacturer: 'Various',
+    category: 'Antiemetic',
+    description: 'Phenothiazine used to treat severe nausea, vomiting, and psychotic disorders.',
+    drugClass: 'Phenothiazine antiemetic/antipsychotic',
+    verified: true,
+    brandNames: ['Compazine', 'Stemetil'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: Nausea: 5-10mg 3-4 times daily. Psychosis: 15-20mg daily in divided doses. Take with food to reduce stomach upset.',
+    mechanism: 'Blocks dopamine D2 receptors in the chemoreceptor trigger zone and brain, reducing nausea and psychotic symptoms.',
+    sideEffects: ['Drowsiness', 'dizziness', 'dry mouth', 'constipation', 'blurred vision', 'extrapyramidal symptoms', 'hypotension', 'photosensitivity.'],
+    interactions: ['CNS depressants', 'anticholinergic drugs', 'lithium', 'alcohol', 'antihypertensives', 'anticonvulsants.'],
+    indications: ['Severe nausea and vomiting', 'psychotic disorders', 'severe anxiety (short-term)', 'migraine-associated nausea.'],
+    contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'children under 2 years or under 10kg.'],
+    warnings: ['Tardive dyskinesia risk. Extrapyramidal symptoms. Neuroleptic malignant syndrome. Blood disorders. Photosensitivity.'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
+    storage: 'Store at room temperature below 30°C. Protect from light.'
+  },
+  {
+    id: 'CNS066',
+    name: 'Temazepam',
+    genericName: 'Temazepam',
+    manufacturer: 'Various',
+    category: 'Sedative-Hypnotic',
+    description: 'Benzodiazepine used for short-term treatment of insomnia.',
+    drugClass: 'Benzodiazepine',
+    verified: true,
+    brandNames: ['Restoril', 'Normison'],
+    prescriptionStatus: 'Controlled',
+    dosageAndAdmin: 'Adults: 15-30mg at bedtime. Elderly: 7.5-15mg at bedtime. Take 30 minutes before desired sleep time. Limit use to 7-10 days.',
+    mechanism: 'Enhances GABA neurotransmitter activity in the brain, promoting sleep and reducing anxiety.',
+    sideEffects: ['Drowsiness', 'dizziness', 'headache', 'nausea', 'fatigue', 'nervousness', 'lethargy', 'dry mouth', 'diarrhea.'],
+    interactions: ['CNS depressants', 'alcohol', 'opioids', 'anticonvulsants', 'cimetidine', 'probenecid.'],
+    indications: ['Short-term treatment of insomnia', 'difficulty falling asleep', 'frequent nighttime awakening.'],
+    contraindications: ['Severe respiratory depression', 'sleep apnea', 'severe liver disease', 'myasthenia gravis', 'pregnancy.'],
+    warnings: ['Physical dependence and withdrawal. Next-day drowsiness. Complex sleep behaviors. Abuse potential. Limit duration of use.'],
+    pregnancy: 'Category X - Contraindicated. May cause fetal harm and neonatal withdrawal.',
+    storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
   }
 ];
+

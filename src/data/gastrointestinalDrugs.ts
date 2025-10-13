@@ -5,7 +5,7 @@ import { DrugData } from "@/components/DrugCard";
 export const gastrointestinalDrugs: DrugData[] = [
   // Gastrointestinal medications
   {
-    id: '9',
+    id: 'GID001',
     name: 'Omeprazole',
     genericName: 'Omeprazole',
     manufacturer: 'Various',
@@ -26,7 +26,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture. Keep container tightly closed.'
   },
   {
-    id: '10',
+    id: 'GID002',
     name: 'Pantoprazole',
     genericName: 'Pantoprazole',
     manufacturer: 'Various',
@@ -47,7 +47,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: '105',
+    id: 'GID003',
     name: 'Ranitidine',
     genericName: 'Ranitidine hydrochloride',
     manufacturer: 'Various',
@@ -68,7 +68,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: '106',
+    id: 'GID004',
     name: 'Famotidine',
     genericName: 'Famotidine',
     manufacturer: 'Various',
@@ -89,7 +89,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
-    id: '107',
+    id: 'GID005',
     name: 'Lansoprazole',
     genericName: 'Lansoprazole',
     manufacturer: 'Various',
@@ -110,7 +110,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from light and moisture. Keep capsules in original container.'
   },
   {
-    id: '108',
+    id: 'GID006',
     name: 'Esomeprazole',
     genericName: 'Esomeprazole magnesium',
     manufacturer: 'Various',
@@ -131,7 +131,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from light and moisture.'
   },
   {
-    id: '246',
+    id: 'GID007',
     name: 'Rabeprazole',
     genericName: 'Rabeprazole sodium',
     manufacturer: 'Various',
@@ -152,7 +152,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture. Swallow tablets whole.'
   },
   {
-    id: '247',
+    id: 'GID008',
     name: 'Dexlansoprazole',
     genericName: 'Dexlansoprazole',
     manufacturer: 'Various',
@@ -173,7 +173,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture. Swallow capsules whole or sprinkle on applesauce.'
   },
   {
-    id: '248',
+    id: 'GID009',
     name: 'Ondansetron',
     genericName: 'Ondansetron hydrochloride',
     manufacturer: 'Various',
@@ -194,7 +194,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light.'
   },
   {
-    id: '249',
+    id: 'GID010',
     name: 'Loperamide',
     genericName: 'Loperamide hydrochloride',
     manufacturer: 'Various',
@@ -215,7 +215,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep in original container.'
   },
   {
-    id: '250',
+    id: 'GID011',
     name: 'Metoclopramide',
     genericName: 'Metoclopramide hydrochloride',
     manufacturer: 'Various',
@@ -236,7 +236,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light.'
   },
   {
-    id: '77',
+    id: 'GID012',
     name: 'Loperamide',
     genericName: 'Loperamide',
     manufacturer: 'Various',
@@ -247,7 +247,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     brandNames: ['Imodium']
   },
   {
-    id: '78',
+    id: 'GID013',
     name: 'Bisacodyl',
     genericName: 'Bisacodyl',
     manufacturer: 'Various',
@@ -268,7 +268,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture and heat.'
   },
   {
-    id: '79',
+    id: 'GID014',
     name: 'Docusate',
     genericName: 'Docusate sodium',
     manufacturer: 'Various',
@@ -289,7 +289,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep container tightly closed.'
   },
   {
-    id: '80',
+    id: 'GID015',
     name: 'Polyethylene Glycol',
     genericName: 'Polyethylene Glycol 3350',
     manufacturer: 'Various',
@@ -310,7 +310,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep container tightly closed.'
   },
   {
-    id: '83',
+    id: 'GID016',
     name: 'Calcium Carbonate',
     genericName: 'Calcium Carbonate',
     manufacturer: 'Various',
@@ -331,7 +331,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
-    id: '84',
+    id: 'GID017',
     name: 'Aluminum Hydroxide',
     genericName: 'Aluminum Hydroxide',
     manufacturer: 'Various',
@@ -352,7 +352,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Do not freeze liquid formulations.'
   },
   {
-    id: '85',
+    id: 'GID018',
     name: 'Magnesium Hydroxide',
     genericName: 'Magnesium Hydroxide',
     manufacturer: 'Various',
@@ -373,7 +373,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Shake well before use.'
   },
   {
-    id: '86',
+    id: 'GID019',
     name: 'Simethicone',
     genericName: 'Simethicone',
     manufacturer: 'Various',
@@ -394,7 +394,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
-    id: '87',
+    id: 'GID020',
     name: 'Dimenhydrinate',
     genericName: 'Dimenhydrinate',
     manufacturer: 'Various',
@@ -415,7 +415,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: '88',
+    id: 'GID021',
     name: 'Meclizine',
     genericName: 'Meclizine hydrochloride',
     manufacturer: 'Various',
@@ -436,7 +436,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: '89',
+    id: 'GID022',
     name: 'Scopolamine',
     genericName: 'Scopolamine hydrobromide',
     manufacturer: 'Various',
@@ -457,7 +457,7 @@ export const gastrointestinalDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep patches in sealed pouch until use.'
   },
   {
-    id: '90',
+    id: 'GID023',
     name: 'Bismuth Subsalicylate',
     genericName: 'Bismuth Subsalicylate',
     manufacturer: 'Various',
@@ -476,5 +476,47 @@ export const gastrointestinalDrugs: DrugData[] = [
     warnings: ['May cause Reye\'s syndrome in children', 'Contains salicylate', 'May interfere with X-ray studies', 'Temporary darkening of stool and tongue'],
     pregnancy: 'Pregnancy Category C. Avoid in third trimester due to salicylate content.',
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Shake liquid well before use.'
+  },
+  {
+    id: 'GID024',
+    name: 'Bisacodyl',
+    genericName: 'Bisacodyl',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'A stimulant laxative that works by increasing bowel movements. It\'s like giving your intestines a gentle push to help move things along when you\'re constipated.',
+    drugClass: 'Stimulant Laxative',
+    verified: true,
+    brandNames: ['Dulcolax', 'Correctol', 'Fleet Bisacodyl'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults: 5-15mg orally once daily, or 10mg rectally once daily. Take oral tablets whole with water. Effects usually occur within 6-12 hours for oral, 15-60 minutes for rectal.',
+    mechanism: 'Bisacodyl stimulates the nerve endings in the colon wall, causing increased muscle contractions that help push stool through the intestines and promote bowel movements.',
+    sideEffects: ['Abdominal cramping', 'Diarrhea', 'Nausea', 'Rectal irritation (with suppositories)', 'Electrolyte imbalance with prolonged use', 'Dehydration'],
+    interactions: ['Antacids (may cause premature tablet dissolution)', 'Milk (may cause stomach irritation)', 'Diuretics (increased risk of electrolyte imbalance)'],
+    indications: ['Constipation', 'Bowel preparation before medical procedures', 'Post-operative bowel care'],
+    contraindications: ['Intestinal obstruction', 'Acute abdominal pain', 'Nausea and vomiting', 'Appendicitis', 'Rectal bleeding', 'Children under 6 years'],
+    warnings: ['Do not use for more than 1 week without medical supervision', 'May cause dependence with long-term use', 'Swallow tablets whole - do not crush or chew', 'Avoid milk or antacids within 1 hour'],
+    pregnancy: 'Pregnancy Category B. Generally considered safe during pregnancy.',
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep in original container. Protect from moisture.'
+  },
+  {
+    id: 'GID025',
+    name: 'Senna',
+    genericName: 'Sennosides',
+    manufacturer: 'Various',
+    category: 'Gastrointestinal',
+    description: 'A natural plant-based laxative that helps relieve constipation. Think of it as nature\'s way of helping your digestive system get back on track when things slow down.',
+    drugClass: 'Stimulant Laxative',
+    verified: true,
+    brandNames: ['Senokot', 'Ex-Lax', 'Fletcher\'s Castoria'],
+    prescriptionStatus: 'OTC',
+    dosageAndAdmin: 'Adults: 15-30mg (2-4 tablets) once daily, preferably at bedtime. Effects usually occur within 6-12 hours. Start with lowest effective dose.',
+    mechanism: 'Senna contains natural compounds called sennosides that are converted by bacteria in the colon into active substances that stimulate intestinal contractions and increase fluid secretion.',
+    sideEffects: ['Abdominal cramping', 'Diarrhea', 'Nausea', 'Urine discoloration (yellow-brown)', 'Electrolyte imbalance with prolonged use', 'Melanosis coli (harmless colon darkening)'],
+    interactions: ['Digoxin (may increase absorption)', 'Warfarin (may enhance anticoagulant effect)', 'Diuretics (increased risk of electrolyte imbalance)', 'Estrogens (may reduce effectiveness)'],
+    indications: ['Constipation', 'Bowel preparation before medical procedures', 'Hemorrhoid-related constipation'],
+    contraindications: ['Intestinal obstruction', 'Acute abdominal pain', 'Nausea and vomiting', 'Appendicitis', 'Inflammatory bowel disease', 'Children under 2 years'],
+    warnings: ['Do not use for more than 1 week without medical supervision', 'May cause laxative dependence', 'May discolor urine', 'Avoid during menstruation (may increase cramping)'],
+    pregnancy: 'Pregnancy Category C. Use only if clearly needed and benefits outweigh risks.',
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Keep in dry place. Protect from light and moisture.'
   }
 ];
