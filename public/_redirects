@@ -1,0 +1,12 @@
+# Netlify redirects for Single Page Application (SPA) routing
+# This ensures all routes are handled by the React Router
+
+# Handle all routes by serving index.html for SPA routing
+/*    /index.html   200
+
+# Optional: Specific redirects for common pages (these will be handled by the catch-all above)
+# /privacy    /index.html   200
+# /terms      /index.html   200
+# /about      /index.html   200
+# /contact    /index.html   200
+# /disclaimer /index.html   200
