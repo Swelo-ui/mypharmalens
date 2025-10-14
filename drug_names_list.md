@@ -3,557 +3,672 @@
 This document contains a comprehensive list of all drug names available in the MyPharmaLens application.
 
 ## Summary
-- **Total Unique Drugs**: 544
-- **Last Updated**: 2025-10-14 - Updated with new drug categories (Anesthetics, Dermatological, Muscle Relaxants, Vaccines, Emergency, Oncology, Gastroenterology, Immunology, Infectious Diseases, Neurology, Hematology, Obstetrics, Pain Management)
+- **Total Unique Drugs**: 659
+- **Last Updated**: 2025-01-27 - Updated with complete drug list from all data files
 - **Purpose**: Reference list for drug verification and duplicate prevention
 - **Note**: Count reflects the application's deduplication logic which removes both ID and name duplicates
 
 ## Complete Drug List (Alphabetical)
 
-1. Acarbose
-2. Acetaminophen
-3. Acitretin
-4. Acyclovir
-5. Adalimumab
-6. Adapalene
-7. Adefovir
-8. Albendazole
-9. Albumin
-10. Albuterol
-11. Alfentanil
-12. Allopurinol
-13. Alprazolam
-14. Alteplase
-15. Aluminum Hydroxide
-16. Amiodarone
-17. Amitriptyline
-18. Amlodipine
-19. Amlodipine/Valsartan
-20. Amodiaquine
-21. Amoxicillin
-22. Amoxicillin/Clavulanic acid
-23. Amphotericin B
-24. Ampicillin
-25. Amrinone
-26. Anastrozole
-27. Antithymocyte Globulin (ATG)
-28. Apixaban
-29. Aripiprazole
-30. Arteether
-31. Artelinic Acid
-32. Artemether/Lumefantrine
-33. Artemisinin
-34. Artemotil
-35. Artesunate
-36. Articaine
-37. Ascorbic Acid
-38. Aspirin
-39. Atenolol
-40. Atorvastatin
-41. Atovaquone/Proguanil
-42. Atracurium
-43. Atropine
-44. Azacitidine
-45. Azathioprine
-46. Azelaic Acid
-47. Azelastine
-48. Azithromycin
-49. Azithromycin for Malaria
-50. BCG Vaccine
-51. Baclofen
-52. Baloxavir Marboxil
-53. Basiliximab
-54. Beclometasone
-55. Bendamustine
-56. Benzocaine
-57. Benzoyl Peroxide
-58. Benzylpenicillin
-59. Betamethasone (topical)
-60. Bevacizumab
-61. Bicalutamide
-62. Bictegravir
-63. Biperiden
-64. Bisacodyl
-65. Bismuth Subsalicylate
-66. Bisoprolol
-67. Bleomycin
-68. Boceprevir
-69. Bortezomib
-70. Brimonidine
-71. Budesonide
-72. Budesonide/Formoterol
-73. Bupivacaine
-74. Buprenorphine
-75. Bupropion
-76. Buspirone
-77. Busulfan
-78. Cabotegravir
-79. Calamine
-80. Calcipotriol
-81. Calcium Carbonate
-82. Calcium Gluconate
-83. Canagliflozin
-84. Candesartan
-85. Capecitabine
-86. Captopril
-87. Carbamazepine
-88. Carboplatin
-89. Carboprost
-90. Carmustine
-91. Carvedilol
-92. Cefazolin
-93. Ceftazidime
-94. Ceftriaxone Sodium
-95. Cefuroxime
-96. Celecoxib
-97. Cephalexin
-98. Cetirizine
-99. Cetuximab
-100. Chloramphenicol
-101. Chlorhexidine
-102. Chloroprocaine
-103. Chloroquine
-104. Chlorproguanil/Dapsone
-105. Chlorpromazine
-106. Cholecalciferol
-107. Chondroitin
-108. Chromium
-109. Cidofovir
-110. Ciprofloxacin
-111. Cisatracurium
-112. Cisplatin
-113. Citalopram
-114. Cladribine
-115. Clarithromycin
-116. Clevidipine
-117. Clevudine
-118. Clindamycin
-119. Clindamycin for Malaria
-120. Clobazam
-121. Clobetasol Propionate
-122. Clofazimine
-123. Clonazepam
-124. Clonidine
-125. Clopidogrel
-126. Clotrimazole
-127. Cloxacillin
-128. Co-trimoxazole
-129. Cocaine
-130. Codeine
-131. Coenzyme Q10
-132. Colistin
-133. Copper Sulfate
-134. Cromolyn
-135. Cyanocobalamin
-136. Cyclobenzaprine
-137. Cyclophosphamide
-138. Cycloserine
-139. Cyclosporine
-140. Cytarabine
-141. Dabigatran
-142. Daclatasvir
-143. Dantrolene
-144. Dapagliflozin
-145. Dapsone
-146. Dapsone/Pyrimethamine
-147. Deferasirox
-148. Deferoxamine
-149. Desflurane
-150. Desiccated Thyroid
-151. Desloratadine
-152. Desmopressin
-153. Desvenlafaxine
-154. Dexamethasone
-155. Dexlansoprazole
-156. Dexmedetomidine
-157. Dextromethorphan
-158. Diazepam
-159. Diazoxide
-160. Diclofenac
-161. Digoxin
-162. Dihydroartemisinin/Piperaquine
-163. Diltiazem
-164. Dimenhydrinate
-165. Dinoprostone
-166. Diphenhydramine
-167. Diphtheria Vaccine
-168. Dobutamine
-169. Docetaxel
-170. Docusate
-171. Dolutegravir
-172. Domperidone
-173. Donepezil
-174. Dopamine
-175. Doxazosin
-176. Doxorubicin
-177. Doxycycline
-178. Doxycycline for Malaria
-179. Dulaglutide
-180. Duloxetine
-181. Edoxaban
-182. Efavirenz
-183. Elbasvir/Grazoprevir
-184. Elvitegravir
-185. Empagliflozin
-186. Emtricitabine/Tenofovir
-187. Enalapril
-188. Enfuvirtide
-189. Enoxaparin
-190. Entecavir
-191. Epinephrine
-192. Epoetin Alfa
-193. Ergocalciferol
-194. Ergometrine
-195. Erythromycin
-196. Escitalopram
-197. Esmolol
-198. Esomeprazole
-199. Estradiol
-200. Ethambutol
-201. Ethinylestradiol/Levonorgestrel
-202. Ethosuximide
-203. Etomidate
-204. Etoposide
-205. Everolimus
-206. Exenatide
-207. Ezetimibe
-208. Famciclovir
-209. Famotidine
-210. Fenofibrate
-211. Fentanyl
-212. Ferroquine
-213. Ferrous Sulfate
-214. Fexofenadine
-215. Filgrastim
-216. Finasteride
-217. Fluconazole
-218. Flucytosine
-219. Fludrocortisone
-220. Flumazenil
-221. Fluocinolone Acetonide
-222. Fluoride
-223. Fluorouracil
-224. Fluoxetine
-225. Fluphenazine
-226. Fluticasone
-227. Folic Acid
-228. Formoterol
-229. Foscarnet
-230. Fosfomycin
-231. Fosmidomycin
-232. Furosemide
-233. Gabapentin
-234. Gemcitabine
-235. Gentamicin
-236. Glecaprevir/Pibrentasvir
-237. Gliclazide
-238. Glimepiride
-239. Glucagon
-240. Glucosamine
-241. Glyburide
-242. Glycopyrrolate
-243. Griseofulvin
-244. Guaifenesin
-245. Haemophilus Influenzae Type B Vaccine
-246. Halofantrine
-247. Haloperidol
-248. Heparin
-249. Hepatitis A Vaccine
-250. Hepatitis B Vaccine
-251. Human Papillomavirus Vaccine
-252. Hydralazine
-253. Hydrochlorothiazide/Lisinopril
-254. Hydrocodone/Acetaminophen
-255. Hydrocortisone
-256. Hydromorphone
-257. Hydroxychloroquine
-258. Hydroxyzine
-259. Hyoscine Butylbromide
-260. Ibuprofen
-261. Imatinib
-262. Imiquimod
-263. Indomethacin
-264. Infliximab
-265. Influenza Vaccine
-266. Insulin (Human)
-267. Insulin Glargine
-268. Iodide
-269. Ipratropium
-270. Irbesartan
-271. Irinotecan
-272. Iron Sulfate
-273. Isoflurane
-274. Isoniazid
-275. Isosorbide Dinitrate
-276. Isosorbide Mononitrate
-277. Isotretinoin
-278. Ivabradine
-279. Ivermectin
-280. Japanese Encephalitis Vaccine
-281. Ketamine
-282. Ketoconazole
-283. Ketoprofen
-284. Ketorolac
-285. Labetalol
-286. Lacosamide
-287. Lamivudine
-288. Lamotrigine
-289. Lansoprazole
-290. Latanoprost
-291. Ledipasvir/Sofosbuvir
-292. Leflunomide
-293. Letrozole
-294. Levetiracetam
-295. Levocetirizine
-296. Levodopa/Carbidopa
-297. Levofloxacin
-298. Levomepromazine
-299. Levothyroxine
-300. Lidocaine
-301. Linagliptin
-302. Lincomycin
-303. Liothyronine
-304. Liraglutide
-305. Lisinopril
-306. Lithium
-307. Loperamide
-308. Loratadine
-309. Lorazepam
-310. Losartan
-311. Lumefantrine
-312. Magnesium Hydroxide
-313. Magnesium Oxide
-314. Magnesium Sulfate
-315. Magnesium sulfate
-316. Manganese
-317. Mannitol
-318. Maraviroc
-319. Measles, Mumps, Rubella Vaccine
-320. Mebendazole
-321. Mebeverine
-322. Meclizine
-323. Medroxyprogesterone acetate
-324. Mefloquine
-325. Melatonin
-326. Meloxicam
-327. Memantine
-328. Meperidine
-329. Mepivacaine
-330. Meropenem
-331. Mesalazine
-332. Metformin
-333. Methadone
-334. Methimazole
-335. Methotrexate
-336. Methyldopa
-337. Methylergometrine
-338. Methylphenidate
-339. Methylprednisolone
-340. Metoclopramide
-341. Metoprolol
-342. Metronidazole
-343. Miconazole
-344. Midazolam
-345. Mifepristone
-346. Milrinone
-347. Miltefosine
-348. Mirtazapine
-349. Misoprostol
-350. Molybdenum
-351. Mometasone
-352. Montelukast
-353. Morphine
-354. Mupirocin
-355. Mycophenolate Mofetil
-356. Nalbuphine
-357. Naloxone
-358. Naproxen
-359. Nateglinide
-360. Nedocromil
-361. Neostigmine
-362. Nevirapine
-363. Niacin
-364. Nicardipine
-365. Niclosamide
-366. Nifedipine
-367. Nintedanib
-368. Nitrofurantoin
-369. Nitroglycerin
-370. Nitrous Oxide
-371. Norepinephrine
-372. Nortriptyline
-373. Nystatin
-374. Olanzapine
-375. Omalizumab
-376. Omega-3 Fatty Acids
-377. Omeprazole
-378. Ondansetron
-379. Oseltamivir
-380. Oxaliplatin
-381. Oxamniquine
-382. Oxycodone
-383. Oxytocin
-384. Paclitaxel
-385. Pancreatic Enzymes (Lipase/Protease/Amylase)
-386. Pancuronium
-387. Pantoprazole
-388. Paracetamol
-389. Paritaprevir/Ritonavir/Ombitasvir
-390. Paroxetine
-391. Pegfilgrastim
-392. Penicillin V
-393. Pentamidine
-394. Peramivir
-395. Permethrin
-396. Pertussis Vaccine
-397. Phenobarbital
-398. Phenylephrine
-399. Phenytoin
-400. Phytomenadione
-401. Phytonadione
-402. Pimecrolimus
-403. Pioglitazone
-404. Piperaquine
-405. Pirfenidone
-406. Pneumococcal Vaccine
-407. Polio Vaccine
-408. Polyethylene Glycol
-409. Potassium Chloride
-410. Pramlintide
-411. Prasugrel
-412. Pravastatin
-413. Praziquantel
-414. Prazosin
-415. Precedex
-416. Prednisolone
-417. Prednisone
-418. Pregabalin
-419. Prilocaine
-420. Primaquine
-421. Procaine
-422. Procaine benzylpenicillin
-423. Prochlorperazine
-424. Proguanil
-425. Propofol
-426. Propranolol
-427. Propylthiouracil
-428. Protamine Sulfate
-429. Pseudoephedrine
-430. Pyrazinamide
-431. Pyridoxine
-432. Pyrimethamine
-433. Pyronaridine/Artesunate
-434. Quetiapine
-435. Quinidine
-436. Quinine
-437. Rabeprazole
-438. Rabies Vaccine
-439. Raltegravir
-440. Ramipril
-441. Ranitidine
-442. Ranolazine
-443. Remifentanil
-444. Repaglinide
-445. Retinol
-446. Ribavirin
-447. Riboflavin
-448. Rifampicin
-449. Rifampin
-450. Rilpivirine
-451. Risperidone
-452. Rituximab
-453. Rivaroxaban
-454. Rocuronium
-455. Roflumilast
-456. Ropinirole
-457. Ropivacaine
-458. Rosuvastatin
-459. Rotavirus Vaccine
-460. Salbutamol
-461. Salmeterol
-462. Scopolamine
-463. Selenium
-464. Selenium Sulfide
-465. Semaglutide
-466. Senna
-467. Sertraline
-468. Sevoflurane
-469. Sildenafil
-470. Silver Sulfadiazine
-471. Simeprevir
-472. Simethicone
-473. Simvastatin
-474. Sitagliptin
-475. Sodium Bicarbonate
-476. Sodium Nitroprusside
-477. Sodium Stibogluconate
-478. Sofosbuvir
-479. Spectinomycin
-480. Spironolactone
-481. Streptokinase
-482. Sufentanil
-483. Sugammadex
-484. Sulfadoxine/Pyrimethamine
-485. Sulfasalazine
-486. Suramin sodium
-487. Suxamethonium
-488. Tacrolimus
-489. Tadalafil
-490. Tafenoquine
-491. Tamoxifen
-492. Tamsulosin
-493. Tazarotene
-494. Telaprevir
-495. Telbivudine
-496. Telmisartan
-497. Temazepam
-498. Tenofovir Alafenamide
-499. Terazosin
-500. Terbinafine
-501. Testosterone Cypionate
-502. Tetracaine
-503. Tetracycline for Malaria
-504. Theophylline
-505. Thiamine
-506. Thiopental
-507. Ticagrelor
-508. Tigecycline
-509. Timolol Maleate
-510. Tiotropium
-511. Tizanidine
-512. Tobramycin
-513. Tocopherol
-514. Topiramate
-515. Tramadol
-516. Trazodone
-517. Tretinoin
-518. Triamcinolone Acetonide
-519. Triclabendazole
-520. Trimethoprim/Sulfamethoxazole
-521. Umeclidinium
-522. Umeclidinium/Vilanterol
-523. Urea
-524. Valacyclovir
-525. Valproic Acid
-526. Valsartan
-527. Vancomycin
-528. Vardenafil
-529. Vasopressin
-530. Velpatasvir/Sofosbuvir
-531. Venlafaxine
-532. Verapamil
-533. Vilazodone
-534. Vitamin B12
-535. Vitamin D
-536. Warfarin
-537. Water for Injection
-538. Zafirlukast
-539. Zanamivir
-540. Zidovudine
-541. Zinc Oxide
-542. Zinc Sulfate
-543. Ziprasidone
-544. Zolpidem
+1. Abacavir
+2. Acarbose
+3. Acebutolol
+4. Acetaminophen
+5. Acitretin
+6. Aclidinium
+7. Activated Charcoal
+8. Acyclovir
+9. Adalimumab
+10. Adapalene
+11. Adefovir
+12. Adenosine
+13. Albendazole
+14. Albumin
+15. Albuterol
+16. Alendronate
+17. Aliskiren
+18. Allopurinol
+19. Alprazolam
+20. Alteplase
+21. Aluminum Hydroxide
+22. Amantadine
+23. Amikacin
+24. Amiloride
+25. Aminocaproic Acid
+26. Aminophylline
+27. Amiodarone
+28. Amitriptyline
+29. Amlodipine
+30. Amlodipine/Valsartan
+31. Amodiaquine
+32. Amoxicillin
+33. Amoxicillin/Clavulanic acid
+34. Amphotericin B
+35. Ampicillin
+36. Anastrozole
+37. Anidulafungin
+38. Antithymocyte Globulin (ATG)
+39. Apixaban
+40. Apremilast
+41. Aprotinin
+42. Aripiprazole
+43. Armodafinil
+44. Arteether
+45. Artelinic Acid
+46. Artemether/Lumefantrine
+47. Artemisinin
+48. Artemotil
+49. Artesunate
+50. Ascorbic Acid
+51. Aspirin
+52. Atenolol
+53. Atezolizumab
+54. Atomoxetine
+55. Atorvastatin
+56. Atovaquone/Proguanil
+57. Atracurium
+58. Atropine
+59. Azacitidine
+60. Azathioprine
+61. Azelastine
+62. Azithromycin
+63. Azithromycin for Malaria
+64. Aztreonam
+65. BCG Vaccine
+66. Baclofen
+67. Baloxavir Marboxil
+68. Baricitinib
+69. Basiliximab
+70. Beclometasone
+71. Belimumab
+72. Bendamustine
+73. Benralizumab
+74. Benznidazole
+75. Benzocaine
+76. Benzonatate
+77. Benzylpenicillin
+78. Beractant
+79. Betamethasone (topical)
+80. Betaxolol
+81. Bethanechol
+82. Bevacizumab
+83. Bicalutamide
+84. Bictegravir
+85. Biperiden
+86. Bisacodyl
+87. Bismuth Subsalicylate
+88. Bisoprolol
+89. Bleomycin
+90. Boceprevir
+91. Bortezomib
+92. Brimonidine
+93. Bromocriptine
+94. Budesonide
+95. Budesonide/Formoterol
+96. Bupivacaine
+97. Bupivacaine/Epinephrine
+98. Buprenorphine
+99. Bupropion
+100. Buspirone
+101. Busulfan
+102. Butorphanol
+103. Cabergoline
+104. Cabotegravir
+105. Caffeine Citrate
+106. Calamine
+107. Calcipotriol
+108. Calcitonin
+109. Calcitriol
+110. Calcium Carbonate
+111. Calcium Gluconate
+112. Canagliflozin
+113. Candesartan
+114. Candesartan/Hydrochlorothiazide
+115. Capecitabine
+116. Captopril
+117. Carbamazepine
+118. Carbimazole
+119. Carboplatin
+120. Carboprost
+121. Carisoprodol
+122. Carmustine
+123. Carteolol
+124. Carvedilol
+125. Caspofungin
+126. Cefaclor
+127. Cefadroxil
+128. Cefazolin
+129. Cefdinir
+130. Cefepime
+131. Cefixime
+132. Cefotaxime
+133. Cefprozil
+134. Ceftazidime
+135. Ceftriaxone Sodium
+136. Cefuroxime
+137. Celecoxib
+138. Cephalexin
+139. Cetirizine
+140. Cetrorelix
+141. Cetuximab
+142. Chloramphenicol
+143. Chlorhexidine
+144. Chloroquine
+145. Chlorproguanil/Dapsone
+146. Chlorpromazine
+147. Cholecalciferol
+148. Chondroitin
+149. Chromium
+150. Ciclesonide
+151. Cidofovir
+152. Cinacalcet
+153. Ciprofloxacin
+154. Cisatracurium
+155. Cisplatin
+156. Citalopram
+157. Cladribine
+158. Clarithromycin
+159. Clevudine
+160. Clindamycin
+161. Clindamycin for Malaria
+162. Clobazam
+163. Clofazimine
+164. Clomifene
+165. Clonazepam
+166. Clonidine
+167. Clopidogrel
+168. Clotrimazole
+169. Cloxacillin
+170. Co-trimoxazole
+171. Codeine
+172. Coenzyme Q10
+173. Colchicine
+174. Colesevelam
+175. Colestipol
+176. Colistin
+177. Copper Sulfate
+178. Cromolyn
+179. Cyanocobalamin
+180. Cyclobenzaprine
+181. Cyclophosphamide
+182. Cycloserine
+183. Cyclosporine
+184. Cyproterone Acetate
+185. Cytarabine
+186. Dabigatran
+187. Daclatasvir
+188. Danazol
+189. Dantrolene
+190. Dapagliflozin
+191. Dapsone/Pyrimethamine
+192. Daptomycin
+193. Darifenacin
+194. Darunavir
+195. Dasatinib
+196. Deferasirox
+197. Deferoxamine
+198. Denosumab
+199. Desflurane
+200. Desiccated Thyroid
+201. Desloratadine
+202. Desmopressin
+203. Desvenlafaxine
+204. Dexamethasone
+205. Dexlansoprazole
+206. Dextromethorphan
+207. Diazepam
+208. Diazoxide
+209. Diclofenac
+210. Dicyclomine
+211. Didanosine
+212. Diflunisal
+213. Dihydroartemisinin/Piperaquine
+214. Diltiazem
+215. Dimenhydrinate
+216. Dimethyl Fumarate
+217. Dinoprostone
+218. Diphenhydramine
+219. Diphenoxylate/Atropine
+220. Diphtheria Vaccine
+221. Dobutamine
+222. Docetaxel
+223. Docusate
+224. Dolutegravir
+225. Domperidone
+226. Donepezil
+227. Dopamine
+228. Dornase Alfa
+229. Dorzolamide
+230. Doxazosin
+231. Doxorubicin
+232. Doxycycline
+233. Doxycycline for Malaria
+234. Dronedarone
+235. Dulaglutide
+236. Duloxetine
+237. Dupilumab
+238. Dutasteride
+239. Edoxaban
+240. Efavirenz
+241. Elbasvir/Grazoprevir
+242. Elvitegravir
+243. Empagliflozin
+244. Empagliflozin/Linagliptin
+245. Empagliflozin/Metformin
+246. Emtricitabine/Tenofovir
+247. Enalapril
+248. Enfuvirtide
+249. Enoxaparin
+250. Entecavir
+251. Epinephrine
+252. Eplerenone
+253. Epoetin Alfa
+254. Epoprostenol
+255. Eptifibatide
+256. Ergocalciferol
+257. Ergometrine
+258. Ertapenem
+259. Erythromycin
+260. Escitalopram
+261. Esomeprazole
+262. Estradiol
+263. Ethambutol
+264. Ethinylestradiol/Levonorgestrel
+265. Ethosuximide
+266. Etodolac
+267. Etomidate
+268. Etoposide
+269. Everolimus
+270. Exenatide
+271. Ezetimibe
+272. Famciclovir
+273. Famotidine
+274. Fenofibrate
+275. Fenoprofen
+276. Fentanyl
+277. Ferroquine
+278. Ferrous Sulfate
+279. Fesoterodine
+280. Fexofenadine
+281. Filgrastim
+282. Finasteride
+283. Fingolimod
+284. Fluconazole
+285. Flucytosine
+286. Fludrocortisone
+287. Fluoride
+288. Fluorouracil
+289. Fluoxetine
+290. Fluphenazine
+291. Flurandrenolide
+292. Flurbiprofen
+293. Fluticasone
+294. Fluvoxamine
+295. Folic Acid
+296. Fomepizole
+297. Fondaparinux
+298. Formoterol
+299. Foscarnet
+300. Fosfomycin
+301. Fosmidomycin
+302. Furosemide
+303. Gabapentin
+304. Galantamine
+305. Ganciclovir
+306. Gemcitabine
+307. Gentamicin
+308. Glecaprevir/Pibrentasvir
+309. Gliclazide
+310. Glimepiride
+311. Glucagon
+312. Glucosamine
+313. Glyburide
+314. Griseofulvin
+315. Guaifenesin
+316. Guanfacine
+317. Haemophilus Influenzae Type B Vaccine
+318. Halcinonide
+319. Halofantrine
+320. Haloperidol
+321. Halothane
+322. Heparin
+323. Hepatitis A Vaccine
+324. Hepatitis B Vaccine
+325. Human Papillomavirus Vaccine
+326. Hydralazine
+327. Hydrochlorothiazide/Lisinopril
+328. Hydrocodone/Acetaminophen
+329. Hydrocortisone
+330. Hydromorphone
+331. Hydroxychloroquine
+332. Hydroxyurea
+333. Hydroxyzine
+334. Hyoscine Butylbromide
+335. Ibandronate
+336. Ibrutinib
+337. Ibuprofen
+338. Imatinib
+339. Imipenem/Cilastatin
+340. Imipramine
+341. Indacaterol
+342. Indomethacin
+343. Infliximab
+344. Influenza Vaccine
+345. Insulin (Human)
+346. Insulin Aspart
+347. Insulin Degludec
+348. Insulin Detemir
+349. Insulin Glargine
+350. Insulin Lispro
+351. Insulin NPH
+352. Interferon Alfa
+353. Iodide
+354. Ipratropium
+355. Irbesartan
+356. Irinotecan
+357. Iron Sulfate
+358. Isoflurane
+359. Isoniazid
+360. Isosorbide Dinitrate
+361. Isosorbide Mononitrate
+362. Ivabradine
+363. Ivermectin
+364. Japanese Encephalitis Vaccine
+365. Ketamine
+366. Ketoconazole
+367. Ketoprofen
+368. Ketorolac
+369. Ketotifen
+370. Lacosamide
+371. Lamivudine
+372. Lamotrigine
+373. Lansoprazole
+374. Latanoprost
+375. Latanoprostene Bunod
+376. Ledipasvir/Sofosbuvir
+377. Leflunomide
+378. Letrozole
+379. Levalbuterol
+380. Levetiracetam
+381. Levocetirizine
+382. Levodopa/Carbidopa
+383. Levofloxacin
+384. Levomepromazine
+385. Levomilnacipran
+386. Levosimendan
+387. Levothyroxine
+388. Lidocaine
+389. Lidocaine/Prilocaine
+390. Linaclotide
+391. Linagliptin
+392. Lincomycin
+393. Linezolid
+394. Liothyronine
+395. Liotrix
+396. Liraglutide
+397. Lisdexamfetamine
+398. Lisinopril
+399. Lithium
+400. Loperamide
+401. Loratadine
+402. Lorazepam
+403. Losartan
+404. Loteprednol
+405. Lubiprostone
+406. Lumefantrine
+407. Lurasidone
+408. Magnesium Hydroxide
+409. Magnesium Oxide
+410. Magnesium Sulfate
+411. Magnesium sulfate
+412. Manganese
+413. Mannitol
+414. Maprotiline
+415. Maraviroc
+416. Measles, Mumps, Rubella Vaccine
+417. Mebendazole
+418. Mebeverine
+419. Meclizine
+420. Meclofenamate
+421. Medroxyprogesterone acetate
+422. Mefloquine
+423. Melatonin
+424. Meloxicam
+425. Memantine
+426. Meropenem
+427. Mesalazine
+428. Metaxalone
+429. Metformin
+430. Methadone
+431. Methimazole
+432. Methocarbamol
+433. Methotrexate
+434. Methoxsalen
+435. Methyldopa
+436. Methylene Blue
+437. Methylergometrine
+438. Methylphenidate
+439. Methylprednisolone
+440. Methyltestosterone
+441. Metoclopramide
+442. Metoprolol
+443. Metronidazole
+444. Miconazole
+445. Midazolam
+446. Mifepristone
+447. Milrinone
+448. Miltefosine
+449. Minocycline
+450. Mirabegron
+451. Mirtazapine
+452. Misoprostol
+453. Modafinil
+454. Molybdenum
+455. Mometasone
+456. Montelukast
+457. Morphine
+458. Mycophenolate Mofetil
+459. N-acetylcysteine
+460. Nabumetone
+461. Nafcillin
+462. Nalbuphine
+463. Naloxone
+464. Naproxen
+465. Nateglinide
+466. Nedocromil
+467. Nepafenac
+468. Nevirapine
+469. Niacin
+470. Niclosamide
+471. Nifedipine
+472. Nintedanib
+473. Nitric Oxide
+474. Nitrofurantoin
+475. Nitroglycerin
+476. Nitroprusside
+477. Nitrous Oxide
+478. Nortriptyline
+479. Nystatin
+480. Ofloxacin
+481. Olanzapine
+482. Olodaterol
+483. Olodaterol/Tiotropium
+484. Olsalazine
+485. Omalizumab
+486. Omega-3 Fatty Acids
+487. Omeprazole
+488. Ondansetron
+489. Orphenadrine
+490. Oseltamivir
+491. Oxaliplatin
+492. Oxamniquine
+493. Oxandrolone
+494. Oxaprozin
+495. Oxybutynin
+496. Oxycodone
+497. Oxygen
+498. Oxytocin
+499. Paclitaxel
+500. Paliperidone
+501. Pancreatic Enzymes (Lipase/Protease/Amylase)
+502. Pancuronium
+503. Pantoprazole
+504. Paracetamol
+505. Paritaprevir/Ritonavir/Ombitasvir
+506. Paroxetine
+507. Pegfilgrastim
+508. Pemirolast
+509. Penicillin V
+510. Pentamidine
+511. Pentosan Polysulfate Sodium
+512. Peramivir
+513. Permethrin
+514. Pertussis Vaccine
+515. Phenobarbital
+516. Phenylephrine
+517. Phenytoin
+518. Phytomenadione
+519. Phytonadione
+520. Pilocarpine
+521. Pioglitazone
+522. Piperacillin/Tazobactam
+523. Piperaquine
+524. Pirbuterol
+525. Pirfenidone
+526. Piroxicam
+527. Pneumococcal Vaccine
+528. Podophyllotoxin
+529. Polio Vaccine
+530. Polyethylene Glycol
+531. Pomalidomide
+532. Potassium Chloride
+533. Pralidoxime
+534. Pramipexole
+535. Pramlintide
+536. Prasugrel
+537. Pravastatin
+538. Praziquantel
+539. Prazosin
+540. Prednisolone
+541. Prednisone
+542. Pregabalin
+543. Primaquine
+544. Procaine benzylpenicillin
+545. Procarbazine
+546. Prochlorperazine
+547. Proguanil
+548. Propofol
+549. Propranolol
+550. Propylthiouracil
+551. Protamine Sulfate
+552. Pseudoephedrine
+553. Pyrazinamide
+554. Pyridoxine
+555. Pyrimethamine
+556. Pyronaridine/Artesunate
+557. Quetiapine
+558. Quinidine
+559. Quinine
+560. Rabeprazole
+561. Rabies Vaccine
+562. Raltegravir
+563. Ramipril
+564. Ranitidine
+565. Ranolazine
+566. Repaglinide
+567. Retinol
+568. Ribavirin
+569. Riboflavin
+570. Rifampicin
+571. Rifampin
+572. Rilpivirine
+573. Risperidone
+574. Rituximab
+575. Rivaroxaban
+576. Rivastigmine
+577. Rocuronium
+578. Roflumilast
+579. Ropinirole
+580. Rosuvastatin
+581. Rotavirus Vaccine
+582. Salbutamol
+583. Salmeterol
+584. Scopolamine
+585. Selegiline
+586. Selenium
+587. Semaglutide
+588. Senna
+589. Sertraline
+590. Sevoflurane
+591. Sildenafil
+592. Silver Sulfadiazine
+593. Simeprevir
+594. Simethicone
+595. Simvastatin
+596. Sitagliptin
+597. Sodium Bicarbonate
+598. Sodium Polystyrene Sulfonate
+599. Sodium Stibogluconate
+600. Sofosbuvir
+601. Spectinomycin
+602. Spironolactone
+603. Streptokinase
+604. Sulfadoxine/Pyrimethamine
+605. Sulfasalazine
+606. Suramin sodium
+607. Suxamethonium
+608. Tacrolimus
+609. Tadalafil
+610. Tafenoquine
+611. Tamoxifen
+612. Tamsulosin
+613. Telaprevir
+614. Telbivudine
+615. Telmisartan
+616. Temazepam
+617. Tenofovir Alafenamide
+618. Terazosin
+619. Terbinafine
+620. Testosterone Cypionate
+621. Tetracycline for Malaria
+622. Theophylline
+623. Thiamine
+624. Ticagrelor
+625. Tigecycline
+626. Timolol Maleate
+627. Tiotropium
+628. Tizanidine
+629. Tobramycin
+630. Tocopherol
+631. Tolterodine
+632. Topiramate
+633. Tramadol
+634. Trazodone
+635. Tretinoin
+636. Triclabendazole
+637. Trimethoprim/Sulfamethoxazole
+638. Umeclidinium
+639. Umeclidinium/Vilanterol
+640. Valacyclovir
+641. Valproic Acid
+642. Valsartan
+643. Vancomycin
+644. Vardenafil
+645. Velpatasvir/Sofosbuvir
+646. Venlafaxine
+647. Verapamil
+648. Vilazodone
+649. Vitamin B12
+650. Vitamin D
+651. Warfarin
+652. Water for Injection
+653. Zafirlukast
+654. Zanamivir
+655. Zidovudine
+656. Zinc Oxide
+657. Zinc Sulfate
+658. Ziprasidone
+659. Zolpidem
 
 ---
 
@@ -579,31 +694,34 @@ This document contains a comprehensive list of all drug names available in the M
 
 ## Data Sources
 The drugs in this list are sourced from the following data files:
-- cardiovascularDrugs.ts
-- respiratoryDrugs.ts
-- gastrointestinalDrugs.ts
-- endocrineDrugs.ts
-- centralNervousDrugs.ts
-- antibioticDrugs.ts
-- antiviralDrugs.ts
-- antimalarialDrugs.ts
-- supplementDrugs.ts
-- otherDrugs.ts
-- extraWHODrugs.ts
 - additionalDrugsData.ts
 - anestheticDrugs.ts
+- antibioticDrugs.ts
+- antimalarialDrugs.ts
+- antiparasiticDrugs.ts
+- antiviralDrugs.ts
+- cardiovascularDrugs.ts
+- centralNervousDrugs.ts
 - dermatologicalDrugs.ts
-- muscleRelaxantDrugs.ts
-- vaccineDrugs.ts
 - emergencyDrugs.ts
-- oncologyDrugs.ts
+- endocrineDrugs.ts
+- extraWHODrugs.ts
 - gastroenterologyDrugs.ts
+- gastrointestinalDrugs.ts
+- hematologyDrugs.ts
 - immunologyDrugs.ts
 - infectiousDiseasesDrugs.ts
-- neurologyDrugs.ts
-- hematologyDrugs.ts
-- obstetricsDrugs.ts
-- painManagementDrugs.ts
 - miscellaneousDrugs.ts
+- muscleRelaxantDrugs.ts
+- neurologyDrugs.ts
+- obstetricsDrugs.ts
+- oncologyDrugs.ts
+- otherDrugs.ts
+- painManagementDrugs.ts
+- respiratoryDrugs.ts
+- steroidHormoneDrugs.ts
+- supplementDrugs.ts
+- urologyDrugs.ts
+- vaccineDrugs.ts
 
 *Generated automatically from MyPharmaLens data files*

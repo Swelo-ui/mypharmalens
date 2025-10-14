@@ -53,6 +53,7 @@ const categoryMappings: CategoryMapping = {
   'Neurology': { abbreviation: 'NEURO', counter: 0 },       // neurologyDrugs.ts
   'Hematology': { abbreviation: 'HEMA', counter: 0 },       // hematologyDrugs.ts
   'Obstetrics': { abbreviation: 'OBS', counter: 0 },        // obstetricsDrugs.ts
+  'Urology': { abbreviation: 'URO', counter: 0 },           // urologyDrugs.ts
   'Miscellaneous': { abbreviation: 'MISCD', counter: 0 }    // miscellaneousDrugs.ts
 };
 
