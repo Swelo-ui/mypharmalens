@@ -24,6 +24,18 @@ import { antiparasiticDrugs } from "./antiparasiticDrugs";
 import { miscellaneousDrugs } from "./miscellaneousDrugs";
 import { painManagementDrugs } from "./painManagementDrugs";
 import { steroidHormoneDrugs } from "./steroidHormoneDrugs";
+import { oncologyDrugs } from "./oncologyDrugs";
+import { immunologyDrugs } from "./immunologyDrugs";
+import { emergencyDrugs } from "./emergencyDrugs";
+import { obstetricsDrugs } from "./obstetricsDrugs";
+import { gastroenterologyDrugs } from "./gastroenterologyDrugs";
+import { hematologyDrugs } from "./hematologyDrugs";
+import { neurologyDrugs } from "./neurologyDrugs";
+import { infectiousDiseasesDrugs } from "./infectiousDiseasesDrugs";
+import { anestheticDrugs } from "./anestheticDrugs";
+import { dermatologicalDrugs } from "./dermatologicalDrugs";
+import { muscleRelaxantDrugs } from "./muscleRelaxantDrugs";
+import { vaccineDrugs } from "./vaccineDrugs";
 
 // Create a map to track drug sources for validation reporting
 const drugSources = new Map<string, string>();
@@ -53,7 +65,19 @@ const allDrugsData: DrugData[] = [
   ...addDrugsWithSource(antiparasiticDrugs, 'antiparasiticDrugs.ts'),
   ...addDrugsWithSource(miscellaneousDrugs, 'miscellaneousDrugs.ts'),
   ...addDrugsWithSource(painManagementDrugs, 'painManagementDrugs.ts'),
-  ...addDrugsWithSource(steroidHormoneDrugs, 'steroidHormoneDrugs.ts')
+  ...addDrugsWithSource(steroidHormoneDrugs, 'steroidHormoneDrugs.ts'),
+  ...addDrugsWithSource(oncologyDrugs, 'oncologyDrugs.ts'),
+  ...addDrugsWithSource(immunologyDrugs, 'immunologyDrugs.ts'),
+  ...addDrugsWithSource(emergencyDrugs, 'emergencyDrugs.ts'),
+  ...addDrugsWithSource(obstetricsDrugs, 'obstetricsDrugs.ts'),
+  ...addDrugsWithSource(gastroenterologyDrugs, 'gastroenterologyDrugs.ts'),
+  ...addDrugsWithSource(hematologyDrugs, 'hematologyDrugs.ts'),
+  ...addDrugsWithSource(neurologyDrugs, 'neurologyDrugs.ts'),
+  ...addDrugsWithSource(infectiousDiseasesDrugs, 'infectiousDiseasesDrugs.ts'),
+  ...addDrugsWithSource(anestheticDrugs, 'anestheticDrugs.ts'),
+  ...addDrugsWithSource(dermatologicalDrugs, 'dermatologicalDrugs.ts'),
+  ...addDrugsWithSource(muscleRelaxantDrugs, 'muscleRelaxantDrugs.ts'),
+  ...addDrugsWithSource(vaccineDrugs, 'vaccineDrugs.ts')
 ];
 
 // Enhanced deduplication with validation logging for both ID and name duplicates

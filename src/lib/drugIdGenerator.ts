@@ -39,6 +39,21 @@ const categoryMappings: CategoryMapping = {
   'Antiparasitic': { abbreviation: 'APD', counter: 0 },     // antiparasiticDrugs.ts
   'Pain Management': { abbreviation: 'PMD', counter: 0 },   // painManagementDrugs.ts
   'Steroid Hormone': { abbreviation: 'SHD', counter: 0 },   // steroidHormoneDrugs.ts
+  
+  // New drug categories
+  'Anesthetics': { abbreviation: 'ANE', counter: 0 },       // anestheticDrugs.ts
+  'Dermatological': { abbreviation: 'DER', counter: 0 },    // dermatologicalDrugs.ts
+  'Muscle Relaxant': { abbreviation: 'MRL', counter: 0 },   // muscleRelaxantDrugs.ts
+  'Vaccines': { abbreviation: 'VAC', counter: 0 },          // vaccineDrugs.ts
+  'Emergency': { abbreviation: 'EMG', counter: 0 },         // emergencyDrugs.ts
+  'Oncology': { abbreviation: 'ONC', counter: 0 },          // oncologyDrugs.ts
+  'Gastroenterology': { abbreviation: 'GASTRO', counter: 0 }, // gastroenterologyDrugs.ts
+  'Immunology': { abbreviation: 'IMM', counter: 0 },        // immunologyDrugs.ts
+  'Infectious Diseases': { abbreviation: 'INFECT', counter: 0 }, // infectiousDiseasesDrugs.ts
+  'Neurology': { abbreviation: 'NEURO', counter: 0 },       // neurologyDrugs.ts
+  'Hematology': { abbreviation: 'HEMA', counter: 0 },       // hematologyDrugs.ts
+  'Obstetrics': { abbreviation: 'OBS', counter: 0 },        // obstetricsDrugs.ts
+  'Miscellaneous': { abbreviation: 'MISCD', counter: 0 }    // miscellaneousDrugs.ts
 };
 
 /**
