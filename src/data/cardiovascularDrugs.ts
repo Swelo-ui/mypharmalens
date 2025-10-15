@@ -1,4 +1,4 @@
-﻿
+
 import { DrugData } from "@/components/DrugCard";
 
 // Cardiovascular drugs - includes antihypertensives, anticoagulants, antiplatelets, and statins
@@ -23,7 +23,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to ACE inhibitors', 'History of angioedema', 'Pregnancy', 'Bilateral renal artery stenosis'],
     warnings: ['Monitor kidney function and potassium levels', 'Risk of angioedema', 'Avoid in pregnancy', 'May cause persistent dry cough'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy due to risk of fetal harm.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture and excessive heat.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture and excessive heat.'
   },
   {
     id: 'CVD002',
@@ -44,7 +44,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to ACE inhibitors', 'Angioedema history', 'Pregnancy', 'Concomitant aliskiren use in diabetes'],
     warnings: ['Monitor renal function and electrolytes', 'Angioedema risk', 'Avoid in pregnancy', 'Neutropenia risk in immunocompromised'],
     pregnancy: 'Pregnancy Category D. Avoid during pregnancy due to teratogenic effects.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD003',
@@ -65,7 +65,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to amlodipine', 'Severe aortic stenosis', 'Unstable angina'],
     warnings: ['May cause peripheral edema', 'Use caution in heart failure', 'Gradual dose reduction recommended', 'Monitor blood pressure'],
     pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD004',
@@ -86,7 +86,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Severe heart failure', 'Sick sinus syndrome'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia symptoms', 'Use caution in asthma/COPD', 'Monitor heart rate'],
     pregnancy: 'Pregnancy Category C. Use with caution during pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD005',
@@ -107,7 +107,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to losartan', 'Pregnancy', 'Concomitant aliskiren use in diabetes'],
     warnings: ['Monitor kidney function and potassium', 'Avoid in pregnancy', 'May cause symptomatic hypotension', 'Use caution in volume depletion'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light.'
   },
   {
     id: 'CVD006',
@@ -128,7 +128,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Severe heart failure', 'Sick sinus syndrome'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia symptoms', 'Use caution in diabetes', 'Monitor heart rate and blood pressure'],
     pregnancy: 'Pregnancy Category D. May cause fetal bradycardia and hypoglycemia.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD007',
@@ -149,7 +149,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe hypotension', 'Sick sinus syndrome', 'Second/third-degree AV block', 'Severe heart failure'],
     warnings: ['Monitor heart rate and blood pressure', 'Use caution with beta-blockers', 'May worsen heart failure', 'Gradual discontinuation recommended'],
     pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD008',
@@ -170,7 +170,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe left ventricular dysfunction', 'Hypotension', 'Sick sinus syndrome', 'Second/third-degree AV block'],
     warnings: ['Avoid with beta-blockers', 'Monitor cardiac function', 'May cause severe constipation', 'Use caution in heart failure'],
     pregnancy: 'Pregnancy Category C. Use only if clearly needed.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD009',
@@ -191,7 +191,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Decompensated heart failure', 'Severe asthma'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia', 'Use caution in diabetes and COPD', 'Monitor heart rate'],
     pregnancy: 'Pregnancy Category C. Use with caution during pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD010',
@@ -212,7 +212,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to ACE inhibitors', 'Angioedema history', 'Pregnancy', 'Bilateral renal artery stenosis'],
     warnings: ['Monitor kidney function and potassium', 'Risk of angioedema', 'Avoid in pregnancy', 'May cause persistent cough'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD011',
@@ -233,7 +233,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to candesartan', 'Pregnancy', 'Concomitant aliskiren use in diabetes'],
     warnings: ['Monitor kidney function and potassium', 'Avoid in pregnancy', 'May cause symptomatic hypotension', 'Use caution in volume depletion'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light.'
   },
   {
     id: 'CVD012',
@@ -254,7 +254,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to irbesartan', 'Pregnancy', 'Concomitant aliskiren use in diabetes'],
     warnings: ['Monitor kidney function and electrolytes', 'Avoid in pregnancy', 'May cause hypotension in volume-depleted patients'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD013',
@@ -275,7 +275,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to telmisartan', 'Pregnancy', 'Concomitant aliskiren use in diabetes', 'Biliary obstruction'],
     warnings: ['Monitor kidney function and potassium', 'Avoid in pregnancy', 'Use caution in hepatic impairment', 'May cause hypotension'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD014',
@@ -296,7 +296,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to either component', 'Angioedema history', 'Pregnancy', 'Anuria', 'Sulfonamide allergy'],
     warnings: ['Monitor kidney function and electrolytes', 'Risk of angioedema', 'May cause photosensitivity', 'Avoid in pregnancy'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD015',
@@ -317,7 +317,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to either component', 'Pregnancy', 'Severe aortic stenosis', 'Concomitant aliskiren use in diabetes'],
     warnings: ['May cause peripheral edema', 'Monitor blood pressure', 'Avoid in pregnancy', 'Use caution in heart failure'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   
   // Anticoagulants and Antiplatelets (drugs 23-25)
@@ -340,7 +340,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'Severe liver disease', 'Pregnancy', 'Recent surgery', 'Uncontrolled hypertension'],
     warnings: ['Regular INR monitoring required', 'Bleeding risk', 'Drug and food interactions', 'Avoid in pregnancy'],
     pregnancy: 'Pregnancy Category X. Teratogenic - contraindicated in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD017',
@@ -361,7 +361,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'Severe liver impairment', 'Hypersensitivity to clopidogrel'],
     warnings: ['Bleeding risk', 'CYP2C19 poor metabolizers have reduced efficacy', 'Discontinue before elective surgery', 'Monitor for bleeding'],
     pregnancy: 'Pregnancy Category B. Use only if clearly needed.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD018',
@@ -382,7 +382,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active GI bleeding', 'Severe liver disease', 'Children with viral infections (Reye syndrome)', 'Aspirin allergy'],
     warnings: ['GI bleeding risk', 'Avoid in children with viral infections', 'Use caution with anticoagulants', 'Monitor for bleeding'],
     pregnancy: 'Pregnancy Category D in third trimester. Avoid high doses in pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD019',
@@ -403,7 +403,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active liver disease', 'Pregnancy', 'Breastfeeding', 'Hypersensitivity to atorvastatin'],
     warnings: ['Monitor liver enzymes', 'Muscle toxicity risk', 'Avoid in pregnancy', 'Diabetes risk', 'Cognitive effects reported'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy and breastfeeding.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD020',
@@ -424,7 +424,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active liver disease', 'Pregnancy', 'Breastfeeding', 'Strong CYP3A4 inhibitors', 'Gemfibrozil'],
     warnings: ['Muscle toxicity risk higher at 80mg', 'Monitor liver enzymes', 'Avoid in pregnancy', 'Drug interactions'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy and breastfeeding.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
     id: 'CVD021',
@@ -445,7 +445,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active liver disease', 'Pregnancy', 'Breastfeeding', 'Cyclosporine use'],
     warnings: ['Dose-dependent proteinuria', 'Muscle toxicity', 'Monitor liver and kidney function', 'Asian population sensitivity'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy and breastfeeding.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
   },
   {
     id: 'CVD022',
@@ -466,9 +466,9 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active liver disease', 'Pregnancy', 'Breastfeeding', 'Hypersensitivity to pravastatin'],
     warnings: ['Monitor liver enzymes', 'Muscle toxicity risk', 'Avoid in pregnancy', 'Lower interaction potential'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy and breastfeeding.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },{
-    id: 'CVD024',
+    id: 'CVD023',
     name: 'Fenofibrate',
     genericName: 'Fenofibrate',
     manufacturer: 'Various',
@@ -479,17 +479,17 @@ export const cardiovascularDrugs: DrugData[] = [
     brandNames: ['Tricor', 'Lipidil', 'Antara'],
     prescriptionStatus: 'Prescription Only',
     dosageAndAdmin: 'Adults: 48-145mg once daily with food (dose depends on formulation). Take with largest meal for optimal absorption.',
-    mechanism: 'Fenofibrate activates peroxisome proliferator-activated receptor alpha (PPARÎ±), enhancing lipolysis and reducing VLDL production.',
+    mechanism: 'Fenofibrate activates peroxisome proliferator-activated receptor alpha (PPARα), enhancing lipolysis and reducing VLDL production.',
     sideEffects: ['Abdominal pain', 'Back pain', 'Headache', 'Abnormal liver tests', 'Respiratory disorder', 'Myalgia'],
     interactions: ['Warfarin (increased INR)', 'Statins (myopathy risk)', 'Cyclosporine (nephrotoxicity)', 'Bile acid sequestrants (reduced absorption)'],
     indications: ['Hypertriglyceridemia', 'Mixed dyslipidemia', 'Primary hypercholesterolemia (adjunct to diet)'],
     contraindications: ['Severe renal dysfunction', 'Active liver disease', 'Gallbladder disease', 'Nursing mothers'],
     warnings: ['Monitor liver and kidney function', 'Myopathy risk with statins', 'Gallstone risk', 'Pancreatitis risk'],
     pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD025',
+    id: 'CVD024',
     name: 'Valsartan',
     genericName: 'Valsartan',
     manufacturer: 'Various',
@@ -507,10 +507,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to valsartan', 'pregnancy', 'bilateral renal artery stenosis', 'severe hepatic impairment.'],
     warnings: ['Monitor renal function and potassium levels. Avoid in pregnancy. Risk of hypotension in volume-depleted patients.'],
     pregnancy: 'Category D - Can cause fetal harm. Discontinue as soon as pregnancy is detected.',
-    storage: 'Store at room temperature 15-30Â°C. Keep in original container. Protect from moisture.'
+    storage: 'Store at room temperature 15-30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD026',
+    id: 'CVD025',
     name: 'Carvedilol',
     genericName: 'Carvedilol',
     manufacturer: 'Various',
@@ -528,10 +528,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'heart block', 'cardiogenic shock', 'severe hepatic impairment', 'asthma.'],
     warnings: ['Do not discontinue abruptly. Monitor for worsening heart failure. Mask hypoglycemia symptoms in diabetics.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
-    storage: 'Store at room temperature below 30Â°C. Protect from moisture and light.'
+    storage: 'Store at room temperature below 30°C. Protect from moisture and light.'
   },
   {
-    id: 'CVD027',
+    id: 'CVD026',
     name: 'Spironolactone',
     genericName: 'Spironolactone',
     manufacturer: 'Various',
@@ -552,7 +552,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature in tight, light-resistant containers. Protect from moisture.'
   },
   {
-    id: 'CVD028',
+    id: 'CVD027',
     name: 'Diltiazem',
     genericName: 'Diltiazem hydrochloride',
     manufacturer: 'Various',
@@ -573,7 +573,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Extended-release capsules should not be crushed or chewed.'
   },
   {
-    id: 'CVD029',
+    id: 'CVD028',
     name: 'Rivaroxaban',
     genericName: 'Rivaroxaban',
     manufacturer: 'Bayer',
@@ -591,10 +591,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'severe renal impairment', 'hepatic disease with coagulopathy', 'pregnancy.'],
     warnings: ['Increased bleeding risk. No routine monitoring required. Discontinue before surgery. Limited reversal options.'],
     pregnancy: 'Category C - May cause fetal harm. Use only if potential benefit justifies risk.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original package to protect from moisture.'
+    storage: 'Store at room temperature below 30°C. Keep in original package to protect from moisture.'
   },
   {
-    id: 'CVD030',
+    id: 'CVD029',
     name: 'Apixaban',
     genericName: 'Apixaban',
     manufacturer: 'Bristol-Myers Squibb',
@@ -612,10 +612,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active pathological bleeding', 'severe hypersensitivity', 'prosthetic heart valves.'],
     warnings: ['Bleeding risk increases with age, weight, renal impairment. Discontinue before invasive procedures.'],
     pregnancy: 'Category B - No adequate studies in pregnant women. Use only if clearly needed.',
-    storage: 'Store at room temperature below 30Â°C. Dispense in original bottle with desiccant.'
+    storage: 'Store at room temperature below 30°C. Dispense in original bottle with desiccant.'
   },
   {
-    id: 'CVD031',
+    id: 'CVD030',
     name: 'Dabigatran',
     genericName: 'Dabigatran etexilate',
     manufacturer: 'Boehringer Ingelheim',
@@ -636,7 +636,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store in original bottle with desiccant. Use within 4 months of opening. Protect from moisture.'
   },
   {
-    id: 'CVD032',
+    id: 'CVD031',
     name: 'Prasugrel',
     genericName: 'Prasugrel hydrochloride',
     manufacturer: 'Eli Lilly',
@@ -646,18 +646,18 @@ export const cardiovascularDrugs: DrugData[] = [
     verified: true,
     brandNames: ['Effient'],
     prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Adults: 60mg loading dose, then 10mg once daily. Reduce to 5mg daily if weight <60kg or age â‰¥75 years.',
+    dosageAndAdmin: 'Adults: 60mg loading dose, then 10mg once daily. Reduce to 5mg daily if weight <60kg or age ≥75 years.',
     mechanism: 'Irreversibly binds to P2Y12 receptors on platelets, inhibiting ADP-induced platelet aggregation.',
     sideEffects: ['Bleeding', 'bruising', 'headache', 'dizziness', 'fatigue', 'nausea', 'back pain.'],
     interactions: ['Anticoagulants', 'NSAIDs', 'fibrinolytics', 'chronic warfarin therapy increases bleeding risk.'],
     indications: ['Acute coronary syndrome with PCI', 'prevention of thrombotic cardiovascular events.'],
-    contraindications: ['Active bleeding', 'history of stroke/TIA', 'age â‰¥75 years (relative)', 'weight <60kg (relative).'],
+    contraindications: ['Active bleeding', 'history of stroke/TIA', 'age ≥75 years (relative)', 'weight <60kg (relative).'],
     warnings: ['Significant bleeding risk. Do not start in patients likely to undergo urgent CABG. Monitor for bleeding.'],
     pregnancy: 'Category B - No adequate studies. Use only if clearly needed.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container. Protect from moisture.'
+    storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD033',
+    id: 'CVD032',
     name: 'Ticagrelor',
     genericName: 'Ticagrelor',
     manufacturer: 'AstraZeneca',
@@ -675,10 +675,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'history of intracranial hemorrhage', 'severe hepatic impairment.'],
     warnings: ['Bleeding risk. Dyspnea is common but usually not serious. Avoid high-dose aspirin.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original package to protect from light and moisture.'
+    storage: 'Store at room temperature below 30°C. Keep in original package to protect from light and moisture.'
   },
   {
-    id: 'CVD034',
+    id: 'CVD033',
     name: 'Rosuvastatin',
     genericName: 'Rosuvastatin calcium',
     manufacturer: 'Various',
@@ -696,10 +696,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active liver disease', 'unexplained persistent elevations of liver enzymes', 'pregnancy', 'nursing.'],
     warnings: ['Monitor liver function and CK levels. Risk of myopathy and rhabdomyolysis. Avoid in pregnancy.'],
     pregnancy: 'Category X - Contraindicated in pregnancy. May cause fetal harm.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container. Protect from moisture.'
+    storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD035',
+    id: 'CVD034',
     name: 'Ezetimibe',
     genericName: 'Ezetimibe',
     manufacturer: 'Various',
@@ -717,10 +717,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to ezetimibe', 'active liver disease when used with statin.'],
     warnings: ['Monitor liver function when used with statin. Increased risk of myopathy when combined with statin.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30Â°C. Protect from moisture.'
+    storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: 'CVD036',
+    id: 'CVD035',
     name: 'Fenofibrate',
     genericName: 'Fenofibrate',
     manufacturer: 'Various',
@@ -738,9 +738,9 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe renal impairment', 'active liver disease', 'gallbladder disease', 'nursing mothers.'],
     warnings: ['Monitor liver function and CK. Increased risk of cholelithiasis. Renal function monitoring required.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container. Protect from moisture.'
+    storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
   },{
-    id: 'CVD038',
+    id: 'CVD036',
     name: 'Ranolazine',
     genericName: 'Ranolazine',
     manufacturer: 'Gilead Sciences',
@@ -758,10 +758,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe renal impairment', 'hepatic cirrhosis', 'concurrent strong CYP3A inhibitors.'],
     warnings: ['QT prolongation risk. Monitor renal function. Avoid grapefruit juice. Limited mortality benefit.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
+    storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD039',
+    id: 'CVD037',
     name: 'Ivabradine',
     genericName: 'Ivabradine hydrochloride',
     manufacturer: 'Servier',
@@ -779,10 +779,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Acute decompensated heart failure', 'severe hypotension', 'sick sinus syndrome', 'pregnancy.'],
     warnings: ['Monitor heart rate regularly. Risk of atrial fibrillation. Visual disturbances possible.'],
     pregnancy: 'Category D - May cause fetal harm. Contraindicated in pregnancy.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original package to protect from light.'
+    storage: 'Store at room temperature below 30°C. Keep in original package to protect from light.'
   },
   {
-    id: 'CVD040',
+    id: 'CVD038',
     name: 'Allopurinol',
     genericName: 'Allopurinol',
     manufacturer: 'Various',
@@ -800,10 +800,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Known hypersensitivity', 'acute gout attack (do not start during attack).'],
     warnings: ['Start slowly to avoid triggering gout attack. Monitor liver function. Stop if severe rash develops.'],
     pregnancy: 'Category C - Use only if clearly needed. Limited human data available.',
-    storage: 'Store at room temperature below 25Â°C. Keep dry and away from light.'
+    storage: 'Store at room temperature below 25°C. Keep dry and away from light.'
   },
   {
-    id: 'CVD041',
+    id: 'CVD039',
     name: 'Amiodarone',
     genericName: 'Amiodarone hydrochloride',
     manufacturer: 'Various',
@@ -824,7 +824,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Keep in original container.'
   },
   {
-    id: 'CVD042',
+    id: 'CVD040',
     name: 'Apixaban',
     genericName: 'Apixaban',
     manufacturer: 'Bristol-Myers Squibb',
@@ -842,10 +842,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'severe liver disease', 'mechanical heart valves.'],
     warnings: ['Increased bleeding risk. Do not stop abruptly. No routine monitoring needed but watch for bleeding signs.'],
     pregnancy: 'Category B - Generally safe but use only if clearly needed.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
+    storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD043',
+    id: 'CVD041',
     name: 'Aspirin',
     genericName: 'Acetylsalicylic acid',
     manufacturer: 'Various',
@@ -866,7 +866,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature in dry place. Keep away from moisture and heat.'
   },
   {
-    id: 'CVD044',
+    id: 'CVD042',
     name: 'Clopidogrel',
     genericName: 'Clopidogrel bisulfate',
     manufacturer: 'Sanofi',
@@ -884,10 +884,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'severe liver disease', 'known hypersensitivity.'],
     warnings: ['Increased bleeding risk. Genetic testing may be needed for some patients. Stop before planned surgery.'],
     pregnancy: 'Category B - Generally safe but use only if clearly needed.',
-    storage: 'Store at room temperature below 25Â°C. Keep in original container.'
+    storage: 'Store at room temperature below 25°C. Keep in original container.'
   },
   {
-    id: 'CVD045',
+    id: 'CVD043',
     name: 'Dabigatran',
     genericName: 'Dabigatran etexilate',
     manufacturer: 'Boehringer Ingelheim',
@@ -905,10 +905,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'mechanical heart valves', 'severe kidney disease.'],
     warnings: ['Swallow capsules whole. Higher bleeding risk than warfarin. Antidote (idarucizumab) available for emergencies.'],
     pregnancy: 'Category C - Use only if potential benefit justifies risk.',
-    storage: 'Store in original bottle with desiccant. Use within 4 months of opening. Keep below 30Â°C.'
+    storage: 'Store in original bottle with desiccant. Use within 4 months of opening. Keep below 30°C.'
   },
   {
-    id: 'CVD046',
+    id: 'CVD044',
     name: 'Doxazosin',
     genericName: 'Doxazosin mesylate',
     manufacturer: 'Various',
@@ -926,10 +926,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Known hypersensitivity to quinazolines.'],
     warnings: ['Take first dose at bedtime due to "first-dose effect" (sudden blood pressure drop). Rise slowly from sitting/lying.'],
     pregnancy: 'Category C - Use only if clearly needed. Limited human data.',
-    storage: 'Store at room temperature below 25Â°C. Keep in original container.'
+    storage: 'Store at room temperature below 25°C. Keep in original container.'
   },
   {
-    id: 'CVD047',
+    id: 'CVD045',
     name: 'Edoxaban',
     genericName: 'Edoxaban tosylate',
     manufacturer: 'Daiichi Sankyo',
@@ -947,10 +947,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'mechanical heart valves', 'severe liver disease.'],
     warnings: ['Do not use if creatinine clearance >95 mL/min in atrial fibrillation. Monitor for bleeding signs.'],
     pregnancy: 'Category C - Use only if potential benefit justifies risk.',
-    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
+    storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD048',
+    id: 'CVD046',
     name: 'Enoxaparin',
     genericName: 'Enoxaparin sodium',
     manufacturer: 'Sanofi',
@@ -971,7 +971,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not freeze. Single-use prefilled syringes.'
   },
   {
-    id: 'CVD049',
+    id: 'CVD047',
     name: 'Furosemide',
     genericName: 'Furosemide',
     manufacturer: 'Various',
@@ -992,7 +992,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Keep tablets dry.'
   },
   {
-    id: 'CVD050',
+    id: 'CVD048',
     name: 'Heparin',
     genericName: 'Heparin sodium',
     manufacturer: 'Various',
@@ -1013,7 +1013,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not freeze. Check for particulates before use.'
   },
   {
-    id: 'CVD051',
+    id: 'CVD049',
     name: 'Hydralazine',
     genericName: 'Hydralazine hydrochloride',
     manufacturer: 'Various',
@@ -1034,7 +1034,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD052',
+    id: 'CVD050',
     name: 'Isosorbide Dinitrate',
     genericName: 'Isosorbide dinitrate',
     manufacturer: 'Various',
@@ -1055,7 +1055,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container. Protect from light.'
   },
   {
-    id: 'CVD053',
+    id: 'CVD051',
     name: 'Isosorbide Mononitrate',
     genericName: 'Isosorbide mononitrate',
     manufacturer: 'Various',
@@ -1076,7 +1076,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD054',
+    id: 'CVD052',
     name: 'Methyldopa',
     genericName: 'Methyldopa',
     manufacturer: 'Various',
@@ -1097,7 +1097,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container.'
   },
   {
-    id: 'CVD055',
+    id: 'CVD053',
     name: 'Nitroglycerin',
     genericName: 'Nitroglycerin',
     manufacturer: 'Various',
@@ -1118,7 +1118,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Sublingual tablets: Keep in original dark glass bottle. Patches: store at room temperature.'
   },
   {
-    id: 'CVD056',
+    id: 'CVD054',
     name: 'Prazosin',
     genericName: 'Prazosin hydrochloride',
     manufacturer: 'Various',
@@ -1139,7 +1139,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD057',
+    id: 'CVD055',
     name: 'Propranolol',
     genericName: 'Propranolol hydrochloride',
     manufacturer: 'Various',
@@ -1160,7 +1160,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD058',
+    id: 'CVD056',
     name: 'Captopril',
     genericName: 'Captopril',
     manufacturer: 'Various',
@@ -1181,7 +1181,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container.'
   },
   {
-    id: 'CVD059',
+    id: 'CVD057',
     name: 'Nifedipine',
     genericName: 'Nifedipine',
     manufacturer: 'Various',
@@ -1202,7 +1202,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect extended-release tablets from light and moisture.'
   },
   {
-    id: 'CVD060',
+    id: 'CVD058',
     name: 'Streptokinase',
     genericName: 'Streptokinase',
     manufacturer: 'Various',
@@ -1223,7 +1223,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstitute just before use. Do not shake vigorously.'
   },
   {
-    id: 'CVD061',
+    id: 'CVD059',
     name: 'Alteplase',
     genericName: 'Alteplase (tissue plasminogen activator)',
     manufacturer: 'Genentech',
@@ -1244,7 +1244,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Reconstitute with sterile water. Use within 8 hours of reconstitution.'
   },
   {
-    id: 'CVD062',
+    id: 'CVD060',
     name: 'Dobutamine',
     genericName: 'Dobutamine hydrochloride',
     manufacturer: 'Various',
@@ -1265,7 +1265,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Dilute before use. Pink discoloration indicates oxidation but does not affect potency.'
   },
   {
-    id: 'CVD063',
+    id: 'CVD061',
     name: 'Simvastatin',
     genericName: 'Simvastatin',
     manufacturer: 'Various',
@@ -1286,7 +1286,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD064',
+    id: 'CVD062',
     name: 'Warfarin',
     genericName: 'Warfarin sodium',
     manufacturer: 'Various',
@@ -1307,7 +1307,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture. Keep in original container.'
   },
   {
-    id: 'CVD065',
+    id: 'CVD063',
     name: 'Terazosin',
     genericName: 'Terazosin hydrochloride',
     manufacturer: 'Various',
@@ -1328,7 +1328,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD066',
+    id: 'CVD064',
     name: 'Adenosine',
     genericName: 'Adenosine',
     manufacturer: 'Various',
@@ -1349,7 +1349,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not refrigerate. Protect from light.'
   },
   {
-    id: 'CVD067',
+    id: 'CVD065',
     name: 'Epoprostenol',
     genericName: 'Epoprostenol sodium',
     manufacturer: 'Various',
@@ -1370,7 +1370,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstituted solution stable for 8 hours at room temperature.'
   },
   {
-    id: 'CVD068',
+    id: 'CVD066',
     name: 'Eptifibatide',
     genericName: 'Eptifibatide',
     manufacturer: 'Various',
@@ -1388,10 +1388,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'Severe hypertension', 'Recent surgery', 'Thrombocytopenia', 'Renal dialysis'],
     warnings: ['Monitor for bleeding complications', 'Check platelet count', 'Avoid IM injections', 'Use caution in elderly'],
     pregnancy: 'Pregnancy Category B. Use only if clearly needed.',
-    storage: 'Store at 2Â°C to 8Â°C. Do not freeze. Protect from light.'
+    storage: 'Store at 2°C to 8°C. Do not freeze. Protect from light.'
   },
   {
-    id: 'CVD069',
+    id: 'CVD067',
     name: 'Fondaparinux',
     genericName: 'Fondaparinux sodium',
     manufacturer: 'Various',
@@ -1409,10 +1409,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Active bleeding', 'Severe renal impairment', 'Body weight <50kg', 'Bacterial endocarditis'],
     warnings: ['Monitor renal function', 'No antidote available', 'Increased bleeding risk in elderly', 'Avoid IM injections'],
     pregnancy: 'Pregnancy Category B. Use during pregnancy only if clearly needed.',
-    storage: 'Store at 25Â°C. Do not freeze. Single-use prefilled syringes.'
+    storage: 'Store at 25°C. Do not freeze. Single-use prefilled syringes.'
   },
   {
-    id: 'CVD070',
+    id: 'CVD068',
     name: 'Levosimendan',
     genericName: 'Levosimendan',
     manufacturer: 'Various',
@@ -1433,7 +1433,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Dilute before administration.'
   },
   {
-    id: 'CVD071',
+    id: 'CVD069',
     name: 'Milrinone',
     genericName: 'Milrinone lactate',
     manufacturer: 'Various',
@@ -1454,7 +1454,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Compatible with normal saline and D5W.'
   },
   {
-    id: 'CVD072',
+    id: 'CVD070',
     name: 'Nitroprusside',
     genericName: 'Sodium nitroprusside',
     manufacturer: 'Various',
@@ -1475,7 +1475,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Reconstituted solution stable for 24 hours when protected from light.'
   },
   {
-    id: 'CVD073',
+    id: 'CVD071',
     name: 'Acebutolol',
     genericName: 'Acebutolol hydrochloride',
     manufacturer: 'Various',
@@ -1493,10 +1493,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Severe heart failure', 'Sick sinus syndrome'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia symptoms', 'Use caution in diabetes', 'Monitor heart rate'],
     pregnancy: 'Pregnancy Category B. Use with caution during pregnancy.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD074',
+    id: 'CVD072',
     name: 'Aliskiren',
     genericName: 'Aliskiren hemifumarate',
     manufacturer: 'Novartis',
@@ -1514,10 +1514,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Diabetes with ACE inhibitor/ARB use', 'Pregnancy', 'Severe renal impairment', 'Hypersensitivity'],
     warnings: ['Monitor kidney function and potassium', 'Avoid in pregnancy', 'Risk of hyperkalemia', 'Angioedema risk'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture. Keep in original container.'
+    storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD075',
+    id: 'CVD073',
     name: 'Amiloride',
     genericName: 'Amiloride hydrochloride',
     manufacturer: 'Various',
@@ -1535,10 +1535,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hyperkalemia', 'Severe renal impairment', 'Anuria', 'Diabetic nephropathy'],
     warnings: ['Monitor potassium and kidney function', 'Risk of hyperkalemia', 'Use caution in elderly', 'Avoid potassium supplements'],
     pregnancy: 'Pregnancy Category B. Use during pregnancy only if clearly needed.',
-    storage: 'Store at 20Â°C to 25Â°C (68Â°F to 77Â°F). Protect from light and moisture.'
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD076',
+    id: 'CVD074',
     name: 'Betaxolol',
     genericName: 'Betaxolol hydrochloride',
     manufacturer: 'Various',
@@ -1556,10 +1556,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Severe heart failure', 'Severe asthma'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia symptoms', 'Use caution in diabetes', 'Monitor heart rate'],
     pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
-    storage: 'Store at 15Â°C to 30Â°C (59Â°F to 86Â°F). Protect from light.'
+    storage: 'Store at 15°C to 30°C (59°F to 86°F). Protect from light.'
   },
   {
-    id: 'CVD077',
+    id: 'CVD075',
     name: 'Candesartan/Hydrochlorothiazide',
     genericName: 'Candesartan cilexetil/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1577,10 +1577,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Pregnancy', 'Anuria', 'Hypersensitivity to sulfonamides', 'Severe renal/hepatic impairment'],
     warnings: ['Monitor kidney function and electrolytes', 'Avoid in pregnancy', 'Risk of hypotension', 'Photosensitivity'],
     pregnancy: 'Pregnancy Category D. Contraindicated in pregnancy.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture. Keep in original container.'
+    storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD078',
+    id: 'CVD076',
     name: 'Carteolol',
     genericName: 'Carteolol hydrochloride',
     manufacturer: 'Various',
@@ -1598,10 +1598,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe bradycardia', 'Heart block', 'Cardiogenic shock', 'Severe heart failure', 'Severe asthma/COPD'],
     warnings: ['Do not discontinue abruptly', 'May mask hypoglycemia symptoms', 'Use caution in asthma', 'Monitor heart rate'],
     pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
-    storage: 'Store at 15Â°C to 30Â°C (59Â°F to 86Â°F). Protect from light and freezing.'
+    storage: 'Store at 15°C to 30°C (59°F to 86°F). Protect from light and freezing.'
   },
   {
-    id: 'CVD079',
+    id: 'CVD077',
     name: 'Dronedarone',
     genericName: 'Dronedarone hydrochloride',
     manufacturer: 'Sanofi',
@@ -1619,10 +1619,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Permanent atrial fibrillation', 'Heart failure', 'Second/third-degree AV block', 'Severe hepatic impairment'],
     warnings: ['Increased mortality in permanent AF', 'Monitor liver function', 'QT prolongation risk', 'Pulmonary toxicity'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture and light.'
+    storage: 'Store at 25°C (77°F). Protect from moisture and light.'
   },
   {
-    id: 'CVD080',
+    id: 'CVD078',
     name: 'Empagliflozin/Linagliptin',
     genericName: 'Empagliflozin/Linagliptin',
     manufacturer: 'Boehringer Ingelheim',
@@ -1640,10 +1640,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Type 1 diabetes', 'Diabetic ketoacidosis', 'Severe renal impairment', 'Dialysis', 'Hypersensitivity'],
     warnings: ['Risk of ketoacidosis', 'Genital infections', 'Volume depletion', 'Acute kidney injury', 'Pancreatitis'],
     pregnancy: 'Pregnancy Category C. Use during pregnancy only if clearly needed.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture. Keep in original container.'
+    storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD081',
+    id: 'CVD079',
     name: 'Empagliflozin/Metformin',
     genericName: 'Empagliflozin/Metformin hydrochloride',
     manufacturer: 'Boehringer Ingelheim',
@@ -1661,10 +1661,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Severe renal impairment', 'Metabolic acidosis', 'Diabetic ketoacidosis', 'Type 1 diabetes'],
     warnings: ['Lactic acidosis risk', 'Kidney function monitoring', 'Genital infections', 'Volume depletion', 'Ketoacidosis'],
     pregnancy: 'Pregnancy Category C. Use during pregnancy only if clearly needed.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture and light.'
+    storage: 'Store at 25°C (77°F). Protect from moisture and light.'
   },
   {
-    id: 'CVD082',
+    id: 'CVD080',
     name: 'Eplerenone',
     genericName: 'Eplerenone',
     manufacturer: 'Pfizer',
@@ -1682,10 +1682,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hyperkalemia', 'Severe renal impairment', 'Concomitant strong CYP3A4 inhibitors'],
     warnings: ['Monitor potassium and kidney function', 'Risk of hyperkalemia', 'Use caution with other potassium-retaining drugs'],
     pregnancy: 'Pregnancy Category B. Use during pregnancy only if clearly needed.',
-    storage: 'Store at 25Â°C (77Â°F). Protect from moisture.'
+    storage: 'Store at 25°C (77°F). Protect from moisture.'
   },
   {
-    id: 'CVD083',
+    id: 'CVD081',
     name: 'Azilsartan',
     genericName: 'Azilsartan medoxomil',
     manufacturer: 'Takeda',
@@ -1703,10 +1703,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to azilsartan', 'Pregnancy', 'Concomitant aliskiren use in diabetic patients'],
     warnings: ['Fetal toxicity during pregnancy', 'Hypotension in volume-depleted patients', 'Renal impairment', 'Hyperkalemia'],
     pregnancy: 'Category D - Contraindicated in pregnancy due to fetal toxicity.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from light and moisture.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD084',
+    id: 'CVD082',
     name: 'Cilostazol',
     genericName: 'Cilostazol',
     manufacturer: 'Various',
@@ -1724,10 +1724,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Heart failure of any severity', 'Hypersensitivity to cilostazol', 'Hemostatic disorders', 'Active bleeding'],
     warnings: ['Contraindicated in heart failure', 'Increased bleeding risk', 'May cause tachycardia', 'Monitor for signs of heart failure'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from light.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light.'
   },
   {
-    id: 'CVD085',
+    id: 'CVD083',
     name: 'Icosapent ethyl',
     genericName: 'Icosapent ethyl',
     manufacturer: 'Amarin',
@@ -1741,14 +1741,14 @@ export const cardiovascularDrugs: DrugData[] = [
     mechanism: 'Reduces hepatic VLDL-TG synthesis and enhances TG clearance from circulating VLDL particles.',
     sideEffects: ['Peripheral edema', 'constipation', 'atrial fibrillation', 'arthralgia', 'oropharyngeal pain'],
     interactions: ['Anticoagulants (increased bleeding risk)', 'Antiplatelets (increased bleeding risk)'],
-    indications: ['Severe hypertriglyceridemia (â‰¥500 mg/dL)', 'Cardiovascular risk reduction in established CVD or diabetes with risk factors'],
+    indications: ['Severe hypertriglyceridemia (≥500 mg/dL)', 'Cardiovascular risk reduction in established CVD or diabetes with risk factors'],
     contraindications: ['Hypersensitivity to icosapent ethyl or any component'],
     warnings: ['Increased risk of atrial fibrillation', 'Increased bleeding risk', 'Fish/shellfish allergy considerations'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
-    storage: 'Store at room temperature 20-25Â°C (68-77Â°F). Protect from light.'
+    storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light.'
   },
   {
-    id: 'CVD086',
+    id: 'CVD084',
     name: 'Indapamide',
     genericName: 'Indapamide',
     manufacturer: 'Various',
@@ -1766,10 +1766,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to indapamide or sulfonamides', 'Anuria', 'Severe renal or hepatic impairment'],
     warnings: ['Monitor electrolytes and kidney function', 'Risk of hypokalemia and hyponatremia', 'May worsen diabetes or gout'],
     pregnancy: 'Category B - Generally considered safe but use only if clearly needed.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from light and moisture.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD087',
+    id: 'CVD085',
     name: 'Labetalol/Hydrochlorothiazide',
     genericName: 'Labetalol hydrochloride/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1787,10 +1787,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Bronchial asthma', 'Overt cardiac failure', 'Greater than first-degree heart block', 'Cardiogenic shock', 'Anuria'],
     warnings: ['Do not discontinue abruptly', 'Monitor for heart failure', 'Masks signs of hypoglycemia', 'Electrolyte monitoring required'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk to fetus.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from light and moisture.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD088',
+    id: 'CVD086',
     name: 'Losartan/Hydrochlorothiazide',
     genericName: 'Losartan potassium/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1808,10 +1808,10 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to components', 'Pregnancy', 'Anuria', 'Concomitant aliskiren in diabetic patients'],
     warnings: ['Fetal toxicity during pregnancy', 'Monitor electrolytes and kidney function', 'Volume depletion risk'],
     pregnancy: 'Category D - Contraindicated in pregnancy due to fetal toxicity.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from light.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light.'
   },
   {
-    id: 'CVD089',
+    id: 'CVD087',
     name: 'Sacubitril/Valsartan',
     genericName: 'Sacubitril/Valsartan',
     manufacturer: 'Novartis',
@@ -1829,7 +1829,7 @@ export const cardiovascularDrugs: DrugData[] = [
     contraindications: ['Concomitant ACE inhibitor use', 'History of angioedema', 'Pregnancy', 'Severe hepatic impairment'],
     warnings: ['36-hour washout required when switching from ACE inhibitors', 'Angioedema risk', 'Fetal toxicity', 'Monitor kidney function'],
     pregnancy: 'Category D - Contraindicated in pregnancy due to fetal toxicity.',
-    storage: 'Store at room temperature 15-30Â°C (59-86Â°F). Protect from moisture.'
+    storage: 'Store at room temperature 15-30°C (59-86°F). Protect from moisture.'
   }
 ];
 
