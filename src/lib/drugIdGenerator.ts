@@ -25,19 +25,19 @@ const categoryMappings: CategoryMapping = {
   
   // Data file specific mappings (matching actual prefixes used)
   'Antibiotic Drugs': { abbreviation: 'ABD', counter: 0 },  // antibioticDrugs.ts
-  'Cardiovascular': { abbreviation: 'CVD', counter: 0 },    // cardiovascularDrugs.ts
-  'Respiratory': { abbreviation: 'RD', counter: 0 },        // respiratoryDrugs.ts
+  'Cardiovascular': { abbreviation: 'CVD', counter: 89 },    // cardiovascularDrugs.ts - updated to 89
+  'Respiratory': { abbreviation: 'RD', counter: 53 },        // respiratoryDrugs.ts - updated to 53
   'Gastrointestinal': { abbreviation: 'GID', counter: 0 },  // gastrointestinalDrugs.ts
-  'Endocrine': { abbreviation: 'ED', counter: 0 },          // endocrineDrugs.ts
-  'Central Nervous System': { abbreviation: 'CNS', counter: 0 }, // centralNervousDrugs.ts
+  'Endocrine': { abbreviation: 'ED', counter: 67 },          // endocrineDrugs.ts - updated to 67
+  'Central Nervous System': { abbreviation: 'CNS', counter: 88 }, // centralNervousDrugs.ts - updated to 88
   'Antiviral': { abbreviation: 'AVD', counter: 0 },         // antiviralDrugs.ts
   'Antimalarial': { abbreviation: 'AMD', counter: 0 },      // antimalarialDrugs.ts
   'Supplement': { abbreviation: 'SUP', counter: 0 },        // supplementDrugs.ts
-  'Other': { abbreviation: 'OTD', counter: 0 },             // otherDrugs.ts
+  'Other': { abbreviation: 'OTD', counter: 28 },             // otherDrugs.ts - updated to 28
   'Extra WHO': { abbreviation: 'EWD', counter: 0 },         // extraWHODrugs.ts
   'Additional': { abbreviation: 'ADD', counter: 0 },        // additionalDrugsData.ts
   'Antiparasitic': { abbreviation: 'APD', counter: 0 },     // antiparasiticDrugs.ts
-  'Pain Management': { abbreviation: 'PMD', counter: 0 },   // painManagementDrugs.ts
+  'Pain Management': { abbreviation: 'PMD', counter: 23 },   // painManagementDrugs.ts - updated to 23
   'Steroid Hormone': { abbreviation: 'SHD', counter: 0 },   // steroidHormoneDrugs.ts
   
   // New drug categories
@@ -53,7 +53,7 @@ const categoryMappings: CategoryMapping = {
   'Neurology': { abbreviation: 'NEURO', counter: 0 },       // neurologyDrugs.ts
   'Hematology': { abbreviation: 'HEMA', counter: 0 },       // hematologyDrugs.ts
   'Obstetrics': { abbreviation: 'OBS', counter: 0 },        // obstetricsDrugs.ts
-  'Urology': { abbreviation: 'URO', counter: 0 },           // urologyDrugs.ts
+  'Urology': { abbreviation: 'URO', counter: 11 },           // urologyDrugs.ts - updated to 11
   'Miscellaneous': { abbreviation: 'MISCD', counter: 0 }    // miscellaneousDrugs.ts
 };
 

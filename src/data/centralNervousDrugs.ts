@@ -1,4 +1,4 @@
-
+﻿
 import { DrugData } from "@/components/DrugCard";
 
 // Central Nervous System drugs - includes antidepressants, anxiolytics, sedatives, and analgesics
@@ -257,50 +257,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   
-  // Antipsychotics
-  {
-    id: 'CNS013',
-    name: 'Olanzapine',
-    genericName: 'Olanzapine',
-    manufacturer: 'Various',
-    category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia and bipolar disorder.',
-    drugClass: 'Atypical antipsychotic',
-    verified: true,
-    brandNames: ['Zyprexa', 'Zyprexa Zydis'],
-    prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Oral: 5-10mg once daily, may increase to 20mg daily. Can be taken with or without food.',
-    mechanism: 'Blocks dopamine D2 and serotonin 5-HT2A receptors, also affects other neurotransmitter systems.',
-    sideEffects: ['Weight gain', 'sedation', 'dizziness', 'constipation', 'dry mouth', 'increased appetite'],
-    interactions: ['CNS depressants', 'CYP1A2 inhibitors', 'anticholinergics', 'antihypertensives'],
-    indications: ['Schizophrenia', 'bipolar I disorder (manic or mixed episodes)', 'treatment-resistant depression'],
-    contraindications: ['Hypersensitivity', 'dementia-related psychosis'],
-    warnings: ['Metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome', 'hyperglycemia'],
-    pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
-  },
-  {
-    id: 'CNS014',
-    name: 'Quetiapine',
-    genericName: 'Quetiapine fumarate',
-    manufacturer: 'Various',
-    category: 'Antipsychotic',
-    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and as add-on treatment for major depressive disorder.',
-    drugClass: 'Atypical antipsychotic',
-    verified: true,
-    brandNames: ['Seroquel', 'Seroquel XR'],
-    prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Oral: 25mg twice daily initially, titrate to 300-800mg daily. Extended-release: once daily.',
-    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, also blocks histamine and adrenergic receptors.',
-    sideEffects: ['Sedation', 'dizziness', 'dry mouth', 'constipation', 'weight gain', 'orthostatic hypotension'],
-    interactions: ['CNS depressants', 'CYP3A4 inhibitors/inducers', 'antihypertensives', 'anticholinergics'],
-    indications: ['Schizophrenia', 'bipolar disorder', 'major depressive disorder (adjunctive)'],
-    contraindications: ['Hypersensitivity', 'dementia-related psychosis'],
-    warnings: ['Metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome', 'cataracts'],
-    pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from light and moisture'
-  },
-  {
+  // Antipsychotics{
     id: 'CNS015',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
@@ -599,29 +556,7 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['GI bleeding', 'cardiovascular thrombotic events', 'renal toxicity', 'hepatotoxicity'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
     storage: 'Store at room temperature, protect from moisture'
-  },
-  {
-    id: 'CNS029',
-    name: 'Gabapentin',
-    genericName: 'Gabapentin',
-    manufacturer: 'Various',
-    category: 'Analgesic',
-    description: 'Anticonvulsant used to treat neuropathic pain and seizures',
-    drugClass: 'Anticonvulsant',
-    verified: true,
-    brandNames: ['Neurontin'],
-    prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Oral: 300mg three times daily, may increase to 3600mg daily. Take with or without food.',
-    mechanism: 'Binds to voltage-gated calcium channels, reducing neurotransmitter release.',
-    sideEffects: ['Dizziness', 'drowsiness', 'fatigue', 'peripheral edema', 'ataxia', 'weight gain'],
-    interactions: ['Antacids', 'morphine', 'hydrocodone', 'alcohol', 'CNS depressants'],
-    indications: ['Neuropathic pain', 'postherpetic neuralgia', 'partial seizures', 'restless leg syndrome'],
-    contraindications: ['Hypersensitivity'],
-    warnings: ['Suicidal thoughts', 'respiratory depression (with CNS depressants)', 'withdrawal seizures'],
-    pregnancy: 'Category C - Use only if benefits outweigh risks',
-    storage: 'Store at room temperature, protect from moisture'
-  },
-  {
+  },{
     id: 'CNS030',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
@@ -871,7 +806,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to escitalopram', 'concurrent MAOI use', 'pimozide use.'],
     warnings: ['Suicidal thoughts in young adults. Serotonin syndrome risk. QT prolongation. Withdrawal symptoms if discontinued abruptly.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk. Risk of neonatal complications.',
-    storage: 'Store at room temperature 15-30°C. Protect from moisture and light.'
+    storage: 'Store at room temperature 15-30Â°C. Protect from moisture and light.'
   },
   {
     id: 'CNS042',
@@ -892,7 +827,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to venlafaxine', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma.'],
     warnings: ['Monitor blood pressure. Suicidal thoughts risk. Discontinuation syndrome. Serotonin syndrome risk.'],
     pregnancy: 'Category C - Use only if potential benefit justifies risk. Neonatal complications possible.',
-    storage: 'Store at room temperature below 30°C. Keep in original container.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
   },
   {
     id: 'CNS043',
@@ -913,7 +848,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Seizure disorder', 'eating disorders', 'abrupt alcohol/sedative discontinuation', 'MAOI use.'],
     warnings: ['Seizure risk increases with dose. Monitor for suicidal thoughts. Avoid alcohol. Neuropsychiatric events.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light and moisture.'
   },
   {
     id: 'CNS044',
@@ -934,7 +869,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to duloxetine', 'concurrent MAOI use', 'uncontrolled narrow-angle glaucoma.'],
     warnings: ['Hepatotoxicity risk. Monitor liver function. Suicidal thoughts. Discontinuation syndrome. Orthostatic hypotension.'],
     pregnancy: 'Category C - Use only if potential benefit justifies risk. Neonatal complications possible.',
-    storage: 'Store at room temperature below 30°C. Protect from moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from moisture.'
   },
   {
     id: 'CNS045',
@@ -955,7 +890,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to mirtazapine', 'concurrent MAOI use.'],
     warnings: ['Agranulocytosis risk (rare). Monitor CBC. Suicidal thoughts. Cholesterol elevation. Sedation affects driving.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Keep in original package.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original package.'
   },
   {
     id: 'CNS046',
@@ -976,7 +911,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to aripiprazole', 'dementia-related psychosis (increased mortality risk).'],
     warnings: ['Tardive dyskinesia risk. Neuroleptic malignant syndrome. Metabolic changes. Orthostatic hypotension. Seizures.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light and moisture.'
   },
   {
     id: 'CNS047',
@@ -997,7 +932,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to quetiapine', 'dementia-related psychosis.'],
     warnings: ['Tardive dyskinesia. Metabolic syndrome. Cataracts. Orthostatic hypotension. Neuroleptic malignant syndrome.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from moisture.'
   },
   {
     id: 'CNS048',
@@ -1018,30 +953,8 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to olanzapine', 'dementia-related psychosis.'],
     warnings: ['Significant weight gain and metabolic effects. Monitor glucose, lipids. Tardive dyskinesia. Neuroleptic malignant syndrome.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
-  },
-  {
-    id: 'CNS049',
-    name: 'Risperidone',
-    genericName: 'Risperidone',
-    manufacturer: 'Various',
-    category: 'Antipsychotic',
-    description: 'Atypical antipsychotic for schizophrenia, bipolar disorder, and irritability in autism.',
-    drugClass: 'Atypical antipsychotic',
-    verified: true,
-    brandNames: ['Risperdal'],
-    prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Adults: 1mg twice daily initially, titrate to 4-8mg daily. Take with or without food.',
-    mechanism: 'High affinity antagonist for dopamine D2 and serotonin 5-HT2A receptors.',
-    sideEffects: ['Extrapyramidal symptoms', 'sedation', 'dizziness', 'constipation', 'nausea', 'weight gain', 'prolactin elevation.'],
-    interactions: ['CYP2D6 inhibitors', 'carbamazepine', 'phenytoin', 'rifampin', 'antihypertensives.'],
-    indications: ['Schizophrenia', 'bipolar I disorder', 'irritability associated with autism spectrum disorder.'],
-    contraindications: ['Hypersensitivity to risperidone', 'dementia-related psychosis.'],
-    warnings: ['Tardive dyskinesia. Neuroleptic malignant syndrome. Hyperprolactinemia. Orthostatic hypotension. Cerebrovascular events.'],
-    pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
-  },
-  {
+    storage: 'Store at room temperature below 30Â°C. Protect from light and moisture.'
+  },{
     id: 'CNS050',
     name: 'Lamotrigine',
     genericName: 'Lamotrigine',
@@ -1060,7 +973,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to lamotrigine', 'serious skin rash history.'],
     warnings: ['Serious skin reactions including Stevens-Johnson syndrome. Slow titration essential. Aseptic meningitis risk.'],
     pregnancy: 'Category C - Pregnancy registry available. Folic acid supplementation recommended.',
-    storage: 'Store at room temperature below 30°C. Keep in original container.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
   },
   {
     id: 'CNS051',
@@ -1081,7 +994,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to levetiracetam or pyrrolidone derivatives.'],
     warnings: ['Behavioral abnormalities and psychotic symptoms. Suicidal thoughts. Monitor for mood changes.'],
     pregnancy: 'Category C - Pregnancy registry available. Use only if clearly needed.',
-    storage: 'Store at room temperature below 30°C. Oral solution should be used within 7 months of opening.'
+    storage: 'Store at room temperature below 30Â°C. Oral solution should be used within 7 months of opening.'
   },
   {
     id: 'CNS052',
@@ -1102,30 +1015,8 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to topiramate', 'metabolic acidosis with metformin use.'],
     warnings: ['Acute angle-closure glaucoma. Kidney stones. Metabolic acidosis. Cognitive effects. Oligohidrosis and hyperthermia.'],
     pregnancy: 'Category D - Increased risk of cleft lip/palate. Use effective contraception.',
-    storage: 'Store at room temperature below 30°C. Protect from moisture.'
-  },
-  {
-    id: 'CNS053',
-    name: 'Gabapentin',
-    genericName: 'Gabapentin',
-    manufacturer: 'Various',
-    category: 'Anticonvulsant',
-    description: 'Anticonvulsant and neuropathic pain medication with GABA-like structure.',
-    drugClass: 'Anticonvulsant',
-    verified: true,
-    brandNames: ['Neurontin'],
-    prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Adults: 300mg once daily initially, titrate to 900-1800mg daily in divided doses. Take with or without food.',
-    mechanism: 'Binds to voltage-gated calcium channels (alpha-2-delta subunit), reducing calcium influx and neurotransmitter release.',
-    sideEffects: ['Dizziness', 'somnolence', 'peripheral edema', 'ataxia', 'fatigue', 'nystagmus', 'tremor.'],
-    interactions: ['Antacids (reduce absorption)', 'morphine (increased gabapentin levels)', 'alcohol (additive CNS effects).'],
-    indications: ['Partial seizures (adjunctive)', 'postherpetic neuralgia', 'neuropathic pain (off-label).'],
-    contraindications: ['Hypersensitivity to gabapentin.'],
-    warnings: ['Suicidal thoughts risk. Respiratory depression with opioids. Withdrawal seizures if discontinued abruptly.'],
-    pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Protect from moisture.'
-  },
-  {
+    storage: 'Store at room temperature below 30Â°C. Protect from moisture.'
+  },{
     id: 'CNS054',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
@@ -1144,7 +1035,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to pregabalin.'],
     warnings: ['Angioedema risk. Suicidal thoughts. Abuse potential (Schedule V). Withdrawal symptoms. Creatine kinase elevation.'],
     pregnancy: 'Category C - Male fertility effects in animals. Use effective contraception.',
-    storage: 'Store at room temperature below 30°C. Keep in original container.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
   },
   {
     id: 'CNS055',
@@ -1165,7 +1056,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to zolpidem', 'severe hepatic impairment.'],
     warnings: ['Complex sleep behaviors (sleep-driving). Next-day impairment. Abuse potential. Limit to 7-10 days use.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
-    storage: 'Store at room temperature below 30°C. Keep in original container.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container.'
   },
   {
     id: 'CNS056',
@@ -1186,7 +1077,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Recent heart attack', 'severe heart disease', 'glaucoma', 'urinary retention', 'MAO inhibitor use within 14 days.'],
     warnings: ['Increased suicide risk in young adults. Heart rhythm problems. Anticholinergic effects. Withdrawal symptoms if stopped suddenly.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause withdrawal symptoms in newborns.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light and moisture.'
   },
   {
     id: 'CNS057',
@@ -1207,7 +1098,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'Parkinson\'s disease.'],
     warnings: ['Tardive dyskinesia (involuntary movements). Neuroleptic malignant syndrome. Blood disorders. Liver toxicity. Photosensitivity.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause movement disorders in newborns.',
-    storage: 'Store at room temperature below 30°C. Protect from light.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light.'
   },
   {
     id: 'CNS058',
@@ -1228,7 +1119,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to clonidine', 'severe bradycardia', 'heart block.'],
     warnings: ['Rebound hypertension if stopped suddenly. Sedation affects driving. Withdrawal syndrome. Cardiac conduction abnormalities.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks.',
-    storage: 'Store at room temperature below 30°C. Keep patches in original pouch until use.'
+    storage: 'Store at room temperature below 30Â°C. Keep patches in original pouch until use.'
   },
   {
     id: 'CNS059',
@@ -1249,7 +1140,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe respiratory depression', 'sleep apnea', 'severe liver disease', 'myasthenia gravis', 'narrow-angle glaucoma.'],
     warnings: ['Physical dependence and withdrawal. Respiratory depression with other depressants. Cognitive impairment. Abuse potential.'],
     pregnancy: 'Category D - Avoid use. May cause fetal harm and withdrawal in newborns.',
-    storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container. Controlled substance - secure storage required.'
   },
   {
     id: 'CNS060',
@@ -1270,7 +1161,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Hypersensitivity to escitalopram or citalopram', 'concurrent MAO inhibitor use', 'pimozide use.'],
     warnings: ['Increased suicide risk in young adults. Serotonin syndrome. QT prolongation. Withdrawal syndrome. Hyponatremia.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause neonatal complications.',
-    storage: 'Store at room temperature below 30°C. Protect from moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from moisture.'
   },
   {
     id: 'CNS061',
@@ -1291,7 +1182,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'subcortical brain damage.'],
     warnings: ['Tardive dyskinesia risk. Neuroleptic malignant syndrome. Extrapyramidal symptoms. Blood disorders. Photosensitivity.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
-    storage: 'Store at room temperature below 30°C. Protect from light. Injectable forms require refrigeration.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light. Injectable forms require refrigeration.'
   },
   {
     id: 'CNS062',
@@ -1312,7 +1203,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe CNS depression', 'coma', 'phaeochromocytoma', 'severe cardiac disease', 'bone marrow depression.'],
     warnings: ['Severe hypotension risk. Tardive dyskinesia. Neuroleptic malignant syndrome. Respiratory depression. Blood disorders.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
-    storage: 'Store at room temperature below 30°C. Protect from light.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light.'
   },
   {
     id: 'CNS063',
@@ -1333,7 +1224,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe respiratory depression', 'acute narrow-angle glaucoma', 'shock', 'coma', 'alcohol intoxication.'],
     warnings: ['Respiratory depression risk, especially with opioids. Paradoxical reactions in children/elderly. Withdrawal syndrome. Amnesia.'],
     pregnancy: 'Category D - Avoid use. May cause fetal harm and neonatal withdrawal.',
-    storage: 'Store at room temperature below 30°C. Protect from light. Controlled substance - secure storage required.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light. Controlled substance - secure storage required.'
   },
   {
     id: 'CNS064',
@@ -1354,7 +1245,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Recent myocardial infarction', 'severe heart disease', 'glaucoma', 'urinary retention', 'MAO inhibitor use within 14 days.'],
     warnings: ['Increased suicide risk in young adults. Cardiac arrhythmias. Anticholinergic effects. Withdrawal syndrome if stopped abruptly.'],
     pregnancy: 'Category D - Avoid use. May cause fetal harm and neonatal withdrawal.',
-    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light and moisture.'
   },
   {
     id: 'CNS065',
@@ -1375,7 +1266,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe CNS depression', 'coma', 'blood disorders', 'liver disease', 'children under 2 years or under 10kg.'],
     warnings: ['Tardive dyskinesia risk. Extrapyramidal symptoms. Neuroleptic malignant syndrome. Blood disorders. Photosensitivity.'],
     pregnancy: 'Category C - Use only if benefits outweigh risks. May cause extrapyramidal symptoms in newborns.',
-    storage: 'Store at room temperature below 30°C. Protect from light.'
+    storage: 'Store at room temperature below 30Â°C. Protect from light.'
   },
   {
     id: 'CNS066',
@@ -1396,7 +1287,7 @@ export const centralNervousDrugs: DrugData[] = [
     contraindications: ['Severe respiratory depression', 'sleep apnea', 'severe liver disease', 'myasthenia gravis', 'pregnancy.'],
     warnings: ['Physical dependence and withdrawal. Next-day drowsiness. Complex sleep behaviors. Abuse potential. Limit duration of use.'],
     pregnancy: 'Category X - Contraindicated. May cause fetal harm and neonatal withdrawal.',
-    storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
+    storage: 'Store at room temperature below 30Â°C. Keep in original container. Controlled substance - secure storage required.'
   },
   {
     id: 'CNS067',
@@ -1640,7 +1531,7 @@ export const centralNervousDrugs: DrugData[] = [
     verified: true,
     brandNames: ['Latuda'],
     prescriptionStatus: 'Prescription Only',
-    dosageAndAdmin: 'Schizophrenia: 40mg daily initially, may increase to 160mg daily. Bipolar depression: 20mg daily initially. Take with food (≥350 calories).',
+    dosageAndAdmin: 'Schizophrenia: 40mg daily initially, may increase to 160mg daily. Bipolar depression: 20mg daily initially. Take with food (â‰¥350 calories).',
     mechanism: 'Antagonizes dopamine D2, serotonin 5-HT2A, and 5-HT7 receptors; partial agonist at 5-HT1A receptors.',
     sideEffects: ['Nausea', 'somnolence', 'akathisia', 'extrapyramidal symptoms', 'dizziness', 'agitation', 'anxiety', 'insomnia'],
     interactions: ['Strong CYP3A4 inhibitors/inducers', 'moderate CYP3A4 inhibitors', 'digoxin', 'lithium'],
@@ -1775,6 +1666,91 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['Hypertensive crisis risk', 'serotonin syndrome', 'application site reactions (patch)', 'melanoma risk'],
     pregnancy: 'Category C - Use only if benefits outweigh risks',
     storage: 'Store at room temperature, protect from light. Patches should be stored in original pouch.'
+  },
+  {
+    id: 'CNS085',
+    name: 'Asenapine',
+    genericName: 'Asenapine',
+    manufacturer: 'Allergan',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic used for treatment of schizophrenia and bipolar I disorder.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    brandNames: ['Saphris', 'Secuado'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Sublingual: 5-10mg twice daily for schizophrenia, 5-10mg twice daily for bipolar disorder. Place under tongue and allow to dissolve completely.',
+    mechanism: 'Antagonizes dopamine D2, serotonin 5-HT2A, and multiple other neurotransmitter receptors in the brain.',
+    sideEffects: ['Oral hypoesthesia', 'somnolence', 'dizziness', 'akathisia', 'oral paresthesia', 'weight gain', 'increased appetite'],
+    interactions: ['CYP1A2 inhibitors (fluvoxamine)', 'Paroxetine', 'CNS depressants', 'Antihypertensive agents', 'Alcohol'],
+    indications: ['Schizophrenia in adults', 'Acute treatment of manic or mixed episodes associated with bipolar I disorder'],
+    contraindications: ['Hypersensitivity to asenapine', 'Severe hepatic impairment (Child-Pugh Class C)'],
+    warnings: ['Increased mortality in elderly patients with dementia-related psychosis', 'Neuroleptic malignant syndrome', 'Tardive dyskinesia', 'Metabolic changes'],
+    pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies potential risk to fetus.',
+    storage: 'Store at room temperature. Keep tablets in original packaging until ready to use.'
+  },
+  {
+    id: 'CNS086',
+    name: 'Brexpiprazole',
+    genericName: 'Brexpiprazole',
+    manufacturer: 'Otsuka',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic used for schizophrenia and as adjunctive treatment for major depressive disorder.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    brandNames: ['Rexulti'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: Schizophrenia: 1mg once daily, titrate to 2-4mg daily. Depression adjunct: 0.5-1mg once daily, may increase to 2mg daily.',
+    mechanism: 'Partial agonist at dopamine D2 and serotonin 5-HT1A receptors, antagonist at serotonin 5-HT2A receptors.',
+    sideEffects: ['Akathisia', 'weight gain', 'headache', 'somnolence', 'tremor', 'dizziness', 'anxiety', 'nausea'],
+    interactions: ['Strong CYP3A4 inhibitors', 'Strong CYP2D6 inhibitors', 'CYP3A4 inducers', 'CNS depressants'],
+    indications: ['Schizophrenia', 'Adjunctive treatment of major depressive disorder'],
+    contraindications: ['Hypersensitivity to brexpiprazole'],
+    warnings: ['Increased mortality in elderly with dementia-related psychosis', 'Suicidal thoughts and behaviors', 'Neuroleptic malignant syndrome', 'Tardive dyskinesia'],
+    pregnancy: 'Pregnancy Category C. Use during pregnancy only if potential benefit justifies potential risk.',
+    storage: 'Store at room temperature. Protect from light and moisture.'
+  },
+  {
+    id: 'CNS087',
+    name: 'Doxepin',
+    genericName: 'Doxepin',
+    manufacturer: 'Various',
+    category: 'Antidepressant',
+    description: 'Tricyclic antidepressant also used for insomnia at low doses.',
+    drugClass: 'Tricyclic antidepressant/Sleep aid',
+    verified: true,
+    brandNames: ['Silenor', 'Sinequan', 'Adapin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Depression: 75-150mg daily in divided doses or at bedtime. Insomnia: 3-6mg once daily within 30 minutes of bedtime.',
+    mechanism: 'Blocks reuptake of norepinephrine and serotonin; low-dose formulation primarily blocks histamine H1 receptors for sleep.',
+    sideEffects: ['Drowsiness', 'dry mouth', 'constipation', 'dizziness', 'blurred vision', 'weight gain', 'urinary retention'],
+    interactions: ['MAO inhibitors', 'CNS depressants', 'Anticholinergic drugs', 'CYP2D6 inhibitors', 'Alcohol', 'Cimetidine'],
+    indications: ['Major depressive disorder', 'Anxiety', 'Insomnia (low-dose formulation)'],
+    contraindications: ['Hypersensitivity to doxepin', 'Glaucoma', 'Urinary retention', 'MAO inhibitor use within 14 days'],
+    warnings: ['Increased suicide risk in young adults', 'Cardiac conduction abnormalities', 'Anticholinergic effects', 'Next-day drowsiness (insomnia indication)'],
+    pregnancy: 'Pregnancy Category C. Use only if benefits outweigh risks.',
+    storage: 'Store at room temperature. Protect from light.'
+  },
+  {
+    id: 'CNS088',
+    name: 'Loxapine',
+    genericName: 'Loxapine',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Typical antipsychotic used for treatment of schizophrenia and acute agitation.',
+    drugClass: 'Typical antipsychotic',
+    verified: true,
+    brandNames: ['Loxitane', 'Adasuve'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 10mg twice daily initially, may increase to 60-100mg daily in divided doses. Inhalation: 10mg as single dose for agitation.',
+    mechanism: 'Blocks dopamine D2 receptors and serotonin 5-HT2 receptors in the brain, reducing psychotic symptoms.',
+    sideEffects: ['Extrapyramidal symptoms', 'drowsiness', 'dry mouth', 'blurred vision', 'constipation', 'weight gain', 'orthostatic hypotension'],
+    interactions: ['CNS depressants', 'Anticholinergic drugs', 'Antihypertensive agents', 'Alcohol', 'Lithium'],
+    indications: ['Schizophrenia', 'Acute treatment of agitation associated with schizophrenia or bipolar I disorder (inhalation)'],
+    contraindications: ['Hypersensitivity to loxapine', 'Comatose states', 'Severe CNS depression', 'Acute respiratory disease (inhalation)'],
+    warnings: ['Increased mortality in elderly with dementia-related psychosis', 'Tardive dyskinesia', 'Neuroleptic malignant syndrome', 'Bronchospasm risk (inhalation)'],
+    pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies potential risk.',
+    storage: 'Store at room temperature. Protect from light and moisture.'
   }
 ];
+
 
