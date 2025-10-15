@@ -1,114 +1,27 @@
-# Duplicate Drugs Analysis Summary
+# Duplicate Drugs Analysis Report
 
-## Overview
-This document summarizes the comprehensive analysis and cleanup of duplicate drug entries across the MyPharmaLens database.
+**Generated:** October 15, 2025  
+**Analysis Date:** During drug names extraction process
 
-## Analysis Results
+## Summary Statistics
 
-### Initial State
-- **Total drug categories analyzed**: 24 files
-- **Total drug entries**: 801 (after cleanup)
-- **Cross-category name duplicates found**: 57 unique drugs
-- **Cross-category generic duplicates found**: 59 unique drugs
-- **Total duplicate instances identified**: 681 entries marked for removal
-
-### ID System Analysis
-- **ID Format**: Each category uses a unique prefix (e.g., CNS, CVD, ED) followed by sequential numbers
-- **ID Integrity**: All categories maintain sequential numbering starting from 001
-- **No gaps found**: ID sequences remain intact after duplicate removal
-
-### Duplicate Categories Identified
-
-#### High-Priority Duplicates Removed
-1. **Semaglutide** (ED039) - Removed from endocrineDrugs.ts (kept better version elsewhere)
-2. **Gabapentin** (CNS053, CNS029) - Removed duplicates from centralNervousDrugs.ts
-3. **Risperidone** (CNS049) - Removed duplicate from centralNervousDrugs.ts
-4. **Quetiapine** (CNS014) - Removed duplicate from centralNervousDrugs.ts
-5. **Olanzapine** (CNS013) - Removed duplicate from centralNervousDrugs.ts
-6. **Isosorbide Mononitrate** (CVD037) - Removed from cardiovascularDrugs.ts
-7. **Ezetimibe** (CVD023) - Removed from cardiovascularDrugs.ts
-
-#### Remaining Duplicates (Require Manual Review)
-- **Name duplicates**: 76 instances across categories
-- **Generic duplicates**: 58 instances across categories
-
-### Common Duplicate Patterns
-1. **Psychiatric medications** appearing in both centralNervousDrugs.ts and other categories
-2. **Cardiovascular drugs** with multiple formulations or brand names
-3. **Endocrine medications** appearing in both endocrineDrugs.ts and steroidHormoneDrugs.ts
-4. **Pain medications** appearing in both painManagementDrugs.ts and centralNervousDrugs.ts
-
-### Files Modified
-1. **endocrineDrugs.ts** - Removed 1 duplicate (Semaglutide)
-2. **centralNervousDrugs.ts** - Removed 5 duplicates
-3. **cardiovascularDrugs.ts** - Removed 2 duplicates
-
-### Quality Assessment
-- **No truly incomplete entries found** - All drugs have sufficient detail
-- **Completeness scoring implemented** - Based on description length, drug class presence, and comprehensive fields
-- **Retention strategy** - Kept the most complete version of each duplicate drug
+- **Total drug entries found:** 847
+- **Unique drug names:** 708
+- **Duplicate drug names:** 114
+- **Total duplicate entries removed:** 139
 
 ## Key Findings
 
-The duplicate removal process successfully eliminated **8 high-priority duplicate drug entries** from multiple category files. The final database now contains **801 unique drugs** across all category files with improved data integrity.
+The deduplication process removed **139 duplicate entries** from **114 unique drug names** that appeared across multiple data files. This explains the difference between your expected ~100 new drugs and the 49 net increase in unique drugs.
 
-## Drugs Remaining in additionalDrugsData.ts (8 drugs)
-
-These 8 drugs were verified as unique and remain in the `additionalDrugsData.ts` file:
-
-1. **Paracetamol** (ADD001) - Analgesic/Antipyretic
-2. **Dextromethorphan** (ADD002) - Antitussive (Cough suppressant)
-3. **Guaifenesin** (ADD003) - Expectorant
-4. **Pseudoephedrine** (ADD004) - Sympathomimetic decongestant
-5. **Phenylephrine** (ADD005) - Sympathomimetic decongestant
-6. **Calamine** (ADD006) - Topical antipruritic
-7. **Zinc Oxide** (ADD007) - Topical protectant/Sunscreen
-8. **Benzocaine** (ADD008) - Topical anesthetic
-
-## Drugs Successfully Removed (77 drugs)
-
-The following drugs were identified as duplicates and successfully removed from `additionalDrugsData.ts` because they already existed in other category-specific files:
-
-### Cardiovascular Drugs (25 removed)
-- Amlodipine/Valsartan, Atenolol, Bisoprolol, Candesartan, Diltiazem, Enalapril, Hydrochlorothiazide/Lisinopril, Indapamide, Irbesartan, Lisinopril, Losartan, Losartan/Hydrochlorothiazide, Metoprolol, Nifedipine, Propranolol, Ramipril, Rosuvastatin, Simvastatin, Spironolactone, Telmisartan, Verapamil
-
-### Central Nervous System Drugs (20 removed)
-- Aripiprazole, Bupropion, Buspirone, Clonazepam, Desvenlafaxine, Duloxetine, Fluoxetine, Gabapentin, Haloperidol, Lamotrigine, Levetiracetam, Lorazepam, Methylphenidate, Mirtazapine, Olanzapine, Paroxetine, Quetiapine, Risperidone, Sertraline, Trazodone, Venlafaxine, Vilazodone, Ziprasidone
-
-### Endocrine/Diabetes Drugs (15 removed)
-- Canagliflozin, Dapagliflozin, Dulaglutide, Empagliflozin, Gliclazide, Glimepiride, Insulin Aspart, Insulin Degludec, Insulin Detemir, Insulin Glargine, Insulin Lispro, Levothyroxine, Linagliptin, Liraglutide, Metformin, Pioglitazone, Repaglinide, Semaglutide, Sitagliptin, Tamsulosin
-
-### Respiratory Drugs (8 removed)
-- Azelastine, Budesonide/Formoterol, Desloratadine, Fexofenadine, Fluticasone/Vilanterol, Ipratropium, Levocetirizine, Loratadine, Montelukast, Salbutamol, Umeclidinium, Umeclidinium/Vilanterol
-
-### Gastrointestinal Drugs (6 removed)
-- Dexlansoprazole, Esomeprazole, Famotidine, Lansoprazole, Omeprazole, Pantoprazole, Rabeprazole
-
-### Antibiotic Drugs (4 removed)
-- Ceftriaxone Sodium, Cephalexin, Clarithromycin, Erythromycin, Levofloxacin, Trimethoprim/Sulfamethoxazole
-
-### Pain Management Drugs (4 removed)
-- Celecoxib, Ibuprofen, Meloxicam, Naproxen, Pregabalin
-
-### Antiviral Drugs (3 removed)
-- Emtricitabine/Tenofovir, Valacyclovir
-
-### Antimalarial Drugs (2 removed)
-- Atovaquone/Proguanil, Doxycycline for Malaria, Hydroxychloroquine
-
-### Infectious Diseases Drugs (1 removed)
-- Fluconazole
-
-## Complete List of Duplicate Drugs (Historical Reference)
-
-*Note: This section contains the original analysis of all duplicate drugs found during the initial scan. The drugs marked with ✅ have been successfully removed from `additionalDrugsData.ts`, while those marked with ❌ were found in other files but not in `additionalDrugsData.ts`.*
+## Complete List of Duplicate Drugs
 
 ### A-C
-1. **Amlodipine/Valsartan** ✅ (2 occurrences) - Files: additionalDrugsData.ts, cardiovascularDrugs.ts
-2. **Apixaban** ❌ (2 occurrences) - Files: cardiovascularDrugs.ts
-3. **Aripiprazole** ✅ (3 occurrences) - Files: additionalDrugsData.ts, centralNervousDrugs.ts
-4. **Aspirin** ❌ (2 occurrences) - Files: cardiovascularDrugs.ts
-5. **Atenolol** ✅ (2 occurrences) - Files: additionalDrugsData.ts, cardiovascularDrugs.ts
+1. **Amlodipine/Valsartan** (2 occurrences) - Files: additionalDrugsData.ts, cardiovascularDrugs.ts
+2. **Apixaban** (2 occurrences) - Files: cardiovascularDrugs.ts
+3. **Aripiprazole** (3 occurrences) - Files: additionalDrugsData.ts, centralNervousDrugs.ts
+4. **Aspirin** (2 occurrences) - Files: cardiovascularDrugs.ts
+5. **Atenolol** (2 occurrences) - Files: additionalDrugsData.ts, cardiovascularDrugs.ts
 6. **Atovaquone/Proguanil** (2 occurrences) - Files: additionalDrugsData.ts, antimalarialDrugs.ts
 7. **Azelastine** (2 occurrences) - Files: additionalDrugsData.ts, respiratoryDrugs.ts
 8. **Betamethasone (topical)** (2 occurrences) - Files: dermatologicalDrugs.ts, obstetricsDrugs.ts
@@ -231,25 +144,11 @@ The following drugs were identified as duplicates and successfully removed from 
 117. **Ziprasidone** (2 occurrences) - Files: additionalDrugsData.ts, centralNervousDrugs.ts
 118. **Zolpidem** (2 occurrences) - Files: centralNervousDrugs.ts
 
-## Process Summary
+## Analysis Notes
 
-### Duplicate Removal Process
-1. **Initial Analysis**: Identified 139 duplicate entries across 114 unique drug names
-2. **First Removal Phase**: Removed 61 duplicate drugs from `additionalDrugsData.ts`
-3. **Verification Phase**: Found 16 additional duplicates that were missed
-4. **Second Removal Phase**: Removed the remaining 16 duplicate drugs
-5. **Final Verification**: Confirmed no duplicates remain across all 32 data files
+- **Most duplicated file:** `additionalDrugsData.ts` appears in 85+ duplicate entries
+- **Highest duplication:** `Duloxetine` appears 4 times across 3 files
+- **Common patterns:** Many cardiovascular, endocrine, and central nervous system drugs appear in both category-specific files and the additional drugs file
+- **Cross-category duplicates:** Some drugs appear in multiple therapeutic categories (e.g., pain management + central nervous system)
 
-### Key Statistics
-- **Original `additionalDrugsData.ts` entries**: 85 drugs
-- **Final `additionalDrugsData.ts` entries**: 8 drugs
-- **Total duplicates removed**: 77 drugs
-- **Database integrity**: ✅ Verified - No duplicates remain
-- **ID sequencing**: ✅ Maintained - ADD001 through ADD008
-
-### Files Processed
-- **Total data files checked**: 32 TypeScript files
-- **Primary source of duplicates**: `additionalDrugsData.ts` (90% of duplicates)
-- **Most affected categories**: Cardiovascular (25), Central Nervous (20), Endocrine (15)
-
-This comprehensive duplicate removal process successfully cleaned the database while maintaining data integrity and proper ID sequencing.
+This analysis confirms that your addition of ~100 drugs resulted in 139 total new entries, but after deduplication, only 49 unique drugs were added to the final list.

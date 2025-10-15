@@ -810,6 +810,27 @@ export const endocrineDrugs: DrugData[] = [
 },
 {
   id: 'ED039',
+  name: 'Semaglutide',
+  genericName: 'Semaglutide',
+  manufacturer: 'Novo Nordisk',
+  category: 'Antidiabetic',
+  description: 'A once-weekly diabetes injection that helps control blood sugar and promotes weight loss. It works like a weekly reminder to your body to manage sugar better.',
+  drugClass: 'GLP-1 receptor agonist',
+  verified: true,
+  brandNames: ['Ozempic', 'Wegovy', 'Rybelsus'],
+  prescriptionStatus: 'Prescription Only',
+  dosageAndAdmin: 'SC injection: Start 0.25 mg weekly for 4 weeks, then 0.5 mg weekly. May increase to 1 mg weekly if needed. Oral: 3-14 mg daily on empty stomach.',
+  mechanism: 'Long-acting GLP-1 receptor agonist that enhances insulin secretion, suppresses glucagon, delays gastric emptying, and reduces appetite',
+  sideEffects: ['Nausea', 'vomiting', 'diarrhea', 'abdominal pain', 'constipation', 'headache'],
+  interactions: ['Oral medications (may delay absorption)', 'insulin', 'sulfonylureas (increased hypoglycemia risk)', 'warfarin'],
+  indications: ['Type 2 diabetes', 'cardiovascular risk reduction in diabetes', 'chronic weight management (higher dose)'],
+  contraindications: ['Type 1 diabetes', 'diabetic ketoacidosis', 'personal/family history of medullary thyroid carcinoma', 'pregnancy'],
+  warnings: ['Thyroid C-cell tumor risk', 'pancreatitis', 'diabetic retinopathy complications', 'kidney problems', 'gallbladder disease'],
+  pregnancy: 'Category C - Discontinue before planned pregnancy',
+  storage: 'Refrigerate. In use pen: room temperature up to 56 days. Protect from light and heat.'
+},
+{
+  id: 'ED040',
   name: 'Propylthiouracil',
   genericName: 'Propylthiouracil',
   manufacturer: 'Various',
@@ -830,7 +851,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature, protect from light and moisture'
  },
  {
-   id: 'ED040',
+   id: 'ED041',
    name: 'Bromocriptine',
   genericName: 'Bromocriptine mesylate',
   manufacturer: 'Various',
@@ -851,7 +872,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature in tight container. Protect from light.'
  },
  {
-   id: 'ED041',
+   id: 'ED042',
    name: 'Cabergoline',
   genericName: 'Cabergoline',
   manufacturer: 'Various',
@@ -872,7 +893,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature in dry place. Protect from light.'
  },
  {
-   id: 'ED042',
+   id: 'ED043',
    name: 'Calcitonin',
   genericName: 'Calcitonin salmon',
   manufacturer: 'Various',
@@ -893,7 +914,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Refrigerate unopened. Room temperature after opening. Nasal spray stable for 30 days at room temperature.'
  },
  {
-   id: 'ED043',
+   id: 'ED044',
    name: 'Calcitriol',
   genericName: 'Calcitriol',
   manufacturer: 'Various',
@@ -914,7 +935,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature, protect from light.'
  },
  {
-   id: 'ED044',
+   id: 'ED045',
    name: 'Carbimazole',
   genericName: 'Carbimazole',
   manufacturer: 'Various',
@@ -935,7 +956,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature in dry place.'
  },
  {
-  id: 'ED045',
+  id: 'ED046',
   name: 'Cetrorelix',
   genericName: 'Cetrorelix acetate',
   manufacturer: 'Various',
@@ -956,7 +977,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature. Use immediately after reconstitution.'
  },
  {
-  id: 'ED046',
+  id: 'ED047',
   name: 'Cinacalcet',
   genericName: 'Cinacalcet hydrochloride',
   manufacturer: 'Amgen',
@@ -977,7 +998,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature. Take with food or shortly after a meal.'
  },
  {
-  id: 'ED047',
+  id: 'ED048',
   name: 'Clomifene',
   genericName: 'Clomifene citrate',
   manufacturer: 'Various',
@@ -998,7 +1019,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature, protect from light and moisture.'
  },
  {
-  id: 'ED048',
+  id: 'ED049',
   name: 'Cyproterone Acetate',
   genericName: 'Cyproterone acetate',
   manufacturer: 'Various',
@@ -1019,7 +1040,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature, protect from moisture.'
  },
  {
-  id: 'ED049',
+  id: 'ED050',
   name: 'Danazol',
   genericName: 'Danazol',
   manufacturer: 'Various',
@@ -1040,7 +1061,7 @@ export const endocrineDrugs: DrugData[] = [
   storage: 'Store at room temperature in tight container.'
  },
   {
-    id: 'ED050',
+    id: 'ED051',
     name: 'Alendronate',
     genericName: 'Alendronate sodium',
     manufacturer: 'Various',
@@ -1061,7 +1082,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature in original container. Protect from moisture.'
   },
   {
-    id: 'ED051',
+    id: 'ED052',
     name: 'Denosumab',
     genericName: 'Denosumab',
     manufacturer: 'Various',
@@ -1082,7 +1103,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate at 2-8°C. Do not freeze or shake. Protect from light.'
   },
   {
-    id: 'ED052',
+    id: 'ED053',
     name: 'Dutasteride',
     genericName: 'Dutasteride',
     manufacturer: 'Various',
@@ -1103,7 +1124,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Do not refrigerate.'
   },
   {
-    id: 'ED053',
+    id: 'ED054',
     name: 'Ibandronate',
     genericName: 'Ibandronate sodium',
     manufacturer: 'Various',
@@ -1124,7 +1145,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original packaging.'
   },
   {
-    id: 'ED054',
+    id: 'ED055',
     name: 'Insulin Aspart',
     genericName: 'Insulin aspart',
     manufacturer: 'Various',
@@ -1145,7 +1166,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials. Room temperature after opening for 28 days.'
   },
   {
-    id: 'ED055',
+    id: 'ED056',
     name: 'Insulin Degludec',
     genericName: 'Insulin degludec',
     manufacturer: 'Various',
@@ -1166,7 +1187,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened pens. Room temperature after opening for 56 days.'
   },
   {
-    id: 'ED056',
+    id: 'ED057',
     name: 'Insulin Detemir',
     genericName: 'Insulin detemir',
     manufacturer: 'Various',
@@ -1187,7 +1208,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials. Room temperature after opening for 42 days.'
   },
   {
-    id: 'ED057',
+    id: 'ED058',
     name: 'Insulin Lispro',
     genericName: 'Insulin lispro',
     manufacturer: 'Various',
@@ -1208,7 +1229,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials. Room temperature after opening for 28 days.'
   },
   {
-    id: 'ED058',
+    id: 'ED059',
     name: 'Insulin NPH',
     genericName: 'Insulin NPH (isophane)',
     manufacturer: 'Various',
@@ -1229,7 +1250,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate unopened vials. Room temperature after opening for 42 days. Gently roll to mix.'
   },
   {
-    id: 'ED059',
+    id: 'ED060',
     name: 'Liotrix',
     genericName: 'Liotrix (T4/T3 combination)',
     manufacturer: 'Various',
@@ -1250,7 +1271,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture.'
   },
   {
-    id: 'ED060',
+    id: 'ED061',
     name: 'Methyltestosterone',
     genericName: 'Methyltestosterone',
     manufacturer: 'Various',
@@ -1271,7 +1292,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature in tight, light-resistant container.'
   },
   {
-    id: 'ED061',
+    id: 'ED062',
     name: 'Oxandrolone',
     genericName: 'Oxandrolone',
     manufacturer: 'Various',
@@ -1292,7 +1313,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature in tight container. Protect from light.'
   },
   {
-    id: 'ED062',
+    id: 'ED063',
     name: 'Dapagliflozin',
     genericName: 'Dapagliflozin propanediol',
     manufacturer: 'AstraZeneca',
@@ -1313,7 +1334,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Protect from moisture.'
   },
   {
-    id: 'ED063',
+    id: 'ED064',
     name: 'Dulaglutide',
     genericName: 'Dulaglutide',
     manufacturer: 'Eli Lilly',
@@ -1334,7 +1355,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate 2-8°C (36-46°F). Do not freeze. May store at room temperature up to 14 days.'
   },
   {
-    id: 'ED064',
+    id: 'ED065',
     name: 'Empagliflozin',
     genericName: 'Empagliflozin',
     manufacturer: 'Boehringer Ingelheim',
@@ -1355,7 +1376,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from moisture.'
   },
   {
-    id: 'ED065',
+    id: 'ED066',
     name: 'Liraglutide',
     genericName: 'Liraglutide',
     manufacturer: 'Novo Nordisk',
@@ -1376,7 +1397,7 @@ export const endocrineDrugs: DrugData[] = [
     storage: 'Refrigerate 2-8°C (36-46°F). Do not freeze. After first use, may store at room temperature up to 30 days.'
   },
   {
-    id: 'ED066',
+    id: 'ED067',
     name: 'Semaglutide',
     genericName: 'Semaglutide',
     manufacturer: 'Novo Nordisk',

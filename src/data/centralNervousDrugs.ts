@@ -1,5 +1,5 @@
 
-import { DrugData } from "@/components/DrugCard";
+import { DrugData } from "../components/DrugCard";
 
 // Central Nervous System drugs - includes antidepressants, anxiolytics, sedatives, and analgesics
 export const centralNervousDrugs: DrugData[] = [
@@ -260,6 +260,48 @@ export const centralNervousDrugs: DrugData[] = [
   // Antipsychotics
   {
     id: 'CNS013',
+    name: 'Olanzapine',
+    genericName: 'Olanzapine',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic used to treat schizophrenia and bipolar disorder.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    brandNames: ['Zyprexa', 'Zyprexa Zydis'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 5-10mg once daily, may increase to 20mg daily. Can be taken with or without food.',
+    mechanism: 'Blocks dopamine D2 and serotonin 5-HT2A receptors, also affects other neurotransmitter systems.',
+    sideEffects: ['Weight gain', 'sedation', 'dizziness', 'constipation', 'dry mouth', 'increased appetite'],
+    interactions: ['CNS depressants', 'CYP1A2 inhibitors', 'anticholinergics', 'antihypertensives'],
+    indications: ['Schizophrenia', 'bipolar I disorder (manic or mixed episodes)', 'treatment-resistant depression'],
+    contraindications: ['Hypersensitivity', 'dementia-related psychosis'],
+    warnings: ['Metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome', 'hyperglycemia'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
+  },
+  {
+    id: 'CNS014',
+    name: 'Quetiapine',
+    genericName: 'Quetiapine fumarate',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and as add-on treatment for major depressive disorder.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    brandNames: ['Seroquel', 'Seroquel XR'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 25mg twice daily initially, titrate to 300-800mg daily. Extended-release: once daily.',
+    mechanism: 'Antagonizes dopamine D2 and serotonin 5-HT2A receptors, also blocks histamine and adrenergic receptors.',
+    sideEffects: ['Sedation', 'dizziness', 'dry mouth', 'constipation', 'weight gain', 'orthostatic hypotension'],
+    interactions: ['CNS depressants', 'CYP3A4 inhibitors/inducers', 'antihypertensives', 'anticholinergics'],
+    indications: ['Schizophrenia', 'bipolar disorder', 'major depressive disorder (adjunctive)'],
+    contraindications: ['Hypersensitivity', 'dementia-related psychosis'],
+    warnings: ['Metabolic changes', 'tardive dyskinesia', 'neuroleptic malignant syndrome', 'cataracts'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from light and moisture'
+  },
+  {
+    id: 'CNS015',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
@@ -280,7 +322,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: 'CNS014',
+    id: 'CNS016',
     name: 'Ziprasidone',
     genericName: 'Ziprasidone hydrochloride',
     manufacturer: 'Various',
@@ -303,7 +345,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Anxiolytics
   {
-    id: 'CNS015',
+    id: 'CNS017',
     name: 'Clonazepam',
     genericName: 'Clonazepam',
     manufacturer: 'Various',
@@ -324,7 +366,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: 'CNS016',
+    id: 'CNS018',
     name: 'Alprazolam',
     genericName: 'Alprazolam',
     manufacturer: 'Various',
@@ -345,7 +387,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture, secure storage required'
   },
   {
-    id: 'CNS017',
+    id: 'CNS019',
     name: 'Lorazepam',
     genericName: 'Lorazepam',
     manufacturer: 'Various',
@@ -366,7 +408,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: 'CNS018',
+    id: 'CNS020',
     name: 'Clonazepam',
     genericName: 'Clonazepam',
     manufacturer: 'Various',
@@ -387,7 +429,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light, secure storage required'
   },
   {
-    id: 'CNS019',
+    id: 'CNS021',
     name: 'Buspirone',
     genericName: 'Buspirone hydrochloride',
     manufacturer: 'Various',
@@ -408,7 +450,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: 'CNS020',
+    id: 'CNS022',
     name: 'Hydroxyzine',
     genericName: 'Hydroxyzine hydrochloride',
     manufacturer: 'Various',
@@ -431,7 +473,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Sedatives and sleep aids
   {
-    id: 'CNS021',
+    id: 'CNS023',
     name: 'Zolpidem',
     genericName: 'Zolpidem',
     manufacturer: 'Various',
@@ -454,7 +496,7 @@ export const centralNervousDrugs: DrugData[] = [
   
   // Analgesics
   {
-    id: 'CNS022',
+    id: 'CNS024',
     name: 'Ibuprofen',
     genericName: 'Ibuprofen',
     manufacturer: 'Various',
@@ -475,7 +517,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS023',
+    id: 'CNS025',
     name: 'Acetaminophen',
     genericName: 'Acetaminophen',
     manufacturer: 'Various',
@@ -496,7 +538,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS024',
+    id: 'CNS026',
     name: 'Hydrocodone/Acetaminophen',
     genericName: 'Hydrocodone bitartrate and acetaminophen',
     manufacturer: 'Various',
@@ -517,7 +559,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: 'CNS025',
+    id: 'CNS027',
     name: 'Tramadol',
     genericName: 'Tramadol hydrochloride',
     manufacturer: 'Various',
@@ -538,7 +580,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required'
   },
   {
-    id: 'CNS026',
+    id: 'CNS028',
     name: 'Meloxicam',
     genericName: 'Meloxicam',
     manufacturer: 'Various',
@@ -557,8 +599,30 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['GI bleeding', 'cardiovascular thrombotic events', 'renal toxicity', 'hepatotoxicity'],
     pregnancy: 'Category C (first/second trimester), Category D (third trimester)',
     storage: 'Store at room temperature, protect from moisture'
-  },{
-    id: 'CNS027',
+  },
+  {
+    id: 'CNS029',
+    name: 'Gabapentin',
+    genericName: 'Gabapentin',
+    manufacturer: 'Various',
+    category: 'Analgesic',
+    description: 'Anticonvulsant used to treat neuropathic pain and seizures',
+    drugClass: 'Anticonvulsant',
+    verified: true,
+    brandNames: ['Neurontin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 300mg three times daily, may increase to 3600mg daily. Take with or without food.',
+    mechanism: 'Binds to voltage-gated calcium channels, reducing neurotransmitter release.',
+    sideEffects: ['Dizziness', 'drowsiness', 'fatigue', 'peripheral edema', 'ataxia', 'weight gain'],
+    interactions: ['Antacids', 'morphine', 'hydrocodone', 'alcohol', 'CNS depressants'],
+    indications: ['Neuropathic pain', 'postherpetic neuralgia', 'partial seizures', 'restless leg syndrome'],
+    contraindications: ['Hypersensitivity'],
+    warnings: ['Suicidal thoughts', 'respiratory depression (with CNS depressants)', 'withdrawal seizures'],
+    pregnancy: 'Category C - Use only if benefits outweigh risks',
+    storage: 'Store at room temperature, protect from moisture'
+  },
+  {
+    id: 'CNS030',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
     manufacturer: 'Various',
@@ -579,7 +643,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS028',
+    id: 'CNS031',
     name: 'Cyclobenzaprine',
     genericName: 'Cyclobenzaprine hydrochloride',
     manufacturer: 'Various',
@@ -600,7 +664,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS029',
+    id: 'CNS032',
     name: 'Tizanidine',
     genericName: 'Tizanidine hydrochloride',
     manufacturer: 'Various',
@@ -621,7 +685,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS030',
+    id: 'CNS033',
     name: 'Oxycodone',
     genericName: 'Oxycodone hydrochloride',
     manufacturer: 'Various',
@@ -642,7 +706,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: 'CNS031',
+    id: 'CNS034',
     name: 'Morphine',
     genericName: 'Morphine sulfate',
     manufacturer: 'Various',
@@ -663,7 +727,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required, protect from theft'
   },
   {
-    id: 'CNS032',
+    id: 'CNS035',
     name: 'Codeine',
     genericName: 'Codeine phosphate',
     manufacturer: 'Various',
@@ -684,7 +748,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, secure storage required'
   },
   {
-    id: 'CNS033',
+    id: 'CNS036',
     name: 'Naproxen',
     genericName: 'Naproxen sodium',
     manufacturer: 'Various',
@@ -705,7 +769,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS034',
+    id: 'CNS037',
     name: 'Celecoxib',
     genericName: 'Celecoxib',
     manufacturer: 'Various',
@@ -726,7 +790,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS035',
+    id: 'CNS038',
     name: 'Diclofenac',
     genericName: 'Diclofenac sodium',
     manufacturer: 'Various',
@@ -747,7 +811,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS036',
+    id: 'CNS039',
     name: 'Indomethacin',
     genericName: 'Indomethacin',
     manufacturer: 'Various',
@@ -768,7 +832,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: 'CNS037',
+    id: 'CNS040',
     name: 'Ketorolac',
     genericName: 'Ketorolac tromethamine',
     manufacturer: 'Various',
@@ -789,7 +853,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: 'CNS038',
+    id: 'CNS041',
     name: 'Escitalopram',
     genericName: 'Escitalopram oxalate',
     manufacturer: 'Various',
@@ -810,7 +874,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Protect from moisture and light.'
   },
   {
-    id: 'CNS039',
+    id: 'CNS042',
     name: 'Venlafaxine',
     genericName: 'Venlafaxine hydrochloride',
     manufacturer: 'Various',
@@ -831,7 +895,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CNS040',
+    id: 'CNS043',
     name: 'Bupropion',
     genericName: 'Bupropion hydrochloride',
     manufacturer: 'Various',
@@ -852,7 +916,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: 'CNS041',
+    id: 'CNS044',
     name: 'Duloxetine',
     genericName: 'Duloxetine hydrochloride',
     manufacturer: 'Various',
@@ -873,7 +937,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: 'CNS042',
+    id: 'CNS045',
     name: 'Mirtazapine',
     genericName: 'Mirtazapine',
     manufacturer: 'Various',
@@ -894,7 +958,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original package.'
   },
   {
-    id: 'CNS043',
+    id: 'CNS046',
     name: 'Aripiprazole',
     genericName: 'Aripiprazole',
     manufacturer: 'Various',
@@ -915,7 +979,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: 'CNS044',
+    id: 'CNS047',
     name: 'Quetiapine',
     genericName: 'Quetiapine fumarate',
     manufacturer: 'Various',
@@ -936,7 +1000,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: 'CNS045',
+    id: 'CNS048',
     name: 'Olanzapine',
     genericName: 'Olanzapine',
     manufacturer: 'Various',
@@ -955,8 +1019,30 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['Significant weight gain and metabolic effects. Monitor glucose, lipids. Tardive dyskinesia. Neuroleptic malignant syndrome.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
-  },{
-    id: 'CNS046',
+  },
+  {
+    id: 'CNS049',
+    name: 'Risperidone',
+    genericName: 'Risperidone',
+    manufacturer: 'Various',
+    category: 'Antipsychotic',
+    description: 'Atypical antipsychotic for schizophrenia, bipolar disorder, and irritability in autism.',
+    drugClass: 'Atypical antipsychotic',
+    verified: true,
+    brandNames: ['Risperdal'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 1mg twice daily initially, titrate to 4-8mg daily. Take with or without food.',
+    mechanism: 'High affinity antagonist for dopamine D2 and serotonin 5-HT2A receptors.',
+    sideEffects: ['Extrapyramidal symptoms', 'sedation', 'dizziness', 'constipation', 'nausea', 'weight gain', 'prolactin elevation.'],
+    interactions: ['CYP2D6 inhibitors', 'carbamazepine', 'phenytoin', 'rifampin', 'antihypertensives.'],
+    indications: ['Schizophrenia', 'bipolar I disorder', 'irritability associated with autism spectrum disorder.'],
+    contraindications: ['Hypersensitivity to risperidone', 'dementia-related psychosis.'],
+    warnings: ['Tardive dyskinesia. Neuroleptic malignant syndrome. Hyperprolactinemia. Orthostatic hypotension. Cerebrovascular events.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
+    storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
+  },
+  {
+    id: 'CNS050',
     name: 'Lamotrigine',
     genericName: 'Lamotrigine',
     manufacturer: 'Various',
@@ -977,7 +1063,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CNS047',
+    id: 'CNS051',
     name: 'Levetiracetam',
     genericName: 'Levetiracetam',
     manufacturer: 'Various',
@@ -998,7 +1084,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Oral solution should be used within 7 months of opening.'
   },
   {
-    id: 'CNS048',
+    id: 'CNS052',
     name: 'Topiramate',
     genericName: 'Topiramate',
     manufacturer: 'Various',
@@ -1017,8 +1103,30 @@ export const centralNervousDrugs: DrugData[] = [
     warnings: ['Acute angle-closure glaucoma. Kidney stones. Metabolic acidosis. Cognitive effects. Oligohidrosis and hyperthermia.'],
     pregnancy: 'Category D - Increased risk of cleft lip/palate. Use effective contraception.',
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
-  },{
-    id: 'CNS049',
+  },
+  {
+    id: 'CNS053',
+    name: 'Gabapentin',
+    genericName: 'Gabapentin',
+    manufacturer: 'Various',
+    category: 'Anticonvulsant',
+    description: 'Anticonvulsant and neuropathic pain medication with GABA-like structure.',
+    drugClass: 'Anticonvulsant',
+    verified: true,
+    brandNames: ['Neurontin'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 300mg once daily initially, titrate to 900-1800mg daily in divided doses. Take with or without food.',
+    mechanism: 'Binds to voltage-gated calcium channels (alpha-2-delta subunit), reducing calcium influx and neurotransmitter release.',
+    sideEffects: ['Dizziness', 'somnolence', 'peripheral edema', 'ataxia', 'fatigue', 'nystagmus', 'tremor.'],
+    interactions: ['Antacids (reduce absorption)', 'morphine (increased gabapentin levels)', 'alcohol (additive CNS effects).'],
+    indications: ['Partial seizures (adjunctive)', 'postherpetic neuralgia', 'neuropathic pain (off-label).'],
+    contraindications: ['Hypersensitivity to gabapentin.'],
+    warnings: ['Suicidal thoughts risk. Respiratory depression with opioids. Withdrawal seizures if discontinued abruptly.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
+    storage: 'Store at room temperature below 30°C. Protect from moisture.'
+  },
+  {
+    id: 'CNS054',
     name: 'Pregabalin',
     genericName: 'Pregabalin',
     manufacturer: 'Various',
@@ -1039,7 +1147,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CNS050',
+    id: 'CNS055',
     name: 'Zolpidem',
     genericName: 'Zolpidem tartrate',
     manufacturer: 'Various',
@@ -1060,7 +1168,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CNS051',
+    id: 'CNS056',
     name: 'Amitriptyline',
     genericName: 'Amitriptyline hydrochloride',
     manufacturer: 'Various',
@@ -1081,7 +1189,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: 'CNS052',
+    id: 'CNS057',
     name: 'Chlorpromazine',
     genericName: 'Chlorpromazine hydrochloride',
     manufacturer: 'Various',
@@ -1102,7 +1210,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: 'CNS053',
+    id: 'CNS058',
     name: 'Clonidine',
     genericName: 'Clonidine hydrochloride',
     manufacturer: 'Various',
@@ -1123,7 +1231,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep patches in original pouch until use.'
   },
   {
-    id: 'CNS054',
+    id: 'CNS059',
     name: 'Diazepam',
     genericName: 'Diazepam',
     manufacturer: 'Various',
@@ -1144,7 +1252,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
   },
   {
-    id: 'CNS055',
+    id: 'CNS060',
     name: 'Escitalopram',
     genericName: 'Escitalopram oxalate',
     manufacturer: 'Various',
@@ -1165,7 +1273,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: 'CNS056',
+    id: 'CNS061',
     name: 'Fluphenazine',
     genericName: 'Fluphenazine hydrochloride',
     manufacturer: 'Various',
@@ -1186,7 +1294,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light. Injectable forms require refrigeration.'
   },
   {
-    id: 'CNS057',
+    id: 'CNS062',
     name: 'Levomepromazine',
     genericName: 'Levomepromazine maleate',
     manufacturer: 'Various',
@@ -1207,7 +1315,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: 'CNS058',
+    id: 'CNS063',
     name: 'Midazolam',
     genericName: 'Midazolam hydrochloride',
     manufacturer: 'Various',
@@ -1228,7 +1336,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light. Controlled substance - secure storage required.'
   },
   {
-    id: 'CNS059',
+    id: 'CNS064',
     name: 'Nortriptyline',
     genericName: 'Nortriptyline hydrochloride',
     manufacturer: 'Various',
@@ -1249,7 +1357,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light and moisture.'
   },
   {
-    id: 'CNS060',
+    id: 'CNS065',
     name: 'Prochlorperazine',
     genericName: 'Prochlorperazine maleate',
     manufacturer: 'Various',
@@ -1270,7 +1378,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from light.'
   },
   {
-    id: 'CNS061',
+    id: 'CNS066',
     name: 'Temazepam',
     genericName: 'Temazepam',
     manufacturer: 'Various',
@@ -1291,7 +1399,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container. Controlled substance - secure storage required.'
   },
   {
-    id: 'CNS062',
+    id: 'CNS067',
     name: 'Amantadine',
     genericName: 'Amantadine hydrochloride',
     manufacturer: 'Various',
@@ -1312,7 +1420,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS063',
+    id: 'CNS068',
     name: 'Armodafinil',
     genericName: 'Armodafinil',
     manufacturer: 'Various',
@@ -1333,7 +1441,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, controlled substance - secure storage required'
   },
   {
-    id: 'CNS064',
+    id: 'CNS069',
     name: 'Atomoxetine',
     genericName: 'Atomoxetine hydrochloride',
     manufacturer: 'Various',
@@ -1354,7 +1462,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS065',
+    id: 'CNS070',
     name: 'Fingolimod',
     genericName: 'Fingolimod hydrochloride',
     manufacturer: 'Various',
@@ -1375,7 +1483,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS066',
+    id: 'CNS071',
     name: 'Fluvoxamine',
     genericName: 'Fluvoxamine maleate',
     manufacturer: 'Various',
@@ -1396,7 +1504,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture and light'
   },
   {
-    id: 'CNS067',
+    id: 'CNS072',
     name: 'Galantamine',
     genericName: 'Galantamine hydrobromide',
     manufacturer: 'Various',
@@ -1417,7 +1525,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS068',
+    id: 'CNS073',
     name: 'Guanfacine',
     genericName: 'Guanfacine hydrochloride',
     manufacturer: 'Various',
@@ -1438,7 +1546,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture and light'
   },
   {
-    id: 'CNS069',
+    id: 'CNS074',
     name: 'Imipramine',
     genericName: 'Imipramine hydrochloride',
     manufacturer: 'Various',
@@ -1459,7 +1567,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: 'CNS070',
+    id: 'CNS075',
     name: 'Lacosamide',
     genericName: 'Lacosamide',
     manufacturer: 'Various',
@@ -1480,7 +1588,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, controlled substance - secure storage required'
   },
   {
-    id: 'CNS071',
+    id: 'CNS076',
     name: 'Levomilnacipran',
     genericName: 'Levomilnacipran hydrochloride',
     manufacturer: 'Various',
@@ -1501,7 +1609,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS072',
+    id: 'CNS077',
     name: 'Lisdexamfetamine',
     genericName: 'Lisdexamfetamine dimesylate',
     manufacturer: 'Various',
@@ -1522,7 +1630,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, controlled substance - secure storage required'
   },
   {
-    id: 'CNS073',
+    id: 'CNS078',
     name: 'Lurasidone',
     genericName: 'Lurasidone hydrochloride',
     manufacturer: 'Various',
@@ -1543,7 +1651,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture'
   },
   {
-    id: 'CNS074',
+    id: 'CNS079',
     name: 'Maprotiline',
     genericName: 'Maprotiline hydrochloride',
     manufacturer: 'Various',
@@ -1564,7 +1672,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light and moisture'
   },
   {
-    id: 'CNS075',
+    id: 'CNS080',
     name: 'Modafinil',
     genericName: 'Modafinil',
     manufacturer: 'Various',
@@ -1585,7 +1693,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, controlled substance - secure storage required'
   },
   {
-    id: 'CNS076',
+    id: 'CNS081',
     name: 'Paliperidone',
     genericName: 'Paliperidone',
     manufacturer: 'Various',
@@ -1606,7 +1714,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from moisture. IM form requires refrigeration.'
   },
   {
-    id: 'CNS077',
+    id: 'CNS082',
     name: 'Pramipexole',
     genericName: 'Pramipexole dihydrochloride',
     manufacturer: 'Various',
@@ -1627,7 +1735,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light'
   },
   {
-    id: 'CNS078',
+    id: 'CNS083',
     name: 'Rivastigmine',
     genericName: 'Rivastigmine tartrate',
     manufacturer: 'Various',
@@ -1648,7 +1756,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from heat. Patches should be stored in sealed pouch.'
   },
   {
-    id: 'CNS079',
+    id: 'CNS084',
     name: 'Selegiline',
     genericName: 'Selegiline hydrochloride',
     manufacturer: 'Various',
@@ -1669,7 +1777,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature, protect from light. Patches should be stored in original pouch.'
   },
   {
-    id: 'CNS080',
+    id: 'CNS085',
     name: 'Asenapine',
     genericName: 'Asenapine',
     manufacturer: 'Allergan',
@@ -1690,7 +1798,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep tablets in original packaging until ready to use.'
   },
   {
-    id: 'CNS081',
+    id: 'CNS086',
     name: 'Brexpiprazole',
     genericName: 'Brexpiprazole',
     manufacturer: 'Otsuka',
@@ -1711,7 +1819,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CNS082',
+    id: 'CNS087',
     name: 'Doxepin',
     genericName: 'Doxepin',
     manufacturer: 'Various',
@@ -1732,7 +1840,7 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light.'
   },
   {
-    id: 'CNS083',
+    id: 'CNS088',
     name: 'Loxapine',
     genericName: 'Loxapine',
     manufacturer: 'Various',
@@ -1753,5 +1861,4 @@ export const centralNervousDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   }
 ];
-
 

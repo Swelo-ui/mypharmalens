@@ -467,8 +467,30 @@ export const cardiovascularDrugs: DrugData[] = [
     warnings: ['Monitor liver enzymes', 'Muscle toxicity risk', 'Avoid in pregnancy', 'Lower interaction potential'],
     pregnancy: 'Pregnancy Category X. Contraindicated in pregnancy and breastfeeding.',
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
-  },{
+  },
+  {
     id: 'CVD023',
+    name: 'Ezetimibe',
+    genericName: 'Ezetimibe',
+    manufacturer: 'Various',
+    category: 'Antilipemic',
+    description: 'Cholesterol absorption inhibitor that blocks dietary and biliary cholesterol uptake in the small intestine.',
+    drugClass: 'Cholesterol absorption inhibitor',
+    verified: true,
+    brandNames: ['Zetia', 'Ezetrol'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 10mg once daily. Can be taken with or without food. May be given with statins for additive effect.',
+    mechanism: 'Ezetimibe inhibits Niemann-Pick C1-Like 1 (NPC1L1) protein, blocking cholesterol absorption at the intestinal brush border.',
+    sideEffects: ['Upper respiratory infection', 'Diarrhea', 'Arthralgia', 'Sinusitis', 'Pain in extremity', 'Fatigue'],
+    interactions: ['Cyclosporine (increased ezetimibe levels)', 'Fibrates (gallstone risk)', 'Warfarin (monitor INR)', 'Cholestyramine (reduced absorption)'],
+    indications: ['Primary hypercholesterolemia', 'Mixed hyperlipidemia', 'Homozygous familial hypercholesterolemia', 'Phytosterolemia'],
+    contraindications: ['Hypersensitivity to ezetimibe', 'Active liver disease (when used with statins)', 'Pregnancy (with statins)'],
+    warnings: ['Monitor liver enzymes when used with statins', 'Myopathy risk with statins', 'Gallbladder disease risk'],
+    pregnancy: 'Pregnancy Category C. Use only if potential benefit justifies risk.',
+    storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from moisture.'
+  },
+  {
+    id: 'CVD024',
     name: 'Fenofibrate',
     genericName: 'Fenofibrate',
     manufacturer: 'Various',
@@ -489,7 +511,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD024',
+    id: 'CVD025',
     name: 'Valsartan',
     genericName: 'Valsartan',
     manufacturer: 'Various',
@@ -510,7 +532,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD025',
+    id: 'CVD026',
     name: 'Carvedilol',
     genericName: 'Carvedilol',
     manufacturer: 'Various',
@@ -531,7 +553,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture and light.'
   },
   {
-    id: 'CVD026',
+    id: 'CVD027',
     name: 'Spironolactone',
     genericName: 'Spironolactone',
     manufacturer: 'Various',
@@ -552,7 +574,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature in tight, light-resistant containers. Protect from moisture.'
   },
   {
-    id: 'CVD027',
+    id: 'CVD028',
     name: 'Diltiazem',
     genericName: 'Diltiazem hydrochloride',
     manufacturer: 'Various',
@@ -573,7 +595,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Extended-release capsules should not be crushed or chewed.'
   },
   {
-    id: 'CVD028',
+    id: 'CVD029',
     name: 'Rivaroxaban',
     genericName: 'Rivaroxaban',
     manufacturer: 'Bayer',
@@ -594,7 +616,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original package to protect from moisture.'
   },
   {
-    id: 'CVD029',
+    id: 'CVD030',
     name: 'Apixaban',
     genericName: 'Apixaban',
     manufacturer: 'Bristol-Myers Squibb',
@@ -615,7 +637,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Dispense in original bottle with desiccant.'
   },
   {
-    id: 'CVD030',
+    id: 'CVD031',
     name: 'Dabigatran',
     genericName: 'Dabigatran etexilate',
     manufacturer: 'Boehringer Ingelheim',
@@ -636,7 +658,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store in original bottle with desiccant. Use within 4 months of opening. Protect from moisture.'
   },
   {
-    id: 'CVD031',
+    id: 'CVD032',
     name: 'Prasugrel',
     genericName: 'Prasugrel hydrochloride',
     manufacturer: 'Eli Lilly',
@@ -657,7 +679,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD032',
+    id: 'CVD033',
     name: 'Ticagrelor',
     genericName: 'Ticagrelor',
     manufacturer: 'AstraZeneca',
@@ -678,7 +700,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original package to protect from light and moisture.'
   },
   {
-    id: 'CVD033',
+    id: 'CVD034',
     name: 'Rosuvastatin',
     genericName: 'Rosuvastatin calcium',
     manufacturer: 'Various',
@@ -699,7 +721,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
   },
   {
-    id: 'CVD034',
+    id: 'CVD035',
     name: 'Ezetimibe',
     genericName: 'Ezetimibe',
     manufacturer: 'Various',
@@ -720,7 +742,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Protect from moisture.'
   },
   {
-    id: 'CVD035',
+    id: 'CVD036',
     name: 'Fenofibrate',
     genericName: 'Fenofibrate',
     manufacturer: 'Various',
@@ -739,8 +761,30 @@ export const cardiovascularDrugs: DrugData[] = [
     warnings: ['Monitor liver function and CK. Increased risk of cholelithiasis. Renal function monitoring required.'],
     pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
     storage: 'Store at room temperature below 30°C. Keep in original container. Protect from moisture.'
-  },{
-    id: 'CVD036',
+  },
+  {
+    id: 'CVD037',
+    name: 'Isosorbide Mononitrate',
+    genericName: 'Isosorbide mononitrate',
+    manufacturer: 'Various',
+    category: 'Antianginal',
+    description: 'Long-acting nitrate used for prevention of angina pectoris and heart failure.',
+    drugClass: 'Nitrate',
+    verified: true,
+    brandNames: ['Imdur', 'Monoket'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Adults: 30-60mg once daily (extended-release) or 20mg twice daily (immediate-release). Take on empty stomach.',
+    mechanism: 'Releases nitric oxide, causing venous and arterial vasodilation, reducing preload and afterload.',
+    sideEffects: ['Headache', 'dizziness', 'hypotension', 'flushing', 'nausea', 'weakness', 'palpitations.'],
+    interactions: ['Phosphodiesterase inhibitors (sildenafil)', 'antihypertensives', 'alcohol', 'tricyclic antidepressants.'],
+    indications: ['Angina pectoris prevention', 'heart failure (off-label)', 'esophageal spasm.'],
+    contraindications: ['Hypersensitivity to nitrates', 'concurrent use with PDE5 inhibitors', 'severe anemia.'],
+    warnings: ['Tolerance develops with continuous use. Maintain nitrate-free interval. Avoid abrupt discontinuation.'],
+    pregnancy: 'Category C - Use only if potential benefit justifies potential risk.',
+    storage: 'Store at room temperature below 30°C. Keep in original container. Protect from light and moisture.'
+  },
+  {
+    id: 'CVD038',
     name: 'Ranolazine',
     genericName: 'Ranolazine',
     manufacturer: 'Gilead Sciences',
@@ -761,7 +805,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD037',
+    id: 'CVD039',
     name: 'Ivabradine',
     genericName: 'Ivabradine hydrochloride',
     manufacturer: 'Servier',
@@ -782,7 +826,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original package to protect from light.'
   },
   {
-    id: 'CVD038',
+    id: 'CVD040',
     name: 'Allopurinol',
     genericName: 'Allopurinol',
     manufacturer: 'Various',
@@ -803,7 +847,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Keep dry and away from light.'
   },
   {
-    id: 'CVD039',
+    id: 'CVD041',
     name: 'Amiodarone',
     genericName: 'Amiodarone hydrochloride',
     manufacturer: 'Various',
@@ -824,7 +868,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Keep in original container.'
   },
   {
-    id: 'CVD040',
+    id: 'CVD042',
     name: 'Apixaban',
     genericName: 'Apixaban',
     manufacturer: 'Bristol-Myers Squibb',
@@ -845,7 +889,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD041',
+    id: 'CVD043',
     name: 'Aspirin',
     genericName: 'Acetylsalicylic acid',
     manufacturer: 'Various',
@@ -866,7 +910,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature in dry place. Keep away from moisture and heat.'
   },
   {
-    id: 'CVD042',
+    id: 'CVD044',
     name: 'Clopidogrel',
     genericName: 'Clopidogrel bisulfate',
     manufacturer: 'Sanofi',
@@ -887,7 +931,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Keep in original container.'
   },
   {
-    id: 'CVD043',
+    id: 'CVD045',
     name: 'Dabigatran',
     genericName: 'Dabigatran etexilate',
     manufacturer: 'Boehringer Ingelheim',
@@ -908,7 +952,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store in original bottle with desiccant. Use within 4 months of opening. Keep below 30°C.'
   },
   {
-    id: 'CVD044',
+    id: 'CVD046',
     name: 'Doxazosin',
     genericName: 'Doxazosin mesylate',
     manufacturer: 'Various',
@@ -929,7 +973,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 25°C. Keep in original container.'
   },
   {
-    id: 'CVD045',
+    id: 'CVD047',
     name: 'Edoxaban',
     genericName: 'Edoxaban tosylate',
     manufacturer: 'Daiichi Sankyo',
@@ -950,7 +994,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature below 30°C. Keep in original container.'
   },
   {
-    id: 'CVD046',
+    id: 'CVD048',
     name: 'Enoxaparin',
     genericName: 'Enoxaparin sodium',
     manufacturer: 'Sanofi',
@@ -971,7 +1015,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not freeze. Single-use prefilled syringes.'
   },
   {
-    id: 'CVD047',
+    id: 'CVD049',
     name: 'Furosemide',
     genericName: 'Furosemide',
     manufacturer: 'Various',
@@ -992,7 +1036,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Keep tablets dry.'
   },
   {
-    id: 'CVD048',
+    id: 'CVD050',
     name: 'Heparin',
     genericName: 'Heparin sodium',
     manufacturer: 'Various',
@@ -1013,7 +1057,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not freeze. Check for particulates before use.'
   },
   {
-    id: 'CVD049',
+    id: 'CVD051',
     name: 'Hydralazine',
     genericName: 'Hydralazine hydrochloride',
     manufacturer: 'Various',
@@ -1034,7 +1078,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD050',
+    id: 'CVD052',
     name: 'Isosorbide Dinitrate',
     genericName: 'Isosorbide dinitrate',
     manufacturer: 'Various',
@@ -1055,7 +1099,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container. Protect from light.'
   },
   {
-    id: 'CVD051',
+    id: 'CVD053',
     name: 'Isosorbide Mononitrate',
     genericName: 'Isosorbide mononitrate',
     manufacturer: 'Various',
@@ -1076,7 +1120,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD052',
+    id: 'CVD054',
     name: 'Methyldopa',
     genericName: 'Methyldopa',
     manufacturer: 'Various',
@@ -1097,7 +1141,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container.'
   },
   {
-    id: 'CVD053',
+    id: 'CVD055',
     name: 'Nitroglycerin',
     genericName: 'Nitroglycerin',
     manufacturer: 'Various',
@@ -1118,7 +1162,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Sublingual tablets: Keep in original dark glass bottle. Patches: store at room temperature.'
   },
   {
-    id: 'CVD054',
+    id: 'CVD056',
     name: 'Prazosin',
     genericName: 'Prazosin hydrochloride',
     manufacturer: 'Various',
@@ -1139,7 +1183,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD055',
+    id: 'CVD057',
     name: 'Propranolol',
     genericName: 'Propranolol hydrochloride',
     manufacturer: 'Various',
@@ -1160,7 +1204,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture.'
   },
   {
-    id: 'CVD056',
+    id: 'CVD058',
     name: 'Captopril',
     genericName: 'Captopril',
     manufacturer: 'Various',
@@ -1181,7 +1225,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container.'
   },
   {
-    id: 'CVD057',
+    id: 'CVD059',
     name: 'Nifedipine',
     genericName: 'Nifedipine',
     manufacturer: 'Various',
@@ -1202,7 +1246,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect extended-release tablets from light and moisture.'
   },
   {
-    id: 'CVD058',
+    id: 'CVD060',
     name: 'Streptokinase',
     genericName: 'Streptokinase',
     manufacturer: 'Various',
@@ -1223,7 +1267,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstitute just before use. Do not shake vigorously.'
   },
   {
-    id: 'CVD059',
+    id: 'CVD061',
     name: 'Alteplase',
     genericName: 'Alteplase (tissue plasminogen activator)',
     manufacturer: 'Genentech',
@@ -1244,7 +1288,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Reconstitute with sterile water. Use within 8 hours of reconstitution.'
   },
   {
-    id: 'CVD060',
+    id: 'CVD062',
     name: 'Dobutamine',
     genericName: 'Dobutamine hydrochloride',
     manufacturer: 'Various',
@@ -1265,7 +1309,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Dilute before use. Pink discoloration indicates oxidation but does not affect potency.'
   },
   {
-    id: 'CVD061',
+    id: 'CVD063',
     name: 'Simvastatin',
     genericName: 'Simvastatin',
     manufacturer: 'Various',
@@ -1286,7 +1330,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD062',
+    id: 'CVD064',
     name: 'Warfarin',
     genericName: 'Warfarin sodium',
     manufacturer: 'Various',
@@ -1307,7 +1351,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light and moisture. Keep in original container.'
   },
   {
-    id: 'CVD063',
+    id: 'CVD065',
     name: 'Terazosin',
     genericName: 'Terazosin hydrochloride',
     manufacturer: 'Various',
@@ -1328,7 +1372,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Keep in original container away from moisture.'
   },
   {
-    id: 'CVD064',
+    id: 'CVD066',
     name: 'Adenosine',
     genericName: 'Adenosine',
     manufacturer: 'Various',
@@ -1349,7 +1393,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Do not refrigerate. Protect from light.'
   },
   {
-    id: 'CVD065',
+    id: 'CVD067',
     name: 'Epoprostenol',
     genericName: 'Epoprostenol sodium',
     manufacturer: 'Various',
@@ -1370,7 +1414,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store powder at room temperature. Reconstituted solution stable for 8 hours at room temperature.'
   },
   {
-    id: 'CVD066',
+    id: 'CVD068',
     name: 'Eptifibatide',
     genericName: 'Eptifibatide',
     manufacturer: 'Various',
@@ -1391,7 +1435,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 2°C to 8°C. Do not freeze. Protect from light.'
   },
   {
-    id: 'CVD067',
+    id: 'CVD069',
     name: 'Fondaparinux',
     genericName: 'Fondaparinux sodium',
     manufacturer: 'Various',
@@ -1412,7 +1456,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C. Do not freeze. Single-use prefilled syringes.'
   },
   {
-    id: 'CVD068',
+    id: 'CVD070',
     name: 'Levosimendan',
     genericName: 'Levosimendan',
     manufacturer: 'Various',
@@ -1433,7 +1477,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Dilute before administration.'
   },
   {
-    id: 'CVD069',
+    id: 'CVD071',
     name: 'Milrinone',
     genericName: 'Milrinone lactate',
     manufacturer: 'Various',
@@ -1454,7 +1498,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Compatible with normal saline and D5W.'
   },
   {
-    id: 'CVD070',
+    id: 'CVD072',
     name: 'Nitroprusside',
     genericName: 'Sodium nitroprusside',
     manufacturer: 'Various',
@@ -1475,7 +1519,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature. Protect from light. Reconstituted solution stable for 24 hours when protected from light.'
   },
   {
-    id: 'CVD071',
+    id: 'CVD073',
     name: 'Acebutolol',
     genericName: 'Acebutolol hydrochloride',
     manufacturer: 'Various',
@@ -1496,7 +1540,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD072',
+    id: 'CVD074',
     name: 'Aliskiren',
     genericName: 'Aliskiren hemifumarate',
     manufacturer: 'Novartis',
@@ -1517,7 +1561,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD073',
+    id: 'CVD075',
     name: 'Amiloride',
     genericName: 'Amiloride hydrochloride',
     manufacturer: 'Various',
@@ -1538,7 +1582,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 20°C to 25°C (68°F to 77°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD074',
+    id: 'CVD076',
     name: 'Betaxolol',
     genericName: 'Betaxolol hydrochloride',
     manufacturer: 'Various',
@@ -1559,7 +1603,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 15°C to 30°C (59°F to 86°F). Protect from light.'
   },
   {
-    id: 'CVD075',
+    id: 'CVD077',
     name: 'Candesartan/Hydrochlorothiazide',
     genericName: 'Candesartan cilexetil/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1580,7 +1624,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD076',
+    id: 'CVD078',
     name: 'Carteolol',
     genericName: 'Carteolol hydrochloride',
     manufacturer: 'Various',
@@ -1601,7 +1645,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 15°C to 30°C (59°F to 86°F). Protect from light and freezing.'
   },
   {
-    id: 'CVD077',
+    id: 'CVD079',
     name: 'Dronedarone',
     genericName: 'Dronedarone hydrochloride',
     manufacturer: 'Sanofi',
@@ -1622,7 +1666,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture and light.'
   },
   {
-    id: 'CVD078',
+    id: 'CVD080',
     name: 'Empagliflozin/Linagliptin',
     genericName: 'Empagliflozin/Linagliptin',
     manufacturer: 'Boehringer Ingelheim',
@@ -1643,7 +1687,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture. Keep in original container.'
   },
   {
-    id: 'CVD079',
+    id: 'CVD081',
     name: 'Empagliflozin/Metformin',
     genericName: 'Empagliflozin/Metformin hydrochloride',
     manufacturer: 'Boehringer Ingelheim',
@@ -1664,7 +1708,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture and light.'
   },
   {
-    id: 'CVD080',
+    id: 'CVD082',
     name: 'Eplerenone',
     genericName: 'Eplerenone',
     manufacturer: 'Pfizer',
@@ -1685,7 +1729,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at 25°C (77°F). Protect from moisture.'
   },
   {
-    id: 'CVD081',
+    id: 'CVD083',
     name: 'Azilsartan',
     genericName: 'Azilsartan medoxomil',
     manufacturer: 'Takeda',
@@ -1706,7 +1750,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD082',
+    id: 'CVD084',
     name: 'Cilostazol',
     genericName: 'Cilostazol',
     manufacturer: 'Various',
@@ -1727,7 +1771,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light.'
   },
   {
-    id: 'CVD083',
+    id: 'CVD085',
     name: 'Icosapent ethyl',
     genericName: 'Icosapent ethyl',
     manufacturer: 'Amarin',
@@ -1748,7 +1792,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 20-25°C (68-77°F). Protect from light.'
   },
   {
-    id: 'CVD084',
+    id: 'CVD086',
     name: 'Indapamide',
     genericName: 'Indapamide',
     manufacturer: 'Various',
@@ -1769,7 +1813,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD085',
+    id: 'CVD087',
     name: 'Labetalol/Hydrochlorothiazide',
     genericName: 'Labetalol hydrochloride/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1790,7 +1834,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light and moisture.'
   },
   {
-    id: 'CVD086',
+    id: 'CVD088',
     name: 'Losartan/Hydrochlorothiazide',
     genericName: 'Losartan potassium/Hydrochlorothiazide',
     manufacturer: 'Various',
@@ -1811,7 +1855,7 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from light.'
   },
   {
-    id: 'CVD087',
+    id: 'CVD089',
     name: 'Sacubitril/Valsartan',
     genericName: 'Sacubitril/Valsartan',
     manufacturer: 'Novartis',
@@ -1832,4 +1876,3 @@ export const cardiovascularDrugs: DrugData[] = [
     storage: 'Store at room temperature 15-30°C (59-86°F). Protect from moisture.'
   }
 ];
-

@@ -86,9 +86,11 @@ const allDrugsData: DrugData[] = [
 let duplicatesFound = 0;
 let duplicateLog: Array<{id: string, kept: string, replaced: string[]}> = [];
 
-export const combinedDrugsData: DrugData[] = allDrugsData.reduce((unique: DrugData[], drug: DrugData) => {
+export const combinedDrugsData: DrugData[] = allDrugsData
+  .filter(drug => drug && drug.id && drug.name) // Filter out undefined/null entries
+  .reduce((unique: DrugData[], drug: DrugData) => {
   // Check for ID duplicates first
-  const existingIdIndex = unique.findIndex(existingDrug => existingDrug.id === drug.id);
+  const existingIdIndex = unique.findIndex(existingDrug => existingDrug && existingDrug.id === drug.id);
   if (existingIdIndex !== -1) {
     // Log duplicate found
     duplicatesFound++;

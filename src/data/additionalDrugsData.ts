@@ -34,7 +34,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature away from moisture.'
     }
   },
-,
   {
     id: 'ADD002',
     name: 'Dextromethorphan',
@@ -68,7 +67,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature away from light and moisture.'
     }
   },
-,
   {
     id: 'ADD003',
     name: 'Guaifenesin',
@@ -102,7 +100,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature away from moisture.'
     }
   },
-,
   {
     id: 'ADD004',
     name: 'Pseudoephedrine',
@@ -136,7 +133,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature away from moisture.'
     }
   },
-,
   {
     id: 'ADD005',
     name: 'Phenylephrine',
@@ -170,7 +166,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature away from light.'
     }
   },
-,
   {
     id: 'ADD006',
     name: 'Calamine',
@@ -204,7 +199,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature. Shake before each use.'
     }
   },
-,
   {
     id: 'ADD007',
     name: 'Zinc Oxide',
@@ -238,7 +232,6 @@ export const additionalDrugsData: DrugData[] = [
       storage: 'Keep at room temperature. Don\'t let it freeze.'
     }
   },
-,
   {
     id: 'ADD008',
     name: 'Benzocaine',
