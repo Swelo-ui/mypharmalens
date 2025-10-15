@@ -1,4 +1,4 @@
-﻿import { DrugData } from "@/components/DrugCard";
+import { DrugData } from "@/components/DrugCard";
 
 export const additionalDrugsData: DrugData[] = [
   {

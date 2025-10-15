@@ -1,12 +1,15 @@
-﻿# MyPharmaLens Drug Names List
+# MyPharmaLens Drug Names List
 
 This document contains a comprehensive list of all drug names available in the MyPharmaLens application.
 
 ## Summary
-- **Total Unique Drugs**: 713
-- **Last Updated**: 2025-10-15 - Updated after duplicate removal from additionalDrugsData.ts
+- **Total Unique Drugs**: 793 (713 + 50 cardiovascular combinations + 30 anti-diabetic combinations)
+- **Last Updated**: 2025-01-27 - Added cardiovascular and anti-diabetic combination drugs
 - **Purpose**: Reference list for drug verification and duplicate prevention
 - **Note**: Count reflects the application's deduplication logic which removes both ID and name duplicates
+- **New Additions**: 
+  - 50 Cardiovascular Combination Drugs (CVC001-CVC050)
+  - 30 Anti-diabetic Combination Drugs (ADC001-ADC030)
 
 ## Complete Drug List (Alphabetical)
 1. Abacavir

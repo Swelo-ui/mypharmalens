@@ -53,7 +53,7 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
   return (
     <div 
       className={cn(
-        "block p-6 rounded-2xl glass-card group transition-all duration-300",
+        "block p-4 sm:p-6 rounded-2xl glass-card group transition-all duration-300 min-w-0 w-full",
         "hover:shadow-lg hover:scale-[1.01]",
         onClick ? "cursor-pointer" : "",
         className
@@ -75,38 +75,38 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
         <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-pharma-600 group-hover:translate-x-1 transition-all" />
       </div>
       
-      <h3 className="text-lg font-semibold mb-1 group-hover:text-pharma-600 transition-colors">
+      <h3 className="text-lg font-semibold mb-1 group-hover:text-pharma-600 transition-colors break-words hyphens-auto leading-tight">
         {drug.name}
       </h3>
       
       {drug.genericName && (
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 italic">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 italic break-words hyphens-auto leading-relaxed">
           {drug.genericName}
         </p>
       )}
       
       {drug.description && (
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 break-words leading-relaxed">
           {drug.description}
         </p>
       )}
       
       <div className="flex flex-wrap gap-2 mt-4">
         {drug.category && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-            {drug.category}
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 break-words max-w-full">
+            <span className="truncate">{drug.category}</span>
           </span>
         )}
         
         {drug.drugClass && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300">
-            {drug.drugClass}
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300 break-words max-w-full">
+            <span className="truncate">{drug.drugClass}</span>
           </span>
         )}
         
         {drug.manufacturer && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
-            {drug.manufacturer}
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 break-words max-w-full">
+            <span className="truncate">{drug.manufacturer}</span>
           </span>
         )}
       </div>
@@ -115,16 +115,16 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
       {drug.brandNames && drug.brandNames.length > 0 && (
         <div className="mt-3">
           <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
-            <Tag className="h-3 w-3 mr-1" />
+            <Tag className="h-3 w-3 mr-1 flex-shrink-0" />
             <span>Brand Names:</span>
           </div>
           <div className="flex flex-wrap gap-1">
             {drug.brandNames.map((brand, index) => (
               <span 
                 key={index}
-                className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
+                className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 break-words max-w-full"
               >
-                {brand}
+                <span className="truncate">{brand}</span>
               </span>
             ))}
           </div>

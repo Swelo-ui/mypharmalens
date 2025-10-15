@@ -16,6 +16,7 @@
     "noUnusedLocals": false,
     "strictNullChecks": false,
     "module": "nodenext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true
   }
 }
