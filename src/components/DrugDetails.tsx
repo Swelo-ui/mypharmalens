@@ -270,7 +270,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             </div>
           </div>
           
-          <h2 className="text-2xl font-bold mb-1">{drug.name}</h2>
+          <h2 className="text-2xl font-bold mb-1 break-words overflow-wrap-anywhere leading-tight">{drug.name}</h2>
           
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
             <span className="font-medium">Generic Name:</span> {drug.genericName}
