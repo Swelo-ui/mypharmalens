@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme with PharmaLens branding -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- PharmaLens brand colors -->
+        <item name="colorPrimary">@color/pharma_600</item>
+        <item name="colorPrimaryDark">@color/pharma_700</item>
+        <item name="colorAccent">@color/pharma_500</item>
+        <item name="android:statusBarColor">@color/pharma_700</item>
+        <item name="android:navigationBarColor">@color/pharma_600</item>
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@color/background_light</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">@color/pharma_700</item>
+        <item name="android:navigationBarColor">@color/pharma_600</item>
+        <!-- Proper padding and spacing -->
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+    </style>
+
+
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:background">@drawable/splash</item>
+        <item name="android:statusBarColor">@color/pharma_700</item>
+        <item name="android:navigationBarColor">@color/pharma_600</item>
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+
+    <!-- Button Styles matching webapp design -->
+    <style name="Widget.PharmaLens.Button" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_primary</item>
+        <item name="android:textAppearance">@style/TextAppearance.PharmaLens.Button</item>
+        <item name="android:paddingLeft">@dimen/button_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/button_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/button_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/button_padding_vertical</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:elevation">@dimen/card_elevation</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <!-- Card Style matching webapp design -->
+    <style name="Widget.PharmaLens.Card" parent="CardView">
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">@color/background_white</item>
+        <item name="contentPadding">@dimen/card_padding</item>
+        <item name="android:layout_margin">@dimen/spacing_sm</item>
+    </style>
+</resources>

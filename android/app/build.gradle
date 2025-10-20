@@ -1,0 +1,134 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.himanshu.pharmalens"
+    compileSdk rootProject.ext.compileSdkVersion
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    signingConfigs {
+        release {
+            storeFile file('pharmalens-release-key.keystore')
+            storePassword 'pharmalens123'
+            keyAlias 'pharmalens'
+            keyPassword 'pharmalens123'
+        }
+    }
+    
+    defaultConfig {
+        applicationId "com.himanshu.pharmalens"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 4
+        versionName "2.2"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Enable vector drawable support for older API levels
+        vectorDrawables.useSupportLibrary = true
+        
+        // Optimize for performance
+        multiDexEnabled true
+        
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            
+            // Additional compression for better performance
+            noCompress 'webp', 'jpg', 'jpeg', 'png', 'gif'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release // Use production signing
+            
+            // Enable additional optimizations
+            zipAlignEnabled true
+            debuggable false
+            
+            // Optimize for performance
+            renderscriptOptimLevel 3
+            
+            // Additional Play Store optimizations
+            crunchPngs true
+            
+            // Build configuration for Play Store
+            buildConfigField "boolean", "IS_PLAY_STORE_BUILD", "true"
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+    }
+    
+    buildFeatures {
+        buildConfig true
+    }
+    
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation "androidx.cardview:cardview:1.0.0"
+    
+    // Performance and optimization libraries
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.work:work-runtime:2.8.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // Auto-update functionality
+    implementation 'androidx.lifecycle:lifecycle-service:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-process:2.6.2'
+    
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    
+    // Force consistent Kotlin stdlib version
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+    
+    // Exclude conflicting Kotlin stdlib versions
+    configurations.all {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    }
+}
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

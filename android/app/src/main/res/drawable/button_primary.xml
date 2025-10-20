@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed state -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/pharma_700" />
+            <corners android:radius="@dimen/button_corner_radius" />
+        </shape>
+    </item>
+    
+    <!-- Focused state -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/pharma_600" />
+            <corners android:radius="@dimen/button_corner_radius" />
+            <stroke android:width="2dp" android:color="@color/pharma_400" />
+        </shape>
+    </item>
+    
+    <!-- Disabled state -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/text_muted" />
+            <corners android:radius="@dimen/button_corner_radius" />
+        </shape>
+    </item>
+    
+    <!-- Default state -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/pharma_600" />
+            <corners android:radius="@dimen/button_corner_radius" />
+        </shape>
+    </item>
+</selector>

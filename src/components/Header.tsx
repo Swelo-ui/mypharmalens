@@ -223,10 +223,15 @@ const Header = () => {
                         
                         {/* Legal Section */}
                         <DropdownMenuItem asChild>
-                          <Link to="/privacy" className="flex items-center w-full cursor-pointer">
+                          <a 
+                            href="https://pharmalens.tech/privacy" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center w-full cursor-pointer"
+                          >
                             <Shield className="mr-2 h-4 w-4" />
                             <span>Privacy Policy</span>
-                          </Link>
+                          </a>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/terms" className="flex items-center w-full cursor-pointer">

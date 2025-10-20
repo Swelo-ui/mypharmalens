@@ -109,9 +109,14 @@ const Footer = () => {
               <h3 className="text-sm font-semibold mb-4">Legal</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/privacy" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
-                    Privacy Policy
-                  </Link>
+                  <a 
+                    href="https://pharmalens.tech/privacy" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors flex items-center"
+                  >
+                    Privacy Policy <ExternalLink className="h-3 w-3 ml-1" />
+                  </a>
                 </li>
                 <li>
                   <Link to="/terms" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
