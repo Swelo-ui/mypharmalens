@@ -54,7 +54,11 @@ const categoryMappings: CategoryMapping = {
   'Hematology': { abbreviation: 'HEMA', counter: 0 },       // hematologyDrugs.ts
   'Obstetrics': { abbreviation: 'OBS', counter: 0 },        // obstetricsDrugs.ts
   'Urology': { abbreviation: 'URO', counter: 11 },           // urologyDrugs.ts - updated to 11
-  'Miscellaneous': { abbreviation: 'MISCD', counter: 0 }    // miscellaneousDrugs.ts
+  'Miscellaneous': { abbreviation: 'MISCD', counter: 0 },    // miscellaneousDrugs.ts
+  
+  // Newly added categories
+  'Pain, Inflammation & Musculoskeletal': { abbreviation: 'PIMS', counter: 50 }, // painInflammationMusculoskeletal.ts - 50 entries
+  'Antibiotics & Antimicrobial Combinations': { abbreviation: 'AAC', counter: 60 } // antibioticsAndAntimicrobialCombinations.ts - 60 entries
 };
 
 /**
