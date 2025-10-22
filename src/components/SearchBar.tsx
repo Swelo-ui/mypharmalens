@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { searchDrugs } from '@/data/combinedDrugsData';
+import { searchDrugs } from '@/data/drugDataLoader';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DrugData } from '@/components/DrugCard';
 
@@ -29,7 +29,7 @@ const SearchBar = ({
   
   // Generate suggestions based on query using the optimized searchDrugs function
   useEffect(() => {
-    if (query.trim().length < 2) {
+    if (!query.trim()) {
       setSuggestions([]);
       return;
     }
@@ -37,13 +37,22 @@ const SearchBar = ({
     console.log("Searching for:", query);
     
     // Find matching drugs using the optimized search function
-    const matchingDrugs = searchDrugs(query);
+    const searchForDrugs = async () => {
+      try {
+        const matchingDrugs = await searchDrugs(query);
+        
+        console.log("Found matching drugs:", matchingDrugs.length);
+        
+        // Extract drug names from the matched drugs
+        const drugNames = matchingDrugs.map(drug => drug.name);
+        setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
+      } catch (error) {
+        console.error("Error searching for drugs:", error);
+        setSuggestions([]);
+      }
+    };
     
-    console.log("Found matching drugs:", matchingDrugs.length);
-    
-    // Extract drug names from the matched drugs
-    const drugNames = matchingDrugs.map(drug => drug.name);
-    setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
+    searchForDrugs();
   }, [query]);
   
   const handleSearch = (e: React.FormEvent) => {

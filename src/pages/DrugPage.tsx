@@ -4,7 +4,7 @@ import {
   Pill, ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getDrugDetails } from '@/data/combinedDrugsData';
+import { getDrugById } from '@/data/drugDataLoader';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DrugDetails, { DetailedDrugData } from '@/components/DrugDetails';
@@ -20,15 +20,38 @@ const DrugPage = () => {
     console.log("DrugPage loaded with ID:", id);
     if (id) {
       // Add a small delay to ensure data is loaded properly
-      const timer = setTimeout(() => {
-        // Pass both id and a callback function as the second argument
-        const drugData = getDrugDetails(id);
-        
-        console.log("Drug data retrieved:", drugData?.name);
-        console.log("Drug data laymanExplanations:", drugData?.laymanExplanations ? "EXISTS" : "MISSING");
-        if (drugData) {
-          setDrug(drugData);
-        } else {
+      const timer = setTimeout(async () => {
+        try {
+          const drugData = await getDrugById(id);
+          
+          console.log("Drug data retrieved:", drugData?.name);
+          console.log("Drug data laymanExplanations:", drugData?.laymanExplanations ? "EXISTS" : "MISSING");
+          if (drugData) {
+            // Convert DrugData to DetailedDrugData by ensuring required fields
+            const detailedDrugData: DetailedDrugData = {
+              ...drugData,
+              genericName: drugData.genericName || drugData.name, // Use name as fallback if genericName is missing
+              manufacturer: drugData.manufacturer || 'Unknown',
+              category: drugData.category || 'Uncategorized',
+              description: drugData.description || '',
+              dosageAndAdmin: drugData.dosageAndAdmin || '',
+              sideEffects: drugData.sideEffects || [],
+              warnings: drugData.warnings || [],
+              interactions: drugData.interactions || [],
+              storage: drugData.storage || '',
+              mechanism: drugData.mechanism || '',
+              indications: drugData.indications || [],
+              contraindications: drugData.contraindications || [],
+              prescriptionStatus: drugData.prescriptionStatus || 'OTC',
+              pregnancy: drugData.pregnancy || '',
+              verified: drugData.verified || false
+            };
+            setDrug(detailedDrugData);
+          } else {
+            toast("Failed to load medication data.");
+          }
+        } catch (error) {
+          console.error("Error loading drug data:", error);
           toast("Failed to load medication data.");
         }
         setLoading(false);

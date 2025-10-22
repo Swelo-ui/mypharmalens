@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard, { DrugData } from '@/components/DrugCard';
 import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
-import { combinedDrugsData, searchDrugs } from '@/data/combinedDrugsData';
+import { searchDrugs, loadAllDrugs } from '@/data/drugDataLoader';
 import { fetchDrugs } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
@@ -55,14 +55,25 @@ const SearchResults = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20); // Show 20 items per page
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
 
   console.log("SearchResults component initialized");
   console.log("Search query:", searchQuery);
-  console.log("Total drugs in combinedDrugsData:", combinedDrugsData.length);
   
-  // Extract unique categories from combinedDrugsData
-  const categories = Array.from(new Set(combinedDrugsData.map(drug => drug.category).filter(Boolean))) as string[];
-  console.log("Available categories:", categories);
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const allDrugs = await loadAllDrugs();
+        const uniqueCategories = Array.from(new Set(allDrugs.map(drug => drug.category).filter(Boolean))) as string[];
+        setCategories(uniqueCategories);
+        console.log("Available categories:", uniqueCategories);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   // Calculate pagination
   const totalPages = Math.ceil(allResults.length / itemsPerPage);
@@ -124,86 +135,92 @@ const SearchResults = () => {
         }
         
         if (useLocalData) {
-        
-        console.log("Searching local data with total entries:", combinedDrugsData.length);
-        // Fall back to combined data if no Supabase results
-        // Enhanced search logic to include brand names and fuzzy matching
-        const filtered = searchQuery
-          ? combinedDrugsData.filter(drug => {
-              const query = searchQuery.toLowerCase();
-              
-              // Direct matches
-              const nameMatch = drug.name.toLowerCase().includes(query);
-              const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
-              const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
-              const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
-              const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
-              
-              // Brand name matching with comprehensive check
-              const brandMatch = drug.brandNames && 
-                drug.brandNames.some(brand => brand.toLowerCase().includes(query));
-              
-              // Improved fuzzy matching for common misspellings
-              // Adjust threshold based on query length for better accuracy
-              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-              const fuzzyMatch = calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= threshold;
+          const allDrugs = await loadAllDrugs();
+          console.log("Searching local data with total entries:", allDrugs.length);
+          // Fall back to combined data if no Supabase results
+          // Enhanced search logic to include brand names and fuzzy matching
+          const filtered = searchQuery
+            ? allDrugs.filter(drug => {
+                const query = searchQuery.toLowerCase();
+                
+                // Direct matches
+                const nameMatch = drug.name.toLowerCase().includes(query);
+                const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
+                const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
+                const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
+                const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
+                
+                // Brand name matching with comprehensive check
+                const brandMatch = drug.brandNames && 
+                  drug.brandNames.some(brand => brand.toLowerCase().includes(query));
+                
+                // Improved fuzzy matching for common misspellings
+                // Adjust threshold based on query length for better accuracy
+                const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
+                const fuzzyMatch = calculateLevenshteinDistance(
+                  query, drug.name.toLowerCase()) <= threshold;
 
-              // For very short queries, be more strict about fuzzy matching
-              const shouldUseFuzzy = query.length > 3;
-              
-              return nameMatch || genericMatch || manufacturerMatch || 
-                     categoryMatch || drugClassMatch || brandMatch || 
-                     (shouldUseFuzzy && fuzzyMatch);
-            })
-          : combinedDrugsData;
-        
-        console.log(`Found ${filtered.length} drugs in local data`);
-        
-        // Apply category filters if any are active
-        const finalResults = activeFilters.length > 0
-          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
-          : filtered;
-        
-        console.log(`After filtering: ${finalResults.length} drugs`);
-        setAllResults(finalResults);
+                // For very short queries, be more strict about fuzzy matching
+                const shouldUseFuzzy = query.length > 3;
+                
+                return nameMatch || genericMatch || manufacturerMatch || 
+                       categoryMatch || drugClassMatch || brandMatch || 
+                       (shouldUseFuzzy && fuzzyMatch);
+              })
+            : allDrugs;
+          
+          console.log(`Found ${filtered.length} drugs in local data`);
+          
+          // Apply category filters if any are active
+          const finalResults = activeFilters.length > 0
+            ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
+            : filtered;
+          
+          console.log(`After filtering: ${finalResults.length} drugs`);
+          setAllResults(finalResults);
         }
       } catch (error) {
         console.error("Error fetching drugs:", error);
         // Fall back to local data on error with same enhanced search
-        const filtered = searchQuery
-          ? combinedDrugsData.filter(drug => {
-              const query = searchQuery.toLowerCase();
-              
-              // Check main properties
-              if (drug.name.toLowerCase().includes(query)) return true;
-              if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
-              if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
-              if (drug.category && drug.category.toLowerCase().includes(query)) return true;
-              if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
+        try {
+          const allDrugs = await loadAllDrugs();
+          const filtered = searchQuery
+            ? allDrugs.filter(drug => {
+                const query = searchQuery.toLowerCase();
+                
+                // Check main properties
+                if (drug.name.toLowerCase().includes(query)) return true;
+                if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
+                if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
+                if (drug.category && drug.category.toLowerCase().includes(query)) return true;
+                if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
 
-              // Check brand names with improved matching
-              if (drug.brandNames && drug.brandNames.some(brand => 
-                brand.toLowerCase().includes(query))) return true;
-              
-              // Improved fuzzy matching for common misspellings
-              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-              if (calculateLevenshteinDistance(
-                query, drug.name.toLowerCase()) <= threshold) {
-                return true;
-              }
-              
-              return false;
-            })
-          : combinedDrugsData;
+                // Check brand names with improved matching
+                if (drug.brandNames && drug.brandNames.some(brand => 
+                  brand.toLowerCase().includes(query))) return true;
+                
+                // Improved fuzzy matching for common misspellings
+                const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
+                if (calculateLevenshteinDistance(
+                  query, drug.name.toLowerCase()) <= threshold) {
+                  return true;
+                }
+                
+                return false;
+              })
+            : allDrugs;
+            
+          console.log(`Found ${filtered.length} drugs in local data after error`);
           
-        console.log(`Found ${filtered.length} drugs in local data after error`);
-        
-        const finalResults = activeFilters.length > 0
-          ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
-          : filtered;
-          
-        setAllResults(finalResults);
+          const finalResults = activeFilters.length > 0
+            ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
+            : filtered;
+            
+          setAllResults(finalResults);
+        } catch (fallbackError) {
+          console.error("Error loading fallback data:", fallbackError);
+          setAllResults([]);
+        }
       } finally {
         setIsLoading(false);
       }
