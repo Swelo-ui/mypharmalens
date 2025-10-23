@@ -31,6 +31,11 @@ const drugDataLoaders = {
   muscleRelaxant: () => import("./muscleRelaxantDrugs").then(m => m.muscleRelaxantDrugs),
   vaccine: () => import("./vaccineDrugs").then(m => m.vaccineDrugs),
   urology: () => import("./urologyDrugs").then(m => m.urologyDrugs),
+  // Recently added combination drug files
+  cardiovascularCombination: () => import("./cardiovascularCombinationDrugs").then(m => m.cardiovascularCombinationDrugs),
+  antidiabeticCombination: () => import("./antidiabeticCombinationDrugs").then(m => m.antidiabeticCombinationDrugs),
+  painInflammationMusculoskeletal: () => import("./painInflammationMusculoskeletal").then(m => m.painInflammationMusculoskeletal),
+  antibioticsAntimicrobialCombinations: () => import("./antibioticsAndAntimicrobialCombinations").then(m => m.antibioticsAndAntimicrobialCombinations),
 };
 
 // Cache for loaded drug data
