@@ -17,7 +17,7 @@ export interface DrugData {
   packageImage?: string;
   brandNames?: string[];
   // Comprehensive pharmaceutical information
-  prescriptionStatus?: 'OTC' | 'Prescription Only' | 'Controlled';
+  prescriptionStatus?: string;
   dosageAndAdmin?: string;
   mechanism?: string;
   indications?: string[];

@@ -12,7 +12,7 @@ export interface DetailedDrugData {
   description: string;
   drugClass?: string;
   verified: boolean;
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled';
+  prescriptionStatus: string;
   dosageAndAdmin: string;
   mechanism: string;
   indications: string[];
@@ -178,7 +178,7 @@ export const getDetailedDrugData = (id: string, allDrugs: DrugData[]): DetailedD
         description: basicDrugData.description || 'No description available.',
         drugClass: basicDrugData.drugClass,
         verified: basicDrugData.verified || false,
-        prescriptionStatus: 'Prescription Only' as 'Prescription Only',
+        prescriptionStatus: 'Prescription Only',
         dosageAndAdmin: 'Consult your healthcare provider for proper dosage information.',
         mechanism: 'Mechanism of action information not available.',
         indications: ['Consult your healthcare provider for information on approved uses.'],

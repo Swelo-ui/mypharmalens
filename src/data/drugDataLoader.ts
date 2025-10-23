@@ -36,6 +36,9 @@ const drugDataLoaders = {
   antidiabeticCombination: () => import("./antidiabeticCombinationDrugs").then(m => m.antidiabeticCombinationDrugs),
   painInflammationMusculoskeletal: () => import("./painInflammationMusculoskeletal").then(m => m.painInflammationMusculoskeletal),
   antibioticsAntimicrobialCombinations: () => import("./antibioticsAndAntimicrobialCombinations").then(m => m.antibioticsAndAntimicrobialCombinations),
+  // Additional drug files
+  gastroenterologyDigestiveHealth: () => import("./gastroenterologyDigestiveHealthDrugs").then(m => m.gastroenterologyDigestiveHealthDrugs),
+  vitaminsNutritionalSupplements: () => import("./vitaminsNutritionalSupplementsDrugs").then(m => m.vitaminsNutritionalSupplementsDrugs),
 };
 
 // Cache for loaded drug data

@@ -472,7 +472,7 @@ const DrugIdentify = () => {
                 mechanism: drugData.mechanism || 'Mechanism of action not specified.',
                 indications: drugData.indications || [],
                 contraindications: drugData.contraindications || [],
-                prescriptionStatus: drugData.prescriptionStatus as 'OTC' | 'Prescription Only' | 'Controlled' | 'Non-pharmaceutical product',
+                prescriptionStatus: drugData.prescriptionStatus || 'Unknown',
                 pregnancy: drugData.pregnancy || 'Consult your healthcare provider before using during pregnancy.',
                 verified: false,
                 image: drugData.image,

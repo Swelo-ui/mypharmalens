@@ -41,6 +41,8 @@ import { cardiovascularCombinationDrugs } from "./cardiovascularCombinationDrugs
 import { antidiabeticCombinationDrugs } from "./antidiabeticCombinationDrugs";
 import { painInflammationMusculoskeletal } from "./painInflammationMusculoskeletal";
 import { antibioticsAndAntimicrobialCombinations } from "./antibioticsAndAntimicrobialCombinations";
+import { gastroenterologyDigestiveHealthDrugs } from "./gastroenterologyDigestiveHealthDrugs";
+import { vitaminsNutritionalSupplementsDrugs } from "./vitaminsNutritionalSupplementsDrugs";
 
 // Create a map to track drug sources for validation reporting
 const drugSources = new Map<string, string>();
@@ -87,7 +89,9 @@ const allDrugsData: DrugData[] = [
   ...addDrugsWithSource(cardiovascularCombinationDrugs, 'cardiovascularCombinationDrugs.ts'),
   ...addDrugsWithSource(antidiabeticCombinationDrugs, 'antidiabeticCombinationDrugs.ts'),
   ...addDrugsWithSource(painInflammationMusculoskeletal, 'painInflammationMusculoskeletal.ts'),
-  ...addDrugsWithSource(antibioticsAndAntimicrobialCombinations, 'antibioticsAndAntimicrobialCombinations.ts')
+  ...addDrugsWithSource(antibioticsAndAntimicrobialCombinations, 'antibioticsAndAntimicrobialCombinations.ts'),
+  ...addDrugsWithSource(gastroenterologyDigestiveHealthDrugs, 'gastroenterologyDigestiveHealthDrugs.ts'),
+  ...addDrugsWithSource(vitaminsNutritionalSupplementsDrugs, 'vitaminsNutritionalSupplementsDrugs.ts')
 ];
 
 // Enhanced deduplication with validation logging for both ID and name duplicates

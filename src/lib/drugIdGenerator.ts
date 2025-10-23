@@ -56,9 +56,13 @@ const categoryMappings: CategoryMapping = {
   'Urology': { abbreviation: 'URO', counter: 11 },           // urologyDrugs.ts - updated to 11
   'Miscellaneous': { abbreviation: 'MISCD', counter: 0 },    // miscellaneousDrugs.ts
   
-  // Newly added categories
+  // Pain, Inflammation & Musculoskeletal
   'Pain, Inflammation & Musculoskeletal': { abbreviation: 'PIMS', counter: 50 }, // painInflammationMusculoskeletal.ts - 50 entries
-  'Antibiotics & Antimicrobial Combinations': { abbreviation: 'AAC', counter: 60 } // antibioticsAndAntimicrobialCombinations.ts - 60 entries
+  'Antibiotics & Antimicrobial Combinations': { abbreviation: 'AAC', counter: 60 }, // antibioticsAndAntimicrobialCombinations.ts - 60 entries
+  
+  // New comprehensive drug categories
+  'Gastroenterology & Digestive Health': { abbreviation: 'GDH', counter: 60 }, // gastroenterologyDigestiveHealthDrugs.ts - 60 entries
+  'Vitamins & Nutritional Supplements': { abbreviation: 'VNS', counter: 80 }   // vitaminsNutritionalSupplementsDrugs.ts - 80 entries
 };
 
 /**
