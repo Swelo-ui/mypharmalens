@@ -25,7 +25,7 @@ export interface DetailedDrugData {
   mechanism: string;
   indications: string[];
   contraindications: string[];
-  prescriptionStatus: 'OTC' | 'Prescription Only' | 'Controlled' | 'Non-pharmaceutical product';
+  prescriptionStatus: string;
   pregnancy: string;
   verified: boolean;
   image?: string;
