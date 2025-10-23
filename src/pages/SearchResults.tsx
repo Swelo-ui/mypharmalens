@@ -360,19 +360,19 @@ const SearchResults = () => {
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-3">
                     {categories.map((category) => (
                       <label 
                         key={category} 
-                        className="flex items-center cursor-pointer group"
+                        className="flex items-start cursor-pointer group"
                       >
                         <input
                           type="checkbox"
                           checked={activeFilters.includes(category)}
                           onChange={() => toggleFilter(category)}
-                          className="rounded border-gray-300 text-pharma-600 shadow-sm focus:border-pharma-300 focus:ring focus:ring-pharma-200 focus:ring-opacity-50"
+                          className="rounded border-gray-300 text-pharma-600 shadow-sm focus:border-pharma-300 focus:ring focus:ring-pharma-200 focus:ring-opacity-50 mt-0.5 flex-shrink-0"
                         />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-pharma-600 transition-colors truncate">
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-pharma-600 transition-colors leading-relaxed">
                           {category}
                         </span>
                       </label>
