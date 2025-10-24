@@ -1,15 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Search, Filter, X, ChevronDown, ChevronUp, Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DrugData } from '@/data/drugDataTypes';
+import { loadAllDrugs } from '@/data/drugDataLoader';
+import { fetchDrugs } from '@/integrations/supabase/client';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
-import DrugCard, { DrugData } from '@/components/DrugCard';
-import { Loader2, Filter, ChevronDown, X, Search } from 'lucide-react';
-import { searchDrugs, loadAllDrugs } from '@/data/drugDataLoader';
-import { fetchDrugs } from '@/integrations/supabase/client';
+import DrugCard from '@/components/DrugCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 // Inline Levenshtein distance implementation to avoid missing module error
 function calculateLevenshteinDistance(a: string, b: string): number {
@@ -43,9 +52,11 @@ function calculateLevenshteinDistance(a: string, b: string): number {
 const SearchResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { isAuthenticated } = useAuthStatus();
+  const { usageStats, getDatabaseSearchLimit } = useSubscription();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('q') || '';
-  const isMobile = useIsMobile();
   
   const [isLoading, setIsLoading] = useState(true);
   const [allResults, setAllResults] = useState<DrugData[]>([]);
@@ -103,10 +114,12 @@ const SearchResults = () => {
         if (searchQuery) {
           // Try to fetch from Supabase first
           try {
+            const databaseSearchLimit = getDatabaseSearchLimit();
             const supabaseDrugs = await fetchDrugs({ 
               searchTerm: searchQuery,
               category: activeFilters.length > 0 ? activeFilters[0] : undefined,
-              limit: 200 // Increase limit to get more results
+              limit: 200, // Increase limit to get more results
+              userSubscriptionLimit: databaseSearchLimit
             });
             
             if (supabaseDrugs && supabaseDrugs.length > 0) {
@@ -451,6 +464,27 @@ const SearchResults = () => {
                       </Button>
                     )}
                   </div>
+
+                  {/* Database Search Usage Display */}
+                  {isAuthenticated && (
+                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="text-sm text-blue-700 dark:text-blue-300">
+                            <span className="font-medium">Database Search Limit:</span> {getDatabaseSearchLimit()} results per search
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate('/pricing')}
+                          className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/30"
+                        >
+                          Upgrade Plan
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Results Grid */}
                   {displayedResults.length > 0 ? (

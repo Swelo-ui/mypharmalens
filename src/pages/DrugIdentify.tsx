@@ -13,6 +13,8 @@ import ImageUpload from '@/components/ImageUpload';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { useSubscription } from '@/hooks/useSubscription';
+import SubscriptionGuard from '@/components/SubscriptionGuard';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -72,6 +74,7 @@ const calculateSimilarity = (hash1: string, hash2: string): number => {
 
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
+  const { canPerformIdentification, incrementIdentificationUsage, usageStats } = useSubscription();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
@@ -428,6 +431,12 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
+      // Check subscription limits before processing
+      if (!canPerformIdentification()) {
+        toast.error("You've reached your AI identification limit for this month. Please upgrade your plan to continue.");
+        return;
+      }
+
       setIsIdentifying(true);
       setErrorDetails(null);
       setProcessingProgress(0);
@@ -483,6 +492,9 @@ const DrugIdentify = () => {
               setIdentifiedDrug(formattedDrugData);
               setIsSaved(false);
               setProcessingProgress(100);
+              
+              // Increment usage count for successful identification
+              await incrementIdentificationUsage();
               
               // Play drug identification completion sound
               playDrugIdentificationSound();
@@ -655,6 +667,40 @@ const DrugIdentify = () => {
             )}
             
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 sm:p-8 lg:p-10 mb-8 max-w-4xl mx-auto">
+              {/* Subscription Usage Display */}
+              {isAuthenticated && usageStats && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg border">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-sm">AI Identifications Usage</h4>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => navigate('/pricing')}
+                      className="text-xs"
+                    >
+                      Upgrade Plan
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Used this month:</span>
+                      <span className="font-medium">
+                        {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit}
+                      </span>
+                    </div>
+                    {usageStats.monthlyLimit !== -1 && (
+                      <Progress 
+                        value={(usageStats.identificationsUsed / usageStats.monthlyLimit) * 100} 
+                        className="h-2"
+                      />
+                    )}
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Current plan: <span className="font-medium">{usageStats.planName}</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6 text-base sm:text-lg">
                 {identificationMode === 'upload' 
                   ? "Upload a clear image of the medication for identification" 

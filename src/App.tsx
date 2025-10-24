@@ -25,6 +25,7 @@ const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const Auth = lazy(() => import("./pages/Auth"));
 const IdentificationHistory = lazy(() => import("./pages/IdentificationHistory"));
 const Profile = lazy(() => import("./pages/Profile"));
+const PricingPage = lazy(() => import("./components/PricingPage"));
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/history" element={<IdentificationHistory />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/pricing" element={<PricingPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

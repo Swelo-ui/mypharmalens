@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Mail, MessageCircle, Linkedin, Send, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, MessageCircle, Linkedin, Send, Loader2, CheckCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -191,6 +192,22 @@ const Contact = () => {
                 <div className="space-y-6">
                   <div className="flex items-start">
                     <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-4 shrink-0">
+                      <MapPin className="h-6 w-6 text-pharma-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium mb-1">Address</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+                        Visit us at:
+                      </p>
+                      <p className="text-pharma-600">
+                        Shriram colony Nainagardh road,<br />
+                        Morena, M.P
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-4 shrink-0">
                       <Mail className="h-6 w-6 text-pharma-600" />
                     </div>
                     <div>
@@ -244,7 +261,7 @@ const Contact = () => {
               <div className="mt-8 p-6 bg-pharma-50 dark:bg-pharma-900/10 rounded-xl border border-pharma-100 dark:border-pharma-800/30">
                 <h3 className="font-medium mb-3">About the Creator</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                  PharmaLens is developed by Himanshu Sharma, a B.Pharm student at Shriram College of Pharmacy, Morena, with a passion for AI and healthcare innovation.
+                  PharmaLens is developed by <Link to="/about#meet-himanshu" className="font-bold text-pharma-600 dark:text-pharma-400 hover:text-pharma-700 dark:hover:text-pharma-300 transition-colors cursor-pointer">Himanshu Sharma</Link>, a B.Pharm student at Shriram College of Pharmacy, Morena, with a passion for AI and healthcare innovation.
                 </p>
                 <div className="flex space-x-3">
                   <a 

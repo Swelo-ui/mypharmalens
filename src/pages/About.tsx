@@ -178,7 +178,7 @@ const About = () => {
         </section>
         
         {/* Creator Section */}
-        <section className="py-16 bg-white dark:bg-gray-900">
+        <section id="meet-himanshu" className="py-16 bg-white dark:bg-gray-900">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
               <div className="md:col-span-8 order-2 md:order-1 animate-on-scroll">

@@ -8,54 +8,6 @@ import { Toaster } from 'sonner'
 
 const root = createRoot(document.getElementById("root")!);
 
-// Register service worker with improved error handling
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        
-        // Set up auto update checking
-        setInterval(() => {
-          registration.update();
-          console.log('Checking for service worker updates');
-        }, 60 * 60 * 1000); // Check every hour
-      })
-      .catch(error => {
-        console.error('ServiceWorker registration failed: ', error);
-      });
-      
-    // Listen for controller change to refresh the page
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('New service worker activated');
-      // Use a custom UI to inform the user about new content and offer a refresh
-      // For now, we'll just log it
-    });
-  });
-  
-  // Handle offline/online events
-  window.addEventListener('online', () => {
-    console.log('App is online');
-    // Modified to check for background sync support before using it
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
-      navigator.serviceWorker.ready.then(registration => {
-        // TypeScript safe way to handle sync registration
-        if ('sync' in registration) {
-          // @ts-ignore - TypeScript doesn't recognize the sync API yet
-          registration.sync.register('sync-data').catch(err => {
-            console.error('Background sync registration failed:', err);
-          });
-        }
-      });
-    }
-  });
-  
-  window.addEventListener('offline', () => {
-    console.log('App is offline');
-    // Show offline notification if needed
-  });
-}
-
 // Add meta tags for healthcare SEO and PWA support
 const addMetaTags = () => {
   const metaTags = [

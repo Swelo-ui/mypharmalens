@@ -16,20 +16,25 @@ export interface FetchDrugsParams {
   searchTerm?: string;
   category?: string;
   limit?: number;
+  userSubscriptionLimit?: number; // Add subscription-based limit
 }
 
 export const fetchDrugs = async ({ 
   searchTerm, 
   category,
-  limit = 100 // Increased limit to show more results
+  limit = 100, // Default limit
+  userSubscriptionLimit // Subscription-based limit override
 }: FetchDrugsParams) => {
-  console.log("Fetching drugs from Supabase with params:", { searchTerm, category, limit });
+  console.log("Fetching drugs from Supabase with params:", { searchTerm, category, limit, userSubscriptionLimit });
+  
+  // Use subscription limit if provided and it's lower than the default limit
+  const effectiveLimit = userSubscriptionLimit && userSubscriptionLimit < limit ? userSubscriptionLimit : limit;
   
   try {
     let query = supabase
       .from('drugs')
       .select('*')
-      .limit(limit);
+      .limit(effectiveLimit);
     
     if (searchTerm) {
       // Search in name, generic_name, drug_class, manufacturer, and description
@@ -49,7 +54,7 @@ export const fetchDrugs = async ({
       return [];
     }
     
-    console.log(`Retrieved ${data?.length || 0} drugs from Supabase`);
+    console.log(`Retrieved ${data?.length || 0} drugs from Supabase (limit: ${effectiveLimit})`);
     return data;
   } catch (e) {
     console.error("Exception fetching from Supabase:", e);
