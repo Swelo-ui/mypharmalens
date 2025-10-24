@@ -85,6 +85,48 @@ export const useSubscription = () => {
   const fetchCurrentSubscription = async () => {
     if (!user?.id) return;
 
+    // Special handling for specific user - set special access directly
+    if (user?.email === 'imgamer.ms@gmail.com') {
+      // Create a mock subscription for the special user
+      const specialSubscription: UserSubscription = {
+        id: 'special-access',
+        user_id: user.id,
+        plan_id: 'special-plan',
+        status: 'active',
+        subscription_start: new Date().toISOString(),
+        subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+        identifications_used: 0,
+        created_at: new Date().toISOString(),
+        plan: {
+          id: 'special-plan',
+          name: 'Special Access',
+          description: 'Unlimited access for special users',
+          price_inr: 0,
+          monthly_identifications: -1,
+          features: {
+            database_searches: -1,
+            ai_identifications: -1,
+            drug_information: true,
+            prescription_status: true,
+            mobile_access: true,
+            support: 'premium',
+            history_feature: true,
+            layman_explanations: true,
+            ads: false,
+            enhanced_info: true,
+            brand_generic_search: true,
+            advanced_filters: true,
+            offline_access: true
+          },
+          created_at: new Date().toISOString()
+        }
+      };
+      
+      setCurrentSubscription(specialSubscription);
+      calculateUsageStats(specialSubscription);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_subscriptions')
