@@ -94,182 +94,361 @@ const PricingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Pricing Cards - Hardcoded to match home page */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Pricing Cards - Mobile-First Design */}
+          <div className={`${isMobile ? 'space-y-6' : 'grid grid-cols-1 md:grid-cols-3 gap-8'}`}>
             {/* Free Plan */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 relative">
-              <div className="flex items-center mb-4">
-                <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg mr-3">
-                  <Pill className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Free Plan</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Perfect for occasional users</p>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">₹0</span>
-                  <span className="text-gray-600 dark:text-gray-300 ml-1">/month</span>
-                </div>
-              </div>
+            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-gray-400' : 'rounded-2xl p-8 shadow-lg'} border border-gray-200 dark:border-gray-700 relative`}>
+              {isMobile ? (
+                // Mobile Layout - Compact horizontal design
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg mr-3">
+                        <Pill className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Free Plan</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">Occasional users</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">₹0</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">/month</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">100 drugs search</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">5 AI identifications</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Basic drug info</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Mobile access</span>
+                    </div>
+                  </div>
 
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">100 drugs database search</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">5 AI identifications per month</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Basic drug information</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Mobile web app access</span>
-                </li>
-              </ul>
+                  <Button 
+                    onClick={() => handlePlanSelect('free')}
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm py-2"
+                  >
+                    Current Plan
+                  </Button>
+                </div>
+              ) : (
+                // Desktop Layout - Original design
+                <>
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg mr-3">
+                      <Pill className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Free Plan</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Perfect for occasional users</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-gray-900 dark:text-white">₹0</span>
+                      <span className="text-gray-600 dark:text-gray-300 ml-1">/month</span>
+                    </div>
+                  </div>
 
-              <Button 
-                onClick={() => handlePlanSelect('free')}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white"
-              >
-                Current Plan
-              </Button>
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">100 drugs database search</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">5 AI identifications per month</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Basic drug information</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Mobile web app access</span>
+                    </li>
+                  </ul>
+
+                  <Button 
+                    onClick={() => handlePlanSelect('free')}
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+                  >
+                    Current Plan
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Weekly Plan */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-pharma-300 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-pharma-600 text-white px-3 py-1">
-                  Popular
-                </Badge>
-              </div>
+            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-500' : 'rounded-2xl p-8 shadow-lg'} border border-pharma-300 relative`}>
+              {!isMobile && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-pharma-600 text-white px-3 py-1">
+                    Popular
+                  </Badge>
+                </div>
+              )}
               
-              <div className="flex items-center mb-4">
-                <div className="p-2 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
-                  <Clock className="h-6 w-6 text-pharma-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Weekly Plan</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">For regular users</p>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                    ₹{isYearly ? Math.round(weeklyPrice * 52 * 0.8) : weeklyPrice}
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-300 ml-1">
-                    /{isYearly ? 'year' : 'week'}
-                  </span>
-                </div>
-                {isYearly && (
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                    Save ₹{Math.round(weeklyPrice * 52 * 0.2)} per year
-                  </p>
-                )}
-              </div>
+              {isMobile ? (
+                // Mobile Layout - Compact horizontal design
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
+                        <Clock className="h-5 w-5 text-pharma-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Weekly Plan</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">Regular users</p>
+                        <Badge className="bg-pharma-600 text-white px-2 py-0.5 text-xs mt-1">
+                          Popular
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        ₹{isYearly ? Math.round(weeklyPrice * 52 * 0.8) : weeklyPrice}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">
+                        /{isYearly ? 'year' : 'week'}
+                      </div>
+                      {isYearly && (
+                        <p className="text-xs text-green-600 dark:text-green-400">
+                          Save ₹{Math.round(weeklyPrice * 52 * 0.2)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">All Free features</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">21 AI per week</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">500+ medicines</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Priority support</span>
+                    </div>
+                  </div>
 
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">All Free Plan features</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">21 AI identifications per week</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">500+ medicines database</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Priority support</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">No ads</span>
-                </li>
-              </ul>
+                  <Button 
+                    onClick={() => handlePlanSelect('weekly')}
+                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                  >
+                    Choose Plan
+                    <ArrowRight className="ml-2 h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                // Desktop Layout - Original design
+                <>
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-pharma-100 dark:bg-pharma-900/30 rounded-lg mr-3">
+                      <Clock className="h-6 w-6 text-pharma-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Weekly Plan</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">For regular users</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                        ₹{isYearly ? Math.round(weeklyPrice * 52 * 0.8) : weeklyPrice}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-300 ml-1">
+                        /{isYearly ? 'year' : 'week'}
+                      </span>
+                    </div>
+                    {isYearly && (
+                      <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                        Save ₹{Math.round(weeklyPrice * 52 * 0.2)} per year
+                      </p>
+                    )}
+                  </div>
 
-              <Button 
-                onClick={() => handlePlanSelect('weekly')}
-                className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
-              >
-                Choose Plan
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">All Free Plan features</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">21 AI identifications per week</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">500+ medicines database</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Priority support</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">No ads</span>
+                    </li>
+                  </ul>
+
+                  <Button 
+                    onClick={() => handlePlanSelect('weekly')}
+                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
+                  >
+                    Choose Plan
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Premium Plan */}
-            <div className="bg-gradient-to-br from-pharma-50 to-pharma-100 dark:from-pharma-900/20 dark:to-pharma-800/20 rounded-2xl p-8 shadow-lg border border-pharma-500 relative">
-              <div className="flex items-center mb-4">
-                <div className="p-2 bg-pharma-200 dark:bg-pharma-800 rounded-lg mr-3">
-                  <Crown className="h-6 w-6 text-pharma-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Premium Plan</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">For power users & families</p>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                    ₹{isYearly ? getYearlyPrice(premiumMonthlyPrice) : premiumMonthlyPrice}
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-300 ml-1">
-                    /{isYearly ? 'year' : 'month'}
-                  </span>
-                </div>
-                {isYearly && (
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                    Save ₹{Math.round(premiumMonthlyPrice * 12 * 0.2)} per year
-                  </p>
-                )}
-              </div>
+            <div className={`bg-gradient-to-br from-pharma-50 to-pharma-100 dark:from-pharma-900/20 dark:to-pharma-800/20 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-600' : 'rounded-2xl p-8 shadow-lg'} border border-pharma-500 relative`}>
+              {isMobile ? (
+                // Mobile Layout - Compact horizontal design
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-pharma-200 dark:bg-pharma-800 rounded-lg mr-3">
+                        <Crown className="h-5 w-5 text-pharma-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Premium Plan</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">Power users</p>
+                        <Badge className="bg-gradient-to-r from-pharma-600 to-pharma-700 text-white px-2 py-0.5 text-xs mt-1">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Best Value
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        ₹{isYearly ? getYearlyPrice(premiumMonthlyPrice) : premiumMonthlyPrice}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">
+                        /{isYearly ? 'year' : 'month'}
+                      </div>
+                      {isYearly && (
+                        <p className="text-xs text-green-600 dark:text-green-400">
+                          Save ₹{Math.round(premiumMonthlyPrice * 12 * 0.2)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">All Weekly features</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Unlimited AI</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">1000+ database</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">History feature</span>
+                    </div>
+                  </div>
 
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">All Weekly Plan features</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Unlimited AI identifications</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">1000+ database drugs</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Layman explanations</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">History feature</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Advanced search filters</span>
-                </li>
-              </ul>
+                  <Button 
+                    onClick={() => handlePlanSelect('premium')}
+                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                  >
+                    Choose Plan
+                    <ArrowRight className="ml-2 h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                // Desktop Layout - Original design
+                <>
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 bg-pharma-200 dark:bg-pharma-800 rounded-lg mr-3">
+                      <Crown className="h-6 w-6 text-pharma-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Premium Plan</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">For power users & families</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                        ₹{isYearly ? getYearlyPrice(premiumMonthlyPrice) : premiumMonthlyPrice}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-300 ml-1">
+                        /{isYearly ? 'year' : 'month'}
+                      </span>
+                    </div>
+                    {isYearly && (
+                      <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                        Save ₹{Math.round(premiumMonthlyPrice * 12 * 0.2)} per year
+                      </p>
+                    )}
+                  </div>
 
-              <Button 
-                onClick={() => handlePlanSelect('premium')}
-                className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
-              >
-                Choose Plan
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">All Weekly Plan features</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Unlimited AI identifications</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">1000+ database drugs</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Layman explanations</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">History feature</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">Advanced search filters</span>
+                    </li>
+                  </ul>
+
+                  <Button 
+                    onClick={() => handlePlanSelect('premium')}
+                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
+                  >
+                    Choose Plan
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
           

@@ -87,7 +87,7 @@ const Hero = () => {
             <Link to="/search" className="px-6 py-2.5 rounded-md bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-md w-full sm:w-auto">
               Search Medications
             </Link>
-            <Link to="/identify" className="px-6 py-2.5 rounded-md bg-white text-pharma-800 font-medium border border-gray-200 hover:bg-gray-50 transition-all shadow-sm w-full sm:w-auto">
+            <Link to="/identify" className="px-6 py-2.5 rounded-md bg-white text-pharma-800 dark:text-pharma-800 font-medium border border-gray-200 hover:bg-gray-50 transition-all shadow-sm w-full sm:w-auto">
               Identify with Camera
             </Link>
           </div>

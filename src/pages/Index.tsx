@@ -434,8 +434,8 @@ const Index = () => {
               <div className="animate-on-scroll delay-150">
                 <div className="glass-card p-8 rounded-2xl shadow-xl">
                   <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <Brain className="h-10 w-10 text-blue-600" />
+                    <div className="w-20 h-20 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center">
+                      <Brain className="h-10 w-10 text-pharma-600" />
                     </div>
                   </div>
                   
@@ -503,19 +503,19 @@ const Index = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 border-t border-gray-200 dark:border-gray-800">
+        <section className="py-20 bg-gradient-to-r from-pharma-600 to-pharma-700 border-t border-gray-200 dark:border-gray-800">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white mb-6">
               Ready to Transform Your Medication Management?
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-pharma-100 mb-8">
               Join thousands of healthcare professionals who trust PharmaLens for accurate drug identification.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" onClick={() => navigate('/search')}>
+              <Button size="lg" variant="secondary" className="bg-white text-pharma-600 hover:bg-gray-100" onClick={() => navigate('/search')}>
                 Start Searching
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600" onClick={() => navigate('/identify')}>
+              <Button size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white hover:text-pharma-600 dark:text-white dark:hover:bg-white dark:hover:text-pharma-600" onClick={() => navigate('/identify')}>
                 Identify Medication
               </Button>
             </div>
@@ -529,4 +529,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Index;

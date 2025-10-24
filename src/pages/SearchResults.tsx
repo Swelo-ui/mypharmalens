@@ -467,10 +467,10 @@ const SearchResults = () => {
 
                   {/* Database Search Usage Display */}
                   {isAuthenticated && (
-                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="mb-6 p-4 bg-pharma-50 dark:bg-pharma-900/20 rounded-lg border border-pharma-200 dark:border-pharma-800">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="text-sm text-blue-700 dark:text-blue-300">
+                          <div className="text-sm text-pharma-700 dark:text-pharma-300">
                             <span className="font-medium">Database Search Limit:</span> {getDatabaseSearchLimit()} results per search
                           </div>
                         </div>
@@ -478,7 +478,7 @@ const SearchResults = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => navigate('/pricing')}
-                          className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/30"
+                          className="text-pharma-600 border-pharma-300 hover:bg-pharma-100 dark:text-pharma-400 dark:border-pharma-600 dark:hover:bg-pharma-900/30"
                         >
                           Upgrade Plan
                         </Button>

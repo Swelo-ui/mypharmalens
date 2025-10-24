@@ -139,10 +139,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       {/* Billing Info */}
       {plan.id !== 'free-plan' && !isCurrentPlan && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-pharma-50 border border-pharma-200 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <Clock className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-blue-700">
+            <Clock className="w-4 h-4 text-pharma-600 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-pharma-700">
               <p className="font-medium">Billing Information</p>
               <p className="mt-1">
                 • Instant activation after payment<br/>

@@ -105,7 +105,7 @@ const DrugCard = ({ drug, className, onClick }: DrugCardProps) => {
         )}
         
         {drug.manufacturer && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 break-words max-w-full">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300 break-words max-w-full">
             <span className="truncate">{drug.manufacturer}</span>
           </span>
         )}
