@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { DrugData } from '@/data/drugDataTypes';
+import { DrugData } from '@/components/DrugCard';
 import { loadAllDrugs } from '@/data/drugDataLoader';
 import { fetchDrugs } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
