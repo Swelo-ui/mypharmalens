@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge, badgeVariants } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   CreditCard, 
@@ -20,7 +20,7 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Tables } from '@/types/database.types';
 
 type PaymentTransaction = Tables<"payment_transactions">;
-type SubscriptionHistoryItem = Tables<"subscription_history">;
+type SubscriptionHistoryItem = Tables<"user_subscriptions">;
 
 
 const PaymentHistory: React.FC = () => {
@@ -55,7 +55,7 @@ const PaymentHistory: React.FC = () => {
 
       // Fetch subscription history
       const { data: history, error: historyError } = await supabase
-        .from('subscription_history')
+        .from('user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -105,7 +105,7 @@ const PaymentHistory: React.FC = () => {
       case 'canceled':
         return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Cancelled</Badge>;
       default:
-        return <Badge variant="outline">{status || 'Unknown'}</Badge>;
+        return <Badge className={badgeVariants({ variant: 'outline' })}>{status || 'Unknown'}</Badge>;
     }
   };
 
@@ -129,17 +129,19 @@ const PaymentHistory: React.FC = () => {
   };
 
   const getActionBadge = (action: string) => {
-    const variants = {
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
       activated: 'default',
       renewed: 'default',
       cancelled: 'destructive',
       expired: 'secondary',
       upgraded: 'default',
       downgraded: 'secondary'
-    } as const;
+    };
+
+    const variant = variants[action] ?? 'outline';
 
     return (
-      <Badge variant={variants[action as keyof typeof variants] || 'outline'}>
+      <Badge className={badgeVariants({ variant })}>
         {action.charAt(0).toUpperCase() + action.slice(1)}
       </Badge>
     );
@@ -180,8 +182,7 @@ const PaymentHistory: React.FC = () => {
           <p className="text-gray-600">View your payment transactions and subscription history</p>
         </div>
         <Button
-          variant="outline"
-          size="sm"
+          className={buttonVariants({ variant: 'outline', size: 'sm' })}
           onClick={fetchPaymentHistory}
           disabled={isLoading}
         >
@@ -311,28 +312,25 @@ const PaymentHistory: React.FC = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      {getActionBadge(item.action)}
-                      {item.amount && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          ₹{item.amount}
-                        </p>
-                      )}
+                      {getActionBadge(item.status)}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600">Action</p>
-                      <p className="font-medium capitalize">{item.action}</p>
+                      <p className="text-gray-600">Status</p>
+                      <p className="font-medium capitalize">{item.status}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-600">Billing Cycle</p>
-                      <p className="font-medium capitalize">{item.billing_cycle}</p>
-                    </div>
-                    {item.transaction_id && (
+                    {item.starts_at && (
                       <div>
-                        <p className="text-gray-600">Transaction ID</p>
-                        <p className="font-medium font-mono text-xs">{item.transaction_id}</p>
+                        <p className="text-gray-600">Starts</p>
+                        <p className="font-medium">{formatDate(item.starts_at)}</p>
+                      </div>
+                    )}
+                    {item.ends_at && (
+                      <div>
+                        <p className="text-gray-600">Ends</p>
+                        <p className="font-medium">{formatDate(item.ends_at)}</p>
                       </div>
                     )}
                   </div>
