@@ -1,7 +1,12 @@
 // @ts-nocheck
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { corsHeaders } from "./_shared/cors.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+};
 
 interface PaymentRequest {
   planId: string;
@@ -65,6 +70,8 @@ async function generatePayUHash(
   email: string,
   salt: string
 ): Promise<string> {
+  // PayU hash format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT
+  // UDF fields are empty, so we use empty strings for udf1-udf5, followed by 6 empty fields
   const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||${salt}`;
   
   const encoder = new TextEncoder();
@@ -73,7 +80,7 @@ async function generatePayUHash(
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   
-  return hashHex;
+  return hashHex.toLowerCase(); // PayU requires lowercase hash
 }
 
 async function createPaymentLink(paymentData: PaymentRequest): Promise<{ success: boolean; paymentUrl: string }> {

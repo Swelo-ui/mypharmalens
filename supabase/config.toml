@@ -10,6 +10,10 @@ verify_jwt = true
 [functions.payu-webhook]
 verify_jwt = false
 
+# PayU configuration endpoint - no auth needed for config
+[functions.payu-config]
+verify_jwt = false
+
 # Payment initiation can remain protected; set to true if you want auth
 [functions.payu-payment]
 verify_jwt = true

@@ -14,8 +14,26 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 Deno.serve(async (req: Request) => {
+  console.log(`PayU Webhook called with method: ${req.method}, URL: ${req.url}`);
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  // Explicitly allow GET and POST methods
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    console.error(`Method ${req.method} not allowed`);
+    return new Response(
+      JSON.stringify({ error: `Method ${req.method} not allowed. Only GET and POST are supported.` }),
+      { 
+        status: 405, 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'Allow': 'GET, POST, OPTIONS'
+        } 
+      }
+    );
   }
 
   try {
