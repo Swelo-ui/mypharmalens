@@ -36,6 +36,8 @@ Deno.serve(async (req: Request) => {
     );
   }
 
+  let responsePromise: Promise<Response>;
+  
   try {
     const url = new URL(req.url);
     const returnUrl = url.searchParams.get('returnUrl') || (Deno.env.get('APP_URL') || 'https://pharmanotes.me') + '/payment-result';
@@ -186,27 +188,26 @@ Deno.serve(async (req: Request) => {
   </body>
 </html>`;
 
-      return new Response(html, {
+      responsePromise = Promise.resolve(new Response(html, {
         headers: { 'Content-Type': 'text/html', ...corsHeaders },
         status: 200
+      }));
+    } else {
+      const qp = new URLSearchParams({
+        txnid: txnid || url.searchParams.get('txnid') || '',
+        status: status || 'failed',
+        hashValid: String(hashValid),
+        mihpayid: payload.mihpayid || url.searchParams.get('mihpayid') || '',
+        amount: payload.amount || url.searchParams.get('amount') || '',
+        mode: payload.mode || url.searchParams.get('mode') || '',
+        error: payload.error_Message || url.searchParams.get('error_Message') || '',
       });
-    }
 
-    const qp = new URLSearchParams({
-      txnid: txnid || url.searchParams.get('txnid') || '',
-      status: status || 'failed',
-      hashValid: String(hashValid),
-      mihpayid: payload.mihpayid || url.searchParams.get('mihpayid') || '',
-      amount: payload.amount || url.searchParams.get('amount') || '',
-      mode: payload.mode || url.searchParams.get('mode') || '',
-      error: payload.error_Message || url.searchParams.get('error_Message') || '',
-    });
+      const redirectUrl = `${returnUrl}?${qp.toString()}`;
+      console.log(`Redirecting to: ${redirectUrl}`);
 
-    const redirectUrl = `${returnUrl}?${qp.toString()}`;
-    console.log(`Redirecting to: ${redirectUrl}`);
-
-    // Minimal HTML redirect
-    const html = `<!doctype html>
+      // Minimal HTML redirect
+      const html = `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -220,16 +221,36 @@ Deno.serve(async (req: Request) => {
   </body>
 </html>`;
 
-    return new Response(html, {
-      headers: { 'Content-Type': 'text/html', ...corsHeaders },
-      status: 200
-    });
+      responsePromise = Promise.resolve(new Response(html, {
+        headers: { 'Content-Type': 'text/html', ...corsHeaders },
+        status: 200
+      }));
+    }
+
+    // Wait for the response to be ready before returning
+    return await responsePromise;
 
   } catch (err: any) {
-    console.error('Webhook error:', err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error('PayU Webhook Error:', err);
+    
+    // Ensure we return a proper response even on error
+    const errorHtml = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Payment Error</title>
+    <style>body{font-family:Arial;padding:40px;text-align:center}</style>
+  </head>
+  <body>
+    <h2>Payment Processing Error</h2>
+    <p>There was an error processing your payment. Please try again.</p>
+    <p><a href="/">Return to Home</a></p>
+  </body>
+</html>`;
+
+    return new Response(errorHtml, {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/html', ...corsHeaders }
     });
   }
 });

@@ -70,9 +70,9 @@ async function generatePayUHash(
   email: string,
   salt: string
 ): Promise<string> {
-  // PayU hash format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT
-  // UDF fields are empty, so we use empty strings for udf1-udf5, followed by 6 empty fields
-  const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||${salt}`;
+  // PayU hash format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10|salt
+  // Must match the form fields exactly (10 UDF fields)
+  const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}||||||||||||||${salt}`;
   
   const encoder = new TextEncoder();
   const data = encoder.encode(hashString);
