@@ -1,9 +1,9 @@
 
 import type { Config } from "tailwindcss";
 
-function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = flattenColorPalette(theme("colors"));
-  let newVars = Object.fromEntries(
+function addVariablesForColors({ addBase, theme }: { addBase: (styles: Record<string, Record<string, string>>) => void; theme: (path: string) => unknown }) {
+  const allColors = flattenColorPalette(theme("colors") as Record<string, unknown>);
+  const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
   );
 
@@ -18,17 +18,17 @@ function addVariablesForColors({ addBase, theme }: any) {
 }
 
 // Helper function to flatten color palette - simplified version of the Tailwind utility
-function flattenColorPalette(colors: Record<string, any>): Record<string, string> {
+function flattenColorPalette(colors: Record<string, unknown>): Record<string, string> {
   const result: Record<string, string> = {};
   
-  const flattenColors = (obj: any, prefix = '') => {
+  const flattenColors = (obj: Record<string, unknown>, prefix = '') => {
     for (const key in obj) {
-      const value = obj[key];
+      const value = obj[key as keyof typeof obj];
       
       if (typeof value === 'string') {
-        result[prefix + key] = value;
-      } else if (typeof value === 'object') {
-        flattenColors(value, `${prefix}${key}-`);
+        result[prefix + key] = value as string;
+      } else if (typeof value === 'object' && value !== null) {
+        flattenColors(value as Record<string, unknown>, `${prefix}${key}-`);
       }
     }
   };

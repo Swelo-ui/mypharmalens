@@ -18,13 +18,21 @@ import {
   Pill,
   ChevronRight
 } from 'lucide-react';
+import PaymentButton from '@/components/PaymentButton';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const PricingPage: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { availablePlans, currentSubscription } = useSubscription();
 
-  // Pricing calculations
+  // Resolve plans from available list
+  const freePlan = availablePlans.find(p => p.id === 'free-plan' || p.name.toLowerCase().includes('free'));
+  const weeklyPlan = availablePlans.find(p => p.id === 'weekly-plan' || p.name.toLowerCase().includes('weekly'));
+  const premiumPlan = availablePlans.find(p => p.id === 'monthly-premium' || p.id === 'monthly-premium-plan' || p.name.toLowerCase().includes('premium'));
+
+  // Pricing calculations (UI display only)
   const weeklyPrice = 39;
   const premiumMonthlyPrice = 199;
   
@@ -95,9 +103,9 @@ const PricingPage: React.FC = () => {
           </div>
 
           {/* Pricing Cards - Mobile-First Design */}
-          <div className={`${isMobile ? 'space-y-6' : 'grid grid-cols-1 md:grid-cols-3 gap-8'}`}>
+          <div className={`${isMobile ? 'space-y-6' : 'grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch'}`}>
             {/* Free Plan */}
-            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-gray-400' : 'rounded-2xl p-8 shadow-lg'} border border-gray-200 dark:border-gray-700 relative`}>
+            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-gray-400' : 'rounded-2xl p-8 shadow-lg'} border border-gray-200 dark:border-gray-700 relative flex flex-col h-full`}>
               {isMobile ? (
                 // Mobile Layout - Compact horizontal design
                 <div className="space-y-4">
@@ -184,7 +192,7 @@ const PricingPage: React.FC = () => {
 
                   <Button 
                     onClick={() => handlePlanSelect('free')}
-                    className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+                    className="w-full mt-auto bg-gray-900 hover:bg-gray-800 text-white"
                   >
                     Current Plan
                   </Button>
@@ -193,7 +201,7 @@ const PricingPage: React.FC = () => {
             </div>
 
             {/* Weekly Plan */}
-            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-500' : 'rounded-2xl p-8 shadow-lg'} border border-pharma-300 relative`}>
+            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-500' : 'rounded-2xl p-8 shadow-lg'} border border-gray-200 dark:border-gray-700 relative flex flex-col h-full`}>
               {!isMobile && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-pharma-600 text-white px-3 py-1">
@@ -252,13 +260,25 @@ const PricingPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => handlePlanSelect('weekly')}
-                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
-                  >
-                    Choose Plan
-                    <ArrowRight className="ml-2 h-3 w-3" />
-                  </Button>
+                  {weeklyPlan ? (
+                    <PaymentButton
+                      plan={weeklyPlan}
+                      planId={weeklyPlan.id}
+                      billingCycle={isYearly ? 'yearly' : 'monthly'}
+                      className="w-full mt-4 bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-3 w-3" />
+                    </PaymentButton>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/contact')}
+                      className="w-full mt-4 bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               ) : (
                 // Desktop Layout - Original design
@@ -312,19 +332,31 @@ const PricingPage: React.FC = () => {
                     </li>
                   </ul>
 
-                  <Button 
-                    onClick={() => handlePlanSelect('weekly')}
-                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
-                  >
-                    Choose Plan
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  {weeklyPlan ? (
+                    <PaymentButton
+                      plan={weeklyPlan}
+                      planId={weeklyPlan.id}
+                      billingCycle={isYearly ? 'yearly' : 'monthly'}
+                      className="w-full mt-auto bg-pharma-600 hover:bg-pharma-700 text-white"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </PaymentButton>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/contact')}
+                      className="w-full mt-auto bg-pharma-600 hover:bg-pharma-700 text-white"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
                 </>
               )}
             </div>
 
             {/* Premium Plan */}
-            <div className={`bg-gradient-to-br from-pharma-50 to-pharma-100 dark:from-pharma-900/20 dark:to-pharma-800/20 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-600' : 'rounded-2xl p-8 shadow-lg'} border border-pharma-500 relative`}>
+            <div className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-xl p-6 shadow-md border-l-4 border-l-pharma-600' : 'rounded-2xl p-8 shadow-lg'} border border-gray-200 dark:border-gray-700 relative flex flex-col h-full`}>
               {isMobile ? (
                 // Mobile Layout - Compact horizontal design
                 <div className="space-y-4">
@@ -376,13 +408,25 @@ const PricingPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => handlePlanSelect('premium')}
-                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
-                  >
-                    Choose Plan
-                    <ArrowRight className="ml-2 h-3 w-3" />
-                  </Button>
+                  {premiumPlan ? (
+                    <PaymentButton
+                      plan={premiumPlan}
+                      planId={premiumPlan.id}
+                      billingCycle={isYearly ? 'yearly' : 'monthly'}
+                      className="w-full mt-4 bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-3 w-3" />
+                    </PaymentButton>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/contact')}
+                      className="w-full mt-4 bg-pharma-600 hover:bg-pharma-700 text-white text-sm py-2"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               ) : (
                 // Desktop Layout - Original design
@@ -440,39 +484,32 @@ const PricingPage: React.FC = () => {
                     </li>
                   </ul>
 
-                  <Button 
-                    onClick={() => handlePlanSelect('premium')}
-                    className="w-full bg-pharma-600 hover:bg-pharma-700 text-white"
-                  >
-                    Choose Plan
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  {premiumPlan ? (
+                    <PaymentButton
+                      plan={premiumPlan}
+                      planId={premiumPlan.id}
+                      billingCycle={isYearly ? 'yearly' : 'monthly'}
+                      className="w-full mt-auto bg-pharma-600 hover:bg-pharma-700 text-white"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </PaymentButton>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/contact')}
+                      className="w-full mt-auto bg-pharma-600 hover:bg-pharma-700 text-white"
+                    >
+                      Choose Plan
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
                 </>
               )}
             </div>
           </div>
           
+          {/* Removed maintenance notice since PayU checkout is integrated */}
           <div className="mt-12 text-center">
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
-              <div className="flex items-center justify-center mb-3">
-                <MessageCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-2" />
-                <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-                  Payment Gateway Notice
-                </h3>
-              </div>
-              <p className="text-yellow-700 dark:text-yellow-300 mb-4">
-                Our payment gateway is currently under maintenance. To purchase any of our premium plans, 
-                please contact our support team directly.
-              </p>
-              <Link 
-                to="/contact" 
-                className="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
-              >
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Contact Support for Purchase
-              </Link>
-            </div>
-            
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Need help choosing? <Link to="/contact" className="text-pharma-600 hover:underline">Contact our team</Link>
             </p>

@@ -96,7 +96,7 @@ const allDrugsData: DrugData[] = [
 
 // Enhanced deduplication with validation logging for both ID and name duplicates
 let duplicatesFound = 0;
-let duplicateLog: Array<{id: string, kept: string, replaced: string[]}> = [];
+const duplicateLog: Array<{id: string, kept: string, replaced: string[]}> = [];
 
 export const combinedDrugsData: DrugData[] = allDrugsData
   .filter(drug => drug && drug.id && drug.name) // Filter out undefined/null entries

@@ -10,7 +10,7 @@ declare global {
   }
   interface Document {
     querySelector(selector: string): Element | null;
-    querySelectorAll(selector: string): NodeList;
+    querySelectorAll(selector: string): NodeListOf<Element>;
   }
   interface Element {
     textContent: string | null;
@@ -20,14 +20,6 @@ declare global {
 }
 
 // Type declarations for Deno environment
-declare global {
-  namespace Deno {
-    function serve(handler: (req: Request) => Response | Promise<Response>): void;
-    const env: {
-      get(key: string): string | undefined;
-    };
-  }
-}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -81,7 +73,7 @@ function getRandomUserAgent(): string {
   return userAgents[Math.floor(Math.random() * userAgents.length)];
 }
 
-function createResponse(data: any, status: number = 200): Response {
+function createResponse(data: unknown, status: number = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -137,7 +129,7 @@ function cleanText(text: string): string {
     .replace(/\s+/g, ' ')
     .replace(/\n+/g, ' ')
     .trim()
-    .replace(/[^\w\s.,;:()\-]/g, '');
+    .replace(/[^\w\s.,;:()-]/g, '');
 }
 
 function extractArrayFromText(text: string, maxItems: number = 15): string[] {
@@ -177,10 +169,10 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
     }
 
     // Extract description
-    const descElements = doc.querySelectorAll('.ddc-drug-info .contentBox p, .drug-subtitle, .ddc-summary p');
+    const descElements = doc.querySelectorAll('.ddc-drug-info .contentBox p, .drug-subtitle, .ddc-summary p') as NodeListOf<Element>;
     if (descElements.length > 0) {
       const descriptions = Array.from(descElements)
-        .map((el: Node) => cleanText((el as Element).textContent || ''))
+        .map((el) => cleanText(el.textContent || ''))
         .filter((text: string) => text.length > 20);
       if (descriptions.length > 0) {
         drugInfo.description = descriptions[0];
@@ -190,9 +182,9 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
     // Extract side effects
     const sideEffectsSection = doc.querySelector('#side-effects .contentBox, .side-effects-list') as Element | null;
     if (sideEffectsSection) {
-      const sideEffectItems = sideEffectsSection.querySelectorAll('li, p');
+      const sideEffectItems = sideEffectsSection.querySelectorAll('li, p') as NodeListOf<Element>;
       drugInfo.sideEffects = Array.from(sideEffectItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 5)
         .slice(0, 15);
     }
@@ -200,9 +192,9 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
     // Extract warnings
     const warningsSection = doc.querySelector('#warnings .contentBox, .warnings-list') as Element | null;
     if (warningsSection) {
-      const warningItems = warningsSection.querySelectorAll('li, p');
+      const warningItems = warningsSection.querySelectorAll('li, p') as NodeListOf<Element>;
       drugInfo.warnings = Array.from(warningItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 10)
         .slice(0, 10);
     }
@@ -216,9 +208,9 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
     // Extract drug interactions
     const interactionsSection = doc.querySelector('#interactions .contentBox, .interactions-list') as Element | null;
     if (interactionsSection) {
-      const interactionItems = interactionsSection.querySelectorAll('li, p');
+      const interactionItems = interactionsSection.querySelectorAll('li, p') as NodeListOf<Element>;
       drugInfo.interactions = Array.from(interactionItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 5)
         .slice(0, 10);
     }
@@ -226,9 +218,9 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
     // Extract brand names
     const brandNamesSection = doc.querySelector('.brand-names-list, .brand-name') as Element | null;
     if (brandNamesSection) {
-      const brandItems = brandNamesSection.querySelectorAll('li, span');
+      const brandItems = brandNamesSection.querySelectorAll('li, span') as NodeListOf<Element>;
       drugInfo.brandNames = Array.from(brandItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 1)
         .slice(0, 10);
     }
@@ -269,9 +261,9 @@ async function scrapeMedlinePlus(drugName: string): Promise<Partial<Comprehensiv
     // Extract description
     const descSection = doc.querySelector('#why-is-this-medication-prescribed + div, .drug-description') as Element | null;
     if (descSection) {
-      const paragraphs = descSection.querySelectorAll('p');
+      const paragraphs = descSection.querySelectorAll('p') as NodeListOf<Element>;
       if (paragraphs.length > 0) {
-        drugInfo.description = cleanText((paragraphs[0] as Element).textContent || '');
+        drugInfo.description = cleanText(paragraphs[0].textContent || '');
       }
     }
 
@@ -284,9 +276,9 @@ async function scrapeMedlinePlus(drugName: string): Promise<Partial<Comprehensiv
     // Extract side effects
     const sideEffectsSection = doc.querySelector('#what-side-effects-can-this-medication-cause + div') as Element | null;
     if (sideEffectsSection) {
-      const sideEffectItems = sideEffectsSection.querySelectorAll('li');
+      const sideEffectItems = sideEffectsSection.querySelectorAll('li') as NodeListOf<Element>;
       drugInfo.sideEffects = Array.from(sideEffectItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 5)
         .slice(0, 15);
     }
@@ -294,9 +286,9 @@ async function scrapeMedlinePlus(drugName: string): Promise<Partial<Comprehensiv
     // Extract warnings/precautions
     const warningsSection = doc.querySelector('#what-special-precautions-should-i-follow + div') as Element | null;
     if (warningsSection) {
-      const warningItems = warningsSection.querySelectorAll('li');
+      const warningItems = warningsSection.querySelectorAll('li') as NodeListOf<Element>;
       drugInfo.warnings = Array.from(warningItems)
-        .map((item: Element) => cleanText(item.textContent || ''))
+        .map((item) => cleanText(item.textContent || ''))
         .filter((text: string) => text.length > 10)
         .slice(0, 10);
     }
@@ -439,11 +431,14 @@ function calculateCompleteness(merged: ComprehensiveDrugInfo): number {
     }
   });
 
-  const arrayFields = ['sideEffects', 'warnings', 'indications', 'contraindications', 'interactions', 'brandNames'];
+  const arrayFields = [
+    'sideEffects', 'warnings', 'interactions', 'indications', 'contraindications', 'brandNames'
+  ];
+
   arrayFields.forEach(field => {
-    const arrayValue = merged[field as keyof ComprehensiveDrugInfo] as string[];
-    if (arrayValue && Array.isArray(arrayValue) && arrayValue.length > 0) {
-      completenessScore += Math.min(arrayValue.length * 2, 8);
+    const arr = merged[field as keyof ComprehensiveDrugInfo] as unknown;
+    if (Array.isArray(arr) && arr.length > 0) {
+      completenessScore += 10;
     }
   });
 
@@ -583,7 +578,7 @@ async function enhanceDrugInfoWithGemini(drugInfo: ComprehensiveDrugInfo): Promi
         // Extract JSON from the response
         const jsonMatch = enhancedText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          const enhancedData = JSON.parse(jsonMatch[0]);
+          const enhancedData = JSON.parse(jsonMatch[0]) as Partial<ComprehensiveDrugInfo>;
           
           // Merge enhanced data with original, keeping source information
           const enhanced: ComprehensiveDrugInfo = {
@@ -591,7 +586,7 @@ async function enhanceDrugInfoWithGemini(drugInfo: ComprehensiveDrugInfo): Promi
             ...enhancedData,
             sources: drugInfo.sources, // Preserve source information
             verified: true,
-            completeness: calculateCompleteness({...drugInfo, ...enhancedData})
+            completeness: calculateCompleteness({ ...drugInfo, ...enhancedData })
           };
 
           console.log(`Enhanced drug info with Gemini, completeness: ${enhanced.completeness}%`);
@@ -618,61 +613,30 @@ Deno.serve(async (req: Request) => {
     return createResponse({ error: 'Method not allowed' }, 405);
   }
 
-  const startTime = Date.now();
-
   try {
-    const { drugName } = await req.json();
+    const startTime = performance.now();
+    const { drugName } = await req.json() as { drugName?: string };
 
-    if (!drugName || typeof drugName !== 'string') {
-      return createResponse({
-        success: false,
-        error: 'Drug name is required and must be a string',
-        searchAttempts: [],
-        processingTime: Date.now() - startTime,
-        sourcesUsed: []
-      } as ApiResponse, 400);
+    if (!drugName || typeof drugName !== 'string' || drugName.trim().length < 2) {
+      return createResponse({ error: 'Invalid drug name' }, 400);
     }
 
-    console.log(`Processing request for drug: ${drugName}`);
+    const { drugInfo, searchAttempts, sourcesUsed } = await collectDrugData(drugName);
 
-    // Search for comprehensive drug information
-    const result = await searchComprehensiveDrugInfo(drugName.trim());
-    
-    // Enhance with Gemini if completeness is low
-    let finalDrugInfo = result.drugInfo;
-    if (finalDrugInfo.completeness < 70) {
-      console.log(`Completeness ${finalDrugInfo.completeness}% < 70%, attempting Gemini enhancement`);
-      finalDrugInfo = await enhanceDrugInfoWithGemini(finalDrugInfo);
-      if (finalDrugInfo.completeness > result.drugInfo.completeness) {
-        result.sourcesUsed.push('Gemini AI');
-      }
-    }
-
-    // Mark as verified if we have substantial data
-    finalDrugInfo.verified = finalDrugInfo.completeness >= 30;
+    // Enhance with Gemini
+    const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
 
     const response: ApiResponse = {
       success: true,
-      data: finalDrugInfo,
-      searchAttempts: result.searchAttempts,
-      processingTime: Date.now() - startTime,
-      sourcesUsed: result.sourcesUsed
+      data: enhancedInfo,
+      searchAttempts,
+      processingTime: Math.round(performance.now() - startTime),
+      sourcesUsed
     };
 
-    console.log(`Request completed in ${response.processingTime}ms, completeness: ${finalDrugInfo.completeness}%`);
-    return createResponse(response);
-
+    return createResponse(response, 200);
   } catch (error) {
-    console.error('API Error:', error);
-    
-    const errorResponse: ApiResponse = {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
-      searchAttempts: [],
-      processingTime: Date.now() - startTime,
-      sourcesUsed: []
-    };
-
-    return createResponse(errorResponse, 500);
+    console.error('Drug info processing error:', error);
+    return createResponse({ success: false, error: 'Failed to process drug information', searchAttempts: [], processingTime: 0, sourcesUsed: [] }, 500);
   }
 });

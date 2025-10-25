@@ -33,7 +33,7 @@ const Profile = () => {
           // Fetch user profile from profiles table
           const { data, error } = await supabase
             .from('profiles')
-            .select('display_name')
+            .select('full_name')
             .eq('id', user.id)
             .single();
             
@@ -43,7 +43,7 @@ const Profile = () => {
           }
           
           if (data) {
-            setDisplayName(data.display_name || '');
+            setDisplayName((data as { full_name: string | null }).full_name || '');
           }
           
           // Set email from auth user
@@ -67,7 +67,7 @@ const Profile = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          display_name: displayName,
+          full_name: displayName,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -330,3 +330,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

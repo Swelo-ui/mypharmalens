@@ -124,16 +124,14 @@ const SearchResults = () => {
             
             if (supabaseDrugs && supabaseDrugs.length > 0) {
               console.log("Found drugs in Supabase:", supabaseDrugs.length);
-              // Map Supabase drugs to DrugData format
-              const formattedDrugs = supabaseDrugs.map(drug => ({
+              // Map Supabase drugs to DrugData format using correct DB fields
+              const formattedDrugs: DrugData[] = supabaseDrugs.map(drug => ({
                 id: drug.id,
-                name: drug.name,
-                genericName: drug.generic_name,
-                manufacturer: drug.manufacturer,
-                category: drug.category,
-                description: drug.description,
-                drugClass: drug.drug_class,
-                verified: drug.verified,
+                name: drug.generic_name || 'Unknown',
+                genericName: drug.generic_name || undefined,
+                manufacturer: drug.manufacturer || undefined,
+                category: drug.category || undefined,
+                description: drug.description || undefined,
                 brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
               }));
               
