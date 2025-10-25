@@ -253,7 +253,7 @@ const Index = () => {
                   </li>
                 </ul>
                 
-                <Link to="/pricing" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all">
+                <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all">
                   Choose Weekly
                 </Link>
               </div>
@@ -301,7 +301,7 @@ const Index = () => {
                   </li>
                 </ul>
                 
-                <Link to="/pricing" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg">
+                <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg">
                   Choose Premium
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
@@ -312,7 +312,7 @@ const Index = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Need help choosing the right plan?
               </p>
-              <Link to="/pricing" className="inline-flex items-center text-pharma-600 hover:text-pharma-700 font-medium">
+              <Link to="/subscription-manager" className="inline-flex items-center text-pharma-600 hover:text-pharma-700 font-medium">
                 View detailed comparison
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Link>

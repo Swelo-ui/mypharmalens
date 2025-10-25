@@ -42,10 +42,13 @@ Deno.serve(async (req: Request) => {
 
     // Accept both POST (standard) and GET (some gateways fallback) methods
     const method = req.method;
+    console.log(`Processing ${method} request to webhook`);
+    console.log(`Query params:`, Object.fromEntries(url.searchParams.entries()));
 
     // Robust body parsing for PayU (supports urlencoded, multipart, json, and GET query)
     const contentType = req.headers.get('content-type')?.toLowerCase() || '';
     const payload: Record<string, string> = {};
+    console.log(`Content-Type: ${contentType}`);
 
     if (method === 'POST') {
       if (contentType.includes('application/x-www-form-urlencoded')) {
@@ -65,12 +68,16 @@ Deno.serve(async (req: Request) => {
         for (const [key, value] of params.entries()) payload[key] = String(value);
       }
     } else if (method === 'GET') {
-      // Some PayU flows may redirect with query params
-      for (const [key, value] of url.searchParams.entries()) payload[key] = String(value);
-    }
+        // Some PayU flows may redirect with query params
+        for (const [key, value] of url.searchParams.entries()) payload[key] = String(value);
+      }
 
-    const txnid = payload.txnid;
-    const status = (payload.status || url.searchParams.get('status') || '').toLowerCase();
+      console.log('Parsed payload:', payload);
+
+      const txnid = payload.txnid;
+      const status = (payload.status || url.searchParams.get('status') || '').toLowerCase();
+
+      console.log(`Transaction ID: ${txnid}, Status: ${status}`);
 
     // Verify hash (PayU response hash: salt|status|udf10|...|udf1|email|firstname|productinfo|amount|txnid|key)
     const merchantKey = Deno.env.get('PAYU_MERCHANT_KEY') || '';
@@ -149,6 +156,42 @@ Deno.serve(async (req: Request) => {
     }
 
     // Build redirect URL to SPA
+    // If no transaction data is received, this might be a direct access or PayU error
+    if (!txnid && !status && Object.keys(payload).length === 0) {
+      console.log('No transaction data received - possible direct access or PayU error');
+      // Redirect with generic failure
+      const qp = new URLSearchParams({
+        txnid: '',
+        status: 'failed',
+        hashValid: 'false',
+        mihpayid: '',
+        amount: '',
+        mode: '',
+        error: 'No transaction data received from payment gateway',
+      });
+      const redirectUrl = `${returnUrl}?${qp.toString()}`;
+      console.log(`Redirecting to: ${redirectUrl}`);
+      
+      const html = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <meta http-equiv="refresh" content="0;url=${redirectUrl}" />
+    <style>body{font-family:Arial;padding:40px;text-align:center}</style>
+  </head>
+  <body>
+    <p>Redirecting back to application...</p>
+    <p>If you are not redirected, <a href="${redirectUrl}">click here</a>.</p>
+  </body>
+</html>`;
+
+      return new Response(html, {
+        headers: { 'Content-Type': 'text/html', ...corsHeaders },
+        status: 200
+      });
+    }
+
     const qp = new URLSearchParams({
       txnid: txnid || url.searchParams.get('txnid') || '',
       status: status || 'failed',
@@ -160,6 +203,7 @@ Deno.serve(async (req: Request) => {
     });
 
     const redirectUrl = `${returnUrl}?${qp.toString()}`;
+    console.log(`Redirecting to: ${redirectUrl}`);
 
     // Minimal HTML redirect
     const html = `<!doctype html>

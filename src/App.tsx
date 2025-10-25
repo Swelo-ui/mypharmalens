@@ -26,7 +26,6 @@ const Auth = lazy(() => import("./pages/Auth"));
 const IdentificationHistory = lazy(() => import("./pages/IdentificationHistory"));
 const Profile = lazy(() => import("./pages/Profile"));
 const AccountSubscriptionPage = lazy(() => import("./pages/AccountSubscription"));
-const PricingPage = lazy(() => import("./components/PricingPage"));
 const PaymentResult = lazy(() => import("./components/PaymentResult"));
 // Replace direct component import with page wrappers
 const PaymentHistoryPage = lazy(() => import("./pages/PaymentHistoryPage"));
@@ -72,10 +71,10 @@ const App = () => {
                   <Route path="/history" element={<IdentificationHistory />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/account-subscription" element={<AccountSubscriptionPage />} />
-                  <Route path="/pricing" element={<PricingPage />} />
                   <Route path="/payment-result" element={<PaymentResult />} />
                   <Route path="/payment-history" element={<PaymentHistoryPage />} />
                   <Route path="/subscription" element={<SubscriptionManagerPage />} />
+                  <Route path="/subscription-manager" element={<SubscriptionManagerPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

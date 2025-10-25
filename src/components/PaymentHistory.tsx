@@ -176,10 +176,10 @@ const PaymentHistory: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Payment History</h2>
-          <p className="text-gray-600">View your payment transactions and subscription history</p>
+          <h2 className="text-xl sm:text-2xl font-bold">Payment History</h2>
+          <p className="text-sm sm:text-base text-gray-600">View your payment transactions and subscription history</p>
         </div>
         <Button
           className={buttonVariants({ variant: 'outline', size: 'sm' })}
@@ -197,65 +197,67 @@ const PaymentHistory: React.FC = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="payments">Payment Transactions</TabsTrigger>
-          <TabsTrigger value="subscriptions">Subscription History</TabsTrigger>
+          <TabsTrigger value="payments" className="text-xs sm:text-sm">Payment Transactions</TabsTrigger>
+          <TabsTrigger value="subscriptions" className="text-xs sm:text-sm">Subscription History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="payments" className="space-y-4">
           {isLoading ? (
             <Card>
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-4 sm:p-6 text-center">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-                <p>Loading payment transactions...</p>
+                <p className="text-sm sm:text-base">Loading payment transactions...</p>
               </CardContent>
             </Card>
           ) : paymentTransactions.length === 0 ? (
             <Card>
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-4 sm:p-6 text-center">
                 <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No payment transactions found.</p>
+                <p className="text-sm sm:text-base text-gray-600">No payment transactions found.</p>
               </CardContent>
             </Card>
           ) : (
             paymentTransactions.map((transaction) => (
               <Card key={transaction.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(transaction.status)}
-                      <div>
-                        <h3 className="font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">
                           {formatPlanName(transaction.plan_id)}
                         </h3>
-                        <p className="text-sm text-gray-600">
-                          Transaction ID: {transaction.transaction_id}
+                        <p className="text-xs sm:text-sm text-gray-600 truncate">
+                          ID: {transaction.transaction_id}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-lg">
+                    <div className="text-left sm:text-right flex-shrink-0">
+                      <p className="font-semibold text-base sm:text-lg">
                         ₹{transaction.amount}
                       </p>
-                      {getStatusBadge(transaction.status)}
+                      <div className="mt-1">
+                        {getStatusBadge(transaction.status)}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Billing Cycle</p>
-                      <p className="font-medium capitalize">{transaction.billing_cycle}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
+                    <div className="min-w-0">
+                      <p className="text-gray-600 text-xs sm:text-sm">Billing Cycle</p>
+                      <p className="font-medium capitalize text-sm truncate">{transaction.billing_cycle}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-600">Payment Method</p>
-                      <p className="font-medium capitalize">{transaction.payment_method}</p>
+                    <div className="min-w-0">
+                      <p className="text-gray-600 text-xs sm:text-sm">Payment Method</p>
+                      <p className="font-medium capitalize text-sm truncate">{getPaymentMethodDisplay(transaction.payment_method)}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-600">Created</p>
-                      <p className="font-medium">{formatDate(transaction.created_at)}</p>
+                    <div className="min-w-0">
+                      <p className="text-gray-600 text-xs sm:text-sm">Created</p>
+                      <p className="font-medium text-sm truncate">{formatDate(transaction.created_at)}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-600">Completed</p>
-                      <p className="font-medium">
+                    <div className="min-w-0">
+                      <p className="text-gray-600 text-xs sm:text-sm">Completed</p>
+                      <p className="font-medium text-sm truncate">
                         {transaction.completed_at 
                           ? formatDate(transaction.completed_at)
                           : 'Pending'
@@ -266,14 +268,14 @@ const PaymentHistory: React.FC = () => {
 
                   {transaction.error_message && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-700">
+                      <p className="text-xs sm:text-sm text-red-700 break-words">
                         <strong>Error:</strong> {transaction.error_message}
                       </p>
                     </div>
                   )}
 
                   {transaction.payu_payment_id && (
-                    <div className="mt-4 text-xs text-gray-500">
+                    <div className="mt-4 text-xs text-gray-500 break-all">
                       PayU Payment ID: {transaction.payu_payment_id}
                     </div>
                   )}
@@ -286,51 +288,51 @@ const PaymentHistory: React.FC = () => {
         <TabsContent value="subscriptions" className="space-y-4">
           {isLoading ? (
             <Card>
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-4 sm:p-6 text-center">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-                <p>Loading subscription history...</p>
+                <p className="text-sm sm:text-base">Loading subscription history...</p>
               </CardContent>
             </Card>
           ) : subscriptionHistory.length === 0 ? (
             <Card>
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-4 sm:p-6 text-center">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No subscription history found.</p>
+                <p className="text-sm sm:text-base text-gray-600">No subscription history found.</p>
               </CardContent>
             </Card>
           ) : (
             subscriptionHistory.map((item) => (
               <Card key={item.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-semibold">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-sm sm:text-base truncate">
                         {formatPlanName(item.plan_id)}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-gray-600 truncate">
                         {formatDate(item.created_at)}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex-shrink-0">
                       {getActionBadge(item.status)}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Status</p>
-                      <p className="font-medium capitalize">{item.status}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm">
+                    <div className="min-w-0">
+                      <p className="text-gray-600 text-xs sm:text-sm">Status</p>
+                      <p className="font-medium capitalize text-sm truncate">{item.status}</p>
                     </div>
                     {item.starts_at && (
-                      <div>
-                        <p className="text-gray-600">Starts</p>
-                        <p className="font-medium">{formatDate(item.starts_at)}</p>
+                      <div className="min-w-0">
+                        <p className="text-gray-600 text-xs sm:text-sm">Starts</p>
+                        <p className="font-medium text-sm truncate">{formatDate(item.starts_at)}</p>
                       </div>
                     )}
                     {item.ends_at && (
-                      <div>
-                        <p className="text-gray-600">Ends</p>
-                        <p className="font-medium">{formatDate(item.ends_at)}</p>
+                      <div className="min-w-0">
+                        <p className="text-gray-600 text-xs sm:text-sm">Ends</p>
+                        <p className="font-medium text-sm truncate">{formatDate(item.ends_at)}</p>
                       </div>
                     )}
                   </div>

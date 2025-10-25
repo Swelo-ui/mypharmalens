@@ -696,7 +696,7 @@ const DrugIdentify = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => navigate('/pricing')}
+                        onClick={() => navigate('/subscription-manager')}
                         className="text-xs"
                       >
                         Upgrade Plan

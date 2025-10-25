@@ -475,7 +475,7 @@ const SearchResults = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => navigate('/pricing')}
+                          onClick={() => navigate('/subscription-manager')}
                           className="text-pharma-600 border-pharma-300 hover:bg-pharma-100 dark:text-pharma-400 dark:border-pharma-600 dark:hover:bg-pharma-900/30"
                         >
                           Upgrade Plan

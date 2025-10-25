@@ -122,8 +122,8 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   };
 
   const handleUpgradeClick = () => {
-    navigate('/pricing');
-    toast.info(`Redirecting to pricing page to upgrade your plan`);
+    navigate('/subscription-manager');
+        toast.info(`Redirecting to subscription manager to upgrade your plan`);
   };
 
   return (
@@ -157,8 +157,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
             <div className="flex items-center justify-center gap-2 text-orange-700">
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">
--                {usageStats.identificationsUsed}/{usageStats.identificationsUsed} identifications used this month
-+                {usageStats.identificationsUsed}/{usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit} identifications used this month
+                {usageStats.identificationsUsed}/{usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit} identifications used this month
               </span>
             </div>
           </div>
