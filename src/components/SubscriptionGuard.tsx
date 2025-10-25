@@ -88,7 +88,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
     switch (feature) {
       case 'ai_identification':
         if (usageStats.identificationsRemaining === 0) {
-          return `You've used all ${usageStats.identificationsUsed} AI identifications in your ${planName}. Upgrade to get more identifications!`;
+          return `You've used all ${usageStats.identificationsUsed} of ${usageStats.monthlyLimit} AI identifications in your ${planName}. Upgrade to get more identifications!`;
         }
         return `AI Drug Identification is not available in your ${planName}.`;
       case 'database_search':
@@ -157,7 +157,8 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
             <div className="flex items-center justify-center gap-2 text-orange-700">
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">
-                {usageStats.identificationsUsed}/{usageStats.identificationsUsed} identifications used this month
+-                {usageStats.identificationsUsed}/{usageStats.identificationsUsed} identifications used this month
++                {usageStats.identificationsUsed}/{usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit} identifications used this month
               </span>
             </div>
           </div>

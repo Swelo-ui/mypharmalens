@@ -49,6 +49,8 @@ const PaymentResult: React.FC = () => {
         // Show appropriate toast message
         if (data.status === 'success') {
           toast.success('Payment successful! Your subscription has been activated.');
+          // Auto-redirect back to Pricing for clear confirmation
+          setTimeout(() => navigate('/pricing'), 2000);
         } else if (data.status === 'failed') {
           toast.error('Payment failed. Please try again.');
         } else {

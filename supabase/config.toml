@@ -5,3 +5,11 @@ verify_jwt = false
 
 [functions.manage-drug-history]
 verify_jwt = true
+
+# Allow external gateway callbacks (PayU) without JWT
+[functions.payu-webhook]
+verify_jwt = false
+
+# Payment initiation can remain protected; set to true if you want auth
+[functions.payu-payment]
+verify_jwt = true

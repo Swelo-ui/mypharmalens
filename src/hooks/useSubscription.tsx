@@ -33,12 +33,65 @@ export const useSubscription = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('identifications_used')
+        .select('identifications_used, last_reset_date')
         .eq('id', user.id)
         .single();
 
-      if (error) throw error;
-      setProfileIdentificationsUsed(data?.identifications_used || 0);
+      if (error && (error as any).code !== 'PGRST116') throw error;
+
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // If no profile row exists, initialize it without resetting usage unexpectedly
+      if (!data) {
+        const { error: createErr } = await supabase
+          .from('profiles')
+          .upsert(
+            {
+              id: user.id,
+              identifications_used: 0,
+              last_reset_date: now.toISOString(),
+            },
+            { onConflict: 'id' }
+          );
+        if (createErr) throw createErr;
+        setProfileIdentificationsUsed(0);
+        return;
+      }
+
+      const lastReset = data.last_reset_date ? new Date(data.last_reset_date) : null;
+      const currentUsed = data.identifications_used ?? 0;
+
+      // Only reset when last_reset_date exists and is before current month
+      if (lastReset && lastReset < monthStart) {
+        const { error: resetErr } = await supabase
+          .from('profiles')
+          .upsert(
+            {
+              id: user.id,
+              identifications_used: 0,
+              last_reset_date: now.toISOString(),
+            },
+            { onConflict: 'id' }
+          );
+        if (resetErr) throw resetErr;
+        setProfileIdentificationsUsed(0);
+      } else {
+        // If last_reset_date is missing, set it without altering current usage
+        if (!lastReset) {
+          const { error: initErr } = await supabase
+            .from('profiles')
+            .upsert(
+              {
+                id: user.id,
+                last_reset_date: now.toISOString(),
+              },
+              { onConflict: 'id' }
+            );
+          if (initErr) console.error('Error initializing last_reset_date:', initErr);
+        }
+        setProfileIdentificationsUsed(currentUsed);
+      }
     } catch (error) {
       console.error('Error fetching profile usage:', error);
       setProfileIdentificationsUsed(0);
@@ -233,31 +286,47 @@ export const useSubscription = () => {
 
   // Increment identification usage (stored in profiles)
   const incrementIdentificationUsage = async (): Promise<boolean> => {
-    if (user?.email === 'imgamer.ms@gmail0com') {
+    if (user?.email === 'imgamer.ms@gmail.com') {
       return true;
     }
     if (!user?.id) return false;
 
     try {
-      // Ensure profile exists and upsert usage atomically
+      // Fetch current usage and last reset
       const { data: existing, error: fetchErr } = await supabase
         .from('profiles')
-        .select('id, identifications_used')
+        .select('id, identifications_used, last_reset_date')
         .eq('id', user.id)
         .single();
 
+      if (fetchErr && (fetchErr as any).code !== 'PGRST116') throw fetchErr;
+
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
       const currentUsed = existing?.identifications_used ?? 0;
+      const lastReset = existing?.last_reset_date ? new Date(existing.last_reset_date) : null;
 
-      // Upsert with conflict on id
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({ id: user.id, identifications_used: currentUsed + 1 }, { onConflict: 'id' });
+      let newUsed = currentUsed + 1;
+      let payload: Partial<Tables<'profiles'>> & { id: string } = { id: user.id } as any;
 
-      if (error || fetchErr) {
-        throw error || fetchErr;
+      // If last_reset_date exists and is before current month, reset then increment
+      if (lastReset && lastReset < monthStart) {
+        newUsed = 1; // reset to 0 then add 1
+        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
+      } else if (!lastReset) {
+        // If missing, initialize last_reset_date without affecting count logic
+        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
+      } else {
+        payload = { id: user.id, identifications_used: newUsed } as any;
       }
 
-      const newUsed = currentUsed + 1;
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (error) throw error;
+
       setProfileIdentificationsUsed(newUsed);
       if (currentSubscription) {
         calculateUsageStats(currentSubscription);
@@ -289,9 +358,9 @@ export const useSubscription = () => {
 
   useEffect(() => {
     const init = async () => {
+      if (!user?.id) return; // wait for user
       setLoading(true);
       try {
-        // Log Supabase URL to aid debugging (non-sensitive)
         console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
         await fetchAvailablePlans();
         await fetchProfileUsage();
@@ -302,6 +371,48 @@ export const useSubscription = () => {
     };
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // Subscribe to realtime updates on profile usage for current user
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`profile-usage-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+        (payload) => {
+          const newUsed = (payload as any)?.new?.identifications_used;
+          if (typeof newUsed === 'number') {
+            setProfileIdentificationsUsed(newUsed);
+            if (currentSubscription) {
+              calculateUsageStats(currentSubscription);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, currentSubscription]);
+
+  // Reset state when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setCurrentSubscription(null);
+      setProfileIdentificationsUsed(0);
+      setUsageStats({
+        identificationsUsed: 0,
+        identificationsRemaining: 5,
+        databaseSearchesUsed: 0,
+        databaseSearchesRemaining: 10,
+        monthlyLimit: 5,
+        planName: 'Free',
+      });
+    }
   }, [isAuthenticated]);
 
   return {
@@ -318,3 +429,5 @@ export const useSubscription = () => {
       incrementIdentificationUsage
     };
 };
+
+

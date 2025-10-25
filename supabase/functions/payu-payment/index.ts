@@ -130,7 +130,7 @@ async function createPaymentLink(paymentData: PaymentRequest): Promise<{ success
     console.log('Generated PayU hash');
 
     // Build return URL to SPA via webhook handler
-    const appUrl = Deno.env.get('APP_URL') || 'http://localhost:8080';
+    const appUrl = Deno.env.get('APP_URL') || 'https://pharmanotes.me';
     const returnUrl = `${appUrl}/payment-result`;
     const webhookBase = `${supabaseUrl}/functions/v1/payu-webhook`;
     const successUrl = `${webhookBase}?returnUrl=${encodeURIComponent(returnUrl)}`;
@@ -161,6 +161,17 @@ async function createPaymentLink(paymentData: PaymentRequest): Promise<{ success
         <input type="hidden" name="firstname" value="${paymentData.userName}" />
         <input type="hidden" name="email" value="${paymentData.userEmail}" />
         <input type="hidden" name="phone" value="" />
+        <!-- Explicitly include all UDF fields to match hash (10 empties) -->
+        <input type="hidden" name="udf1" value="" />
+        <input type="hidden" name="udf2" value="" />
+        <input type="hidden" name="udf3" value="" />
+        <input type="hidden" name="udf4" value="" />
+        <input type="hidden" name="udf5" value="" />
+        <input type="hidden" name="udf6" value="" />
+        <input type="hidden" name="udf7" value="" />
+        <input type="hidden" name="udf8" value="" />
+        <input type="hidden" name="udf9" value="" />
+        <input type="hidden" name="udf10" value="" />
         <input type="hidden" name="surl" value="${successUrl}" />
         <input type="hidden" name="furl" value="${failureUrl}" />
         <input type="hidden" name="hash" value="${hash}" />

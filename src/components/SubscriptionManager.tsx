@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import PaymentButton from './PaymentButton';
 import { Tables } from '@/types/database.types';
+import { useSubscription } from '@/hooks/useSubscription';
 
 type UserProfile = Tables<"profiles">;
 type SubscriptionPlan = Tables<"subscription_plans">;
@@ -29,6 +30,8 @@ type UserSubscription = Tables<"user_subscriptions"> & { plan?: SubscriptionPlan
 
 const SubscriptionManager: React.FC = () => {
   const { user } = useAuthStatus();
+  // Wire unified subscription usage state
+  const { usageStats, loading: subLoading } = useSubscription();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   // Track current subscription from user_subscriptions table
@@ -130,8 +133,12 @@ const SubscriptionManager: React.FC = () => {
   };
 
   const getUsagePercentage = () => {
-    if (!profile) return 0;
-    return Math.min((profile.identifications_used / profile.monthly_identifications) * 100, 100);
+    // Use unified usage stats from useSubscription with guards
+    if (!usageStats) return 0;
+    if (usageStats.monthlyLimit === -1) return 0;
+    const used = usageStats.identificationsUsed || 0;
+    const limit = usageStats.monthlyLimit || 1;
+    return Math.min((used / limit) * 100, 100);
   };
 
   const formatPlanName = (planId: string) => {
@@ -250,18 +257,28 @@ const SubscriptionManager: React.FC = () => {
 
           {/* Usage Progress */}
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Monthly Identifications Used</span>
-              <span>
-                {profile?.identifications_used || 0} / {profile?.monthly_identifications || 0}
-              </span>
-            </div>
-            <Progress value={usagePercentage} className="h-2" />
-            {usagePercentage >= 80 && (
-              <p className="text-sm text-amber-600 flex items-center gap-1">
-                <AlertTriangle className="w-4 h-4" />
-                You're approaching your monthly limit
-              </p>
+            {subLoading ? (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading usage...
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span>Monthly Identifications Used</span>
+                  <span>
+                    {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit}
+                  </span>
+                </div>
+                {usageStats.monthlyLimit !== -1 && (
+                  <Progress value={usagePercentage} className="h-2" />
+                )}
+                {usageStats.monthlyLimit !== -1 && usagePercentage >= 80 && (
+                  <p className="text-sm text-amber-600 flex items-center gap-1">
+                    <AlertTriangle className="w-4 h-4" />
+                    You're approaching your monthly limit
+                  </p>
+                )}
+              </>
             )}
           </div>
 

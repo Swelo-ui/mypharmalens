@@ -11,10 +11,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { toast } from 'sonner';
-import { Loader2, Save, Key, User, Mail } from 'lucide-react';
+import { Loader2, Save, Key, User, Mail, Calendar, CreditCard, Info } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
+  const navigate = useNavigate();
+  const { currentSubscription, usageStats, loading } = useSubscription();
   
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,6 +30,7 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [tabValue, setTabValue] = useState('profile');
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -171,8 +177,21 @@ const Profile = () => {
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center sm:text-left">Profile Settings</h1>
         
-        <Tabs defaultValue="profile" className="w-full max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-12 sm:h-14">
+        <Tabs value={tabValue} onValueChange={setTabValue} className="w-full max-w-4xl mx-auto">
+          <div className="sm:hidden mb-4">
+            <Select value={tabValue} onValueChange={setTabValue}>
+              <SelectTrigger aria-label="Profile menu" className="w-full">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="profile">Profile Information</SelectItem>
+                <SelectItem value="security">Security</SelectItem>
+                <SelectItem value="audio">Audio Settings</SelectItem>
+                <SelectItem value="subscription">Subscription & Usage</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <TabsList className="hidden sm:grid w-full grid-cols-4 mb-6 sm:mb-8 h-12 sm:h-14">
             <TabsTrigger value="profile" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
               <span className="text-center leading-tight">Profile<br className="sm:hidden" /><span className="hidden sm:inline"> Information</span></span>
             </TabsTrigger>
@@ -181,6 +200,9 @@ const Profile = () => {
             </TabsTrigger>
             <TabsTrigger value="audio" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
               <span className="text-center leading-tight">Audio<br className="sm:hidden" /><span className="hidden sm:inline"> Settings</span></span>
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
+              <span className="text-center leading-tight">Subscription<br className="sm:hidden" /><span className="hidden sm:inline"> & Usage</span></span>
             </TabsTrigger>
           </TabsList>
           
@@ -322,6 +344,59 @@ const Profile = () => {
           
           <TabsContent value="audio">
             <AudioSettings />
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            <Card className="border-0 sm:border shadow-none sm:shadow-sm">
+              <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
+                <CardTitle className="text-lg sm:text-xl">Subscription & Usage</CardTitle>
+                <CardDescription className="text-sm">View your current plan, usage, and history</CardDescription>
+              </CardHeader>
+              <CardContent className="px-4 sm:px-6 pb-6 space-y-6">
+                {loading ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Loading subscription and usage...
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg border bg-muted/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Info className="w-4 h-4" />
+                          <span className="font-medium">Current Plan</span>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <p><span className="text-gray-600">Plan:</span> {currentSubscription?.plan?.name || 'Free'}</p>
+                          <p><span className="text-gray-600">Status:</span> {currentSubscription?.status || 'active'}</p>
+                          <p className="flex items-center gap-2"><Calendar className="w-4 h-4" /> <span className="text-gray-600">Start:</span> {currentSubscription?.starts_at || currentSubscription?.created_at ? new Date((currentSubscription?.starts_at || currentSubscription?.created_at)!).toLocaleDateString() : '—'}</p>
+                          <p className="flex items-center gap-2"><Calendar className="w-4 h-4" /> <span className="text-gray-600">End:</span> {currentSubscription?.plan?.id === 'free-plan' ? 'No expiration' : (currentSubscription?.ends_at ? new Date(currentSubscription.ends_at).toLocaleDateString() : '—')}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg border bg-muted/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CreditCard className="w-4 h-4" />
+                          <span className="font-medium">AI Identifications Usage</span>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <p>Used this month: <span className="font-semibold">{usageStats.identificationsUsed}</span>{usageStats.monthlyLimit >= 0 ? ` / ${usageStats.monthlyLimit}` : ' (Unlimited)'}</p>
+                          {usageStats.monthlyLimit >= 0 && (
+                            <div className="w-full h-2 bg-gray-200 rounded">
+                              <div className="h-2 bg-[#0384c6] rounded" style={{ width: `${Math.min(100, (usageStats.identificationsUsed / Math.max(usageStats.monthlyLimit, 1)) * 100)}%` }} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 justify-end">
+                      <Button variant="outline" onClick={() => navigate('/payment-history')}>View Purchase History</Button>
+                      <Button variant="outline" onClick={() => navigate('/subscription')}>Manage Subscription</Button>
+                      <Button variant="primary" onClick={() => navigate('/account-subscription')}>Open Detailed Page</Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

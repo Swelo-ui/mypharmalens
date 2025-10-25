@@ -74,7 +74,7 @@ const calculateSimilarity = (hash1: string, hash2: string): number => {
 
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
-  const { canPerformIdentification, incrementIdentificationUsage, usageStats } = useSubscription();
+  const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
@@ -431,8 +431,23 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
-      // Check subscription limits before processing
-      if (!canPerformIdentification()) {
+      // Check subscription limits before processing, guard loading first
+      if (loading) {
+        toast.info("Loading your subscription details... please wait a moment.");
+        return;
+      }
+
+      // Use unified usageStats for consistency with the top usage bar
+      const used = usageStats?.identificationsUsed ?? 0;
+      const limit = usageStats?.monthlyLimit ?? 5;
+      const isUnlimited = limit === -1;
+      if (!isUnlimited && used >= limit) {
+        toast.error("You've reached your AI identification limit for this month. Please upgrade your plan to continue.");
+        return;
+      }
+
+      // Fallback to canPerformIdentification if usageStats are not ready
+      if (!usageStats && !canPerformIdentification()) {
         toast.error("You've reached your AI identification limit for this month. Please upgrade your plan to continue.");
         return;
       }
@@ -442,27 +457,27 @@ const DrugIdentify = () => {
       setProcessingProgress(0);
       setProcessingPhase("Preparing image");
       toast.info("Processing your image...");
-      
+
       // Check image quality
       await checkImageQuality(file);
-      
+
       const reader = new FileReader();
-      
+
       reader.onload = async (event) => {
         if (event.target?.result) {
           const base64Image = event.target.result.toString();
           setCapturedImage(base64Image);
-          
+
           try {
             // Identify the drug with advanced processing
             const drugData = await identifyDrugFromImage(base64Image);
             setProcessingProgress(90);
-            
+
             // Check if the response indicates an error
             if (drugData && drugData.success === false) {
               throw new Error(drugData.message || drugData.error || 'Failed to identify medication');
             }
-            
+
             if (drugData && drugData.success !== false) {
               setProcessingProgress(95);
               // Format the drug data to match our DetailedDrugData interface
@@ -668,37 +683,44 @@ const DrugIdentify = () => {
             
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 sm:p-8 lg:p-10 mb-8 max-w-4xl mx-auto">
               {/* Subscription Usage Display */}
-              {isAuthenticated && usageStats && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg border">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-sm">AI Identifications Usage</h4>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => navigate('/pricing')}
-                      className="text-xs"
-                    >
-                      Upgrade Plan
-                    </Button>
+
+              {isAuthenticated && (
+                loading ? (
+                  <div className="mb-6 p-4 rounded-lg border bg-gray-50 dark:bg-gray-900/20 flex items-center gap-2 text-sm text-gray-600">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Loading usage...
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Used this month:</span>
-                      <span className="font-medium">
-                        {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit}
-                      </span>
+                ) : (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg border">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-sm">AI Identifications Usage</h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => navigate('/pricing')}
+                        className="text-xs"
+                      >
+                        Upgrade Plan
+                      </Button>
                     </div>
-                    {usageStats.monthlyLimit !== -1 && (
-                      <Progress 
-                        value={(usageStats.identificationsUsed / usageStats.monthlyLimit) * 100} 
-                        className="h-2"
-                      />
-                    )}
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Current plan: <span className="font-medium">{usageStats.planName}</span>
-                    </p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Used this month:</span>
+                        <span className="font-medium">
+                          {usageStats?.identificationsUsed} / {usageStats?.monthlyLimit === -1 ? '∞' : usageStats?.monthlyLimit}
+                        </span>
+                      </div>
+                      {usageStats?.monthlyLimit !== -1 && (
+                        <Progress 
+                          value={((usageStats?.identificationsUsed || 0) / (usageStats?.monthlyLimit || 1)) * 100} 
+                          className="h-2"
+                        />
+                      )}
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Current plan: <span className="font-medium">{usageStats?.planName}</span>
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )
               )}
               
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6 text-base sm:text-lg">

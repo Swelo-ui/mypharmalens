@@ -20,45 +20,47 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const returnUrl = url.searchParams.get('returnUrl') || (Deno.env.get('APP_URL') || 'http://localhost:8080') + '/payment-result';
+    const returnUrl = url.searchParams.get('returnUrl') || (Deno.env.get('APP_URL') || 'https://pharmanotes.me') + '/payment-result';
 
-    if (req.method !== 'POST') {
-      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-        status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    // Accept both POST (standard) and GET (some gateways fallback) methods
+    const method = req.method;
 
-    // Robust body parsing for PayU (supports urlencoded, multipart and json)
+    // Robust body parsing for PayU (supports urlencoded, multipart, json, and GET query)
     const contentType = req.headers.get('content-type')?.toLowerCase() || '';
     const payload: Record<string, string> = {};
-    if (contentType.includes('application/x-www-form-urlencoded')) {
-      const text = await req.text();
-      const params = new URLSearchParams(text);
-      for (const [key, value] of params.entries()) payload[key] = String(value);
-    } else if (contentType.includes('multipart/form-data')) {
-      const form = await req.formData();
-      for (const [key, value] of form.entries()) payload[key] = String(value);
-    } else if (contentType.includes('application/json')) {
-      const json = await req.json();
-      for (const key of Object.keys(json)) payload[key] = String(json[key]);
-    } else {
-      // Fallback: try URLSearchParams
-      const text = await req.text();
-      const params = new URLSearchParams(text);
-      for (const [key, value] of params.entries()) payload[key] = String(value);
+
+    if (method === 'POST') {
+      if (contentType.includes('application/x-www-form-urlencoded')) {
+        const text = await req.text();
+        const params = new URLSearchParams(text);
+        for (const [key, value] of params.entries()) payload[key] = String(value);
+      } else if (contentType.includes('multipart/form-data')) {
+        const form = await req.formData();
+        for (const [key, value] of form.entries()) payload[key] = String(value);
+      } else if (contentType.includes('application/json')) {
+        const json = await req.json();
+        for (const key of Object.keys(json)) payload[key] = String(json[key]);
+      } else {
+        // Fallback: try parsing raw text as params
+        const text = await req.text();
+        const params = new URLSearchParams(text);
+        for (const [key, value] of params.entries()) payload[key] = String(value);
+      }
+    } else if (method === 'GET') {
+      // Some PayU flows may redirect with query params
+      for (const [key, value] of url.searchParams.entries()) payload[key] = String(value);
     }
 
     const txnid = payload.txnid;
-    const status = payload.status?.toLowerCase();
+    const status = (payload.status || url.searchParams.get('status') || '').toLowerCase();
 
     // Verify hash (PayU response hash: salt|status|udf10|...|udf1|email|firstname|productinfo|amount|txnid|key)
     const merchantKey = Deno.env.get('PAYU_MERCHANT_KEY') || '';
     const merchantSalt = Deno.env.get('PAYU_MERCHANT_SALT') || '';
-    const responseHash = payload.hash || '';
+    const responseHash = payload.hash || url.searchParams.get('hash') || '';
 
     // Use 10 empty UDF placeholders
-    const calcHashString = `${merchantSalt}|${status}||||||||||${payload.email}|${payload.firstname}|${payload.productinfo}|${payload.amount}|${txnid}|${merchantKey}`;
+    const calcHashString = `${merchantSalt}|${status}||||||||||${payload.email || url.searchParams.get('email') || ''}|${payload.firstname || url.searchParams.get('firstname') || ''}|${payload.productinfo || url.searchParams.get('productinfo') || ''}|${payload.amount || url.searchParams.get('amount') || ''}|${payload.txnid || url.searchParams.get('txnid') || ''}|${merchantKey}`;
     const enc = new TextEncoder();
     const data = enc.encode(calcHashString);
     const hashBuffer = await crypto.subtle.digest('SHA-512', data);
@@ -67,30 +69,76 @@ Deno.serve(async (req: Request) => {
 
     const hashValid = !!merchantSalt && !!merchantKey && !!responseHash && responseHash === calcHash;
 
-    // Update transaction in DB
+    // Update transaction in DB, and activate subscription on success
     if (txnid) {
       const normalizedStatus = status === 'success' ? 'success' : status === 'failure' ? 'failed' : status === 'pending' ? 'pending' : 'failed';
+      const nowIso = new Date().toISOString();
       const updateFields: Record<string, any> = {
         status: normalizedStatus,
-        payu_payment_id: payload.payuMoneyId || payload.mihpayid || null,
-        payu_response: payload
+        payu_payment_id: payload.payuMoneyId || payload.mihpayid || url.searchParams.get('mihpayid') || null,
+        payu_response: payload,
+        completed_at: normalizedStatus !== 'pending' ? nowIso : null,
+        error_message: normalizedStatus === 'failed' ? (payload.error_Message || url.searchParams.get('error_Message') || 'Payment failed') : null,
       };
 
-      await supabase
+      const { data: tx } = await supabase
         .from('payment_transactions')
         .update(updateFields)
-        .eq('transaction_id', txnid);
+        .eq('transaction_id', txnid)
+        .select('*')
+        .single();
+
+      // If payment succeeded, ensure the user's subscription is activated
+      if (normalizedStatus === 'success' && tx && tx.user_id && tx.plan_id) {
+        const endsAtMs = (tx.billing_cycle === 'yearly')
+          ? Date.now() + 365 * 24 * 60 * 60 * 1000
+          : Date.now() + 30 * 24 * 60 * 60 * 1000;
+        const endsAtIso = new Date(endsAtMs).toISOString();
+
+        // Try to update existing active subscription, else insert a new one
+        const { data: existing } = await supabase
+          .from('user_subscriptions')
+          .select('id')
+          .eq('user_id', tx.user_id)
+          .eq('status', 'active')
+          .single();
+
+        if (existing?.id) {
+          await supabase
+            .from('user_subscriptions')
+            .update({
+              plan_id: tx.plan_id,
+              starts_at: nowIso,
+              ends_at: endsAtIso,
+              updated_at: nowIso,
+              status: 'active',
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('user_subscriptions')
+            .insert({
+              user_id: tx.user_id,
+              plan_id: tx.plan_id,
+              status: 'active',
+              starts_at: nowIso,
+              ends_at: endsAtIso,
+              created_at: nowIso,
+              updated_at: nowIso,
+            });
+        }
+      }
     }
 
     // Build redirect URL to SPA
     const qp = new URLSearchParams({
-      txnid: txnid || '',
+      txnid: txnid || url.searchParams.get('txnid') || '',
       status: status || 'failed',
       hashValid: String(hashValid),
-      mihpayid: payload.mihpayid || '',
-      amount: payload.amount || '',
-      mode: payload.mode || '',
-      error: payload.error_Message || '',
+      mihpayid: payload.mihpayid || url.searchParams.get('mihpayid') || '',
+      amount: payload.amount || url.searchParams.get('amount') || '',
+      mode: payload.mode || url.searchParams.get('mode') || '',
+      error: payload.error_Message || url.searchParams.get('error_Message') || '',
     });
 
     const redirectUrl = `${returnUrl}?${qp.toString()}`;
