@@ -115,7 +115,25 @@ const Terms = () => {
               <li>We are not liable for any losses resulting from service interruptions</li>
             </ul>
 
-            <h2>9. Content and Conduct</h2>
+            <h2>9. Refund Policy</h2>
+            <p>
+              <strong>Refund - We do not provide any kind of refund due to the nature of our business.</strong>
+            </p>
+            <p>
+              PharmaLens provides digital services including AI-powered medication identification and information access. Given the immediate delivery and consumption of our digital services, and the nature of our business model, we maintain a strict no-refund policy. This policy applies to all services, subscriptions, and any payments made to PharmaLens.
+            </p>
+            <ul>
+              <li><strong>No Refunds:</strong> All payments are final and non-refundable</li>
+              <li><strong>Service Nature:</strong> Our digital services are delivered immediately upon access</li>
+              <li><strong>Business Model:</strong> The nature of our AI-powered identification service does not permit refunds</li>
+              <li><strong>Alternative Resolution:</strong> For service issues, please contact our support team for assistance</li>
+              <li><strong>Legal Compliance:</strong> This policy is subject to applicable consumer protection laws in your jurisdiction</li>
+            </ul>
+            <p>
+              If you have concerns about our service quality or experience technical issues, please contact our support team. While we cannot provide refunds, we are committed to resolving service-related problems and ensuring user satisfaction within the bounds of our service capabilities.
+            </p>
+
+            <h2>10. Content and Conduct</h2>
             <p>
               While PharmaLens primarily processes medication images for identification, users must adhere to content guidelines:
             </p>
@@ -127,7 +145,7 @@ const Terms = () => {
               <li>We reserve the right to remove content that violates these guidelines</li>
             </ul>
 
-            <h2>10. Third-Party Services</h2>
+            <h2>11. Third-Party Services</h2>
             <p>
               PharmaLens integrates with the following third-party services to provide our functionality:
             </p>
@@ -139,7 +157,7 @@ const Terms = () => {
               Your use of these integrated services is subject to their respective terms of service and privacy policies. We are not responsible for the practices or policies of these third-party services.
             </p>
 
-            <h2>11. Medical Disclaimer and Liability Limitations</h2>
+            <h2>12. Medical Disclaimer and Liability Limitations</h2>
             <p>
               <strong>IMPORTANT MEDICAL DISCLAIMER:</strong> PharmaLens is an informational tool only and is not intended for medical diagnosis, treatment, or emergency situations.
             </p>
@@ -152,7 +170,7 @@ const Terms = () => {
               <li><strong>User Responsibility:</strong> Users are solely responsible for verifying medication information with healthcare professionals</li>
             </ul>
             
-            <h2>12. Intellectual Property</h2>
+            <h2>13. Intellectual Property</h2>
             <p>
               All content, features, and functionality on PharmaLens, including but not limited to text, graphics, logos, icons, images, software, and AI models, are owned by PharmaLens or its licensors and are protected by copyright, trademark, and other intellectual property laws.
             </p>
@@ -163,7 +181,7 @@ const Terms = () => {
               <li>All trademarks and service marks are the property of their respective owners</li>
             </ul>
             
-            <h2>13. Data Processing and Privacy</h2>
+            <h2>14. Data Processing and Privacy</h2>
             <p>
               Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your information. Key points include:
             </p>
@@ -175,7 +193,7 @@ const Terms = () => {
               <li>You have rights regarding your personal data as outlined in our Privacy Policy</li>
             </ul>
             
-            <h2>14. Indemnification</h2>
+            <h2>15. Indemnification</h2>
             <p>
               You agree to indemnify, defend, and hold harmless PharmaLens, its officers, directors, employees, agents, and affiliates from and against any and all claims, damages, obligations, losses, liabilities, costs, or debt, and expenses (including attorney's fees) arising from:
             </p>
@@ -186,7 +204,7 @@ const Terms = () => {
               <li>Any claim that your use of the service caused damage to a third party</li>
             </ul>
             
-            <h2>15. Limitations of Liability</h2>
+            <h2>16. Limitations of Liability</h2>
             <p>
               To the maximum extent permitted by law, PharmaLens and its affiliates shall not be liable for any direct, indirect, incidental, special, consequential, or exemplary damages resulting from:
             </p>
@@ -199,7 +217,7 @@ const Terms = () => {
               <li>Medical decisions made based on information from our service</li>
             </ul>
             
-            <h2>16. Dispute Resolution</h2>
+            <h2>17. Dispute Resolution</h2>
             <p>
               Any disputes arising out of or relating to these Terms or the use of PharmaLens shall be resolved as follows:
             </p>
@@ -211,7 +229,7 @@ const Terms = () => {
               <li><strong>Jurisdiction:</strong> Any legal proceedings shall be conducted in the courts of India</li>
             </ul>
             
-            <h2>17. Termination</h2>
+            <h2>18. Termination</h2>
             <p>
               These Terms remain in effect until terminated by either you or PharmaLens:
             </p>
@@ -223,7 +241,7 @@ const Terms = () => {
               <li><strong>Survival:</strong> Sections regarding liability, indemnification, and dispute resolution survive termination</li>
             </ul>
             
-            <h2>18. Updates and Notifications</h2>
+            <h2>19. Updates and Notifications</h2>
             <p>
               We will notify users of significant changes to these Terms through:
             </p>
@@ -235,17 +253,17 @@ const Terms = () => {
               <li>Continued use after the effective date constitutes acceptance of new Terms</li>
             </ul>
             
-            <h2>19. Severability</h2>
+            <h2>20. Severability</h2>
             <p>
               If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect and enforceable.
             </p>
             
-            <h2>20. Governing Law and Jurisdiction</h2>
+            <h2>21. Governing Law and Jurisdiction</h2>
             <p>
               These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any legal action or proceeding arising under these Terms will be brought exclusively in the courts of India, and you hereby consent to personal jurisdiction and venue therein.
             </p>
             
-            <h2>21. Contact Information</h2>
+            <h2>22. Contact Information</h2>
             <p>
               If you have any questions about these Terms, need support, or wish to report violations, please contact us:
             </p>
@@ -256,7 +274,7 @@ const Terms = () => {
               <li><strong>Business Hours:</strong> Monday to Friday, 9:00 AM to 6:00 PM IST</li>
             </ul>
             
-            <h2>22. Entire Agreement</h2>
+            <h2>23. Entire Agreement</h2>
             <p>
               These Terms, together with our Privacy Policy, constitute the entire agreement between you and PharmaLens regarding the use of our service and supersede all prior and contemporaneous understandings, agreements, representations, and warranties, both written and oral, regarding the service.
             </p>
