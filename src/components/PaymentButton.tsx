@@ -137,7 +137,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               <span className="font-medium">Secure Payment</span>
             </div>
             <p className="text-green-600 dark:text-green-400 text-xs mt-1">
-              256-bit SSL encryption • PCI DSS compliant • PayU secured
+              256-bit SSL encryption • PCI DSS compliant • PhonePe secured
             </p>
           </CardContent>
         </Card>
@@ -190,9 +190,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               <p className="font-medium">Billing Information</p>
               <p className="mt-1">
                 • Instant activation after payment<br/>
-                • Auto-renewal can be managed in settings<br/>
-                • 7-day money-back guarantee<br/>
-                • Cancel anytime
+                • Auto-renewal can be managed in settings
               </p>
             </div>
           </div>
@@ -206,7 +204,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             <div className="text-xs text-blue-700 dark:text-blue-200">
               <p className="font-medium">Secure Payment</p>
               <p className="mt-1">
-                Your payment is processed securely through PayU. You'll be redirected to complete the payment.
+                Your payment is processed securely through PhonePe. You'll be redirected to complete the payment.
               </p>
             </div>
           </div>
