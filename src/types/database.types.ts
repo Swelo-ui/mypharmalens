@@ -224,8 +224,10 @@ export type Database = {
           error_message: string | null
           id: string
           payment_method: string | null
-          payu_payment_id: string | null
-          payu_response: Json | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          razorpay_response: Json | null
           plan_id: string | null
           status: string | null
           transaction_id: string
@@ -241,8 +243,10 @@ export type Database = {
           error_message?: string | null
           id?: string
           payment_method?: string | null
-          payu_payment_id?: string | null
-          payu_response?: Json | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          razorpay_response?: Json | null
           plan_id?: string | null
           status?: string | null
           transaction_id: string
@@ -258,8 +262,10 @@ export type Database = {
           error_message?: string | null
           id?: string
           payment_method?: string | null
-          payu_payment_id?: string | null
-          payu_response?: Json | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          razorpay_response?: Json | null
           plan_id?: string | null
           status?: string | null
           transaction_id?: string

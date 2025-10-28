@@ -6,14 +6,12 @@ verify_jwt = false
 [functions.manage-drug-history]
 verify_jwt = true
 
-# Allow external gateway callbacks (PayU) without JWT
-[functions.payu-webhook]
-verify_jwt = false
+# PayU entries removed (migrated to Razorpay)
 
-# PayU configuration endpoint - no auth needed for config
-[functions.payu-config]
-verify_jwt = false
-
-# Payment initiation can remain protected; set to true if you want auth
-[functions.payu-payment]
+# Razorpay order creation - protect with JWT
+[functions.razorpay-order]
 verify_jwt = true
+
+# Razorpay webhook - must be publicly accessible for gateway callbacks
+[functions.razorpay-webhook]
+verify_jwt = false

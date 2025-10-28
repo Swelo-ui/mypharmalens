@@ -274,9 +274,14 @@ const PaymentHistory: React.FC = () => {
                     </div>
                   )}
 
-                  {transaction.payu_payment_id && (
+                  {transaction.razorpay_order_id && (
                     <div className="mt-4 text-xs text-gray-500 break-all">
-                      PayU Payment ID: {transaction.payu_payment_id}
+                      Razorpay Order ID: {transaction.razorpay_order_id}
+                    </div>
+                  )}
+                  {transaction.razorpay_payment_id && (
+                    <div className="mt-1 text-xs text-gray-500 break-all">
+                      Razorpay Payment ID: {transaction.razorpay_payment_id}
                     </div>
                   )}
                 </CardContent>

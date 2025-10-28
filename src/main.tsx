@@ -64,7 +64,7 @@ const addMetaTags = () => {
 addMetaTags();
 
 root.render(
-  <BrowserRouter>
+  <BrowserRouter future={{ v7_relativeSplatPath: true }}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <App />
       <Toaster position="bottom-right" />

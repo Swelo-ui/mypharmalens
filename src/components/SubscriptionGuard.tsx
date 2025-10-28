@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Crown, Zap, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuthStatus } from '../hooks/useAuthStatus'; // Corrected import path and hook name
 
 interface SubscriptionGuardProps {
   feature: 'ai_identification' | 'database_search' | 'history_feature' | 'layman_explanations' | 'advanced_filters';
@@ -22,8 +23,9 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
 }) => {
   const { currentSubscription, canPerformIdentification, hasFeatureAccess, usageStats, loading } = useSubscription();
   const navigate = useNavigate();
+  const { session, isLoading: isAuthLoading } = useAuthStatus();
 
-  if (loading) {
+  if (loading || isAuthLoading) {
     return (
       <div className="flex items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pharma-600"></div>
@@ -31,21 +33,33 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
     );
   }
 
-  // Check specific feature access
+  // Redirect to sign-in if not authenticated and trying to access AI identification
+  if (!session && feature === 'ai_identification') {
+    navigate('/signin');
+    toast.info('Please sign in to use the AI Drug Identification feature.');
+    return null;
+  }
+
+  // Check specific feature access with improved error handling
   const checkFeatureAccess = (): boolean => {
-    switch (feature) {
-      case 'ai_identification':
-        return canPerformIdentification();
-      case 'database_search':
-        return usageStats.databaseSearchesRemaining > 0 || usageStats.databaseSearchesRemaining === -1;
-      case 'history_feature':
-        return hasFeatureAccess('history_feature');
-      case 'layman_explanations':
-        return hasFeatureAccess('layman_explanations');
-      case 'advanced_filters':
-        return hasFeatureAccess('advanced_filters');
-      default:
-        return false;
+    try {
+      switch (feature) {
+        case 'ai_identification':
+          return canPerformIdentification();
+        case 'database_search':
+          return (usageStats?.databaseSearchesRemaining ?? 0) > 0 || usageStats?.databaseSearchesRemaining === -1;
+        case 'history_feature':
+          return hasFeatureAccess('history_feature');
+        case 'layman_explanations':
+          return hasFeatureAccess('layman_explanations');
+        case 'advanced_filters':
+          return hasFeatureAccess('advanced_filters');
+        default:
+          return false;
+      }
+    } catch (error) {
+      console.error('Error checking feature access:', error);
+      return false;
     }
   };
 
@@ -83,24 +97,33 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   };
 
   const getUpgradeMessage = (): string => {
-    const planName = currentSubscription?.plan?.name || 'Free Plan';
-    
-    switch (feature) {
-      case 'ai_identification':
-        if (usageStats.identificationsRemaining === 0) {
-          return `You've used all ${usageStats.identificationsUsed} of ${usageStats.monthlyLimit} AI identifications in your ${planName}. Upgrade to get more identifications!`;
-        }
-        return `AI Drug Identification is not available in your ${planName}.`;
-      case 'database_search':
-        return `You've reached the database search limit for your ${planName}.`;
-      case 'history_feature':
-        return `Identification History is available in Premium plans only.`;
-      case 'layman_explanations':
-        return `Layman explanations for medical terms are available in Premium plans only.`;
-      case 'advanced_filters':
-        return `Advanced search filters are available in Premium plans only.`;
-      default:
-        return `This feature requires a premium subscription.`;
+    try {
+      const planName = currentSubscription?.plan?.name || 'Free Plan';
+      
+      switch (feature) {
+        case 'ai_identification':
+          const identificationsRemaining = usageStats?.identificationsRemaining ?? 0;
+          const identificationsUsed = usageStats?.identificationsUsed ?? 0;
+          const monthlyLimit = usageStats?.monthlyLimit ?? 5;
+          
+          if (identificationsRemaining === 0) {
+            return `You've used all ${identificationsUsed} of ${monthlyLimit === -1 ? '∞' : monthlyLimit} AI identifications in your ${planName}. Upgrade to get more identifications!`;
+          }
+          return `AI Drug Identification is not available in your ${planName}.`;
+        case 'database_search':
+          return `You've reached the database search limit for your ${planName}.`;
+        case 'history_feature':
+          return `Identification History is available in Premium plans only.`;
+        case 'layman_explanations':
+          return `Layman explanations for medical terms are available in Premium plans only.`;
+        case 'advanced_filters':
+          return `Advanced search filters are available in Premium plans only.`;
+        default:
+          return `This feature requires a premium subscription.`;
+      }
+    } catch (error) {
+      console.error('Error generating upgrade message:', error);
+      return 'This feature requires a premium subscription.';
     }
   };
 
@@ -122,9 +145,14 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   };
 
   const handleUpgradeClick = () => {
-    navigate('/subscription-manager');
-        toast.info(`Redirecting to subscription manager to upgrade your plan`);
-  };
+    try {
+      navigate('/subscription-manager');
+      toast.info(`Redirecting to subscription manager to upgrade your plan`);
+    } catch (error) {
+      console.error('Error navigating to subscription manager:', error);
+      toast.error('Unable to navigate to subscription manager. Please try again.'); // Fixed unterminated string literal
+    }
+  }; // Added missing closing curly brace for handleUpgradeClick
 
   return (
     <Card className="border-2 border-dashed border-pharma-200 bg-pharma-50/50">
@@ -152,12 +180,12 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
           </Badge>
         </div>
 
-        {feature === 'ai_identification' && usageStats.identificationsRemaining === 0 && (
+        {feature === 'ai_identification' && (usageStats?.identificationsRemaining ?? 0) === 0 && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
             <div className="flex items-center justify-center gap-2 text-orange-700">
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">
-                {usageStats.identificationsUsed}/{usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit} identifications used this month
+                {usageStats?.identificationsUsed ?? 0}/{(usageStats?.monthlyLimit ?? 5) === -1 ? '∞' : (usageStats?.monthlyLimit ?? 5)} identifications used this month
               </span>
             </div>
           </div>

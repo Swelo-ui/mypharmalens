@@ -148,12 +148,13 @@ export const useSubscription = () => {
       } as unknown as UserSubscription;
       
       setCurrentSubscription(specialSubscription);
-      calculateUsageStats(specialSubscription);
+      await calculateUsageStats(specialSubscription, true);
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      // Fetch all active subscriptions, ordered by created_at descending to get the latest
+      const { data: allActiveSubscriptions, error: fetchError } = await supabase
         .from('user_subscriptions')
         .select(`
           *,
@@ -161,16 +162,39 @@ export const useSubscription = () => {
         `)
         .eq('user_id', user?.id || '')
         .eq('status', 'active')
-        .single();
+        .order('created_at', { ascending: false });
 
-      if (error && (error as any).code !== 'PGRST116') {
-        throw error;
+      if (fetchError) {
+        throw fetchError;
       }
 
-      if (data) {
-        setCurrentSubscription(data as UserSubscription);
-        calculateUsageStats(data as UserSubscription);
+      // If we have multiple active subscriptions, keep only the latest (non-free) one
+      if (allActiveSubscriptions && allActiveSubscriptions.length > 1) {
+        console.log(`Found ${allActiveSubscriptions.length} active subscriptions, cleaning up...`);
+        
+        // Find the latest non-free subscription, or latest overall
+        const latestPaidSubscription = allActiveSubscriptions.find(sub => sub.plan_id !== 'free-plan');
+        const activeSubscription = latestPaidSubscription || allActiveSubscriptions[0];
+        
+        // Deactivate all other subscriptions
+        const subscriptionsToDeactivate = allActiveSubscriptions.filter(sub => sub.id !== activeSubscription.id);
+        
+        for (const sub of subscriptionsToDeactivate) {
+          await supabase
+            .from('user_subscriptions')
+            .update({ status: 'inactive' })
+            .eq('id', sub.id);
+          console.log(`Deactivated subscription: ${sub.plan_id} (${sub.id})`);
+        }
+        
+        setCurrentSubscription(activeSubscription as UserSubscription);
+        await calculateUsageStats(activeSubscription as UserSubscription, true);
+      } else if (allActiveSubscriptions && allActiveSubscriptions.length === 1) {
+        // Single active subscription - use it
+        setCurrentSubscription(allActiveSubscriptions[0] as UserSubscription);
+        await calculateUsageStats(allActiveSubscriptions[0] as UserSubscription, true);
       } else {
+        // No active subscription found - assign free plan
         await assignFreePlan();
       }
     } catch (error: any) {
@@ -211,7 +235,7 @@ export const useSubscription = () => {
       if (error) throw error;
 
       setCurrentSubscription(data as UserSubscription);
-      calculateUsageStats(data as UserSubscription);
+      await calculateUsageStats(data as UserSubscription, true);
     } catch (error: any) {
       console.error('Error assigning free plan:', error);
       toast.error('Failed to assign free plan', {
@@ -221,11 +245,32 @@ export const useSubscription = () => {
   };
 
   // Calculate usage statistics
-  const calculateUsageStats = (subscription: UserSubscription) => {
+  const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = false) => {
     const plan = subscription.plan;
-    // For now, use a default limit of 5 for free plans since we don't have limit columns
-    const monthlyLimit = plan?.id === 'free-plan' ? 5 : (plan?.id === 'special-plan' ? -1 : 100);
-    const used = profileIdentificationsUsed || 0;
+    // Determine limits based on plan features and plan id
+    const hasUnlimited = Array.isArray(plan?.features) && plan!.features!.includes('unlimited_identifications');
+    // Use -1 for unlimited, 5 for free, 100 default for other paid plans
+    const monthlyLimit = hasUnlimited ? -1 : (plan?.id === 'free-plan' ? 5 : (plan?.id === 'special-plan' ? -1 : 100));
+    
+    // If forceRefresh, get fresh usage data from profiles
+    let used = profileIdentificationsUsed || 0;
+    if (forceRefresh && user?.id) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('identifications_used')
+          .eq('id', user.id)
+          .single();
+        
+        if (!error && data) {
+          used = data.identifications_used ?? 0;
+          setProfileIdentificationsUsed(used);
+        }
+      } catch (err) {
+        console.error('Error fetching fresh usage data:', err);
+      }
+    }
+    
     const remaining = monthlyLimit < 0 ? -1 : Math.max(monthlyLimit - used, 0);
 
     setUsageStats({
@@ -243,6 +288,13 @@ export const useSubscription = () => {
     if (user?.email === 'imgamer.ms@gmail.com') {
       return true;
     }
+    
+    // For unauthenticated users, allow limited usage based on localStorage
+    if (!isAuthenticated || !user?.id) {
+      const guestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
+      return guestUsage < 3; // Allow 3 free identifications for guests
+    }
+    
     // While subscription info is loading or unavailable, default to Free plan limits
     if (!currentSubscription?.plan) {
       return (profileIdentificationsUsed || 0) < 5;
@@ -289,6 +341,14 @@ export const useSubscription = () => {
     if (user?.email === 'imgamer.ms@gmail.com') {
       return true;
     }
+    
+    // For unauthenticated users, increment guest usage in localStorage
+    if (!isAuthenticated || !user?.id) {
+      const currentGuestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
+      localStorage.setItem('guest_identifications_used', (currentGuestUsage + 1).toString());
+      return true;
+    }
+    
     if (!user?.id) return false;
 
     try {
@@ -329,7 +389,7 @@ export const useSubscription = () => {
 
       setProfileIdentificationsUsed(newUsed);
       if (currentSubscription) {
-        calculateUsageStats(currentSubscription);
+        await calculateUsageStats(currentSubscription, false);
       }
       return true;
     } catch (error) {
@@ -381,12 +441,12 @@ export const useSubscription = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
-        (payload) => {
+        async (payload) => {
           const newUsed = (payload as any)?.new?.identifications_used;
           if (typeof newUsed === 'number') {
             setProfileIdentificationsUsed(newUsed);
             if (currentSubscription) {
-              calculateUsageStats(currentSubscription);
+              await calculateUsageStats(currentSubscription, false);
             }
           }
         }
@@ -398,6 +458,52 @@ export const useSubscription = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, currentSubscription]);
+
+  // Subscribe to realtime updates on user_subscriptions for current user
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`subscription-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_subscriptions', filter: `user_id=eq.${user.id}` },
+        async (payload: any) => {
+          try {
+            const newRow = payload?.new;
+            if (newRow && newRow.status === 'active') {
+              // Ensure plan details are present by fetching joined record
+              const { data, error } = await supabase
+                .from('user_subscriptions')
+                .select(`*, plan:subscription_plans(*)`)
+                .eq('id', newRow.id)
+                .single();
+              if (!error && data) {
+                const updated = data as UserSubscription;
+                setCurrentSubscription(updated);
+                await calculateUsageStats(updated, true); // Force refresh usage on subscription update
+              } else {
+                // Fallback: infer plan from available plans if join failed
+                const inferredPlan = availablePlans.find(p => p.id === newRow.plan_id);
+                const updated = { ...newRow, plan: inferredPlan } as UserSubscription;
+                setCurrentSubscription(updated);
+                await calculateUsageStats(updated, true);
+              }
+            } else {
+              // On delete or inactive status, re-fetch to determine current state
+              await fetchCurrentSubscription();
+            }
+          } catch (err) {
+            console.error('Realtime subscription update handling error:', err);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, availablePlans]);
 
   // Reset state when user logs out
   useEffect(() => {
@@ -430,4 +536,4 @@ export const useSubscription = () => {
     };
 };
 
-
+

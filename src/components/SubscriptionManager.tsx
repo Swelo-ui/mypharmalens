@@ -22,6 +22,8 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import PaymentButton from './PaymentButton';
 import { Tables } from '@/types/database.types';
 import { useSubscription } from '@/hooks/useSubscription';
+import CongratulationsMessage from '@/components/CongratulationsMessage';
+import { SubscriptionService } from '@/services/subscriptionService';
 
 type UserProfile = Tables<"profiles">;
 type SubscriptionPlan = Tables<"subscription_plans">;
@@ -30,8 +32,8 @@ type UserSubscription = Tables<"user_subscriptions"> & { plan?: SubscriptionPlan
 
 const SubscriptionManager: React.FC = () => {
   const { user } = useAuthStatus();
-  // Wire unified subscription usage state
-  const { usageStats, loading: subLoading } = useSubscription();
+  // Wire unified subscription usage state and current plan
+  const { usageStats, loading: subLoading, currentSubscription: unifiedSubscription } = useSubscription();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   // Track current subscription from user_subscriptions table
@@ -40,34 +42,65 @@ const SubscriptionManager: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [congratulationsPlan, setCongratulationsPlan] = useState<string>('');
 
   useEffect(() => {
     if (user) {
       fetchUserData();
+      
+      // Subscribe to subscription updates
+      const subscriptionService = SubscriptionService.getInstance();
+      const unsubscribe = subscriptionService.onSubscriptionUpdate((subscription) => {
+        if (subscription && subscription.status === 'active') {
+          setCurrentSubscription(subscription);
+          // Show congratulations message for new subscriptions
+          const planName = subscription.plan?.name || 'Premium Plan';
+          setCongratulationsPlan(planName);
+          setShowCongratulations(true);
+          
+          // Refetch user data to ensure UI is fully updated
+          setTimeout(() => {
+            fetchUserData();
+          }, 1000);
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
     }
   }, [user]);
 
-  const fetchUserData = async () => {
-    if (!user) return;
+  // Sync local state with unified subscription from hook for accuracy across app
+  useEffect(() => {
+    if (unifiedSubscription) {
+      setCurrentSubscription(unifiedSubscription);
+    }
+  }, [unifiedSubscription]);
 
+  const fetchUserData = async () => {
     setIsLoading(true);
+    if (!user) {
+      console.log('User not available, skipping fetchUserData.');
+      setIsLoading(false);
+      return;
+    }
+    console.log('Fetching user data for userId:', user.id);
     try {
-      // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (profileError) {
+      if (profileError && (profileError as any).code !== 'PGRST116') {
         throw profileError;
       }
 
-      // Fetch subscription plans
       const { data: plansData, error: plansError } = await supabase
         .from('subscription_plans')
-        .select('*')
-        .order('price', { ascending: true });
+        .select('*');
 
       if (plansError) {
         throw plansError;
@@ -79,11 +112,17 @@ const SubscriptionManager: React.FC = () => {
         .select(`*, plan:subscription_plans(*)`)
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (subscriptionError && (subscriptionError as any).code !== 'PGRST116') {
         throw subscriptionError;
       }
+
+      // Note: Usage stats are automatically managed by the useSubscription hook
+      // No need to fetch separately - the hook handles realtime updates
+      console.log('Subscription data loaded:', subscriptionData?.plan_id);
 
       setProfile(profileData);
       setPlans((plansData || []) as SubscriptionPlan[]);
@@ -203,6 +242,7 @@ const SubscriptionManager: React.FC = () => {
   const currentPlan = getCurrentPlan();
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -341,11 +381,15 @@ const SubscriptionManager: React.FC = () => {
               return (
                 <Card 
                   key={plan.id} 
-                  className={`relative ${isCurrentPlan ? 'ring-2 ring-blue-500' : ''}`}
+                  className={`relative transition-all duration-500 ${
+                    isCurrentPlan 
+                      ? 'ring-2 ring-blue-500 border-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-border' 
+                      : 'hover:shadow-md'
+                  }`}
                 >
                   {isCurrentPlan && (
-                    <Badge className="absolute -top-2 right-4 bg-green-500">
-                      Current Plan
+                    <Badge className="absolute -top-2 right-4 bg-blue-500 animate-fade-in">
+                      Active Plan
                     </Badge>
                   )}
                   
@@ -454,6 +498,16 @@ const SubscriptionManager: React.FC = () => {
         </Card>
       )}
     </div>
+    
+    {/* Congratulations Message */}
+    <CongratulationsMessage
+      isVisible={showCongratulations}
+      planName={congratulationsPlan}
+      onDismiss={() => setShowCongratulations(false)}
+      autoHide={true}
+      duration={5000}
+    />
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { SubscriptionService } from '@/services/subscriptionService';
 
 const PaymentResult: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -16,45 +17,131 @@ const PaymentResult: React.FC = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        const transactionId = searchParams.get('txnid');
-        const status = searchParams.get('status');
-        const payuPaymentId = searchParams.get('mihpayid');
-        const amount = searchParams.get('amount');
-        const hash = searchParams.get('hash');
+        const razorpayOrderId = searchParams.get('razorpay_order_id');
+        const razorpayPaymentId = searchParams.get('razorpay_payment_id');
+        const razorpaySignature = searchParams.get('razorpay_signature');
+        const returnPath = searchParams.get('return');
 
-        if (!transactionId) {
+        if (!razorpayOrderId && !razorpayPaymentId) {
           throw new Error('Invalid payment response');
         }
 
-        // Verify payment with backend
-        const { data, error } = await supabase.functions.invoke('payu-payment', {
-          body: {
-            action: 'verify_payment',
-            transactionId,
-            status,
-            payuPaymentId,
-            amount,
-            hash,
-            allParams: Object.fromEntries(searchParams.entries())
-          }
-        });
-
-        if (error) {
-          throw new Error(error.message || 'Payment verification failed');
+        // Query latest transaction status for this user/order
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          throw new Error('Please log in to verify payment');
         }
 
-        setPaymentStatus(data.status);
-        setTransactionDetails(data.transaction);
+        const { data: tx, error: txErr } = await supabase
+          .from('payment_transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .or(`razorpay_order_id.eq.${razorpayOrderId},razorpay_payment_id.eq.${razorpayPaymentId}`)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (txErr) {
+          throw txErr;
+        }
+
+        const status = tx?.status || 'pending';
+        setPaymentStatus(status as 'success' | 'failed' | 'pending');
+        setTransactionDetails(tx);
 
         // Show appropriate toast message
-        if (data.status === 'success') {
+        if (status === 'success') {
           toast.success('Payment successful! Your subscription has been activated.');
-          // Auto-redirect back to Subscription Manager for clear confirmation
-    setTimeout(() => navigate('/subscription-manager'), 2000);
-        } else if (data.status === 'failed') {
+
+          // Secondary safety net: proactively activate and notify UI
+          try {
+            await supabase.functions.invoke('subscription-manager', {
+              body: {
+                action: 'activate',
+                userId: user.id,
+                planId: tx?.plan_id,
+                billingCycle: tx?.billing_cycle || 'monthly',
+                transactionId: tx?.transaction_id
+              }
+            });
+          } catch (e) {
+            console.error('Activation invoke error (PaymentResult):', e);
+          }
+
+          try {
+            await SubscriptionService.getInstance().updateSubscriptionStatus(
+              user.id,
+              tx?.plan_id,
+              tx?.transaction_id
+            );
+          } catch (e) {
+            console.error('Client update error (PaymentResult):', e);
+          }
+
+          setTimeout(() => navigate(returnPath || '/subscription-manager'), 1500);
+        } else if (status === 'failed') {
           toast.error('Payment failed. Please try again.');
         } else {
-          toast.info('Payment is being processed. You will be notified once completed.');
+          toast.info('Payment is being processed. Finalizing...');
+          // Poll for status updates while webhook finalizes
+          const start = Date.now();
+          const interval = setInterval(async () => {
+            try {
+              const { data: latest, error: latestErr } = await supabase
+                .from('payment_transactions')
+                .select('*')
+                .eq('user_id', user.id)
+                .or(`razorpay_order_id.eq.${razorpayOrderId},razorpay_payment_id.eq.${razorpayPaymentId}`)
+                .order('updated_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+              if (latestErr) return; // keep polling
+
+              const newStatus = latest?.status || 'pending';
+              setPaymentStatus(newStatus as 'success' | 'failed' | 'pending');
+              setTransactionDetails(latest);
+
+              if (newStatus === 'success') {
+                toast.success('Payment confirmed! Subscription activated.');
+                clearInterval(interval);
+
+                // Secondary safety net on polling success
+                try {
+                  await supabase.functions.invoke('subscription-manager', {
+                    body: {
+                      action: 'activate',
+                      userId: user.id,
+                      planId: latest?.plan_id,
+                      billingCycle: latest?.billing_cycle || 'monthly',
+                      transactionId: latest?.transaction_id
+                    }
+                  });
+                } catch (e) {
+                  console.error('Activation invoke error (Polling):', e);
+                }
+
+                try {
+                  await SubscriptionService.getInstance().updateSubscriptionStatus(
+                    user.id,
+                    latest?.plan_id,
+                    latest?.transaction_id
+                  );
+                } catch (e) {
+                  console.error('Client update error (Polling):', e);
+                }
+
+                setTimeout(() => navigate(returnPath || '/subscription-manager'), 1500);
+              } else if (newStatus === 'failed') {
+                toast.error('Payment failed during verification.');
+                clearInterval(interval);
+              } else if (Date.now() - start > 30000) {
+                // stop polling after 30s
+                clearInterval(interval);
+                toast.info('Still processing. You will see updates in Subscription Manager.');
+              }
+            } catch {}
+          }, 2000);
         }
 
       } catch (error) {
@@ -109,12 +196,13 @@ const PaymentResult: React.FC = () => {
   };
 
   const handleContinue = () => {
+    const returnPath = searchParams.get('return');
     if (paymentStatus === 'success') {
-      navigate('/dashboard');
+      navigate(returnPath || '/subscription-manager');
     } else if (paymentStatus === 'failed') {
-      navigate('/subscription-manager');
+      navigate(returnPath || '/subscription-manager');
     } else {
-      navigate('/dashboard');
+      navigate(returnPath || '/subscription-manager');
     }
   };
 
