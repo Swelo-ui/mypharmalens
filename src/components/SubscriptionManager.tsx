@@ -165,9 +165,25 @@ const SubscriptionManager: React.FC = () => {
     if (!currentSubscription) {
       return { status: 'expired', daysLeft: 0 };
     }
-    if (currentSubscription.status === 'active') {
-      return { status: 'active', daysLeft: 30 };
+    
+    if (currentSubscription.status === 'active' && currentSubscription.ends_at) {
+      const now = new Date();
+      const endsAt = new Date(currentSubscription.ends_at);
+      const daysLeft = Math.ceil((endsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Check if expiring soon (less than 7 days)
+      if (daysLeft <= 7 && daysLeft > 0) {
+        return { status: 'expiring', daysLeft };
+      }
+      
+      // Check if expired
+      if (daysLeft <= 0) {
+        return { status: 'expired', daysLeft: 0 };
+      }
+      
+      return { status: 'active', daysLeft };
     }
+    
     return { status: 'expired', daysLeft: 0 };
   };
 

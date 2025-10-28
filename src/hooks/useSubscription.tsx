@@ -40,7 +40,6 @@ export const useSubscription = () => {
       if (error && (error as any).code !== 'PGRST116') throw error;
 
       const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
       // If no profile row exists, initialize it without resetting usage unexpectedly
       if (!data) {
@@ -62,8 +61,12 @@ export const useSubscription = () => {
       const lastReset = data.last_reset_date ? new Date(data.last_reset_date) : null;
       const currentUsed = data.identifications_used ?? 0;
 
-      // Only reset when last_reset_date exists and is before current month
-      if (lastReset && lastReset < monthStart) {
+      // Check if we need to reset based on billing cycle (30 days since last reset)
+      // This ensures reset happens on subscription anniversary, not calendar month
+      const shouldReset = lastReset && (now.getTime() - lastReset.getTime()) >= (30 * 24 * 60 * 60 * 1000);
+
+      if (shouldReset) {
+        console.log('📅 Resetting usage - 30 days elapsed since last reset');
         const { error: resetErr } = await supabase
           .from('profiles')
           .upsert(
@@ -247,10 +250,32 @@ export const useSubscription = () => {
   // Calculate usage statistics
   const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = true) => {
     const plan = subscription.plan;
-    // Determine limits based on plan features and plan id
+    
+    // Check if paid subscription is expired
+    const now = new Date();
+    const endsAt = subscription.ends_at ? new Date(subscription.ends_at) : null;
+    const isExpired = endsAt && now > endsAt && subscription.plan_id !== 'free-plan';
+    
+    // Determine limits based on plan features, billing period, and plan id
     const hasUnlimited = Array.isArray(plan?.features) && plan!.features!.includes('unlimited_identifications');
-    // Use -1 for unlimited, 5 for free, 100 default for other paid plans
-    const monthlyLimit = hasUnlimited ? -1 : (plan?.id === 'free-plan' ? 5 : (plan?.id === 'special-plan' ? -1 : 100));
+    const billingPeriod = plan?.billing_period || subscription.plan?.billing_period || 'monthly';
+    
+    // If expired, force free tier limits (5), otherwise use plan limits
+    let monthlyLimit: number;
+    if (isExpired) {
+      monthlyLimit = 5; // Expired subscriptions get free tier limits
+      console.log('⚠️ Subscription expired - applying free tier limits');
+    } else if (hasUnlimited || plan?.id === 'special-plan') {
+      monthlyLimit = -1; // Unlimited
+    } else if (plan?.id === 'free-plan') {
+      monthlyLimit = 5; // Free tier
+    } else if (billingPeriod === 'weekly') {
+      monthlyLimit = 21; // Weekly plan: 21 identifications per week
+    } else if (billingPeriod === 'yearly') {
+      monthlyLimit = 1200; // Yearly plan: 100/month * 12 months
+    } else {
+      monthlyLimit = 100; // Monthly plan default
+    }
     
     // Always get fresh usage data from profiles to ensure sync across devices
     let used = profileIdentificationsUsed || 0;
@@ -286,8 +311,9 @@ export const useSubscription = () => {
     });
   };
 
-  // Check if user can perform an AI identification
+  // Check if user can perform an identification
   const canPerformIdentification = (): boolean => {
+    // Special access for specific user
     if (user?.email === 'imgamer.ms@gmail.com') {
       return true;
     }
@@ -298,14 +324,39 @@ export const useSubscription = () => {
       return guestUsage < 3; // Allow 3 free identifications for guests
     }
     
+    // Check if subscription is expired (paid subscriptions only)
+    if (currentSubscription && currentSubscription.plan_id !== 'free-plan') {
+      const now = new Date();
+      const endsAt = currentSubscription.ends_at ? new Date(currentSubscription.ends_at) : null;
+      if (endsAt && now > endsAt) {
+        console.warn('⚠️ Subscription expired - limiting to free tier');
+        // Expired paid subscription = free tier limits (5 identifications)
+        return (profileIdentificationsUsed || 0) < 5;
+      }
+    }
+    
     // While subscription info is loading or unavailable, default to Free plan limits
     if (!currentSubscription?.plan) {
       return (profileIdentificationsUsed || 0) < 5;
     }
     const plan = currentSubscription.plan;
-    // Use default limits based on plan type
-    const limit = plan.id === 'free-plan' ? 5 : (plan.id === 'special-plan' ? -1 : 100);
-    if (limit === -1) return true;
+    const billingPeriod = plan.billing_period || 'monthly';
+    
+    // Use default limits based on plan type and billing period
+    let limit: number;
+    if (plan.id === 'special-plan') {
+      limit = -1; // Unlimited
+    } else if (plan.id === 'free-plan') {
+      limit = 5;
+    } else if (billingPeriod === 'weekly') {
+      limit = 21; // Weekly plan
+    } else if (billingPeriod === 'yearly') {
+      limit = 1200; // Yearly plan
+    } else {
+      limit = 100; // Monthly plan
+    }
+    
+    if (limit === -1) return true; // Unlimited
     return profileIdentificationsUsed < limit;
   };
 

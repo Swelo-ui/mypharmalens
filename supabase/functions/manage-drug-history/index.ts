@@ -14,11 +14,6 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client with the auth context from the request
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-    
     // Get the JWT token from the request
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -26,10 +21,13 @@ serve(async (req) => {
     }
     const token = authHeader.replace('Bearer ', '');
     
-    // Set the auth token in the Supabase client
-    supabaseClient.auth.setSession({
-      access_token: token,
-      refresh_token: '',
+    // Create Supabase client with the auth token
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: { Authorization: `Bearer ${token}` }
+      }
     });
 
     // Parse request body
@@ -50,39 +48,26 @@ serve(async (req) => {
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
         // Create object with only fields that exist in the database table
-        const identificationData = {
+        const identificationData: any = {
           user_id: data.userId,
           drug_name: drugName,
           image_url: data.imageUrl || null,
           details: data.details || null,
         };
         
-        // Add image_features only if the column exists in the schema and if data is provided
-        try {
-          // First attempt to check if we can query the table with the image_features column
-          const { error: columnCheckError } = await supabaseClient
-            .from('drug_identifications')
-            .select('image_features')
-            .limit(1);
-          
-          if (!columnCheckError) {
-            // Column exists, we can add the image_features field
-            if (data.imageFeatures) {
-              identificationData.image_features = data.imageFeatures;
-            }
-          } else {
-            console.log('image_features column does not exist, skipping this field');
-          }
-        } catch (err) {
-          console.log('Error checking for image_features column, skipping this field:', err.message);
+        // Add image_features if provided
+        if (data.imageFeatures) {
+          identificationData.image_features = data.imageFeatures;
         }
           
+        console.log('Attempting to insert identification:', identificationData);
+        
         result = await supabaseClient
           .from('drug_identifications')
-          .insert([identificationData])
+          .insert(identificationData)
           .select();
           
-        console.log('Insert result:', result);
+        console.log('Insert result - success:', result.data ? 'yes' : 'no', 'error:', result.error);
         break;
         
       case 'removeIdentification':
@@ -128,12 +113,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in manage-drug-history function:', error);
     return new Response(JSON.stringify({ 
       success: false, 
       data: null,
-      error: error.message 
+      error: error?.message || 'Unknown error' 
     }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
