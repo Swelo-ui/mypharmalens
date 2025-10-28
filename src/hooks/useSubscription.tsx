@@ -245,16 +245,16 @@ export const useSubscription = () => {
   };
 
   // Calculate usage statistics
-  const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = false) => {
+  const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = true) => {
     const plan = subscription.plan;
     // Determine limits based on plan features and plan id
     const hasUnlimited = Array.isArray(plan?.features) && plan!.features!.includes('unlimited_identifications');
     // Use -1 for unlimited, 5 for free, 100 default for other paid plans
     const monthlyLimit = hasUnlimited ? -1 : (plan?.id === 'free-plan' ? 5 : (plan?.id === 'special-plan' ? -1 : 100));
     
-    // If forceRefresh, get fresh usage data from profiles
+    // Always get fresh usage data from profiles to ensure sync across devices
     let used = profileIdentificationsUsed || 0;
-    if (forceRefresh && user?.id) {
+    if (user?.id) {
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -265,6 +265,9 @@ export const useSubscription = () => {
         if (!error && data) {
           used = data.identifications_used ?? 0;
           setProfileIdentificationsUsed(used);
+          console.log('✅ Usage synced from database:', used);
+        } else if (error) {
+          console.warn('Error fetching usage data, using cached value:', error);
         }
       } catch (err) {
         console.error('Error fetching fresh usage data:', err);
@@ -387,9 +390,10 @@ export const useSubscription = () => {
 
       if (error) throw error;
 
+      console.log('✅ Usage incremented to:', newUsed, 'for user:', user.id);
       setProfileIdentificationsUsed(newUsed);
       if (currentSubscription) {
-        await calculateUsageStats(currentSubscription, false);
+        await calculateUsageStats(currentSubscription, true);
       }
       return true;
     } catch (error) {
@@ -432,6 +436,38 @@ export const useSubscription = () => {
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  // Refresh usage when page becomes visible (fixes cross-device sync)
+  useEffect(() => {
+    if (!user?.id || !currentSubscription) return;
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Page visible - refreshing usage data');
+        await fetchProfileUsage();
+        if (currentSubscription) {
+          await calculateUsageStats(currentSubscription, true);
+        }
+      }
+    };
+
+    const handleFocus = async () => {
+      console.log('🔄 Window focused - refreshing usage data');
+      await fetchProfileUsage();
+      if (currentSubscription) {
+        await calculateUsageStats(currentSubscription, true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, currentSubscription]);
 
   // Subscribe to realtime updates on profile usage for current user
   useEffect(() => {
