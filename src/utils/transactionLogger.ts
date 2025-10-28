@@ -59,7 +59,8 @@ class TransactionLogger {
 
   private async saveToDatabase(log: TransactionLog): Promise<void> {
     try {
-      const { error } = await supabase
+      // Cast to any to bypass TypeScript checking for transaction_logs table
+      const { error } = await (supabase as any)
         .from('transaction_logs')
         .insert({
           user_id: log.user_id,
@@ -276,7 +277,8 @@ class TransactionLogger {
     eventType?: TransactionLog['event_type']
   ): Promise<TransactionLog[]> {
     try {
-      let query = supabase
+      // Cast to any to bypass TypeScript checking
+      let query = (supabase as any)
         .from('transaction_logs')
         .select('*')
         .eq('user_id', userId)
@@ -303,7 +305,8 @@ class TransactionLogger {
 
   public async getLogsForSession(sessionId: string): Promise<TransactionLog[]> {
     try {
-      const { data, error } = await supabase
+      // Cast to any to bypass TypeScript checking
+      const { data, error } = await (supabase as any)
         .from('transaction_logs')
         .select('*')
         .eq('session_id', sessionId)
