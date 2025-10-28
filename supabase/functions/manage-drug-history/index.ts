@@ -36,6 +36,29 @@ serve(async (req) => {
 
     let result;
     switch (action) {
+      case 'getHistoryCount':
+        // Get count of user's history
+        if (!data.userId) {
+          throw new Error('Missing required field: userId is required');
+        }
+        
+        const { count, error: countError } = await supabaseClient
+          .from('drug_identifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', data.userId);
+          
+        if (countError) {
+          throw new Error(`Failed to get history count: ${countError.message}`);
+        }
+        
+        return new Response(JSON.stringify({ 
+          success: true, 
+          data: count || 0,
+          error: null
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+        
       case 'addIdentification':
         // Validate required fields
         if (!data.userId) {
@@ -47,20 +70,47 @@ serve(async (req) => {
         
         console.log(`Adding identification for user ${data.userId}, drug ${drugName}`);
         
-        // Create object with only fields that exist in the database table
+        // Check current history count
+        const { data: existingHistory, error: historyError } = await supabaseClient
+          .from('drug_identifications')
+          .select('id, created_at')
+          .eq('user_id', data.userId)
+          .order('created_at', { ascending: true });
+          
+        if (historyError) {
+          console.warn('Could not check history count:', historyError);
+        }
+        
+        // If user has 10 or more records, delete the oldest one
+        if (existingHistory && existingHistory.length >= 10) {
+          const oldestId = existingHistory[0].id;
+          console.log(`Deleting oldest record (ID: ${oldestId}) to make space`);
+          
+          const { error: deleteError } = await supabaseClient
+            .from('drug_identifications')
+            .delete()
+            .eq('id', oldestId);
+            
+          if (deleteError) {
+            console.warn('Failed to delete oldest record:', deleteError);
+          }
+        }
+        
+        // Create object WITHOUT image to reduce server load
         const identificationData: any = {
           user_id: data.userId,
           drug_name: drugName,
-          image_url: data.imageUrl || null,
           details: data.details || null,
+          // Explicitly set created_at to current time
+          created_at: new Date().toISOString()
         };
         
-        // Add image_features if provided
+        // Add image_features if provided (for matching, not display)
         if (data.imageFeatures) {
           identificationData.image_features = data.imageFeatures;
         }
           
-        console.log('Attempting to insert identification:', identificationData);
+        console.log('Attempting to insert identification (no image):', identificationData);
         
         result = await supabaseClient
           .from('drug_identifications')

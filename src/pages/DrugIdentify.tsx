@@ -182,16 +182,43 @@ const DrugIdentify = () => {
       }
 
       setIsSaving(true);
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        toast.error("Session expired. Please sign in again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Check history count before saving
+      const { data: historyCount } = await supabase.functions.invoke('manage-drug-history', {
+        body: { 
+          action: 'getHistoryCount',
+          data: { userId: user?.id }
+        },
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`
+        }
+      });
+      
+      const count = historyCount?.data || 0;
+      if (count >= 10) {
+        toast.warning("History limit reached", {
+          description: "You can only store 10 identifications. The oldest one will be removed."
+        });
+      }
+      
       const result = await saveDrugIdentification({
         name: identifiedDrug.name,
         drug_name: identifiedDrug.name,
-        image: identifiedDrug.image,
-        image_url: identifiedDrug.image,
+        // Don't save image to reduce server load
         details: identifiedDrug
       });
 
       if (result) {
-        toast.success("Added to your history");
+        toast.success("Saved to history", {
+          description: count >= 10 ? "Oldest entry was removed to make space" : "You can store up to 10 identifications"
+        });
         setIsSaved(true);
       } else {
         toast.error("Failed to save to history");
@@ -636,7 +663,7 @@ const DrugIdentify = () => {
           
           {isAuthenticated && (
             <Button 
-              variant="outline" 
+              variant="outline"
               onClick={() => navigate('/history')}
             >
               View Identification History

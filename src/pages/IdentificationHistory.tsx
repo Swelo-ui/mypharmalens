@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Clock, Search, AlertTriangle, Filter, Trash2 } from 'lucide-react';
+import { Clock, Search, AlertTriangle, Filter, Trash2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
@@ -10,6 +10,7 @@ import DrugCard from '@/components/DrugCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -41,7 +42,21 @@ const IdentificationHistory = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showWarningBanner, setShowWarningBanner] = useState(true);
   const navigate = useNavigate();
+
+  // Check if banner was dismissed in this session
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem('historyWarningDismissed');
+    if (dismissed === 'true') {
+      setShowWarningBanner(false);
+    }
+  }, []);
+
+  const dismissWarningBanner = () => {
+    setShowWarningBanner(false);
+    sessionStorage.setItem('historyWarningDismissed', 'true');
+  };
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -191,7 +206,7 @@ const IdentificationHistory = () => {
     <>
       <Header />
       <div className="container max-w-6xl mx-auto px-4 pt-24 pb-12">
-        <div className="flex justify-between items-center flex-wrap gap-4 mb-8">
+        <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">Identification History</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
@@ -216,6 +231,26 @@ const IdentificationHistory = () => {
             </Button>
           </div>
         </div>
+
+        {/* Dismissible Warning Banner */}
+        {showWarningBanner && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={dismissWarningBanner}
+              className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-800"
+            >
+              <X className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </Button>
+            <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertTitle className="text-blue-800 dark:text-blue-300 pr-8">History Storage Limit</AlertTitle>
+            <AlertDescription className="text-blue-700 dark:text-blue-400 text-sm break-words">
+              You can store up to <strong className="font-semibold">10 drug identifications</strong>. 
+              Images are not stored to reduce server load. When you reach the limit, the oldest entry will be automatically removed.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
