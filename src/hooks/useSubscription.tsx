@@ -487,9 +487,23 @@ export const useSubscription = () => {
 
       console.log('✅ Usage incremented to:', newUsed, 'for user:', user.id);
       setProfileIdentificationsUsed(newUsed);
+      
+      // Always update usage stats, even for free tier users without subscription
       if (currentSubscription) {
         await calculateUsageStats(currentSubscription, true);
+      } else {
+        // For free tier users without subscription, manually update usage stats
+        setUsageStats({
+          identificationsUsed: newUsed,
+          identificationsRemaining: Math.max(5 - newUsed, 0),
+          databaseSearchesUsed: 0,
+          databaseSearchesRemaining: 10,
+          monthlyLimit: 5,
+          planName: 'Free'
+        });
+        console.log('✅ Free tier usage stats updated:', { used: newUsed, remaining: Math.max(5 - newUsed, 0) });
       }
+      
       return true;
     } catch (error) {
       console.error('Error incrementing identification usage:', error);
@@ -545,7 +559,7 @@ export const useSubscription = () => {
 
   // Refresh usage when page becomes visible (fixes cross-device sync)
   useEffect(() => {
-    if (!user?.id || !currentSubscription) return;
+    if (!user?.id) return;
 
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
@@ -553,6 +567,26 @@ export const useSubscription = () => {
         await fetchProfileUsage();
         if (currentSubscription) {
           await calculateUsageStats(currentSubscription, true);
+        } else {
+          // For free tier users, fetch fresh usage and manually update stats
+          try {
+            const { data } = await supabase
+              .from('profiles')
+              .select('identifications_used')
+              .eq('id', user.id)
+              .single();
+            const used = data?.identifications_used ?? 0;
+            setUsageStats({
+              identificationsUsed: used,
+              identificationsRemaining: Math.max(5 - used, 0),
+              databaseSearchesUsed: 0,
+              databaseSearchesRemaining: 10,
+              monthlyLimit: 5,
+              planName: 'Free'
+            });
+          } catch (err) {
+            console.error('Error fetching usage on visibility change:', err);
+          }
         }
       }
     };
@@ -562,6 +596,26 @@ export const useSubscription = () => {
       await fetchProfileUsage();
       if (currentSubscription) {
         await calculateUsageStats(currentSubscription, true);
+      } else {
+        // For free tier users, fetch fresh usage and manually update stats
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('identifications_used')
+            .eq('id', user.id)
+            .single();
+          const used = data?.identifications_used ?? 0;
+          setUsageStats({
+            identificationsUsed: used,
+            identificationsRemaining: Math.max(5 - used, 0),
+            databaseSearchesUsed: 0,
+            databaseSearchesRemaining: 10,
+            monthlyLimit: 5,
+            planName: 'Free'
+          });
+        } catch (err) {
+          console.error('Error fetching usage on focus:', err);
+        }
       }
     };
 
@@ -589,6 +643,17 @@ export const useSubscription = () => {
             setProfileIdentificationsUsed(newUsed);
             if (currentSubscription) {
               await calculateUsageStats(currentSubscription, false);
+            } else {
+              // For free tier users without subscription, manually update usage stats
+              setUsageStats({
+                identificationsUsed: newUsed,
+                identificationsRemaining: Math.max(5 - newUsed, 0),
+                databaseSearchesUsed: 0,
+                databaseSearchesRemaining: 10,
+                monthlyLimit: 5,
+                planName: 'Free'
+              });
+              console.log('✅ Realtime: Free tier usage stats updated:', { used: newUsed, remaining: Math.max(5 - newUsed, 0) });
             }
           }
         }
