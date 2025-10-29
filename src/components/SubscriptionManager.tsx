@@ -44,6 +44,8 @@ const SubscriptionManager: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsPlan, setCongratulationsPlan] = useState<string>('');
+  const [congratulationsCycle, setCongratulationsCycle] = useState<string>('monthly');
+  const [congratulationsFeatures, setCongratulationsFeatures] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -56,7 +58,42 @@ const SubscriptionManager: React.FC = () => {
           setCurrentSubscription(subscription);
           // Show congratulations message for new subscriptions
           const planName = subscription.plan?.name || 'Premium Plan';
+          const planId = subscription.plan_id || '';
+          const isWeekly = planId.includes('weekly') || subscription.plan?.billing_period === 'weekly';
+          const cycle = isWeekly ? 'weekly' : (subscription.plan?.billing_period || 'monthly');
+          
+          let features: string[] = [];
+          if (isWeekly) {
+            features = [
+              '21 AI identifications per week',
+              '500+ medicines database',
+              'Priority support',
+              'No ads',
+              'History feature'
+            ];
+          } else if (cycle === 'yearly') {
+            features = [
+              '1200 AI identifications per year',
+              '1000+ medicines database',
+              'Advanced search & filters',
+              'Layman explanations',
+              'History feature',
+              'Unlimited database searches'
+            ];
+          } else {
+            features = [
+              '100 AI identifications per month',
+              '1000+ medicines database',
+              'Advanced search & filters',
+              'Layman explanations',
+              'History feature',
+              'Unlimited database searches'
+            ];
+          }
+          
           setCongratulationsPlan(planName);
+          setCongratulationsCycle(cycle);
+          setCongratulationsFeatures(features);
           setShowCongratulations(true);
           
           // Refetch user data to ensure UI is fully updated
@@ -559,9 +596,9 @@ const SubscriptionManager: React.FC = () => {
     <CongratulationsMessage
       isVisible={showCongratulations}
       planName={congratulationsPlan}
+      billingCycle={congratulationsCycle}
+      planFeatures={congratulationsFeatures}
       onDismiss={() => setShowCongratulations(false)}
-      autoHide={true}
-      duration={5000}
     />
     </>
   );

@@ -468,14 +468,22 @@ const DrugIdentify = () => {
       const used = usageStats?.identificationsUsed ?? 0;
       const limit = usageStats?.monthlyLimit ?? 5;
       const isUnlimited = limit === -1;
+      
+      console.log('🔍 Identification check:', { used, limit, isUnlimited, planName: usageStats?.planName });
+      
+      // Strict enforcement: block if at or above limit
       if (!isUnlimited && used >= limit) {
-        toast.error("You've reached your AI identification limit for this month. Please upgrade your plan to continue.");
+        toast.error(`You've reached your AI identification limit (${used}/${limit}). Please upgrade your plan to continue.`, {
+          description: `Current plan: ${usageStats?.planName || 'Free'}`
+        });
         return;
       }
 
-      // Fallback to canPerformIdentification if usageStats are not ready
-      if (!usageStats && !canPerformIdentification()) {
-        toast.error("You've reached your AI identification limit for this month. Please upgrade your plan to continue.");
+      // Double-check with canPerformIdentification for safety
+      if (!canPerformIdentification()) {
+        toast.error(`You've reached your identification limit. Please upgrade to continue.`, {
+          description: `Used: ${used}/${limit === -1 ? 'Unlimited' : limit}`
+        });
         return;
       }
 

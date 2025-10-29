@@ -220,8 +220,44 @@ const PaymentResult: React.FC = () => {
       <CongratulationsModal
         isOpen={showCongratulations}
         onClose={handleCloseCongratulations}
-        planName={transactionDetails?.plan_id?.replace('-', ' ').toUpperCase() || 'Premium'}
+        planName={(() => {
+          const planId = transactionDetails?.plan_id || '';
+          if (planId.includes('weekly')) return 'Weekly Plan';
+          if (planId.includes('monthly') || planId.includes('premium')) return 'Monthly Premium';
+          if (planId.includes('yearly')) return 'Yearly Premium';
+          return 'Premium Plan';
+        })()}
         billingCycle={transactionDetails?.billing_cycle || 'monthly'}
+        planFeatures={(() => {
+          const cycle = transactionDetails?.billing_cycle || 'monthly';
+          if (cycle === 'weekly') {
+            return [
+              '21 AI identifications per week',
+              '500+ medicines database',
+              'Priority support',
+              'No ads',
+              'History feature'
+            ];
+          } else if (cycle === 'yearly') {
+            return [
+              '1200 AI identifications per year',
+              '1000+ medicines database',
+              'Advanced search & filters',
+              'Layman explanations',
+              'History feature',
+              'Unlimited database searches'
+            ];
+          } else {
+            return [
+              '100 AI identifications per month',
+              '1000+ medicines database',
+              'Advanced search & filters',
+              'Layman explanations',
+              'History feature',
+              'Unlimited database searches'
+            ];
+          }
+        })()}
       />
       
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

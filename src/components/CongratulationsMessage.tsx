@@ -8,42 +8,26 @@ interface CongratulationsMessageProps {
   isVisible: boolean;
   planName: string;
   onDismiss: () => void;
-  autoHide?: boolean;
-  duration?: number;
+  billingCycle?: string;
+  planFeatures?: string[];
 }
 
 const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
   isVisible,
   planName,
   onDismiss,
-  autoHide = true,
-  duration = 5000
+  billingCycle = 'monthly',
+  planFeatures
 }) => {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
       setShowConfetti(true);
-      
-      if (autoHide) {
-        const timer = setTimeout(() => {
-          onDismiss();
-        }, duration);
-
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isVisible, autoHide, duration, onDismiss]);
-
-  useEffect(() => {
-    if (showConfetti) {
-      const confettiTimer = setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
-
+      const confettiTimer = setTimeout(() => setShowConfetti(false), 3000);
       return () => clearTimeout(confettiTimer);
     }
-  }, [showConfetti]);
+  }, [isVisible]);
 
   const confettiVariants = {
     hidden: { opacity: 0, scale: 0 },
@@ -160,14 +144,14 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
           >
             <Card className="relative overflow-hidden border-2 border-blue-500 shadow-2xl shadow-blue-500/20">
               {/* Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-950 dark:via-gray-900 dark:to-purple-950" />
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-pharma-900 to-blue-900" />
               
               {/* Close Button */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onDismiss}
-                className="absolute top-2 right-2 z-10 h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="absolute top-2 right-2 z-10 h-8 w-8 p-0 hover:bg-gray-800 text-white"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -210,14 +194,14 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                   className="space-y-3"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <Sparkles className="h-6 w-6 text-yellow-500 animate-pulse" />
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-yellow-500 animate-pulse" />
+                    <h2 className="text-2xl md:text-3xl font-bold text-white">
                       Congratulations!
                     </h2>
-                    <Sparkles className="h-6 w-6 text-yellow-500 animate-pulse" />
+                    <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-yellow-500 animate-pulse" />
                   </div>
                   
-                  <p className="text-lg text-gray-700 dark:text-gray-300">
+                  <p className="text-base md:text-lg text-gray-200">
                     Your subscription has been successfully activated!
                   </p>
                 </motion.div>
@@ -227,13 +211,17 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.6, duration: 0.5 }}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-4 space-y-2"
+                  className="bg-gradient-to-r from-pharma-500 to-blue-500 text-white rounded-lg p-3 md:p-4 space-y-2"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <Crown className="h-5 w-5" />
-                    <span className="font-semibold text-lg">{planName}</span>
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/20 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                    </div>
                   </div>
-                  <p className="text-blue-100 text-sm">
+                  <p className="text-xl md:text-2xl font-bold text-white text-center">
+                    {planName}
+                  </p>
+                  <p className="text-xs md:text-sm text-white/80 text-center">
                     You now have access to all premium features!
                   </p>
                 </motion.div>
@@ -243,38 +231,67 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 0.5 }}
-                  className="space-y-2"
+                  className="space-y-2 text-left"
                 >
-                  <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400">
-                    <Gift className="h-4 w-4" />
-                    <span className="text-sm">What's included:</span>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {['Unlimited Identifications', 'Advanced Search', 'Priority Support'].map((feature, index) => (
-                      <motion.span
-                        key={feature}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 1 + index * 0.1, duration: 0.3 }}
-                        className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full text-xs font-medium"
-                      >
-                        {feature}
-                      </motion.span>
-                    ))}
+                  <p className="text-sm md:text-base font-semibold text-gray-200 mb-2 flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">📦</span>
+                    What's included:
+                  </p>
+                  <div className="space-y-2">
+                    {(planFeatures && planFeatures.length > 0) ? (
+                      planFeatures.map((feature, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.9 + index * 0.1, duration: 0.3 }}
+                          className="flex items-center text-xs md:text-sm text-gray-300"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                          {feature}
+                        </motion.div>
+                      ))
+                    ) : (
+                      <>
+                        {billingCycle === 'weekly' ? (
+                          <>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              21 AI identifications/week
+                            </div>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              500+ medicines database
+                            </div>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              Priority support
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              {billingCycle === 'yearly' ? '1200 AI identifications/year' : '100 AI identifications/month'}
+                            </div>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              1000+ medicines database
+                            </div>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              Advanced search & filters
+                            </div>
+                            <div className="flex items-center text-xs md:text-sm text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mr-2" />
+                              History feature
+                            </div>
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 </motion.div>
-
-                {/* Auto-dismiss indicator */}
-                {autoHide && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 0.5 }}
-                    className="text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    This message will auto-dismiss in {Math.ceil(duration / 1000)} seconds
-                  </motion.div>
-                )}
               </CardContent>
             </Card>
           </motion.div>

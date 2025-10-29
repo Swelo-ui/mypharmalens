@@ -10,13 +10,15 @@ interface CongratulationsModalProps {
   onClose: () => void;
   planName: string;
   billingCycle: string;
+  planFeatures?: string[];
 }
 
 const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
   isOpen,
   onClose,
   planName,
-  billingCycle
+  billingCycle,
+  planFeatures
 }) => {
   const { width, height } = useWindowSize();
   const isMobile = (width || 0) <= 480;
@@ -48,7 +50,7 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.5, opacity: 0, y: 50 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md md:max-w-lg w-full p-5 md:p-8 relative max-h-[85vh] overflow-y-auto"
+              className="bg-gradient-to-br from-gray-900 via-pharma-900 to-blue-900 rounded-2xl shadow-2xl max-w-md md:max-w-lg w-full p-5 md:p-8 relative max-h-[85vh] overflow-y-auto border border-pharma-500/20"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -84,26 +86,28 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
                 transition={{ delay: 0.3 }}
                 className="text-center"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center justify-center gap-2">
                   <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
                   Congratulations!
                   <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
                 </h2>
                 
-                <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-5 md:mb-6">
+                <p className="text-base md:text-lg text-gray-200 mb-5 md:mb-6">
                   Your subscription has been activated successfully!
                 </p>
 
                 {/* Plan Details */}
-                <div className="bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg p-3 md:p-4 mb-5 md:mb-6">
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    You're now subscribed to
-                  </p>
-                  <p className="text-xl md:text-2xl font-bold text-pharma-600 dark:text-pharma-400">
+                <div className="bg-gradient-to-r from-pharma-500 to-blue-500 rounded-lg p-3 md:p-4 mb-5 md:mb-6">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/20 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                    </div>
+                  </div>
+                  <p className="text-xl md:text-2xl font-bold text-white text-center">
                     {planName}
                   </p>
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {billingCycle} Billing
+                  <p className="text-xs md:text-sm text-white/80 text-center mt-1">
+                    You now have access to all premium features!
                   </p>
                 </div>
 
@@ -114,55 +118,56 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
                   transition={{ delay: 0.5 }}
                   className="text-left space-y-2 mb-5 md:mb-6"
                 >
-                  <p className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
-                    You now have access to:
+                  <p className="text-sm md:text-base font-semibold text-gray-200 mb-2 md:mb-3 flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">📦</span>
+                    What's included:
                   </p>
-                  {billingCycle === 'weekly' ? (
-                    <>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        21 AI drug identifications per week
+                  {(planFeatures && planFeatures.length > 0) ? (
+                    planFeatures.map((feature, index) => (
+                      <div key={index} className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                        {feature}
                       </div>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        7 days of premium features
-                      </div>
-                    </>
-                  ) : billingCycle === 'monthly' ? (
-                    <>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        100 AI drug identifications per month
-                      </div>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        30 days of premium features
-                      </div>
-                    </>
+                    ))
                   ) : (
                     <>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        1200 AI drug identifications per year
-                      </div>
-                      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        365 days of premium features
-                      </div>
+                      {billingCycle === 'weekly' ? (
+                        <>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            21 AI identifications/week
+                          </div>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            500+ medicines database
+                          </div>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            Priority support
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            {billingCycle === 'yearly' ? '1200 AI identifications/year' : '100 AI identifications/month'}
+                          </div>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            1000+ medicines database
+                          </div>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            Advanced search & filters
+                          </div>
+                          <div className="flex items-center text-xs md:text-sm text-gray-300">
+                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                            History feature
+                          </div>
+                        </>
+                      )}
                     </>
                   )}
-                  <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                    <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Unlimited database searches
-                  </div>
-                  <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                    <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    10 identification history storage
-                  </div>
-                  <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                    <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Priority support
-                  </div>
                 </motion.div>
 
                 {/* Action Button */}
