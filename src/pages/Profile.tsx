@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { toast } from 'sonner';
-import { Loader2, Save, Key, User, Mail, Calendar, CreditCard, Info } from 'lucide-react';
+import { Loader2, Save, Key, User, Mail, Calendar, CreditCard, Info, LogOut } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
@@ -31,6 +31,17 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [tabValue, setTabValue] = useState('profile');
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success('Signed out successfully');
+      navigate('/');
+    } catch (err) {
+      console.error('Error signing out:', err);
+      toast.error('Failed to sign out');
+    }
+  };
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -175,7 +186,17 @@ const Profile = () => {
       <Header />
       
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center sm:text-left">Profile Settings</h1>
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Profile Settings</h1>
+          <Button variant="outline" size="sm" onClick={handleSignOut} className="hidden sm:inline-flex">
+            <LogOut className="mr-2 h-4 w-4" /> Sign Out
+          </Button>
+        </div>
+        <div className="sm:hidden mb-4">
+          <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full">
+            <LogOut className="mr-2 h-4 w-4" /> Sign Out
+          </Button>
+        </div>
         
         <Tabs value={tabValue} onValueChange={setTabValue} className="w-full max-w-4xl mx-auto">
           <div className="sm:hidden mb-4">

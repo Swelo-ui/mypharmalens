@@ -108,6 +108,16 @@ export const useSubscription = () => {
           if (initErr) console.error('Error initializing last_reset_date:', initErr);
         }
         setProfileIdentificationsUsed(currentUsed);
+        // If no subscription is loaded yet, immediately reflect usage in the UI (assume Free limits)
+        if (!currentSubscription) {
+          setUsageStats(prev => ({
+            ...prev,
+            identificationsUsed: currentUsed,
+            identificationsRemaining: Math.max(5 - currentUsed, 0),
+            monthlyLimit: 5,
+            planName: 'Free'
+          }));
+        }
       }
     } catch (error) {
       console.error('Error fetching profile usage:', error);
