@@ -386,13 +386,52 @@ const SubscriptionManager: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {plans.map((plan) => {
-              const price = plan.price;
-              const isCurrentPlan = plan.id === (currentSubscription?.plan?.id || currentSubscription?.plan_id || '');
+              // Default to free-plan if no subscription exists
+              const userPlanId = currentSubscription?.plan?.id || currentSubscription?.plan_id || 'free-plan';
+              const isCurrentPlan = plan.id === userPlanId;
               const isUpgrade = currentPlan && plan.price > currentPlan.price;
               const isDowngrade = currentPlan && plan.price < currentPlan.price;
 
-              // Normalize features to string[]
-              const features: string[] = Array.isArray(plan.features) ? (plan.features as unknown as string[]) : [];
+              // Determine which billing cycle to display/apply to button
+              const isWeeklyPlan = (plan.billing_period === 'weekly') || plan.id.includes('weekly');
+              const effectiveBillingCycle: 'monthly' | 'yearly' | 'weekly' = isWeeklyPlan ? 'weekly' : billingCycle;
+
+              // Compute displayed price based on selected cycle (20% off yearly)
+              let displayPrice = plan.price;
+              if (!isWeeklyPlan && billingCycle === 'yearly') {
+                displayPrice = Math.round((plan.price || 0) * 12 * 0.8);
+              }
+              const periodSuffix = isWeeklyPlan ? 'week' : (billingCycle === 'yearly' ? 'year' : 'month');
+
+              // Build display features per plan to avoid leaking monthly features into weekly
+              const displayFeatures: string[] = (() => {
+                if (plan.id === 'free-plan') {
+                  return [
+                    '100 drugs database search',
+                    '5 AI identifications per month',
+                    'Basic drug information',
+                    'Mobile web app access'
+                  ];
+                }
+                if (isWeeklyPlan) {
+                  return [
+                    'All Free Plan features',
+                    '21 AI identifications per week',
+                    '500+ medicines database',
+                    'Priority support',
+                    'No ads'
+                  ];
+                }
+                // Monthly/Yearly premium
+                return [
+                  'All Weekly Plan features',
+                  'Unlimited AI identifications',
+                  '1000+ database drugs',
+                  'Layman explanations',
+                  'History feature',
+                  'Advanced search filters'
+                ];
+              })();
 
               return (
                 <Card 
@@ -412,9 +451,9 @@ const SubscriptionManager: React.FC = () => {
                   <CardHeader className="text-center">
                     <CardTitle className="text-lg">{plan.name}</CardTitle>
                     <div className="text-3xl font-bold">
-                      ₹{price}
+                      ₹{displayPrice}
                       <span className="text-sm font-normal text-gray-600">
-                        /{plan.billing_period || 'month'}
+                        /{periodSuffix}
                       </span>
                     </div>
                   </CardHeader>
@@ -422,15 +461,16 @@ const SubscriptionManager: React.FC = () => {
                   <CardContent className="space-y-4">
                     <div className="text-center">
                       <p className="text-lg font-semibold">
-                        {features.includes('unlimited_identifications') 
-                          ? 'Unlimited' 
-                          : (plan.id === 'free-plan' ? '5' : '100')
-                        } identifications/month
+                        {isWeeklyPlan
+                          ? '21 identifications/week'
+                          : (plan.id === 'free-plan' 
+                              ? '5 identifications/month'
+                              : (billingCycle === 'yearly' ? '1200 identifications/year' : '100 identifications/month'))}
                       </p>
                     </div>
                     
                     <ul className="space-y-2 text-sm">
-                      {features.map((feature, index) => (
+                      {displayFeatures.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                           {feature}

@@ -6,6 +6,7 @@ import { CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriptionService } from '@/services/subscriptionService';
+import CongratulationsModal from '@/components/CongratulationsModal';
 
 const PaymentResult: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -13,6 +14,7 @@ const PaymentResult: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | 'pending' | null>(null);
   const [transactionDetails, setTransactionDetails] = useState<any>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -51,8 +53,6 @@ const PaymentResult: React.FC = () => {
 
         // Show appropriate toast message
         if (status === 'success') {
-          toast.success('Payment successful! Your subscription has been activated.');
-
           // Secondary safety net: proactively activate and notify UI
           try {
             await supabase.functions.invoke('subscription-manager', {
@@ -78,7 +78,8 @@ const PaymentResult: React.FC = () => {
             console.error('Client update error (PaymentResult):', e);
           }
 
-          setTimeout(() => navigate(returnPath || '/subscription-manager'), 1500);
+          // Show congratulations modal
+          setShowCongratulations(true);
         } else if (status === 'failed') {
           toast.error('Payment failed. Please try again.');
         } else {
@@ -103,7 +104,6 @@ const PaymentResult: React.FC = () => {
               setTransactionDetails(latest);
 
               if (newStatus === 'success') {
-                toast.success('Payment confirmed! Subscription activated.');
                 clearInterval(interval);
 
                 // Secondary safety net on polling success
@@ -131,7 +131,8 @@ const PaymentResult: React.FC = () => {
                   console.error('Client update error (Polling):', e);
                 }
 
-                setTimeout(() => navigate(returnPath || '/subscription-manager'), 1500);
+                // Show congratulations modal
+                setShowCongratulations(true);
               } else if (newStatus === 'failed') {
                 toast.error('Payment failed during verification.');
                 clearInterval(interval);
@@ -198,7 +199,7 @@ const PaymentResult: React.FC = () => {
   const handleContinue = () => {
     const returnPath = searchParams.get('return');
     if (paymentStatus === 'success') {
-      navigate(returnPath || '/subscription-manager');
+      setShowCongratulations(true);
     } else if (paymentStatus === 'failed') {
       navigate(returnPath || '/subscription-manager');
     } else {
@@ -206,17 +207,33 @@ const PaymentResult: React.FC = () => {
     }
   };
 
+  const handleCloseCongratulations = () => {
+    setShowCongratulations(false);
+    const returnPath = searchParams.get('return');
+    navigate(returnPath || '/subscription-manager');
+    // Force refresh subscription data
+    window.location.reload();
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center pb-4">
-          <div className="flex justify-center mb-4">
-            {getStatusIcon()}
-          </div>
-          <CardTitle className="text-2xl font-bold">
-            {getStatusTitle()}
-          </CardTitle>
-        </CardHeader>
+    <>
+      <CongratulationsModal
+        isOpen={showCongratulations}
+        onClose={handleCloseCongratulations}
+        planName={transactionDetails?.plan_id?.replace('-', ' ').toUpperCase() || 'Premium'}
+        billingCycle={transactionDetails?.billing_cycle || 'monthly'}
+      />
+      
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-4">
+            <div className="flex justify-center mb-4">
+              {getStatusIcon()}
+            </div>
+            <CardTitle className="text-2xl font-bold">
+              {getStatusTitle()}
+            </CardTitle>
+          </CardHeader>
         
         <CardContent className="text-center space-y-4">
           <p className="text-gray-600">
@@ -294,6 +311,7 @@ const PaymentResult: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 

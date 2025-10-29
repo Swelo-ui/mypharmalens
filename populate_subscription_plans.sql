@@ -44,21 +44,22 @@ INSERT INTO subscription_plans (
     'weekly-plan',
     'Weekly Plan',
     'Regular users who need frequent identification',
-    156,
-    90,
+    39,
+    21,
     '{
         "database_searches": 500,
-        "ai_identifications": 90,
+        "ai_identifications": 21,
         "drug_information": true,
         "prescription_status": true,
         "mobile_access": true,
         "support": "priority",
-        "history_feature": false,
+        "history_feature": true,
         "layman_explanations": false,
         "ads": false,
         "enhanced_info": true,
         "billing_cycle": "weekly",
-        "weekly_price": 39
+        "billing_period": "weekly",
+        "duration_days": 7
     }',
     NOW()
 );

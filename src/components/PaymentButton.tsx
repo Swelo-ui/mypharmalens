@@ -123,14 +123,42 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         paymentMethod: 'razorpay'
       });
 
-      const currentBillingCycle = (currentPlan as any)?.billing_period === 'weekly'
-        ? 'weekly'
-        : (billingCycle || (currentPlan.id.includes('yearly') ? 'yearly' : 'monthly'));
-      const amount = currentPlan.price;
+      // Detect billing cycle from plan features or plan ID
+      const planFeatures = currentPlan.features as any;
+      let currentBillingCycle: 'weekly' | 'monthly' | 'yearly' = 'monthly';
+      
+      if (planFeatures?.billing_period === 'weekly' || planFeatures?.billing_cycle === 'weekly' || currentPlan.id.includes('weekly')) {
+        currentBillingCycle = 'weekly';
+      } else if (currentPlan.id.includes('yearly') || planFeatures?.billing_period === 'yearly') {
+        currentBillingCycle = 'yearly';
+      } else {
+        currentBillingCycle = billingCycle || 'monthly';
+      }
+      
+      // Compute charge amount based on billing cycle
+      let amount = currentPlan.price || 0;
+      if (currentBillingCycle === 'weekly') {
+        const weeklyPrice = Number((planFeatures && (planFeatures as any).weekly_price) || amount);
+        amount = weeklyPrice;
+      } else if (currentBillingCycle === 'yearly') {
+        const yearlyFromFeatures = Number((planFeatures && (planFeatures as any).yearly_price) || 0);
+        amount = yearlyFromFeatures > 0 ? yearlyFromFeatures : Math.round(((currentPlan.price || 0) * 12) * 0.8);
+      } else {
+        // monthly
+        amount = currentPlan.price || 0;
+      }
 
       if (!amount || amount <= 0) {
-        throw new Error('Invalid plan pricing');
+        console.error('Invalid plan pricing computed:', { plan: currentPlan, currentBillingCycle, planFeatures, amount });
+        throw new Error('Invalid plan pricing. Please refresh and try again.');
       }
+
+      console.log('Payment details:', {
+        planId: currentPlan.id,
+        amount,
+        billingCycle: currentBillingCycle,
+        planFeatures
+      });
 
       // Create Razorpay order via Supabase function with retry
       const invokeWithRetry = async (attempts = 2) => {
