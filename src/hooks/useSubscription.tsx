@@ -26,34 +26,48 @@ export const useSubscription = () => {
   // Fetch identifications_used from profiles
   const [profileIdentificationsUsed, setProfileIdentificationsUsed] = useState<number>(0);
 
-  // Fetch profile usage data
+  // Fetch profile usage data - ensures profile exists and is initialized
   const fetchProfileUsage = async () => {
     if (!user?.id) return;
     
     try {
+      const now = new Date();
+      
+      // First, ensure profile exists with proper defaults
+      const { error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            identifications_used: 0,
+            last_reset_date: now.toISOString(),
+            monthly_identifications: 5
+          },
+          { 
+            onConflict: 'id',
+            ignoreDuplicates: true // Don't overwrite existing data
+          }
+        );
+      
+      if (upsertError) {
+        console.error('Error ensuring profile exists:', upsertError);
+      }
+      
+      // Now fetch the actual data
       const { data, error } = await supabase
         .from('profiles')
         .select('identifications_used, last_reset_date')
         .eq('id', user.id)
         .single();
 
-      if (error && (error as any).code !== 'PGRST116') throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setProfileIdentificationsUsed(0);
+        return;
+      }
 
-      const now = new Date();
-
-      // If no profile row exists, initialize it without resetting usage unexpectedly
       if (!data) {
-        const { error: createErr } = await supabase
-          .from('profiles')
-          .upsert(
-            {
-              id: user.id,
-              identifications_used: 0,
-              last_reset_date: now.toISOString(),
-            },
-            { onConflict: 'id' }
-          );
-        if (createErr) throw createErr;
+        console.warn('No profile data found after upsert');
         setProfileIdentificationsUsed(0);
         return;
       }
@@ -324,6 +338,9 @@ export const useSubscription = () => {
       return guestUsage < 3; // Allow 3 free identifications for guests
     }
     
+    // Get current usage count
+    const currentUsage = profileIdentificationsUsed || 0;
+    
     // Check if subscription is expired (paid subscriptions only)
     if (currentSubscription && currentSubscription.plan_id !== 'free-plan') {
       const now = new Date();
@@ -331,13 +348,17 @@ export const useSubscription = () => {
       if (endsAt && now > endsAt) {
         console.warn('⚠️ Subscription expired - limiting to free tier');
         // Expired paid subscription = free tier limits (5 identifications)
-        return (profileIdentificationsUsed || 0) < 5;
+        const canProceed = currentUsage < 5;
+        console.log('🔒 Free tier check (expired):', { currentUsage, limit: 5, canProceed });
+        return canProceed;
       }
     }
     
     // While subscription info is loading or unavailable, default to Free plan limits
     if (!currentSubscription?.plan) {
-      return (profileIdentificationsUsed || 0) < 5;
+      const canProceed = currentUsage < 5;
+      console.log('🔒 Free tier check (no subscription):', { currentUsage, limit: 5, canProceed });
+      return canProceed;
     }
     const plan = currentSubscription.plan;
     const billingPeriod = plan.billing_period || 'monthly';
@@ -357,7 +378,10 @@ export const useSubscription = () => {
     }
     
     if (limit === -1) return true; // Unlimited
-    return profileIdentificationsUsed < limit;
+    
+    const canProceed = currentUsage < limit;
+    console.log('🔒 Limit check:', { currentUsage, limit, planId: plan.id, canProceed });
+    return canProceed;
   };
 
   // Get database search limit based on subscription plan
@@ -396,7 +420,7 @@ export const useSubscription = () => {
       return true;
     }
     
-    // For unauthenticated users, increment guest usage in localStorage
+    // For unauthenticated users, increment localStorage counter
     if (!isAuthenticated || !user?.id) {
       const currentGuestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
       localStorage.setItem('guest_identifications_used', (currentGuestUsage + 1).toString());
@@ -406,6 +430,25 @@ export const useSubscription = () => {
     if (!user?.id) return false;
 
     try {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      // Ensure profile exists first
+      await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            identifications_used: 0,
+            last_reset_date: now.toISOString(),
+            monthly_identifications: 5
+          },
+          { 
+            onConflict: 'id',
+            ignoreDuplicates: true
+          }
+        );
+      
       // Fetch current usage and last reset
       const { data: existing, error: fetchErr } = await supabase
         .from('profiles')
@@ -413,10 +456,10 @@ export const useSubscription = () => {
         .eq('id', user.id)
         .single();
 
-      if (fetchErr && (fetchErr as any).code !== 'PGRST116') throw fetchErr;
-
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      if (fetchErr) {
+        console.error('Error fetching profile for increment:', fetchErr);
+        throw fetchErr;
+      }
 
       const currentUsed = existing?.identifications_used ?? 0;
       const lastReset = existing?.last_reset_date ? new Date(existing.last_reset_date) : null;
@@ -426,6 +469,7 @@ export const useSubscription = () => {
 
       // If last_reset_date exists and is before current month, reset then increment
       if (lastReset && lastReset < monthStart) {
+        console.log('📅 Monthly reset triggered - resetting usage count');
         newUsed = 1; // reset to 0 then add 1
         payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
       } else if (!lastReset) {
@@ -480,6 +524,17 @@ export const useSubscription = () => {
         await fetchAvailablePlans();
         await fetchProfileUsage();
         await fetchCurrentSubscription();
+      } catch (error) {
+        console.error('Error during subscription initialization:', error);
+        // Ensure we have default free tier stats even if initialization fails
+        setUsageStats({
+          identificationsUsed: profileIdentificationsUsed || 0,
+          identificationsRemaining: Math.max(5 - (profileIdentificationsUsed || 0), 0),
+          databaseSearchesUsed: 0,
+          databaseSearchesRemaining: 10,
+          monthlyLimit: 5,
+          planName: 'Free'
+        });
       } finally {
         setLoading(false);
       }
