@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, Shield, CheckCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
+import { Shield, CheckCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { SubscriptionPlan } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -391,24 +391,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           </CardContent>
         </Card>
       )}
-      {currentPlan?.id !== 'free-plan' && !isCurrentPlan && (
-        <Card className="border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-green-700 dark:text-green-300 text-sm">
-              <Shield className="w-4 h-4" />
-              <span className="font-medium">Secure Payment</span>
-            </div>
-            <p className="text-green-600 dark:text-green-400 text-xs mt-1">
-              256-bit SSL encryption • PCI DSS compliant • Razorpay secured
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       <Button
         onClick={handlePayment}
         disabled={isCurrentPlan || isProcessing || isPolling}
-        className={`w-full transition-all duration-300 ${
+        className={`w-full h-12 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500 inline-flex items-center justify-center gap-2 ${
           plan?.id === 'monthly-premium-plan' && !isCurrentPlan
             ? 'bg-pharma-600 hover:bg-pharma-700 text-white' 
             : ''
@@ -428,9 +415,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           </>
         ) : (
           <>
-            {!isCurrentPlan && plan?.id !== 'free-plan' && (
-              <CreditCard className="w-4 h-4 mr-2" />
-            )}
             {isCurrentPlan && <CheckCircle className="w-4 h-4 mr-2" />}
             {children || getButtonText()}
           </>
