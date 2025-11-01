@@ -62,7 +62,14 @@ const categoryMappings: CategoryMapping = {
   
   // New comprehensive drug categories
   'Gastroenterology & Digestive Health': { abbreviation: 'GDH', counter: 60 }, // gastroenterologyDigestiveHealthDrugs.ts - 60 entries
-  'Vitamins & Nutritional Supplements': { abbreviation: 'VNS', counter: 80 }   // vitaminsNutritionalSupplementsDrugs.ts - 80 entries
+  'Vitamins & Nutritional Supplements': { abbreviation: 'VNS', counter: 80 },   // vitaminsNutritionalSupplementsDrugs.ts - 80 entries
+  
+  // Additional specialized categories
+  'Respiratory Combination': { abbreviation: 'RCOMB', counter: 15 },    // respiratoryCombinationDrugs.ts - 15 entries
+  'Ophthalmology': { abbreviation: 'OPHT', counter: 19 },               // ophthalmologyDrugs.ts - 19 entries
+  'Cognitive Enhancer': { abbreviation: 'COGN', counter: 6 },           // cognitiveNootropicDrugs.ts - 6 entries
+  'Gynecology': { abbreviation: 'GYN', counter: 14 },                   // gynecologyDrugs.ts - 14 entries
+  'Dermatology Expansion': { abbreviation: 'DEXP', counter: 20 }        // dermatologyExpansionDrugs.ts - 20 entries
 };
 
 /**

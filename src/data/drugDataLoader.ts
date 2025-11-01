@@ -39,6 +39,12 @@ const drugDataLoaders = {
   // Additional drug files
   gastroenterologyDigestiveHealth: () => import("./gastroenterologyDigestiveHealthDrugs").then(m => m.gastroenterologyDigestiveHealthDrugs),
   vitaminsNutritionalSupplements: () => import("./vitaminsNutritionalSupplementsDrugs").then(m => m.vitaminsNutritionalSupplementsDrugs),
+  // New specialized categories
+  respiratoryCombination: () => import("./respiratoryCombinationDrugs").then(m => m.respiratoryCombinationDrugs),
+  ophthalmology: () => import("./ophthalmologyDrugs").then(m => m.ophthalmologyDrugs),
+  cognitiveNootropic: () => import("./cognitiveNootropicDrugs").then(m => m.cognitiveNootropicDrugs),
+  gynecology: () => import("./gynecologyDrugs").then(m => m.gynecologyDrugs),
+  dermatologyExpansion: () => import("./dermatologyExpansionDrugs").then(m => m.dermatologyExpansionDrugs),
 };
 
 // Cache for loaded drug data
