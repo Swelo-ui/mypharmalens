@@ -1,0 +1,68 @@
+import { DrugData } from "@/components/DrugCard";
+
+// Miscellaneous expansion drugs - additional specialized medications (Part 1 of 2)
+export const miscellaneousExpansionDrugs: DrugData[] = [
+  {
+    id: 'MEXP001',
+    name: 'Metronidazole/Miconazole Vaginal Gel',
+    genericName: 'Metronidazole + Miconazole',
+    manufacturer: 'Various',
+    category: 'Gynecology',
+    description: 'Combination antimicrobial for mixed vaginal infections.',
+    drugClass: 'Antibiotic + Antifungal',
+    verified: true,
+    brandNames: [],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Intravaginal: Apply 1 applicator at bedtime for 5-7 days.',
+    mechanism: 'Metronidazole kills anaerobic bacteria; miconazole inhibits fungal cell membranes.',
+    sideEffects: ['Vaginal burning', 'itching', 'discharge', 'metallic taste'],
+    interactions: ['Alcohol (disulfiram reaction)', 'warfarin'],
+    indications: ['Mixed vaginal infections', 'bacterial vaginosis with candidiasis'],
+    contraindications: ['First trimester pregnancy', 'hypersensitivity', 'alcohol consumption'],
+    warnings: ['Avoid alcohol during and 48 hours after treatment', 'complete full course'],
+    pregnancy: 'Category B - Avoid in first trimester',
+    storage: 'Store below 25°C'
+  },
+  {
+    id: 'MEXP002',
+    name: 'Fluconazole Vaginal Tablet',
+    genericName: 'Fluconazole',
+    manufacturer: 'Various',
+    category: 'Gynecology',
+    description: 'Antifungal for vaginal candidiasis.',
+    drugClass: 'Azole Antifungal',
+    verified: true,
+    brandNames: ['Diflucan'],
+    prescriptionStatus: 'Prescription Only',
+    dosageAndAdmin: 'Oral: 150mg single dose for uncomplicated vaginal candidiasis.',
+    mechanism: 'Inhibits fungal cytochrome P450 enzyme 14α-demethylase disrupting ergosterol synthesis.',
+    sideEffects: ['Headache', 'nausea', 'abdominal pain', 'diarrhea'],
+    interactions: ['Warfarin', 'phenytoin', 'cyclosporine', 'statins', 'oral hypoglycemics'],
+    indications: ['Vaginal candidiasis', 'oral thrush', 'systemic fungal infections'],
+    contraindications: ['Hypersensitivity', 'concurrent terfenadine/cisapride'],
+    warnings: ['Hepatotoxicity possible', 'QT prolongation', 'drug interactions'],
+    pregnancy: 'Category C - Avoid high doses',
+    storage: 'Store below 30°C'
+  },
+  {
+    id: 'MEXP003',
+    name: 'Boric Acid Vaginal Suppository',
+    genericName: 'Boric Acid',
+    manufacturer: 'Various',
+    category: 'Gynecology',
+    description: 'Antiseptic for recurrent vaginal infections.',
+    drugClass: 'Antiseptic',
+    verified: true,
+    brandNames: [],
+    prescriptionStatus: 'Over the Counter',
+    dosageAndAdmin: 'Intravaginal: 600mg once or twice daily for 7-14 days.',
+    mechanism: 'Acidifies vaginal pH creating unfavorable environment for pathogens.',
+    sideEffects: ['Vaginal burning', 'watery discharge', 'redness'],
+    interactions: ['None significant'],
+    indications: ['Recurrent vaginal candidiasis', 'bacterial vaginosis', 'trichomoniasis (adjunct)'],
+    contraindications: ['Pregnancy', 'broken vaginal skin', 'hypersensitivity'],
+    warnings: ['Toxic if ingested', 'not for oral use', 'keep away from children'],
+    pregnancy: 'Category X - Contraindicated',
+    storage: 'Store in cool, dry place'
+  }
+];

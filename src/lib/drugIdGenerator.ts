@@ -65,11 +65,17 @@ const categoryMappings: CategoryMapping = {
   'Vitamins & Nutritional Supplements': { abbreviation: 'VNS', counter: 80 },   // vitaminsNutritionalSupplementsDrugs.ts - 80 entries
   
   // Additional specialized categories
-  'Respiratory Combination': { abbreviation: 'RCOMB', counter: 15 },    // respiratoryCombinationDrugs.ts - 15 entries
+  'Respiratory Combination': { abbreviation: 'RCOMB', counter: 27 },    // respiratoryCombinationDrugs.ts - 27 entries
   'Ophthalmology': { abbreviation: 'OPHT', counter: 19 },               // ophthalmologyDrugs.ts - 19 entries
   'Cognitive Enhancer': { abbreviation: 'COGN', counter: 6 },           // cognitiveNootropicDrugs.ts - 6 entries
   'Gynecology': { abbreviation: 'GYN', counter: 14 },                   // gynecologyDrugs.ts - 14 entries
-  'Dermatology Expansion': { abbreviation: 'DEXP', counter: 20 }        // dermatologyExpansionDrugs.ts - 20 entries
+  'Dermatology Expansion': { abbreviation: 'DEXP', counter: 20 },       // dermatologyExpansionDrugs.ts - 20 entries
+  'Supplements Expansion': { abbreviation: 'SEXP', counter: 10 },       // supplementsExpansionDrugs.ts - 10 entries
+  'Gastrointestinal Expansion': { abbreviation: 'GIEX', counter: 10 },  // gastrointestinalExpansionDrugs.ts - 10 entries
+  'Permethrin Scabies': { abbreviation: 'PERM', counter: 1 },           // permethrinScabiesDrugs.ts - 1 entry
+  'Additional Miscellaneous': { abbreviation: 'AMISC', counter: 20 },   // additionalMiscellaneousDrugs.ts - 20 entries
+  'Final Expansion': { abbreviation: 'FEXP', counter: 20 },             // finalExpansionDrugs.ts - 20 entries
+  'Miscellaneous Expansion': { abbreviation: 'MEXP', counter: 3 }       // miscellaneousExpansionDrugs.ts - 3 entries
 };
 
 /**

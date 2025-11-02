@@ -48,6 +48,12 @@ import { ophthalmologyDrugs } from "./ophthalmologyDrugs";
 import { cognitiveNootropicDrugs } from "./cognitiveNootropicDrugs";
 import { gynecologyDrugs } from "./gynecologyDrugs";
 import { dermatologyExpansionDrugs } from "./dermatologyExpansionDrugs";
+import { supplementsExpansionDrugs } from "./supplementsExpansionDrugs";
+import { gastrointestinalExpansionDrugs } from "./gastrointestinalExpansionDrugs";
+import { permethrinScabiesDrugs } from "./permethrinScabiesDrugs";
+import { additionalMiscellaneousDrugs } from "./additionalMiscellaneousDrugs";
+import { finalExpansionDrugs } from "./finalExpansionDrugs";
+import { miscellaneousExpansionDrugs } from "./miscellaneousExpansionDrugs";
 
 // Create a map to track drug sources for validation reporting
 const drugSources = new Map<string, string>();
@@ -101,7 +107,13 @@ const allDrugsData: DrugData[] = [
   ...addDrugsWithSource(ophthalmologyDrugs, 'ophthalmologyDrugs.ts'),
   ...addDrugsWithSource(cognitiveNootropicDrugs, 'cognitiveNootropicDrugs.ts'),
   ...addDrugsWithSource(gynecologyDrugs, 'gynecologyDrugs.ts'),
-  ...addDrugsWithSource(dermatologyExpansionDrugs, 'dermatologyExpansionDrugs.ts')
+  ...addDrugsWithSource(dermatologyExpansionDrugs, 'dermatologyExpansionDrugs.ts'),
+  ...addDrugsWithSource(supplementsExpansionDrugs, 'supplementsExpansionDrugs.ts'),
+  ...addDrugsWithSource(gastrointestinalExpansionDrugs, 'gastrointestinalExpansionDrugs.ts'),
+  ...addDrugsWithSource(permethrinScabiesDrugs, 'permethrinScabiesDrugs.ts'),
+  ...addDrugsWithSource(additionalMiscellaneousDrugs, 'additionalMiscellaneousDrugs.ts'),
+  ...addDrugsWithSource(finalExpansionDrugs, 'finalExpansionDrugs.ts'),
+  ...addDrugsWithSource(miscellaneousExpansionDrugs, 'miscellaneousExpansionDrugs.ts')
 ];
 
 // Enhanced deduplication with validation logging for both ID and name duplicates

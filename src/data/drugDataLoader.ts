@@ -45,6 +45,12 @@ const drugDataLoaders = {
   cognitiveNootropic: () => import("./cognitiveNootropicDrugs").then(m => m.cognitiveNootropicDrugs),
   gynecology: () => import("./gynecologyDrugs").then(m => m.gynecologyDrugs),
   dermatologyExpansion: () => import("./dermatologyExpansionDrugs").then(m => m.dermatologyExpansionDrugs),
+  supplementsExpansion: () => import("./supplementsExpansionDrugs").then(m => m.supplementsExpansionDrugs),
+  gastrointestinalExpansion: () => import("./gastrointestinalExpansionDrugs").then(m => m.gastrointestinalExpansionDrugs),
+  permethrinScabies: () => import("./permethrinScabiesDrugs").then(m => m.permethrinScabiesDrugs),
+  additionalMiscellaneous: () => import("./additionalMiscellaneousDrugs").then(m => m.additionalMiscellaneousDrugs),
+  finalExpansion: () => import("./finalExpansionDrugs").then(m => m.finalExpansionDrugs),
+  miscellaneousExpansion: () => import("./miscellaneousExpansionDrugs").then(m => m.miscellaneousExpansionDrugs),
 };
 
 // Cache for loaded drug data
