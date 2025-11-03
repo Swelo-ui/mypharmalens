@@ -368,12 +368,9 @@ const DrugInteractionChecker = () => {
                           key={index}
                           className={"p-0 bg-transparent border-0 shadow-none"}
                         >
-                          {!isMobile && (
-                            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                          )}
                           <AlertTitle className="mb-3">
                             <div
-                              className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-2 border-l-4 ${
+                              className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-2 border-l-4 pl-4 ${
                                 interaction.severity === 'contraindicated'
                                   ? 'border-red-500'
                                   : interaction.severity === 'severe'
