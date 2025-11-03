@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, Scan, History, User } from 'lucide-react';
+import { Home, Search, Scan, Activity, User } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 
 const BottomNavigation = () => {
@@ -59,9 +59,9 @@ const BottomNavigation = () => {
           <span className="text-[10px] sm:text-xs text-gray-700 dark:text-gray-400 mt-0.5 sm:mt-1 font-medium">Identify</span>
         </Link>
         
-        <Link to="/history" className="flex flex-col items-center space-y-0.5 sm:space-y-1">
-          <History className={`h-4 w-4 sm:h-5 sm:w-5 ${isActive('/history') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
-          <span className={`text-[10px] sm:text-xs ${isActive('/history') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>History</span>
+        <Link to="/symptom-checker" className="flex flex-col items-center space-y-0.5 sm:space-y-1">
+          <Activity className={`h-4 w-4 sm:h-5 sm:w-5 ${isActive('/symptom-checker') ? 'text-[#024f7d]' : 'text-gray-700 dark:text-gray-400'}`} />
+          <span className={`text-[10px] sm:text-xs ${isActive('/symptom-checker') ? 'text-[#024f7d] font-medium' : 'text-gray-700 dark:text-gray-400'}`}>Symptoms</span>
         </Link>
         
         <Link to="/profile" className="flex flex-col items-center space-y-0.5 sm:space-y-1">

@@ -672,9 +672,9 @@ const DrugIdentify = () => {
           {isAuthenticated && (
             <Button 
               variant="outline"
-              onClick={() => navigate('/history')}
+              onClick={() => navigate('/symptom-checker')}
             >
-              View Identification History
+              Check Symptoms
             </Button>
           )}
         </div>

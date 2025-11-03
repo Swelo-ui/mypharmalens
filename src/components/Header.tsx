@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, History, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -76,7 +76,7 @@ const Header = () => {
   ];
 
   // Don't render the full header on specific pages when on mobile
-  const isCompactHeader = isMobile && ['/identify', '/search', '/history', '/profile'].includes(location.pathname);
+  const isCompactHeader = isMobile && ['/identify', '/search', '/symptom-checker', '/profile'].includes(location.pathname);
 
   // If it's a page with bottom navigation on mobile, render a minimal header
   if (isCompactHeader) {
@@ -138,14 +138,14 @@ const Header = () => {
               ))}
               {isAuthenticated && (
                 <Link
-                  to="/history"
+                  to="/symptom-checker"
                   className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                    location.pathname === '/history'
+                    location.pathname === '/symptom-checker'
                       ? 'text-pharma-600 dark:text-pharma-400'
                       : 'text-gray-600 dark:text-gray-300'
                   }`}
                 >
-                  History
+                  Symptoms
                 </Link>
               )}
             </nav>
@@ -187,9 +187,9 @@ const Header = () => {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link to="/history" className="flex items-center w-full cursor-pointer">
-                            <History className="mr-2 h-4 w-4" />
-                            <span>Profile History</span>
+                          <Link to="/symptom-checker" className="flex items-center w-full cursor-pointer">
+                            <Activity className="mr-2 h-4 w-4" />
+                            <span>Symptom Checker</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
@@ -312,15 +312,15 @@ const Header = () => {
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/history"
+                    to="/symptom-checker"
                     className={`text-lg font-medium transition-colors ${
-                      location.pathname === '/history'
+                      location.pathname === '/symptom-checker'
                         ? 'text-pharma-600 dark:text-pharma-400'
                         : 'text-gray-800 dark:text-gray-200'
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    History
+                    Symptom Checker
                   </Link>
                   
                   <Link

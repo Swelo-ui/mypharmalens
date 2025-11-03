@@ -23,7 +23,8 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const Auth = lazy(() => import("./pages/Auth"));
-const IdentificationHistory = lazy(() => import("./pages/IdentificationHistory"));
+const SymptomChecker = lazy(() => import("./pages/SymptomChecker"));
+const DrugInteractionChecker = lazy(() => import("./pages/DrugInteractionChecker"));
 const Profile = lazy(() => import("./pages/Profile"));
 const AccountSubscriptionPage = lazy(() => import("./pages/AccountSubscription"));
 const PaymentResult = lazy(() => import("./components/PaymentResult"));
@@ -68,7 +69,8 @@ const App = () => {
                   <Route path="/disclaimer" element={<Disclaimer />} />
                   <Route path="/drug/:id" element={<DrugPage />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/history" element={<IdentificationHistory />} />
+                  <Route path="/symptom-checker" element={<SymptomChecker />} />
+                  <Route path="/drug-interactions" element={<DrugInteractionChecker />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/account-subscription" element={<AccountSubscriptionPage />} />
                   <Route path="/payment-result" element={<PaymentResult />} />
