@@ -366,11 +366,23 @@ const DrugInteractionChecker = () => {
                       {interactionResult.interactions.map((interaction, index) => (
                         <Alert
                           key={index}
-                          className={`border-2 ${getSeverityColor(interaction.severity)}`}
+                          className={"p-0 bg-transparent border-0 shadow-none"}
                         >
-                          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                          {!isMobile && (
+                            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                          )}
                           <AlertTitle className="mb-3">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                            <div
+                              className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-2 border-l-4 ${
+                                interaction.severity === 'contraindicated'
+                                  ? 'border-red-500'
+                                  : interaction.severity === 'severe'
+                                  ? 'border-orange-500'
+                                  : interaction.severity === 'moderate'
+                                  ? 'border-yellow-500'
+                                  : 'border-blue-500'
+                              }`}
+                            >
                               <span className="font-semibold text-sm sm:text-base break-words leading-tight">
                                 {interaction.drug1.name} ↔ {interaction.drug2.name}
                               </span>
