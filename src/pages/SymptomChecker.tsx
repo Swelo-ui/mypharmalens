@@ -53,33 +53,123 @@ const SymptomChecker = () => {
 
     syms.forEach(s => {
       const name = s.nameEn.toLowerCase();
-      // Headache
+      
+      // HEAD & MIND
       if (name.includes('headache')) {
-        addClass('nsaid', 60);
-        addClass('anti-inflammatory', 30);
-        addClass('analgesic', 20);
-        addClass('triptan', 50);
-        ['ibuprofen','naproxen','diclofenac','paracetamol','acetaminophen','sumatriptan','rizatriptan']
-          .forEach(n => addName(n, 40));
-        // Deprioritize opioids/combos/topicals for primary headache treatment
-        addNegClass('opioid', 60);
-        addNegClass('opioid analgesic', 60);
-        addNegName('tramadol', 60);
-        addNegClass('topical', 30);
-        addNegName('spray', 25);
-        addNegName('gel', 25);
+        addClass('nsaid', 60); addClass('anti-inflammatory', 30); addClass('analgesic', 20); addClass('triptan', 50);
+        ['ibuprofen','naproxen','diclofenac','paracetamol','acetaminophen','sumatriptan','rizatriptan'].forEach(n => addName(n, 40));
+        addNegClass('opioid', 60); addNegName('tramadol', 60); addNegClass('topical', 30);
       }
-      // Anxiety
       if (name.includes('anxiety') || name.includes('nervous')) {
-        addClass('benzodiazepine', 60);
-        addClass('ssri', 25);
-        addClass('anxiolytic', 60);
-        ['alprazolam','lorazepam','clonazepam','diazepam']
-          .forEach(n => addName(n, 40));
-        ['sertraline','paroxetine','fluoxetine','escitalopram']
-          .forEach(n => addName(n, 25));
-        // Reduce unrelated sedatives dominance (e.g., antihistamines)
+        addClass('benzodiazepine', 60); addClass('ssri', 25); addClass('anxiolytic', 60);
+        ['alprazolam','lorazepam','clonazepam','diazepam'].forEach(n => addName(n, 40));
+        ['sertraline','paroxetine','fluoxetine','escitalopram'].forEach(n => addName(n, 25));
         addNegClass('antihistamine', 20);
+      }
+      if (name.includes('insomnia') || name.includes('sleep')) {
+        addClass('sedative', 50); addClass('hypnotic', 50); addClass('benzodiazepine', 30);
+        ['zolpidem','eszopiclone','melatonin','doxepin'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('dizz')) {
+        addClass('antihistamine', 40); addClass('antivertigo', 50);
+        ['meclizine','betahistine','dimenhydrinate'].forEach(n => addName(n, 35));
+      }
+      
+      // FEVER & GENERAL
+      if (name.includes('fever')) {
+        addClass('antipyretic', 60); addClass('analgesic', 30);
+        ['paracetamol','acetaminophen','ibuprofen'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('body ache') || name.includes('myalgia')) {
+        addClass('analgesic', 50); addClass('nsaid', 50); addClass('muscle relaxant', 30);
+        ['ibuprofen','paracetamol','diclofenac','cyclobenzaprine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('tired') || name.includes('fatigue') || name.includes('weak')) {
+        addClass('multivitamin', 40); addClass('iron supplement', 40); addClass('vitamin b', 30);
+        ['ferrous','folic','vitamin b12','multivitamin'].forEach(n => addName(n, 30));
+      }
+      
+      // DIGESTIVE
+      if (name.includes('stomach pain') || name.includes('abdominal')) {
+        addClass('antacid', 40); addClass('antispasmodic', 50); addClass('ppi', 35);
+        ['omeprazole','pantoprazole','dicyclomine','hyoscine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('acid') || name.includes('heartburn') || name.includes('gerd')) {
+        addClass('ppi', 60); addClass('h2 blocker', 40); addClass('antacid', 30);
+        ['omeprazole','pantoprazole','esomeprazole','ranitidine','famotidine'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('nausea') || name.includes('vomit')) {
+        addClass('antiemetic', 60); addClass('prokinetic', 40);
+        ['ondansetron','metoclopramide','domperidone'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('diarrhea') || name.includes('loose')) {
+        addClass('antidiarrheal', 60); addClass('probiotic', 35);
+        ['loperamide','racecadotril','saccharomyces'].forEach(n => addName(n, 40));
+        addNegClass('laxative', 50);
+      }
+      if (name.includes('constipation')) {
+        addClass('laxative', 60); addClass('stool softener', 40);
+        ['lactulose','bisacodyl','docusate','psyllium'].forEach(n => addName(n, 40));
+        addNegClass('antidiarrheal', 50);
+      }
+      if (name.includes('gas') || name.includes('bloat')) {
+        addClass('antiflatulent', 60); addClass('carminative', 40);
+        ['simethicone','activated charcoal'].forEach(n => addName(n, 40));
+      }
+      
+      // RESPIRATORY
+      if (name.includes('cough')) {
+        addClass('antitussive', 50); addClass('expectorant', 40); addClass('mucolytic', 35);
+        ['dextromethorphan','guaifenesin','ambroxol','bromhexine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('cold') || name.includes('nasal')) {
+        addClass('decongestant', 50); addClass('antihistamine', 40);
+        ['pseudoephedrine','cetirizine','loratadine','phenylephrine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('breathless') || name.includes('asthma')) {
+        addClass('bronchodilator', 60); addClass('corticosteroid', 40);
+        ['salbutamol','albuterol','budesonide','fluticasone'].forEach(n => addName(n, 40));
+      }
+      
+      // SKIN & INFECTIONS
+      if (name.includes('itch') || name.includes('allergy')) {
+        addClass('antihistamine', 60); addClass('corticosteroid', 35);
+        ['cetirizine','loratadine','fexofenadine','hydrocortisone'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('rash') || name.includes('acne') || name.includes('pimple')) {
+        addClass('antibiotic', 40); addClass('retinoid', 35); addClass('corticosteroid', 30);
+        ['clindamycin','benzoyl peroxide','tretinoin','adapalene'].forEach(n => addName(n, 30));
+      }
+      if (name.includes('swell') || name.includes('inflam')) {
+        addClass('anti-inflammatory', 50); addClass('nsaid', 50); addClass('corticosteroid', 35);
+        ['ibuprofen','diclofenac','prednisolone'].forEach(n => addName(n, 35));
+      }
+      
+      // JOINTS & MUSCLES
+      if (name.includes('joint') || name.includes('arthritis') || name.includes('knee') || name.includes('back pain')) {
+        addClass('nsaid', 60); addClass('analgesic', 40); addClass('muscle relaxant', 30);
+        ['ibuprofen','diclofenac','naproxen','etoricoxib','cyclobenzaprine'].forEach(n => addName(n, 40));
+        addNegClass('opioid', 30);
+      }
+      if (name.includes('muscle cramp') || name.includes('spasm')) {
+        addClass('muscle relaxant', 60); addClass('magnesium', 40);
+        ['cyclobenzaprine','methocarbamol','magnesium'].forEach(n => addName(n, 40));
+      }
+      
+      // ENT
+      if (name.includes('sore throat') || name.includes('throat')) {
+        addClass('analgesic', 50); addClass('antiseptic', 40); addClass('antibiotic', 30);
+        ['benzocaine','chlorhexidine','amoxicillin','azithromycin'].forEach(n => addName(n, 30));
+      }
+      if (name.includes('ear pain') || name.includes('ear')) {
+        addClass('analgesic', 50); addClass('antibiotic', 40);
+        ['ibuprofen','paracetamol','ciprofloxacin'].forEach(n => addName(n, 35));
+      }
+      
+      // OTHER
+      if (name.includes('burn') && name.includes('urinat')) {
+        addClass('antibiotic', 60); addClass('urinary alkalizer', 40);
+        ['nitrofurantoin','ciprofloxacin','trimethoprim'].forEach(n => addName(n, 40));
       }
     });
 
@@ -480,7 +570,9 @@ const SymptomChecker = () => {
                       className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">{category.icon}</span>
+                        <Badge variant="outline" className="text-xs px-2 py-1 font-mono bg-pharma-50 text-pharma-700 border-pharma-300 dark:bg-pharma-900/20 dark:text-pharma-300 dark:border-pharma-700">
+                          {category.icon}
+                        </Badge>
                         <span className="font-semibold">{category.title}</span>
                         <Badge variant="secondary">{category.symptoms.length}</Badge>
                       </div>

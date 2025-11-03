@@ -1,4 +1,5 @@
 import { DrugData } from "@/components/DrugCard";
+import { simplifyMedicalTerm, medicalToLaymanTerms } from "@/utils/laymanTerms";
 
 export interface DrugInteraction {
   drug1: DrugData;
@@ -6,7 +7,17 @@ export interface DrugInteraction {
   severity: 'mild' | 'moderate' | 'severe' | 'contraindicated';
   description: string;
   recommendation: string;
+  // Additional structured clinical metadata to improve UX
+  onset?: string;          // e.g., 'Rapid (hours to days)'
+  monitoring?: string;     // e.g., 'Monitor INR and signs of bleeding'
+  mechanism?: string;      // e.g., 'Additive antiplatelet/anticoagulant effect'
+  sources?: string[];      // evidence trail, e.g., ['data:drug1.interactions','rule:class-combo anticoagulant+nsaid']
   alternatives?: { drug: DrugData; reason: string }[];
+  // Layman-friendly versions
+  laymanDescription?: string;
+  laymanRecommendation?: string;
+  laymanMechanism?: string;
+  laymanMonitoring?: string;
 }
 
 export interface InteractionCheckResult {
@@ -69,11 +80,13 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   let interactionText = '';
   let severity: 'mild' | 'moderate' | 'severe' | 'contraindicated' = 'mild';
 
+  const sources: string[] = [];
   // If either drug's text mentions the other's tokens, consider interaction
   for (const t of texts1) {
     if (textContainsAny(t, tokens2)) {
       interactionFound = true;
       interactionText = t;
+      sources.push('data:drug1.interactions');
       break;
     }
   }
@@ -82,6 +95,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
       if (textContainsAny(t, tokens1)) {
         interactionFound = true;
         interactionText = t;
+        sources.push('data:drug2.interactions');
         break;
       }
     }
@@ -93,6 +107,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
       interactionFound = true;
       interactionText = interactionText || `Both medications are ${drug1Class}, which may increase side-effect risk.`;
       severity = severity === 'mild' ? 'moderate' : severity;
+      sources.push(`rule:same-class ${drug1Class}`);
     }
   }
 
@@ -117,6 +132,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
     interactionFound = true;
     severity = hasCombo.severity;
     interactionText = interactionText || hasCombo.note;
+    sources.push(`rule:class-combo ${hasCombo.classes.join('+')}`);
   }
 
   // Infer severity from interaction text keywords
@@ -145,7 +161,150 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
       break;
   }
 
-  return { drug1, drug2, severity, description: interactionText || 'Potential interaction detected.', recommendation, alternatives: [] };
+  // Derive mechanism, onset and monitoring using class heuristics and text keywords
+  const textForMeta = (interactionText || '').toLowerCase();
+  const classes = `${drug1Class} + ${drug2Class}`;
+
+  // Mechanism patterns with layman explanations
+  const mechMap: { test: (t: string) => boolean; mech: string; layman: string }[] = [
+    { 
+      test: t => /(bleed|hemorrhage|inr|antiplatelet|anticoagulant)/.test(t) || (drug1Class+drug2Class).includes('anticoagulant') || (drug1Class+drug2Class).includes('antiplatelet'), 
+      mech: 'Additive antiplatelet/anticoagulant effect increases bleeding risk',
+      layman: 'Both medicines thin your blood, which increases bleeding risk'
+    },
+    { 
+      test: t => /(serotonin|5-ht)/.test(t) || (drug1Class+drug2Class).includes('ssri') && (drug1Class+drug2Class).includes('maoi'), 
+      mech: 'Excess serotonergic activity (serotonin syndrome risk)',
+      layman: 'Too much serotonin in your brain can cause dangerous symptoms'
+    },
+    { 
+      test: t => /(cyp3a4|cyp2c9|inhibitor|inducer|macrolide|grapefruit)/.test(t) || (drug1Class+drug2Class).includes('macrolide') && (drug1Class+drug2Class).includes('statin'), 
+      mech: 'Metabolic interaction (CYP-mediated) increases serum drug levels',
+      layman: 'One medicine affects how your liver processes the other, making it stronger'
+    },
+    { 
+      test: t => /(qt prolong|torsade)/.test(t), 
+      mech: 'Additive QT prolongation increases arrhythmia risk',
+      layman: 'Both medicines can affect your heart rhythm when used together'
+    },
+    { 
+      test: t => /(respiratory|cns depression|sedation)/.test(t) || (drug1Class+drug2Class).includes('benzodiazepine') && (drug1Class+drug2Class).includes('opioid'), 
+      mech: 'Additive CNS depression/respiratory depression',
+      layman: 'Both medicines can make you very drowsy and slow your breathing'
+    },
+    { 
+      test: t => /(hypotension|blood pressure|nitrate)/.test(t) || (drug1Class+drug2Class).includes('pde5 inhibitor') && (drug1Class+drug2Class).includes('nitrate'), 
+      mech: 'Excess vasodilation causing severe hypotension',
+      layman: 'Both medicines lower blood pressure and together can cause dangerous drops'
+    },
+    { 
+      test: t => /(potassium|hyperkalemia)/.test(t) || (drug1Class+drug2Class).includes('potassium-sparing') && (drug1Class+drug2Class).includes('ace'), 
+      mech: 'Hyperkalemia due to combined effects on potassium homeostasis',
+      layman: 'Both medicines can increase potassium levels in your blood to dangerous levels'
+    },
+  ];
+  const mechResult = mechMap.find(m => m.test(textForMeta));
+  const detectedMech = mechResult?.mech || (hasCombo ? hasCombo.note : undefined) || undefined;
+  const laymanMech = mechResult?.layman || undefined;
+
+  // Onset patterns
+  let onset: string | undefined;
+  if (/(immediate|sudden|rapid|hours)/.test(textForMeta) || severity === 'contraindicated' || (classes.includes('benzodiazepine') && classes.includes('opioid')) || (classes.includes('nitrate') && classes.includes('pde5')) ) {
+    onset = 'Rapid (hours to days)';
+  } else if (/(days|weeks|accumulate|build up|elevated levels)/.test(textForMeta) || (classes.includes('macrolide') && classes.includes('statin')) || classes.includes('warfarin')) {
+    onset = 'Typically within days to weeks';
+  }
+  if (!onset) {
+    onset = severity === 'severe' || severity === 'contraindicated' ? 'Rapid (hours to days)' : 'Variable (days to weeks)';
+  }
+
+  // Monitoring suggestions with layman versions
+  let monitoring: string | undefined;
+  let laymanMonitoring: string | undefined;
+  if (/(inr|warfarin|bleed)/.test(textForMeta) || classes.includes('anticoagulant')) {
+    monitoring = 'Check INR (if on warfarin) and monitor for bleeding/bruising; avoid concurrent NSAIDs/antiplatelets if possible';
+    laymanMonitoring = 'Get blood tests to check clotting; watch for unusual bleeding or bruising; avoid pain medicines like ibuprofen';
+  } else if (/(potassium|hyperkalemia)/.test(textForMeta) || classes.includes('potassium-sparing') || classes.includes('ace')) {
+    monitoring = 'Monitor serum potassium and renal function (creatinine) within 1–2 weeks of initiation or dose change';
+    laymanMonitoring = 'Get blood tests within 1-2 weeks to check potassium levels and kidney function';
+  } else if (/(qt prolong|torsade)/.test(textForMeta)) {
+    monitoring = 'Obtain baseline and follow-up ECG; correct electrolytes (K/Mg); avoid in congenital long QT';
+    laymanMonitoring = 'Get heart rhythm tests (ECG) before and during treatment; correct low potassium/magnesium';
+  } else if (/(macrolide|cyp3a4|statin)/.test(textForMeta) || (classes.includes('macrolide') && classes.includes('statin'))) {
+    monitoring = 'Consider holding or switching statin; monitor for myopathy (CK) and liver enzymes if continued';
+    laymanMonitoring = 'May need to temporarily stop cholesterol medicine; watch for muscle pain or weakness';
+  } else if ((classes.includes('benzodiazepine') && classes.includes('opioid')) || /(respiratory|cns depression)/.test(textForMeta)) {
+    monitoring = 'Avoid combination or use minimal doses; monitor level of consciousness and respiration; provide take-home naloxone if appropriate';
+    laymanMonitoring = 'Use lowest possible doses; watch for extreme drowsiness or slow breathing; keep naloxone (overdose reversal) available';
+  } else if ((classes.includes('nitrate') && classes.includes('pde5')) || /(hypotension|blood pressure)/.test(textForMeta)) {
+    monitoring = 'Absolute avoidance recommended; if inadvertently combined, monitor blood pressure closely and seek medical attention for dizziness/syncope';
+    laymanMonitoring = 'Never use together; if accidentally combined, check blood pressure often and get help if dizzy or faint';
+  }
+
+  const description = interactionText || 'Potential interaction detected.';
+
+  // Tailor recommendation by mechanism/classes with layman versions
+  const recHints: string[] = [];
+  const laymanRecHints: string[] = [];
+  if ((drug1Class+drug2Class).includes('anticoagulant')) {
+    if ((drug1Class+drug2Class).includes('nsaid')) {
+      recHints.push('Prefer paracetamol (acetaminophen) for pain instead of NSAIDs.');
+      laymanRecHints.push('Use paracetamol for pain instead of ibuprofen or similar medicines.');
+    }
+    if ((drug1Class+drug2Class).includes('antiplatelet')) {
+      recHints.push('Use the lowest effective antiplatelet regimen; assess bleeding risk and gastroprotection (e.g., PPI).');
+      laymanRecHints.push('Use the lowest dose that works; may need stomach protection medicine.');
+    }
+    if ((drug1.name+drug2.name).toLowerCase().includes('warfarin')) {
+      recHints.push('If suitable, discuss DOAC alternatives (e.g., apixaban, rivaroxaban) with your doctor.');
+      laymanRecHints.push('Ask your doctor about newer blood thinners that may be safer.');
+    }
+  }
+  if ((drug1Class+drug2Class).includes('benzodiazepine') && (drug1Class+drug2Class).includes('opioid')) {
+    recHints.push('Avoid alcohol and other sedatives; do not drive; ask about take‑home naloxone.');
+    laymanRecHints.push('Avoid alcohol; do not drive; ask about emergency overdose medicine (naloxone).');
+  }
+  if ((drug1Class+drug2Class).includes('statin') && (drug1Class+drug2Class).includes('macrolide')) {
+    recHints.push('Temporarily hold or switch statin (e.g., to pravastatin/rosuvastatin) while on macrolide antibiotic.');
+    laymanRecHints.push('May need to temporarily stop cholesterol medicine while taking antibiotic.');
+  }
+  if ((drug1Class+drug2Class).includes('pde5') && (drug1Class+drug2Class).includes('nitrate')) {
+    recHints.push('Absolute avoidance: do not take nitrates within 24–48h of PDE5 inhibitors.');
+    laymanRecHints.push('Never take these together - wait at least 24-48 hours between doses.');
+  }
+  if (recHints.length) {
+    recommendation = `${recommendation} ${recHints.join(' ')}`.trim();
+  }
+  
+  // Create layman versions
+  const laymanDescription = simplifyMedicalTerm(description);
+  const baseLaymanRec = severity === 'contraindicated' 
+    ? 'DO NOT use these medicines together. Talk to your doctor right away about other options.'
+    : severity === 'severe'
+    ? 'This combination can be dangerous. Only use together with close doctor supervision.'
+    : severity === 'moderate'
+    ? 'Use carefully. Watch for side effects and talk to your doctor before combining.'
+    : 'Generally safe but tell your doctor. May need small timing or dose changes.';
+  const laymanRecommendation = laymanRecHints.length 
+    ? `${baseLaymanRec} ${laymanRecHints.join(' ')}`.trim()
+    : baseLaymanRec;
+
+  return { 
+    drug1, 
+    drug2, 
+    severity, 
+    description, 
+    recommendation, 
+    onset, 
+    monitoring, 
+    mechanism: detectedMech, 
+    sources, 
+    alternatives: [],
+    laymanDescription,
+    laymanRecommendation,
+    laymanMechanism: laymanMech,
+    laymanMonitoring
+  };
 };
 
 // Main function to check interactions between multiple drugs
@@ -153,8 +312,44 @@ export const checkDrugInteractions = (
   selectedDrugs: DrugData[],
   allDrugs: DrugData[]
 ): InteractionCheckResult => {
-  const interactions: DrugInteraction[] = [];
-  
+  const byPair: Record<string, DrugInteraction> = {};
+
+  const sevRank: Record<DrugInteraction['severity'], number> = {
+    contraindicated: 3,
+    severe: 2,
+    moderate: 1,
+    mild: 0
+  };
+
+  const merge = (key: string, cand: DrugInteraction) => {
+    const prev = byPair[key];
+    if (!prev) {
+      byPair[key] = cand;
+      return;
+    }
+    // Prefer higher severity
+    if (sevRank[cand.severity] > sevRank[prev.severity]) {
+      byPair[key] = { ...cand, alternatives: prev.alternatives || cand.alternatives };
+    } else if (sevRank[cand.severity] === sevRank[prev.severity]) {
+      // If same severity, keep richer description
+      const betterDesc = (cand.description || '').length > (prev.description || '').length ? cand.description : prev.description;
+      const mech = prev.mechanism || cand.mechanism;
+      const onset = prev.onset || cand.onset;
+      const monitoring = prev.monitoring || cand.monitoring;
+      const sources = Array.from(new Set([...(prev.sources || []), ...(cand.sources || [])]));
+      // Merge alternatives unique by id
+      const alts = [...(prev.alternatives || []), ...(cand.alternatives || [])];
+      const seenAlt = new Set<string>();
+      const mergedAlts = alts.filter(a => {
+        const id = a.drug.id;
+        if (seenAlt.has(id)) return false;
+        seenAlt.add(id);
+        return true;
+      }).slice(0, 3);
+      byPair[key] = { ...prev, description: betterDesc, mechanism: mech, onset, monitoring, sources, alternatives: mergedAlts };
+    }
+  };
+
   // Check each pair of selected drugs
   for (let i = 0; i < selectedDrugs.length; i++) {
     for (let j = i + 1; j < selectedDrugs.length; j++) {
@@ -165,11 +360,13 @@ export const checkDrugInteractions = (
           const alternatives = findAlternatives(interaction.drug2, allDrugs, selectedDrugs);
           interaction.alternatives = alternatives;
         }
-        interactions.push(interaction);
+        const key = [interaction.drug1.id, interaction.drug2.id].sort().join('|');
+        merge(key, interaction);
       }
     }
   }
-  
+  const interactions = Object.values(byPair);
+
   const hasSevereInteractions = interactions.some(
     i => i.severity === 'severe' || i.severity === 'contraindicated'
   );

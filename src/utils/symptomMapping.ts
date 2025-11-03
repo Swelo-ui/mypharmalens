@@ -533,42 +533,42 @@ export const symptoms: Symptom[] = [
 
 export const symptomCategories = [
   {
-    icon: '🧠',
+    icon: 'HEAD',
     title: 'Head & Mind Related',
     symptoms: symptoms.filter(s => s.category === 'Head & Mind')
   },
   {
-    icon: '🤒',
+    icon: 'FEVER',
     title: 'Fever & General',
     symptoms: symptoms.filter(s => s.category === 'Fever & General')
   },
   {
-    icon: '🤢',
+    icon: 'DIGESTIVE',
     title: 'Stomach & Digestive',
     symptoms: symptoms.filter(s => s.category === 'Stomach & Digestive')
   },
   {
-    icon: '😮‍💨',
+    icon: 'RESPIRATORY',
     title: 'Respiratory',
     symptoms: symptoms.filter(s => s.category === 'Respiratory')
   },
   {
-    icon: '😷',
+    icon: 'SKIN',
     title: 'Infections & Skin',
     symptoms: symptoms.filter(s => s.category === 'Infections & Skin')
   },
   {
-    icon: '🦵',
+    icon: 'JOINTS',
     title: 'Joints & Muscles',
     symptoms: symptoms.filter(s => s.category === 'Joints & Muscles')
   },
   {
-    icon: '👁️',
+    icon: 'ENT',
     title: 'Eye, Ear, Nose, Throat',
     symptoms: symptoms.filter(s => s.category === 'Eye, Ear, Nose, Throat')
   },
   {
-    icon: '💓',
+    icon: 'OTHER',
     title: 'Other Common Symptoms',
     symptoms: symptoms.filter(s => s.category === 'Other Common Symptoms')
   }

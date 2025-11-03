@@ -25,6 +25,7 @@ const DrugInteractionChecker = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [allDrugs, setAllDrugs] = useState<DrugData[]>([]);
   const [selectedDrugs, setSelectedDrugs] = useState<DrugData[]>([]);
+  const [useLaymanTerms, setUseLaymanTerms] = useState(true); // Default to layman terms for better UX
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [interactionResult, setInteractionResult] = useState<InteractionCheckResult | null>(null);
@@ -326,9 +327,23 @@ const DrugInteractionChecker = () => {
             {selectedDrugs.length >= 2 && interactionResult && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Interaction Analysis
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      <span className="text-base sm:text-lg">Interaction Analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs sm:text-sm font-normal cursor-pointer flex items-center gap-1">
+                        <input
+                          type="checkbox"
+                          checked={useLaymanTerms}
+                          onChange={(e) => setUseLaymanTerms(e.target.checked)}
+                          className="w-3 h-3 sm:w-4 sm:h-4"
+                        />
+                        <span className="hidden sm:inline">Simple terms</span>
+                        <span className="sm:hidden">Simple</span>
+                      </label>
+                    </div>
                   </CardTitle>
                   <CardDescription>
                     {interactionResult.hasInteractions
@@ -353,58 +368,127 @@ const DrugInteractionChecker = () => {
                           key={index}
                           className={`border-2 ${getSeverityColor(interaction.severity)}`}
                         >
-                          <AlertTriangle className="h-4 w-4" />
-                          <AlertTitle className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold">
-                              {interaction.drug1.name} ↔ {interaction.drug2.name}
-                            </span>
-                            <Badge className={getSeverityBadgeColor(interaction.severity)}>
-                              {getSeverityLabel(interaction.severity)}
-                            </Badge>
+                          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                          <AlertTitle className="mb-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                              <span className="font-semibold text-sm sm:text-base break-words leading-tight">
+                                {interaction.drug1.name} ↔ {interaction.drug2.name}
+                              </span>
+                              <Badge className={`${getSeverityBadgeColor(interaction.severity)} text-xs w-fit flex-shrink-0`}>
+                                {getSeverityLabel(interaction.severity)}
+                              </Badge>
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                              <span className="flex items-center gap-1">
+                                <span className="font-semibold">Type:</span>
+                                <span className="break-words">
+                                  {useLaymanTerms 
+                                    ? `${interaction.drug1.drugClass?.replace(/[A-Z]/g, ' $&').trim() || 'Medicine'} + ${interaction.drug2.drugClass?.replace(/[A-Z]/g, ' $&').trim() || 'Medicine'}`
+                                    : `${interaction.drug1.drugClass || 'N/A'} + ${interaction.drug2.drugClass || 'N/A'}`
+                                  }
+                                </span>
+                              </span>
+                            </div>
                           </AlertTitle>
-                          <AlertDescription className="space-y-3">
-                            <div>
-                              <p className="font-medium mb-1">Description:</p>
-                              <p className="text-sm">{interaction.description}</p>
+                          <AlertDescription className="space-y-3 text-sm">
+                            <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                              <p className="font-semibold mb-1 text-xs uppercase tracking-wide">What Happens:</p>
+                              <p className="text-sm leading-relaxed break-words">
+                                {useLaymanTerms && interaction.laymanDescription 
+                                  ? interaction.laymanDescription 
+                                  : interaction.description}
+                              </p>
                             </div>
                             
-                            <div>
-                              <p className="font-medium mb-1">Recommendation:</p>
-                              <p className="text-sm">{interaction.recommendation}</p>
+                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                              <p className="font-semibold mb-1 text-xs uppercase tracking-wide text-blue-700 dark:text-blue-400">What To Do:</p>
+                              <p className="text-sm leading-relaxed break-words">
+                                {useLaymanTerms && interaction.laymanRecommendation 
+                                  ? interaction.laymanRecommendation 
+                                  : interaction.recommendation}
+                              </p>
+                            </div>
+
+                            {/* Additional clinical info (responsive layout) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+                              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                                <p className="font-semibold mb-1">When it starts:</p>
+                                <p className="text-gray-600 dark:text-gray-400 break-words">
+                                  {interaction.onset || (interaction.severity === 'contraindicated' || interaction.severity === 'severe' 
+                                    ? (useLaymanTerms ? 'Quickly (hours to days)' : 'Rapid (hours to days)')
+                                    : (useLaymanTerms ? 'Varies (days to weeks)' : 'Variable (days to weeks)'))}
+                                </p>
+                              </div>
+                              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                                <p className="font-semibold mb-1">What to watch:</p>
+                                <p className="text-gray-600 dark:text-gray-400 break-words">
+                                  {useLaymanTerms && interaction.laymanMonitoring 
+                                    ? interaction.laymanMonitoring
+                                    : interaction.monitoring || (interaction.severity === 'contraindicated'
+                                      ? (useLaymanTerms ? 'Do not use together' : 'Avoid combination')
+                                      : interaction.severity === 'severe'
+                                      ? (useLaymanTerms ? 'Watch closely with doctor' : 'Frequent monitoring required')
+                                      : (useLaymanTerms ? 'Check with doctor regularly' : 'Periodic monitoring advised'))}
+                                </p>
+                              </div>
+                              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 lg:col-span-1">
+                                <p className="font-semibold mb-1">How it works:</p>
+                                <p className="text-gray-600 dark:text-gray-400 break-words">
+                                  {useLaymanTerms && interaction.laymanMechanism 
+                                    ? interaction.laymanMechanism
+                                    : interaction.mechanism || (useLaymanTerms 
+                                      ? 'The medicines affect each other'
+                                      : 'Pharmacodynamic or pharmacokinetic interaction')}
+                                </p>
+                              </div>
                             </div>
 
                             {interaction.alternatives && interaction.alternatives.length > 0 && (
-                              <div>
-                                <p className="font-medium mb-2">Alternative Medications:</p>
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                  Consider replacing <strong>{interaction.drug2.name}</strong> with one of these alternatives:
+                              <div className="border-t pt-3">
+                                <p className="font-semibold mb-2 text-sm">Safer Alternatives:</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
+                                  {useLaymanTerms 
+                                    ? `Consider replacing `
+                                    : 'Consider replacing '}
+                                  <strong className="text-orange-600 dark:text-orange-400">{interaction.drug2.name}</strong>
+                                  {useLaymanTerms 
+                                    ? ' with one of these safer options:'
+                                    : ' with one of these pharmacologically appropriate alternatives:'}
                                 </p>
                                 <div className="space-y-2">
                                   {interaction.alternatives.map((alt, altIndex) => (
                                     <div
                                       key={altIndex}
-                                      className="p-3 bg-white dark:bg-gray-900 rounded-lg border cursor-pointer hover:border-pharma-300 transition-colors"
+                                      className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800 cursor-pointer hover:border-green-400 dark:hover:border-green-600 transition-all"
                                       onClick={() => navigate(`/drug/${alt.drug.id}`)}
                                     >
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-2">
-                                            <Badge variant="outline" className="text-[10px] bg-green-50 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400">
-                                              Alternative #{altIndex + 1}
+                                      <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 mb-1">
+                                            <Badge variant="outline" className="text-[10px] bg-green-100 text-green-800 border-green-400 dark:bg-green-900/40 dark:text-green-300 dark:border-green-600">
+                                              Option {altIndex + 1}
                                             </Badge>
                                           </div>
-                                          <div className="font-medium mt-1">{alt.drug.name}</div>
+                                          <div className="font-semibold text-sm break-words">{alt.drug.name}</div>
                                           {alt.drug.genericName && (
-                                            <div className="text-xs text-gray-500">{alt.drug.genericName}</div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400 break-words">{alt.drug.genericName}</div>
                                           )}
                                           {alt.drug.drugClass && (
                                             <Badge variant="secondary" className="text-[10px] mt-1">{alt.drug.drugClass}</Badge>
                                           )}
-                                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                                            ✓ {alt.reason}
-                                          </p>
+                                          <div className="mt-2 p-2 bg-white/60 dark:bg-gray-800/60 rounded text-xs">
+                                            <p className="text-green-700 dark:text-green-400 leading-relaxed break-words">
+                                              ✓ {useLaymanTerms 
+                                                ? alt.reason.replace(/pharmacologically|mechanism|therapeutic/gi, match => 
+                                                    match.toLowerCase() === 'pharmacologically' ? 'medically' :
+                                                    match.toLowerCase() === 'mechanism' ? 'way it works' :
+                                                    match.toLowerCase() === 'therapeutic' ? 'treatment' : match
+                                                  )
+                                                : alt.reason}
+                                            </p>
+                                          </div>
                                         </div>
-                                        <ArrowRight className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
+                                        <ArrowRight className="h-4 w-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
                                       </div>
                                     </div>
                                   ))}
