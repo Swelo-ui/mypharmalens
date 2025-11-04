@@ -1,6 +1,7 @@
 // @ts-expect-error - Remote Deno std HTTP import in Edge runtime
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { checkDrugCache, saveDrugToCache } from './cache-integration';
 
 // Narrow declaration for Deno env access when type information isn't available
 declare const Deno: { env: { get: (key: string) => string | undefined } };
@@ -1014,10 +1015,32 @@ serve(async (req) => {
     const geminiStage = await stageGeminiAnalysis(imageBase64, extractedText);
     stages.push(geminiStage);
 
-    // Stage 3: Multi-Source Enrichment (if we have a drug name and it's a pharmaceutical product)
+    // NEW: Check cache after Gemini analysis
     const gemData = geminiStage.success ? (geminiStage.data as GeminiAnalysisData | undefined) : undefined;
     const drugName = gemData?.name;
     const productType = gemData?.productType;
+    
+    // Check cache first if we have a drug name
+    if (drugName && !drugName.toLowerCase().includes('unknown')) {
+      console.log(`🔍 Checking cache for: ${drugName}`);
+      const cachedDrug = await checkDrugCache(drugName);
+      
+      if (cachedDrug) {
+        console.log(`✅ Cache HIT! Returning cached data for ${drugName}`);
+        const result: DrugIdentificationResult = {
+          success: true,
+          data: cachedDrug,
+          processingStages: ['text-extraction', 'gemini-analysis', 'cache-hit'],
+          confidence: cachedDrug.confidence as 'high' | 'medium' | 'low',
+          fallbackUsed: false,
+          processingTime: Date.now() - overallStartTime
+        };
+        return createResponse(result);
+      }
+      console.log(`❌ Cache miss, continuing with API enrichment...`);
+    }
+
+    // Stage 3: Multi-Source Enrichment (if we have a drug name and it's a pharmaceutical product)
     
     if (drugName && 
         !drugName.toLowerCase().includes('unknown') && 
@@ -1046,6 +1069,14 @@ serve(async (req) => {
     const combinedResult = combineStageResults(stages);
 
     if (combinedResult) {
+      // NEW: Save successful identification to cache (async, don't block response)
+      if (combinedResult.name && combinedResult.name !== 'Unknown Medication' && !combinedResult.name.toLowerCase().includes('unknown')) {
+        console.log(`💾 Saving ${combinedResult.name} to cache...`);
+        saveDrugToCache(combinedResult).catch(err => 
+          console.error('⚠️ Cache save failed (non-critical):', err)
+        );
+      }
+      
       const result: DrugIdentificationResult = {
         success: true,
         data: combinedResult,

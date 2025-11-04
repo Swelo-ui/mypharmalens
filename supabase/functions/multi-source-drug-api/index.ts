@@ -1,6 +1,14 @@
-// Multi-Source Drug Information API
+// Multi-Source Drug Information API with Caching
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCachedDrug, saveDrugToCache } from './cache';
+import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers';
+
+// Declare Deno for edge runtime
+declare const Deno: {
+  env: { get: (key: string) => string | undefined };
+  serve: (handler: (req: Request) => Promise<Response> | Response) => void;
+};
 
 // Use native DOMParser available in Deno Edge Runtime
 // Fallback type declaration for DOMParser if not available
@@ -13,7 +21,7 @@ declare global {
     querySelectorAll(selector: string): NodeListOf<Element>;
   }
   interface Element {
-    textContent: string | null;
+    textContent: string;
     innerHTML: string;
     getAttribute(name: string): string | null;
   }
@@ -59,6 +67,7 @@ interface ApiResponse {
   searchAttempts: string[];
   processingTime: number;
   sourcesUsed: string[];
+  fromCache?: boolean;
 }
 
 // User agents for web scraping
@@ -445,7 +454,107 @@ function calculateCompleteness(merged: ComprehensiveDrugInfo): number {
   return Math.min(completenessScore, 100);
 }
 
-async function searchComprehensiveDrugInfo(drugName: string): Promise<{
+// 🆕 Enhanced merge function for ALL 5 sources
+function mergeAllSourceData(
+  drugsComData: Partial<ComprehensiveDrugInfo> | null,
+  medlinePlusData: Partial<ComprehensiveDrugInfo> | null,
+  fdaData: Partial<ComprehensiveDrugInfo> | null,
+  rxListData: Partial<ComprehensiveDrugInfo> | null,
+  dailyMedData: Partial<ComprehensiveDrugInfo> | null,
+  drugName: string
+): ComprehensiveDrugInfo {
+  
+  const merged: ComprehensiveDrugInfo = {
+    name: drugName,
+    genericName: "",
+    manufacturer: "",
+    category: "",
+    drugClass: "",
+    description: "",
+    dosageAndAdmin: "",
+    sideEffects: [],
+    warnings: [],
+    interactions: [],
+    storage: "",
+    mechanism: "",
+    indications: [],
+    contraindications: [],
+    prescriptionStatus: "Unknown",
+    pregnancy: "",
+    brandNames: [],
+    verified: false,
+    sources: {},
+    completeness: 0
+  };
+
+  // Priority order: FDA > Drugs.com > MedlinePlus > RxList > DailyMed
+  // FDA is most authoritative for regulatory/official info
+  
+  const allSources = [
+    { data: fdaData, name: 'FDA', key: 'fda' },
+    { data: drugsComData, name: 'Drugs.com', key: 'drugscom' },
+    { data: medlinePlusData, name: 'MedlinePlus', key: 'medlineplus' },
+    { data: rxListData, name: 'RxList', key: 'rxlist' },
+    { data: dailyMedData, name: 'DailyMed', key: 'dailymed' }
+  ];
+  
+  // Merge each source in priority order
+  for (const source of allSources) {
+    if (!source.data) continue;
+    
+    // Track source
+    if (source.data.sources) {
+      merged.sources = { ...merged.sources, ...source.data.sources };
+    }
+    
+    // Fill in missing fields (first valid value wins due to priority order)
+    if (!merged.genericName && source.data.genericName) merged.genericName = source.data.genericName;
+    if (!merged.manufacturer && source.data.manufacturer) merged.manufacturer = source.data.manufacturer;
+    if (!merged.category && source.data.category) merged.category = source.data.category;
+    if (!merged.drugClass && source.data.drugClass) merged.drugClass = source.data.drugClass;
+    if (!merged.description && source.data.description) merged.description = source.data.description;
+    if (!merged.dosageAndAdmin && source.data.dosageAndAdmin) merged.dosageAndAdmin = source.data.dosageAndAdmin;
+    if (!merged.storage && source.data.storage) merged.storage = source.data.storage;
+    if (!merged.mechanism && source.data.mechanism) merged.mechanism = source.data.mechanism;
+    if (!merged.pregnancy && source.data.pregnancy) merged.pregnancy = source.data.pregnancy;
+    if (merged.prescriptionStatus === 'Unknown' && source.data.prescriptionStatus) {
+      merged.prescriptionStatus = source.data.prescriptionStatus;
+    }
+    
+    // Merge arrays (combine unique items from all sources)
+    if (source.data.sideEffects?.length) {
+      merged.sideEffects = [...new Set([...merged.sideEffects, ...source.data.sideEffects])].slice(0, 20);
+    }
+    if (source.data.warnings?.length) {
+      merged.warnings = [...new Set([...merged.warnings, ...source.data.warnings])].slice(0, 15);
+    }
+    if (source.data.interactions?.length) {
+      merged.interactions = [...new Set([...merged.interactions, ...source.data.interactions])].slice(0, 15);
+    }
+    if (source.data.indications?.length) {
+      merged.indications = [...new Set([...merged.indications, ...source.data.indications])].slice(0, 10);
+    }
+    if (source.data.contraindications?.length) {
+      merged.contraindications = [...new Set([...merged.contraindications, ...source.data.contraindications])].slice(0, 10);
+    }
+    if (source.data.brandNames?.length) {
+      merged.brandNames = [...new Set([...merged.brandNames, ...source.data.brandNames])].slice(0, 10);
+    }
+  }
+  
+  // Mark as verified if we have FDA data
+  merged.verified = !!fdaData;
+  
+  // Calculate completeness
+  merged.completeness = calculateCompleteness(merged);
+  
+  const sourceCount = allSources.filter(s => s.data !== null).length;
+  console.log(`✅ Merged data from ${sourceCount}/5 sources, completeness: ${merged.completeness}%`);
+  
+  return merged;
+}
+
+async function collectDrugData(drugName: string): Promise<{
   drugInfo: ComprehensiveDrugInfo;
   searchAttempts: string[];
   sourcesUsed: string[];
@@ -454,28 +563,63 @@ async function searchComprehensiveDrugInfo(drugName: string): Promise<{
   const sourcesUsed: string[] = [];
   
   console.log(`Starting comprehensive search for: ${drugName}`);
+  console.log('🔍 Fetching from 5 data sources in parallel...');
   
-  // Try scraping from multiple sources
-  const [drugsComData, medlinePlusData] = await Promise.allSettled([
+  // 🆕 Try scraping from ALL 5 sources in parallel
+  const [
+    drugsComData,
+    medlinePlusData,
+    fdaData,
+    rxListData,
+    dailyMedData
+  ] = await Promise.allSettled([
     scrapeDrugsCom(drugName),
-    scrapeMedlinePlus(drugName)
+    scrapeMedlinePlus(drugName),
+    scrapeFDAOpenFDA(drugName),
+    scrapeRxList(drugName),
+    scrapeNIHDailyMed(drugName)
   ]);
   
+  // Extract results
   const drugsComResult = drugsComData.status === 'fulfilled' ? drugsComData.value : null;
   const medlinePlusResult = medlinePlusData.status === 'fulfilled' ? medlinePlusData.value : null;
+  const fdaResult = fdaData.status === 'fulfilled' ? fdaData.value : null;
+  const rxListResult = rxListData.status === 'fulfilled' ? rxListData.value : null;
+  const dailyMedResult = dailyMedData.status === 'fulfilled' ? dailyMedData.value : null;
   
+  // Track successful sources
   if (drugsComResult) {
     searchAttempts.push(`Drugs.com: ${drugName}`);
     sourcesUsed.push('Drugs.com');
   }
-  
   if (medlinePlusResult) {
     searchAttempts.push(`MedlinePlus: ${drugName}`);
     sourcesUsed.push('MedlinePlus');
   }
+  if (fdaResult) {
+    searchAttempts.push(`FDA OpenFDA: ${drugName}`);
+    sourcesUsed.push('FDA OpenFDA');
+  }
+  if (rxListResult) {
+    searchAttempts.push(`RxList: ${drugName}`);
+    sourcesUsed.push('RxList');
+  }
+  if (dailyMedResult) {
+    searchAttempts.push(`NIH DailyMed: ${drugName}`);
+    sourcesUsed.push('NIH DailyMed');
+  }
   
-  // Merge data from all sources
-  const drugInfo = mergeMultiSourceData(drugsComResult, medlinePlusResult, drugName);
+  console.log(`✅ Successfully fetched from ${sourcesUsed.length}/5 sources: ${sourcesUsed.join(', ')}`);
+  
+  // 🆕 Merge data from ALL sources
+  const drugInfo = mergeAllSourceData(
+    drugsComResult,
+    medlinePlusResult,
+    fdaResult,
+    rxListResult,
+    dailyMedResult,
+    drugName
+  );
   
   return {
     drugInfo,
@@ -615,25 +759,58 @@ Deno.serve(async (req: Request) => {
 
   try {
     const startTime = performance.now();
-    const { drugName } = await req.json() as { drugName?: string };
+    const { drugName, skipCache } = await req.json() as { drugName?: string; skipCache?: boolean };
 
     if (!drugName || typeof drugName !== 'string' || drugName.trim().length < 2) {
       return createResponse({ error: 'Invalid drug name' }, 400);
     }
 
+    console.log(`\n========== Drug Lookup: ${drugName} ==========`);
+    
+    // NEW: Check cache first (unless skipCache is true)
+    if (!skipCache) {
+      console.log(`🔍 Checking cache for: ${drugName}`);
+      const cachedDrug = await getCachedDrug(drugName);
+      
+      if (cachedDrug && cachedDrug.completeness >= 60) {
+        console.log(`✅ Cache HIT! ${drugName} (${cachedDrug.completeness}% complete)`);
+        const response: ApiResponse = {
+          success: true,
+          data: cachedDrug,
+          searchAttempts: ['Cache lookup'],
+          processingTime: Math.round(performance.now() - startTime),
+          sourcesUsed: Object.keys(cachedDrug.sources).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+          fromCache: true
+        };
+        return createResponse(response, 200);
+      }
+      console.log(`❌ Cache miss or low quality, fetching from APIs...`);
+    }
+
+    // Fetch from multiple sources (existing + new)
     const { drugInfo, searchAttempts, sourcesUsed } = await collectDrugData(drugName);
 
     // Enhance with Gemini
     const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
+
+    // NEW: Save to cache for future use (async, don't block)
+    if (enhancedInfo.completeness >= 30) {
+      console.log(`💾 Saving ${drugName} to cache (${enhancedInfo.completeness}% complete)...`);
+      saveDrugToCache(drugName, enhancedInfo, sourcesUsed)
+        .then(() => console.log(`✅ Cached ${drugName}`))
+        .catch(err => console.error('⚠️ Cache save failed:', err));
+    }
 
     const response: ApiResponse = {
       success: true,
       data: enhancedInfo,
       searchAttempts,
       processingTime: Math.round(performance.now() - startTime),
-      sourcesUsed
+      sourcesUsed,
+      fromCache: false
     };
 
+    console.log(`Response: ${sourcesUsed.length} sources, ${enhancedInfo.completeness}% complete`);
     return createResponse(response, 200);
   } catch (error) {
     console.error('Drug info processing error:', error);
