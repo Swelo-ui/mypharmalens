@@ -33,6 +33,30 @@ const FAQ = () => {
           "@type": "Answer",
           "text": "No, PharmaLens is an information tool only and should not be used as a substitute for professional medical advice. Always consult with a qualified healthcare provider."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the Symptoms Checker work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Symptoms Checker uses AI to analyze your symptoms and provide personalized medication recommendations. Select your symptoms from organized categories, and our system will suggest appropriate first-line treatments based on evidence-based medical guidelines."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Drug Interaction Checker and why is it important?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Drug Interaction Checker is a safety tool that analyzes potential risks when combining medications. It can detect dangerous interactions that could cause serious side effects, reduce medication effectiveness, or require special monitoring."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What subscription plans are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PharmaLens offers three plans: Free (₹0/month), Weekly (₹39/week), and Premium (₹199/month) with varying features including AI identifications, database access, and advanced tools."
+        }
       }
     ]
   };
@@ -100,6 +124,76 @@ const FAQ = () => {
               <AccordionTrigger>How can I report an incorrect identification?</AccordionTrigger>
               <AccordionContent>
                 If you believe our system has misidentified a medication, please use the feedback button on the results page or contact us through our Help Center. Your feedback helps us improve our AI models and database accuracy.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-8">
+              <AccordionTrigger>How does the Symptoms Checker work?</AccordionTrigger>
+              <AccordionContent>
+                Our Symptoms Checker uses AI to analyze your symptoms and provide personalized medication recommendations. Select your symptoms from organized categories (Headache, Fever, Digestive, etc.), and our system will suggest appropriate first-line treatments based on evidence-based medical guidelines. The recommendations include both brand and generic names with clear explanations in layman terms.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-9">
+              <AccordionTrigger>What is the Drug Interaction Checker and why is it important?</AccordionTrigger>
+              <AccordionContent>
+                The Drug Interaction Checker is a safety tool that analyzes potential risks when combining medications. It can detect dangerous interactions that could cause serious side effects, reduce medication effectiveness, or require special monitoring. The tool provides information about onset timing, severity levels, and what actions to take. You can toggle between simple terms and medical terminology for better understanding.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-10">
+              <AccordionTrigger>What subscription plans are available?</AccordionTrigger>
+              <AccordionContent>
+                PharmaLens offers three plans: Free (₹0/month) with 100 drugs database search and 5 AI identifications; Weekly (₹39/week) with 21 AI identifications and 500+ medicines database; Premium (₹199/month) with unlimited AI identifications, 1000+ database drugs, layman explanations, history feature, and advanced search filters. All plans include mobile web app access and basic drug information.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-11">
+              <AccordionTrigger>Is PharmaLens available as a mobile app?</AccordionTrigger>
+              <AccordionContent>
+                Currently, PharmaLens is available as a mobile-optimized web application that works seamlessly on all devices including smartphones, tablets, and desktops. You can access all features through your mobile browser with a native app-like experience. We are exploring native mobile app development for future releases.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-12">
+              <AccordionTrigger>How accurate is the AI identification system?</AccordionTrigger>
+              <AccordionContent>
+                Our AI identification system maintains a 99.5% accuracy rate across our database of 1000+ medications. The system is trained on large datasets of medication images and continuously improved based on user feedback. Accuracy depends on image quality, lighting conditions, and whether the medication is in our database. For best results, follow our photography guidelines.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-13">
+              <AccordionTrigger>Can I use PharmaLens for emergency situations?</AccordionTrigger>
+              <AccordionContent>
+                While PharmaLens provides quick medication identification and safety information, it should NOT be used as the primary tool in medical emergencies. For poisoning, overdose, or serious adverse reactions, immediately contact emergency services (911/108) or poison control. PharmaLens is designed for educational purposes and routine medication management, not emergency medical care.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-14">
+              <AccordionTrigger>How do I access my identification history?</AccordionTrigger>
+              <AccordionContent>
+                The identification history feature is available for Premium subscribers (₹199/month). Once subscribed, all your medication identifications and searches are automatically saved in your account. You can access your history from the main menu, view past results, and quickly re-access previously identified medications. This feature helps track your medication queries over time.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-15">
+              <AccordionTrigger>What payment methods are supported?</AccordionTrigger>
+              <AccordionContent>
+                PharmaLens supports secure payments through PhonePe, India's leading digital payment platform. You can pay using UPI, debit/credit cards, net banking, and digital wallets. All transactions are processed securely with 256-bit SSL encryption. Payment confirmations are instant, and your subscription activates immediately upon successful payment.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-16">
+              <AccordionTrigger>How often is the medication database updated?</AccordionTrigger>
+              <AccordionContent>
+                Our medication database is updated continuously with new medications, safety information, and drug interactions. We source data from trusted pharmaceutical databases including Drugs.com and national drug formularies. Updates include new drug approvals, safety alerts, recall information, and revised dosing guidelines. Premium users get priority access to the latest database updates.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-17">
+              <AccordionTrigger>Can healthcare professionals use PharmaLens?</AccordionTrigger>
+              <AccordionContent>
+                Yes, PharmaLens is designed for both consumers and healthcare professionals. Medical professionals can use it as a quick reference tool for medication identification, interaction checking, and patient education. The platform provides both layman terms and medical terminology, making it suitable for explaining medications to patients. However, it should complement, not replace, professional medical judgment and established clinical protocols.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

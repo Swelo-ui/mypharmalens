@@ -8,7 +8,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/use-mobile';
-import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain, Clock, Crown, ArrowRight } from 'lucide-react';
+import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain, Clock, Crown, ArrowRight, Stethoscope, AlertTriangle, Users, TrendingUp, Activity, Zap } from 'lucide-react';
 
 const Index = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -164,6 +164,157 @@ const Index = () => {
                 Try It Now
                 <ChevronRight className="h-4 w-4 ml-2" />
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Advanced Features Section */}
+        <section className="py-20 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center mb-16 animate-on-scroll">
+              <div className="inline-block mb-3">
+                <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800">
+                  Advanced Features
+                </span>
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Comprehensive Healthcare Tools</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Beyond medication identification, PharmaLens offers powerful tools to help you understand symptoms and check for dangerous drug interactions.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-stretch">
+              {/* Symptoms Checker Feature */}
+              <div className="animate-on-scroll h-full">
+                <div className="bg-gradient-to-br from-pharma-50 to-pharma-100 dark:from-pharma-900/20 dark:to-pharma-800/20 rounded-2xl p-6 sm:p-8 shadow-lg border border-pharma-200 dark:border-pharma-800 flex flex-col h-full">
+                  <div className="flex items-center mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-pharma-600 flex items-center justify-center mr-4">
+                      <Stethoscope className="h-7 w-7 sm:h-8 sm:w-8 text-white flex-shrink-0" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-pharma-900 dark:text-pharma-100">Symptoms Checker</h3>
+                      <p className="text-pharma-700 dark:text-pharma-300">AI-powered symptom analysis</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 break-words">
+                    Get personalized medication recommendations based on your symptoms. Our intelligent system analyzes your symptoms and suggests appropriate first-line treatments from our comprehensive database.
+                  </p>
+                  
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-pharma-900 dark:text-pharma-100">Professional Categories</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Organized by medical specialties: Headache, Fever, Digestive, Respiratory, and more</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
+                        <TrendingUp className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-pharma-900 dark:text-pharma-100">First-Line Treatments</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Evidence-based medication recommendations for common symptoms</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
+                        <Users className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-pharma-900 dark:text-pharma-100">Layman-Friendly</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Clear explanations in simple terms for better understanding</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link to="/symptom-checker" className="mt-auto inline-flex items-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg hover:shadow-xl hover:shadow-pharma-600/20">
+                    Try Symptoms Checker
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Drug Interactions Feature */}
+              <div className="animate-on-scroll delay-150 h-full">
+                <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl p-6 sm:p-8 shadow-lg border border-red-200 dark:border-red-800 flex flex-col h-full">
+                  <div className="flex items-center mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-600 flex items-center justify-center mr-4">
+                      <AlertTriangle className="h-7 w-7 sm:h-8 sm:w-8 text-white flex-shrink-0" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-100">Drug Interactions</h3>
+                      <p className="text-red-700 dark:text-red-300">Safety-first interaction checking</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 break-words">
+                    Protect yourself from dangerous drug combinations. Our comprehensive interaction checker analyzes potential risks between medications and provides clear safety guidance.
+                  </p>
+                  
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
+                        <Zap className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-red-900 dark:text-red-100">Real-Time Analysis</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Instant detection of potentially harmful drug combinations</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
+                        <Activity className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-red-900 dark:text-red-100">Clinical Metadata</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Onset timing, monitoring requirements, and severity levels</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
+                        <Users className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-red-900 dark:text-red-100">Simple & Medical Terms</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Toggle between layman terms and medical terminology</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link to="/drug-interactions" className="mt-auto inline-flex items-center px-6 py-3 rounded-full bg-red-600 text-white font-medium hover:bg-red-700 transition-all shadow-lg hover:shadow-xl hover:shadow-red-600/20">
+                    Check Interactions
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            {/* Feature Statistics */}
+            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 animate-on-scroll">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pharma-600 mb-2">50+</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Symptom Categories</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pharma-600 mb-2">1000+</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Drug Interactions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pharma-600 mb-2">99.9%</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Safety Accuracy</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pharma-600 mb-2">24/7</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Available</div>
+              </div>
             </div>
           </div>
         </section>

@@ -99,7 +99,7 @@ const HelpCenter = () => {
               </Link>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-3 sm:mb-4">
                 <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-pharma-600" />
               </div>
@@ -109,6 +109,38 @@ const HelpCenter = () => {
               </p>
               <Link 
                 to="/help/results" 
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
+              >
+                Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+              </Link>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3 sm:mb-4">
+                <Search className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+              </div>
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Symptoms Checker</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+                Learn how to use our AI-powered symptom analysis for medication recommendations.
+              </p>
+              <Link 
+                to="/help/article/7" 
+                className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
+              >
+                Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+              </Link>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3 sm:mb-4">
+                <Search className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
+              </div>
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Drug Interactions</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+                Understanding drug interactions and how to use our safety checker effectively.
+              </p>
+              <Link 
+                to="/help/article/8" 
                 className="text-pharma-600 hover:text-pharma-700 inline-flex items-center text-xs sm:text-sm font-medium"
               >
                 Read guides <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />

@@ -8,7 +8,7 @@ export interface HelpArticle {
   id: string;
   title: string;
   content: string;
-  category: 'visual-identification' | 'searching' | 'results' | 'general';
+  category: 'visual-identification' | 'searching' | 'results' | 'general' | 'symptoms-checker' | 'drug-interactions';
   createdAt: string;
 }
 
@@ -198,6 +198,286 @@ export const helpArticles: HelpArticle[] = [
     `,
     category: 'general',
     createdAt: '2024-03-01'
+  },
+  {
+    id: '7',
+    title: 'Using the Symptoms Checker effectively',
+    content: `
+      <h2>Using the Symptoms Checker effectively</h2>
+      
+      <p>The PharmaLens Symptoms Checker is an AI-powered tool that helps you find appropriate medications based on your symptoms. Here's how to use it effectively:</p>
+      
+      <h3>Getting Started:</h3>
+      
+      <ol>
+        <li><strong>Navigate to the Symptoms Checker</strong> from the main menu or home page</li>
+        <li><strong>Browse symptom categories</strong> organized by medical specialties</li>
+        <li><strong>Select your primary symptom</strong> from categories like Headache, Fever, Digestive, Respiratory, etc.</li>
+        <li><strong>Review recommendations</strong> for first-line treatments</li>
+      </ol>
+      
+      <h3>Available Symptom Categories:</h3>
+      
+      <ul>
+        <li><strong>HEAD:</strong> Headaches, migraines, tension headaches</li>
+        <li><strong>FEVER:</strong> General fever, body aches, chills</li>
+        <li><strong>DIGESTIVE:</strong> Nausea, vomiting, stomach pain, acid reflux</li>
+        <li><strong>RESPIRATORY:</strong> Cough, cold, congestion, breathing issues</li>
+        <li><strong>SKIN:</strong> Allergies, rashes, itching, skin conditions</li>
+        <li><strong>JOINTS:</strong> Joint pain, muscle aches, arthritis symptoms</li>
+        <li><strong>ENT:</strong> Ear, nose, throat problems</li>
+        <li><strong>UTI:</strong> Urinary tract infections and related symptoms</li>
+      </ul>
+      
+      <h3>Understanding Recommendations:</h3>
+      
+      <p>For each symptom, the system provides:</p>
+      
+      <ul>
+        <li><strong>First-line treatments:</strong> Evidence-based medication recommendations</li>
+        <li><strong>Brand and generic names:</strong> Both commercial and generic options</li>
+        <li><strong>Layman explanations:</strong> Clear descriptions of how medications work</li>
+        <li><strong>Usage guidelines:</strong> Basic information about proper use</li>
+      </ul>
+      
+      <h3>Important Safety Notes:</h3>
+      
+      <ul>
+        <li>Always consult a healthcare professional before starting any new medication</li>
+        <li>Check for allergies and existing medical conditions</li>
+        <li>Review potential drug interactions if you're taking other medications</li>
+        <li>Follow dosage instructions on medication packaging</li>
+        <li>Seek immediate medical attention for severe or persistent symptoms</li>
+      </ul>
+      
+      <p>The Symptoms Checker is designed to provide educational information and should not replace professional medical advice or diagnosis.</p>
+    `,
+    category: 'symptoms-checker',
+    createdAt: '2024-03-15'
+  },
+  {
+    id: '8',
+    title: 'Understanding Drug Interactions and Safety',
+    content: `
+      <h2>Understanding Drug Interactions and Safety</h2>
+      
+      <p>The Drug Interaction Checker is a critical safety tool that helps prevent dangerous medication combinations. Understanding how to use it can protect you from serious health risks.</p>
+      
+      <h3>How to Use the Drug Interaction Checker:</h3>
+      
+      <ol>
+        <li><strong>Access the tool</strong> from the main menu or home page</li>
+        <li><strong>Enter your medications</strong> by typing drug names in the search fields</li>
+        <li><strong>Add multiple drugs</strong> to check for interactions between all combinations</li>
+        <li><strong>Review results</strong> which show potential interactions with severity levels</li>
+        <li><strong>Toggle between views</strong> using the "Simple terms" switch for easier understanding</li>
+      </ol>
+      
+      <h3>Types of Drug Interactions:</h3>
+      
+      <ul>
+        <li><strong>Major Interactions:</strong> Potentially life-threatening combinations that should be avoided</li>
+        <li><strong>Moderate Interactions:</strong> Combinations that may require monitoring or dose adjustments</li>
+        <li><strong>Minor Interactions:</strong> Generally safe combinations with minimal risk</li>
+      </ul>
+      
+      <h3>Understanding Interaction Information:</h3>
+      
+      <p>For each interaction, you'll see:</p>
+      
+      <ul>
+        <li><strong>What Happens:</strong> Description of the interaction effect</li>
+        <li><strong>What To Do:</strong> Recommended actions and precautions</li>
+        <li><strong>Onset Timing:</strong> How quickly the interaction may occur (Rapid, Delayed, etc.)</li>
+        <li><strong>Monitoring:</strong> What to watch for or tests that may be needed</li>
+        <li><strong>Alternative Options:</strong> Safer medication alternatives when available</li>
+      </ul>
+      
+      <h3>Layman vs. Medical Terms:</h3>
+      
+      <p>The tool offers two viewing modes:</p>
+      
+      <ul>
+        <li><strong>Simple Terms (Default):</strong> Patient-friendly language like "Both medicines thin your blood"</li>
+        <li><strong>Medical Terms:</strong> Professional terminology like "Additive antiplatelet/anticoagulant effect"</li>
+      </ul>
+      
+      <h3>Common Dangerous Interactions:</h3>
+      
+      <ul>
+        <li><strong>Blood thinners + NSAIDs:</strong> Increased bleeding risk</li>
+        <li><strong>Sedatives + Alcohol:</strong> Dangerous central nervous system depression</li>
+        <li><strong>MAOIs + SSRIs:</strong> Risk of serotonin syndrome</li>
+        <li><strong>ACE inhibitors + Potassium supplements:</strong> Dangerous potassium levels</li>
+      </ul>
+      
+      <h3>When to Seek Help:</h3>
+      
+      <ul>
+        <li>If you discover a major interaction between your current medications</li>
+        <li>Before starting any new medication while taking others</li>
+        <li>If you experience unexpected side effects from medication combinations</li>
+        <li>When switching between similar medications</li>
+      </ul>
+      
+      <p>Remember: This tool provides educational information but should not replace consultation with your healthcare provider or pharmacist about medication safety.</p>
+    `,
+    category: 'drug-interactions',
+    createdAt: '2024-03-15'
+  },
+  {
+    id: '9',
+    title: 'Maximizing your PharmaLens subscription benefits',
+    content: `
+      <h2>Maximizing your PharmaLens subscription benefits</h2>
+      
+      <p>PharmaLens offers different subscription tiers to meet various needs. Here's how to get the most value from your subscription:</p>
+      
+      <h3>Free Plan Benefits (₹0/month):</h3>
+      
+      <ul>
+        <li><strong>100 drugs database search:</strong> Access basic information for common medications</li>
+        <li><strong>5 AI identifications per month:</strong> Use camera feature for pill identification</li>
+        <li><strong>Basic drug information:</strong> Essential details about medications</li>
+        <li><strong>Mobile web app access:</strong> Use on any device with internet</li>
+      </ul>
+      
+      <h3>Weekly Plan Benefits (₹39/week):</h3>
+      
+      <ul>
+        <li><strong>All Free Plan features</strong></li>
+        <li><strong>21 AI identifications per week:</strong> More frequent use of camera identification</li>
+        <li><strong>500+ medicines database:</strong> Expanded medication coverage</li>
+        <li><strong>Priority support:</strong> Faster response to queries and issues</li>
+        <li><strong>No ads:</strong> Uninterrupted, clean user experience</li>
+      </ul>
+      
+      <h3>Premium Plan Benefits (₹199/month):</h3>
+      
+      <ul>
+        <li><strong>All Weekly Plan features</strong></li>
+        <li><strong>Unlimited AI identifications:</strong> No restrictions on camera use</li>
+        <li><strong>1000+ database drugs:</strong> Comprehensive medication coverage</li>
+        <li><strong>Layman explanations:</strong> Simplified medical terminology</li>
+        <li><strong>History feature:</strong> Track all your searches and identifications</li>
+        <li><strong>Advanced search filters:</strong> More precise medication searches</li>
+      </ul>
+      
+      <h3>Tips to Maximize Value:</h3>
+      
+      <ul>
+        <li><strong>Use the history feature</strong> (Premium) to track medications for family members</li>
+        <li><strong>Take advantage of unlimited identifications</strong> (Premium) for medicine cabinet audits</li>
+        <li><strong>Utilize advanced search filters</strong> (Premium) to find specific formulations</li>
+        <li><strong>Enable layman explanations</strong> (Premium) for better understanding</li>
+        <li><strong>Use priority support</strong> (Weekly/Premium) for quick assistance</li>
+      </ul>
+      
+      <h3>Payment and Billing:</h3>
+      
+      <ul>
+        <li><strong>Secure PhonePe integration:</strong> Pay with UPI, cards, or digital wallets</li>
+        <li><strong>Instant activation:</strong> Features unlock immediately after payment</li>
+        <li><strong>Flexible billing:</strong> Choose weekly or monthly based on usage patterns</li>
+        <li><strong>Easy cancellation:</strong> Cancel anytime through your account settings</li>
+      </ul>
+      
+      <h3>Choosing the Right Plan:</h3>
+      
+      <ul>
+        <li><strong>Free Plan:</strong> Occasional users, basic medication lookups</li>
+        <li><strong>Weekly Plan:</strong> Regular users, short-term needs, trying premium features</li>
+        <li><strong>Premium Plan:</strong> Power users, families, healthcare professionals, comprehensive needs</li>
+      </ul>
+      
+      <p>Consider upgrading if you find yourself hitting usage limits or needing more detailed information regularly.</p>
+    `,
+    category: 'general',
+    createdAt: '2024-03-20'
+  },
+  {
+    id: '10',
+    title: 'Mobile optimization and cross-device usage',
+    content: `
+      <h2>Mobile optimization and cross-device usage</h2>
+      
+      <p>PharmaLens is designed as a mobile-first web application that works seamlessly across all devices. Here's how to get the best experience:</p>
+      
+      <h3>Mobile Web App Features:</h3>
+      
+      <ul>
+        <li><strong>Responsive design:</strong> Optimized layouts for phones, tablets, and desktops</li>
+        <li><strong>Touch-friendly interface:</strong> Large buttons and easy navigation</li>
+        <li><strong>Camera integration:</strong> Direct access to device camera for pill identification</li>
+        <li><strong>Offline-ready design:</strong> Minimal data usage and fast loading</li>
+        <li><strong>Progressive Web App (PWA):</strong> App-like experience in your browser</li>
+      </ul>
+      
+      <h3>Installing as a Web App:</h3>
+      
+      <p><strong>On Android:</strong></p>
+      <ol>
+        <li>Open PharmaLens in Chrome browser</li>
+        <li>Tap the menu (three dots) in the top right</li>
+        <li>Select "Add to Home screen"</li>
+        <li>Confirm installation</li>
+      </ol>
+      
+      <p><strong>On iPhone:</strong></p>
+      <ol>
+        <li>Open PharmaLens in Safari browser</li>
+        <li>Tap the Share button (square with arrow)</li>
+        <li>Select "Add to Home Screen"</li>
+        <li>Confirm installation</li>
+      </ol>
+      
+      <h3>Cross-Device Synchronization:</h3>
+      
+      <ul>
+        <li><strong>Account-based sync:</strong> Your subscription and history sync across devices</li>
+        <li><strong>Universal access:</strong> Use the same account on phone, tablet, and computer</li>
+        <li><strong>Consistent experience:</strong> Same features and interface across all devices</li>
+      </ul>
+      
+      <h3>Optimizing Camera Usage:</h3>
+      
+      <ul>
+        <li><strong>Good lighting:</strong> Use natural light or bright indoor lighting</li>
+        <li><strong>Steady hands:</strong> Hold device steady for clear photos</li>
+        <li><strong>Clean lens:</strong> Wipe camera lens for better image quality</li>
+        <li><strong>Proper distance:</strong> Get close enough to see pill details clearly</li>
+      </ul>
+      
+      <h3>Data Usage and Performance:</h3>
+      
+      <ul>
+        <li><strong>Optimized images:</strong> Compressed uploads to save data</li>
+        <li><strong>Efficient caching:</strong> Frequently accessed data stored locally</li>
+        <li><strong>Fast loading:</strong> Optimized for both WiFi and mobile data</li>
+        <li><strong>Battery efficient:</strong> Minimal background processing</li>
+      </ul>
+      
+      <h3>Troubleshooting Common Issues:</h3>
+      
+      <ul>
+        <li><strong>Camera not working:</strong> Check browser permissions for camera access</li>
+        <li><strong>Slow loading:</strong> Clear browser cache or try incognito mode</li>
+        <li><strong>Layout issues:</strong> Refresh page or try different browser</li>
+        <li><strong>Login problems:</strong> Clear cookies and log in again</li>
+      </ul>
+      
+      <h3>Browser Compatibility:</h3>
+      
+      <ul>
+        <li><strong>Recommended:</strong> Chrome, Safari, Firefox, Edge (latest versions)</li>
+        <li><strong>Mobile:</strong> Chrome Mobile, Safari Mobile, Samsung Internet</li>
+        <li><strong>Features:</strong> All modern browsers support full functionality</li>
+      </ul>
+      
+      <p>For the best experience, keep your browser updated and ensure you have a stable internet connection when using AI identification features.</p>
+    `,
+    category: 'general',
+    createdAt: '2024-03-25'
   }
 ];
 
