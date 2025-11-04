@@ -984,7 +984,7 @@ function combineStageResults(stages: ProcessingStage[]): CombinedResult | null {
 }
 
 // Main serve function
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -1010,13 +1010,24 @@ serve(async (req) => {
 
     console.log('Starting enhanced drug identification pipeline...');
 
-    // Stage 1: Text Extraction
-    const textExtractionStage = await stageTextExtraction(imageBase64);
-    stages.push(textExtractionStage);
+    // Stage 1: Text Extraction (Optional - non-blocking)
+    let extractedText: string | undefined;
+    try {
+      const textExtractionStage = await stageTextExtraction(imageBase64);
+      stages.push(textExtractionStage);
+      const texData = textExtractionStage.success ? (textExtractionStage.data as TextExtractionData | undefined) : undefined;
+      extractedText = texData?.extractedText ?? texData?.text;
+    } catch (error) {
+      console.warn('⚠️ Text extraction failed, continuing without it:', error);
+      stages.push({
+        name: 'text-extraction',
+        success: false,
+        processingTime: 0,
+        error: 'Text extraction unavailable'
+      });
+    }
 
     // Stage 2: Gemini Analysis
-    const texData = textExtractionStage.success ? (textExtractionStage.data as TextExtractionData | undefined) : undefined;
-    const extractedText = texData?.extractedText ?? texData?.text;
     const geminiStage = await stageGeminiAnalysis(imageBase64, extractedText);
     stages.push(geminiStage);
 
@@ -1071,6 +1082,13 @@ serve(async (req) => {
     }
 
     // Combine results from all stages
+    console.log(`\n📊 === STAGE SUMMARY ===`);
+    console.log(`   Total stages: ${stages.length}`);
+    stages.forEach(stage => {
+      console.log(`   - ${stage.name}: ${stage.success ? '✅ SUCCESS' : '❌ FAILED'}${stage.error ? ` (${stage.error})` : ''}`);
+    });
+    console.log(`📊 === END STAGE SUMMARY ===\n`);
+    
     const combinedResult = combineStageResults(stages);
 
     if (combinedResult) {
@@ -1125,7 +1143,7 @@ serve(async (req) => {
     
     const result: DrugIdentificationResult = {
       success: false,
-      error: error.message || "Unknown error occurred",
+      error: (error as Error).message || "Unknown error occurred",
       processingStages: stages.map(s => s.name),
       confidence: 'low',
       fallbackUsed: false,
