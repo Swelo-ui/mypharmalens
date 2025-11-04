@@ -1,12 +1,23 @@
 // Cache integration module for enhanced-drug-identify
 // Add this to enhanced-drug-identify/index.ts to enable caching
 
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno?.env?.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+// Log credentials status (without exposing actual keys)
+console.log(`🔑 Cache module initialized:`);
+console.log(`   SUPABASE_URL present: ${!!SUPABASE_URL}`);
+console.log(`   SUPABASE_SERVICE_ROLE_KEY present: ${!!SUPABASE_SERVICE_ROLE_KEY}`);
+console.log(`   URL length: ${SUPABASE_URL?.length || 0}`);
+console.log(`   Key length: ${SUPABASE_SERVICE_ROLE_KEY?.length || 0}`);
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('⚠️ WARNING: Supabase credentials missing! Cache will not work.');
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -20,7 +31,9 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
   }
 
   try {
-    console.log(`🔍 Checking cache for: ${drugName}`);
+    console.log(`\n🔍 === CACHE CHECK START (enhanced-drug-identify) ===`);
+    console.log(`   Drug name: ${drugName}`);
+    console.log(`   Calling RPC: get_cached_drug`);
     
     const { data, error } = await supabase
       .rpc('get_cached_drug', {
@@ -29,18 +42,35 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
         p_imprint: null
       })
       .single();
+    
+    console.log(`   RPC call completed`);
 
-    if (error || !data) {
-      console.log('❌ Cache miss');
+    if (error) {
+      console.error(`🔴 RPC get_cached_drug FAILED:`);
+      console.error(`   Error code: ${error.code}`);
+      console.error(`   Error message: ${error.message}`);
+      console.error(`   Error details:`, JSON.stringify(error, null, 2));
+      console.log(`🔍 === CACHE CHECK END (ERROR) ===\n`);
       return null;
     }
 
+    if (!data) {
+      console.log(`❌ No cache entry found for: ${drugName}`);
+      console.log(`🔍 === CACHE CHECK END (MISS) ===\n`);
+      return null;
+    }
+
+    console.log(`📊 Cache entry found:`);
+    console.log(`   Completeness: ${data.completeness_score}%`);
+    console.log(`   Access count: ${data.access_count}`);
+    
     // Only use cache if completeness is good (>= 50%)
     if (data.completeness_score >= 50) {
-      console.log(`✅ Cache HIT! ${drugName} (${data.completeness_score}% complete)`);
+      console.log(`✅ Cache HIT! Returning cached data`);
+      console.log(`🔍 === CACHE CHECK END (HIT) ===\n`);
       
       // Transform to expected format
-      return {
+      const transformedData = {
         id: data.id,
         name: data.drug_name,
         genericName: data.generic_name || '',
@@ -67,12 +97,18 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
         fromCache: true,
         cacheCompleteness: data.completeness_score
       };
+      return transformedData;
     } else {
-      console.log(`⚠️ Cache found but low quality (${data.completeness_score}%), re-analyzing...`);
+      console.log(`⚠️ Cache found but low quality (${data.completeness_score}% < 50%)`);
+      console.log(`🔍 === CACHE CHECK END (LOW QUALITY) ===\n`);
       return null;
     }
   } catch (error) {
-    console.error('Cache check error:', error);
+    console.error('🔴 Cache check EXCEPTION:', error);
+    if (error && typeof error === 'object') {
+      console.error('   Error details:', JSON.stringify(error, null, 2));
+    }
+    console.log(`🔍 === CACHE CHECK END (EXCEPTION) ===\n`);
     return null;
   }
 }
@@ -111,41 +147,58 @@ export async function saveDrugToCache(drugData: any): Promise<void> {
 
     console.log(`💾 Saving ${drugName} to cache (${completeness}% complete)`);
 
+    // Prepare data in exact format expected by save_drug_to_cache RPC
     const cacheData = {
-      genericName: drugData.genericName || null,
-      manufacturer: drugData.manufacturer || null,
-      category: drugData.category || null,
-      drugClass: drugData.drugClass || null,
-      description: drugData.description || null,
-      dosageAndAdmin: drugData.dosageAndAdmin || null,
-      sideEffects: drugData.sideEffects || [],
-      warnings: drugData.warnings || [],
-      interactions: drugData.interactions || [],
-      storage: drugData.storage || null,
-      mechanism: drugData.mechanism || null,
-      indications: drugData.indications || [],
-      contraindications: drugData.contraindications || [],
+      genericName: drugData.genericName || '',
+      manufacturer: drugData.manufacturer || '',
+      category: drugData.category || '',
+      drugClass: drugData.drugClass || '',
+      description: drugData.description || '',
+      dosageAndAdmin: drugData.dosageAndAdmin || '',
+      sideEffects: Array.isArray(drugData.sideEffects) ? drugData.sideEffects : [],
+      warnings: Array.isArray(drugData.warnings) ? drugData.warnings : [],
+      interactions: Array.isArray(drugData.interactions) ? drugData.interactions : [],
+      storage: drugData.storage || '',
+      mechanism: drugData.mechanism || '',
+      indications: Array.isArray(drugData.indications) ? drugData.indications : [],
+      contraindications: Array.isArray(drugData.contraindications) ? drugData.contraindications : [],
       prescriptionStatus: drugData.prescriptionStatus || 'Unknown',
-      pregnancy: drugData.pregnancy || null,
-      brandNames: drugData.brandNames || [],
-      imprint: drugData.imprint || null,
-      color: drugData.color || null,
-      shape: drugData.shape || null,
-      sourcesUsed: drugData.processingStages || [],
+      pregnancy: drugData.pregnancy || '',
+      brandNames: Array.isArray(drugData.brandNames) ? drugData.brandNames : [],
+      imprint: drugData.imprint || '',
+      color: drugData.color || '',
+      shape: drugData.shape || '',
+      sourcesUsed: Array.isArray(drugData.processingStages) ? drugData.processingStages : ['enhanced-drug-identify'],
       completeness: completeness,
-      verified: drugData.verified || false,
+      verified: Boolean(drugData.verified),
       confidence: drugData.confidence || 'medium'
     };
 
-    await supabase.rpc('save_drug_to_cache', {
+    console.log(`📤 Calling save_drug_to_cache RPC...`);
+    console.log(`   Drug name: ${drugName}`);
+    console.log(`   Completeness: ${completeness}%`);
+    
+    const { data, error } = await supabase.rpc('save_drug_to_cache', {
       p_drug_name: drugName,
       p_drug_data: cacheData
     });
 
+    if (error) {
+      console.error(`🔴 RPC save_drug_to_cache FAILED:`);
+      console.error(`   Error code: ${error.code}`);
+      console.error(`   Error message: ${error.message}`);
+      console.error(`   Error details:`, JSON.stringify(error, null, 2));
+      throw error;
+    }
+
     console.log(`✅ Saved ${drugName} to cache successfully`);
+    console.log(`   Cache ID: ${data}`);
   } catch (error) {
-    console.error('Cache save error:', error);
-    // Don't throw - caching is not critical
+    console.error('🔴 Cache save EXCEPTION:', error);
+    if (error && typeof error === 'object') {
+      console.error('   Error details:', JSON.stringify(error, null, 2));
+    }
+    // Don't throw - caching is not critical, but log extensively
   }
 }
 

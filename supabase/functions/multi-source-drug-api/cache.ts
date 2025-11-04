@@ -1,6 +1,6 @@
 // Cache helper functions for Supabase drug identification cache
-import { createClient } from 'npm:@supabase/supabase-js@2';
-import type { ComprehensiveDrugInfo, CachedDrugData } from './types';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import type { ComprehensiveDrugInfo, CachedDrugData } from './types.ts';
 
 // Declare Deno env
 declare const Deno: { env: { get: (key: string) => string | undefined } };

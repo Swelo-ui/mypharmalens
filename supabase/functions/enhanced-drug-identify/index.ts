@@ -1,7 +1,7 @@
 // @ts-expect-error - Remote Deno std HTTP import in Edge runtime
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { checkDrugCache, saveDrugToCache } from './cache-integration';
+import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 
 // Narrow declaration for Deno env access when type information isn't available
 declare const Deno: { env: { get: (key: string) => string | undefined } };
@@ -229,7 +229,7 @@ OUTPUT FORMAT (JSON only):
 
 Analyze the image and respond with JSON only:`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -256,7 +256,12 @@ Analyze the image and respond with JSON only:`;
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+      const errorBody = await response.text();
+      console.error(`🔴 Gemini API error: ${response.status} ${response.statusText}`);
+      console.error(`   Error body: ${errorBody}`);
+      console.error(`   API key present: ${!!GEMINI_API_KEY}`);
+      console.error(`   API key length: ${GEMINI_API_KEY?.length || 0}`);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorBody}`);
     }
 
     const result = await response.json();
@@ -1071,10 +1076,23 @@ serve(async (req) => {
     if (combinedResult) {
       // NEW: Save successful identification to cache (async, don't block response)
       if (combinedResult.name && combinedResult.name !== 'Unknown Medication' && !combinedResult.name.toLowerCase().includes('unknown')) {
-        console.log(`💾 Saving ${combinedResult.name} to cache...`);
-        saveDrugToCache(combinedResult).catch(err => 
-          console.error('⚠️ Cache save failed (non-critical):', err)
-        );
+        console.log(`\n💾 === ATTEMPTING CACHE SAVE ===`);
+        console.log(`   Drug name: ${combinedResult.name}`);
+        console.log(`   Has description: ${!!combinedResult.description}`);
+        console.log(`   Has genericName: ${!!combinedResult.genericName}`);
+        console.log(`   Processing stages: ${combinedResult.processingStages?.join(', ')}`);
+        
+        saveDrugToCache(combinedResult).catch(err => {
+          console.error('🔴 === CACHE SAVE FAILED ===');
+          console.error('   Error:', err);
+          console.error('   Error message:', err?.message);
+          console.error('   Error stack:', err?.stack);
+          console.error('💾 === CACHE SAVE END (FAILED) ===\n');
+        });
+      } else {
+        console.log(`⚠️ Skipping cache save:`);
+        console.log(`   Name: ${combinedResult?.name}`);
+        console.log(`   Reason: ${!combinedResult?.name ? 'No name' : 'Name is unknown/invalid'}`);
       }
       
       const result: DrugIdentificationResult = {

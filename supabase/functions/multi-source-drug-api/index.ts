@@ -1,8 +1,8 @@
 // Multi-Source Drug Information API with Caching
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { getCachedDrug, saveDrugToCache } from './cache';
-import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers';
+import { getCachedDrug, saveDrugToCache } from './cache.ts';
+import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers.ts';
 
 // Declare Deno for edge runtime
 declare const Deno: {
@@ -562,8 +562,13 @@ async function collectDrugData(drugName: string): Promise<{
   const searchAttempts: string[] = [];
   const sourcesUsed: string[] = [];
   
-  console.log(`Starting comprehensive search for: ${drugName}`);
+  console.log(`\n🌐 === DATA COLLECTION START === for: ${drugName}`);
   console.log('🔍 Fetching from 5 data sources in parallel...');
+  console.log(`   1. Drugs.com`);
+  console.log(`   2. MedlinePlus`);
+  console.log(`   3. FDA OpenFDA`);
+  console.log(`   4. RxList`);
+  console.log(`   5. NIH DailyMed`);
   
   // 🆕 Try scraping from ALL 5 sources in parallel
   const [
@@ -609,9 +614,18 @@ async function collectDrugData(drugName: string): Promise<{
     sourcesUsed.push('NIH DailyMed');
   }
   
-  console.log(`✅ Successfully fetched from ${sourcesUsed.length}/5 sources: ${sourcesUsed.join(', ')}`);
+  console.log(`\n📊 === SCRAPING RESULTS ===`);
+  console.log(`   ✅ Successful: ${sourcesUsed.length}/5`);
+  console.log(`   📝 Sources: ${sourcesUsed.join(', ')}`);
+  
+  if (drugsComData.status === 'rejected') console.error(`   ❌ Drugs.com failed:`, drugsComData.reason);
+  if (medlinePlusData.status === 'rejected') console.error(`   ❌ MedlinePlus failed:`, medlinePlusData.reason);
+  if (fdaData.status === 'rejected') console.error(`   ❌ FDA OpenFDA failed:`, fdaData.reason);
+  if (rxListData.status === 'rejected') console.error(`   ❌ RxList failed:`, rxListData.reason);
+  if (dailyMedData.status === 'rejected') console.error(`   ❌ DailyMed failed:`, dailyMedData.reason);
   
   // 🆕 Merge data from ALL sources
+  console.log(`\n🔀 === MERGING DATA ===`);
   const drugInfo = mergeAllSourceData(
     drugsComResult,
     medlinePlusResult,
@@ -620,6 +634,8 @@ async function collectDrugData(drugName: string): Promise<{
     dailyMedResult,
     drugName
   );
+  console.log(`   Merged completeness: ${drugInfo.completeness}%`);
+  console.log(`🌐 === DATA COLLECTION END ===\n`);
   
   return {
     drugInfo,
@@ -769,22 +785,35 @@ Deno.serve(async (req: Request) => {
     
     // NEW: Check cache first (unless skipCache is true)
     if (!skipCache) {
-      console.log(`🔍 Checking cache for: ${drugName}`);
-      const cachedDrug = await getCachedDrug(drugName);
-      
-      if (cachedDrug && cachedDrug.completeness >= 60) {
-        console.log(`✅ Cache HIT! ${drugName} (${cachedDrug.completeness}% complete)`);
-        const response: ApiResponse = {
-          success: true,
-          data: cachedDrug,
-          searchAttempts: ['Cache lookup'],
-          processingTime: Math.round(performance.now() - startTime),
-          sourcesUsed: Object.keys(cachedDrug.sources).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
-          fromCache: true
-        };
-        return createResponse(response, 200);
+      console.log(`\n🔍 === CACHE CHECK START === for: ${drugName}`);
+      try {
+        const cachedDrug = await getCachedDrug(drugName);
+        
+        if (cachedDrug) {
+          console.log(`📊 Cache found: completeness=${cachedDrug.completeness}%, sources=${Object.keys(cachedDrug.sources).length}`);
+          
+          if (cachedDrug.completeness >= 60) {
+            console.log(`✅ Cache HIT! Returning cached data`);
+            console.log(`   Sources: ${Object.keys(cachedDrug.sources).join(', ')}`);
+            const response: ApiResponse = {
+              success: true,
+              data: cachedDrug,
+              searchAttempts: ['Cache lookup'],
+              processingTime: Math.round(performance.now() - startTime),
+              sourcesUsed: Object.keys(cachedDrug.sources).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+              fromCache: true
+            };
+            return createResponse(response, 200);
+          } else {
+            console.log(`⚠️ Cache found but low quality (${cachedDrug.completeness}% < 60%)`);
+          }
+        } else {
+          console.log(`❌ No cache entry found`);
+        }
+      } catch (cacheError) {
+        console.error(`🔴 Cache check failed:`, cacheError);
       }
-      console.log(`❌ Cache miss or low quality, fetching from APIs...`);
+      console.log(`🔍 === CACHE CHECK END === Proceeding to API fetch...\n`);
     }
 
     // Fetch from multiple sources (existing + new)
@@ -794,11 +823,25 @@ Deno.serve(async (req: Request) => {
     const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
 
     // NEW: Save to cache for future use (async, don't block)
+    console.log(`\n💾 === CACHE SAVE START ===`);
     if (enhancedInfo.completeness >= 30) {
-      console.log(`💾 Saving ${drugName} to cache (${enhancedInfo.completeness}% complete)...`);
+      console.log(`   Completeness: ${enhancedInfo.completeness}% (>= 30%, saving...)`);
+      console.log(`   Sources used: ${sourcesUsed.join(', ')}`);
+      console.log(`   Drug name: ${drugName}`);
+      
       saveDrugToCache(drugName, enhancedInfo, sourcesUsed)
-        .then(() => console.log(`✅ Cached ${drugName}`))
-        .catch(err => console.error('⚠️ Cache save failed:', err));
+        .then(() => {
+          console.log(`✅ Successfully cached: ${drugName}`);
+          console.log(`💾 === CACHE SAVE END ===\n`);
+        })
+        .catch(err => {
+          console.error(`🔴 Cache save FAILED:`, err);
+          console.error(`   Error details:`, JSON.stringify(err, null, 2));
+          console.log(`💾 === CACHE SAVE END (FAILED) ===\n`);
+        });
+    } else {
+      console.log(`   ⚠️ Completeness too low (${enhancedInfo.completeness}% < 30%), NOT saving`);
+      console.log(`💾 === CACHE SAVE END (SKIPPED) ===\n`);
     }
 
     const response: ApiResponse = {
@@ -810,7 +853,12 @@ Deno.serve(async (req: Request) => {
       fromCache: false
     };
 
-    console.log(`Response: ${sourcesUsed.length} sources, ${enhancedInfo.completeness}% complete`);
+    console.log(`\n🎉 === FINAL RESPONSE ===`);
+    console.log(`   Sources: ${sourcesUsed.length}`);
+    console.log(`   Completeness: ${enhancedInfo.completeness}%`);
+    console.log(`   From cache: ${false}`);
+    console.log(`   Processing time: ${Math.round(performance.now() - startTime)}ms`);
+    console.log(`🎉 === REQUEST COMPLETE ===\n`);
     return createResponse(response, 200);
   } catch (error) {
     console.error('Drug info processing error:', error);
