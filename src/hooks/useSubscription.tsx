@@ -145,6 +145,106 @@ export const useSubscription = () => {
     }
   };
 
+  // Handle expired subscriptions - mark as expired and reset to free plan
+  const handleExpiredSubscriptions = async () => {
+    if (!user?.id) return;
+
+    try {
+      const now = new Date();
+
+      // Find all active paid subscriptions that have expired
+      const { data: expiredSubs, error: fetchError } = await supabase
+        .from('user_subscriptions')
+        .select('id, plan_id, ends_at')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .neq('plan_id', 'free-plan')
+        .not('ends_at', 'is', null);
+
+      if (fetchError) {
+        console.error('Error fetching subscriptions for expiry check:', fetchError);
+        return;
+      }
+
+      if (!expiredSubs || expiredSubs.length === 0) {
+        return;
+      }
+
+      // Check which ones are actually expired
+      const expiredIds = expiredSubs
+        .filter(sub => sub.ends_at && new Date(sub.ends_at) < now)
+        .map(sub => sub.id);
+
+      if (expiredIds.length === 0) {
+        return;
+      }
+
+      console.log(`⚠️ Found ${expiredIds.length} expired subscriptions, processing...`);
+
+      // Mark subscriptions as expired
+      const { error: updateError } = await supabase
+        .from('user_subscriptions')
+        .update({ status: 'expired' })
+        .in('id', expiredIds);
+
+      if (updateError) {
+        console.error('Error marking subscriptions as expired:', updateError);
+        return;
+      }
+
+      // Reset user usage to 0
+      const { error: resetError } = await supabase
+        .from('profiles')
+        .update({
+          identifications_used: 0,
+          last_reset_date: now.toISOString(),
+          monthly_identifications: 5
+        })
+        .eq('id', user.id);
+
+      if (resetError) {
+        console.error('Error resetting user usage:', resetError);
+      }
+
+      // Check if user already has an active free plan
+      const { data: existingFreePlan } = await supabase
+        .from('user_subscriptions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('plan_id', 'free-plan')
+        .eq('status', 'active')
+        .maybeSingle();
+
+      // If no active free plan, create one
+      if (!existingFreePlan) {
+        const { error: freePlanError } = await supabase
+          .from('user_subscriptions')
+          .insert({
+            user_id: user.id,
+            plan_id: 'free-plan',
+            status: 'active',
+            starts_at: now.toISOString(),
+            ends_at: null
+          });
+
+        if (freePlanError) {
+          console.error('Error creating free plan:', freePlanError);
+        } else {
+          console.log('✅ Assigned free plan to user');
+        }
+      }
+
+      console.log('✅ Successfully processed expired subscriptions');
+      toast.info('Subscription Expired', {
+        description: 'Your subscription has expired. You have been moved to the free plan.',
+        duration: 5000
+      });
+
+    } catch (error) {
+      console.error('Error handling expired subscriptions:', error);
+    }
+  };
+
   // Fetch user's current subscription
   const fetchCurrentSubscription = async () => {
     if (!user?.id) return;
@@ -180,6 +280,9 @@ export const useSubscription = () => {
     }
 
     try {
+      // First, check for expired subscriptions and handle them
+      await handleExpiredSubscriptions();
+
       // Fetch all active subscriptions, ordered by created_at descending to get the latest
       const { data: allActiveSubscriptions, error: fetchError } = await supabase
         .from('user_subscriptions')

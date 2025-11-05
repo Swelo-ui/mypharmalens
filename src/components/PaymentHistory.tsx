@@ -128,6 +128,28 @@ const PaymentHistory: React.FC = () => {
     }
   };
 
+  const getSubscriptionStatusBadge = (status: string, endsAt: string | null) => {
+    // Check if subscription is expired based on end date
+    const now = new Date();
+    const endDate = endsAt ? new Date(endsAt) : null;
+    const isExpired = endDate && endDate < now;
+
+    // Override status if subscription has passed its end date
+    const effectiveStatus = isExpired ? 'expired' : status;
+
+    switch (effectiveStatus?.toLowerCase()) {
+      case 'active':
+        return <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>;
+      case 'expired':
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Expired</Badge>;
+      case 'inactive':
+      case 'cancelled':
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Cancelled</Badge>;
+      default:
+        return <Badge className={badgeVariants({ variant: 'outline' })}>{effectiveStatus || 'Unknown'}</Badge>;
+    }
+  };
+
   const getActionBadge = (action: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
       activated: 'default',
@@ -319,7 +341,7 @@ const PaymentHistory: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex-shrink-0">
-                      {getActionBadge(item.status)}
+                      {getSubscriptionStatusBadge(item.status, item.ends_at)}
                     </div>
                   </div>
 

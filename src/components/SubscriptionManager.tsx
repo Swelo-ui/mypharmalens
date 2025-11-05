@@ -200,6 +200,16 @@ const SubscriptionManager: React.FC = () => {
 
   const getSubscriptionStatus = () => {
     if (!currentSubscription) {
+      return { status: 'free', daysLeft: 0 };
+    }
+
+    // Check if it's a free plan
+    if (currentSubscription.plan_id === 'free-plan') {
+      return { status: 'free', daysLeft: 0 };
+    }
+
+    // Check if subscription is already marked as expired
+    if (currentSubscription.status === 'expired') {
       return { status: 'expired', daysLeft: 0 };
     }
     
@@ -208,20 +218,20 @@ const SubscriptionManager: React.FC = () => {
       const endsAt = new Date(currentSubscription.ends_at);
       const daysLeft = Math.ceil((endsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       
-      // Check if expiring soon (less than 7 days)
-      if (daysLeft <= 7 && daysLeft > 0) {
-        return { status: 'expiring', daysLeft };
-      }
-      
-      // Check if expired
+      // Check if expired (end date has passed)
       if (daysLeft <= 0) {
         return { status: 'expired', daysLeft: 0 };
+      }
+      
+      // Check if expiring soon (less than 7 days)
+      if (daysLeft <= 7) {
+        return { status: 'expiring', daysLeft };
       }
       
       return { status: 'active', daysLeft };
     }
     
-    return { status: 'expired', daysLeft: 0 };
+    return { status: 'free', daysLeft: 0 };
   };
 
   const getUsagePercentage = () => {
@@ -332,15 +342,19 @@ const SubscriptionManager: React.FC = () => {
                 {currentPlan ? currentPlan.name : 'Free Plan'}
               </h3>
               <p className="text-gray-600">
-                {currentSubscription?.status === 'active' && (currentSubscription?.plan_id !== 'free-plan')
+                {subscriptionStatus.status === 'active'
                   ? 'Active subscription'
+                  : subscriptionStatus.status === 'expired'
+                  ? 'Subscription expired - moved to free plan'
+                  : subscriptionStatus.status === 'expiring'
+                  ? `Expiring in ${subscriptionStatus.daysLeft} days`
                   : 'Free plan - no expiration'
                 }
               </p>
             </div>
             <div className="text-right">
               {getStatusBadge(subscriptionStatus.status)}
-              {subscriptionStatus.daysLeft > 0 && (
+              {subscriptionStatus.status === 'active' && subscriptionStatus.daysLeft > 0 && (
                 <p className="text-sm text-gray-600 mt-1">
                   {subscriptionStatus.daysLeft} days left
                 </p>

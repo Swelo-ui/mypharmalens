@@ -1,0 +1,8 @@
+{
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "./functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": ["kv", "ffi"]
+}

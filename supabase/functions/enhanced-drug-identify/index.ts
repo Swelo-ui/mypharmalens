@@ -763,7 +763,7 @@ function parseHtmlForDrugInfo(html: string, drugName: string): CombinedResult | 
 }
 
 // Stage 0: Image Quality Analysis & Pre-Processing
-async function stageImageQualityAnalysis(imageBase64: string): Promise<ProcessingStage> {
+function stageImageQualityAnalysis(imageBase64: string): ProcessingStage {
   console.log('=== STAGE 0: Image Quality Analysis ===');
   const startTime = Date.now();
   
@@ -805,10 +805,10 @@ async function stageImageQualityAnalysis(imageBase64: string): Promise<Processin
 }
 
 // Stage 6: Data Consolidation & Enrichment
-async function stageDataConsolidation(
+function stageDataConsolidation(
   multiSourceData: MultiSourceData,
   previousStages: ProcessingStage[]
-): Promise<ProcessingStage> {
+): ProcessingStage {
   console.log('=== STAGE 6: Data Consolidation ===');
   const startTime = Date.now();
   
@@ -869,9 +869,9 @@ async function stageDataConsolidation(
 }
 
 // Stage 7: Cross-Reference Verification
-async function stageCrossReferenceVerification(
+function stageCrossReferenceVerification(
   stages: ProcessingStage[]
-): Promise<ProcessingStage> {
+): ProcessingStage {
   console.log('=== STAGE 7: Cross-Reference Verification ===');
   const startTime = Date.now();
   
