@@ -48,6 +48,12 @@ export interface DetailedDrugData {
     pregnancy?: string;
     storage?: string;
   };
+  // Additional optional fields for enhanced identification
+  imprint?: string;
+  color?: string;
+  shape?: string;
+  possibleNames?: string[];
+  recommendations?: string[];
 }
 
 interface DrugDetailsProps {

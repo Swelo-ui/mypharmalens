@@ -1,6 +1,5 @@
 // Multi-Source Drug Information API with Caching
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import "@supabase/functions-js/edge-runtime.d.ts";
 import { getCachedDrug, saveDrugToCache } from './cache.ts';
 import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers.ts';
 
@@ -56,6 +55,10 @@ interface ComprehensiveDrugInfo {
   sources: {
     drugscom?: string;
     medlineplus?: string;
+    fda?: string;
+    rxlist?: string;
+    dailymed?: string;
+    gemini?: string;
   };
   completeness: number; // 0-100 score based on available information
 }
@@ -92,44 +95,63 @@ function createResponse(data: unknown, status: number = 200): Response {
   });
 }
 
-// Enhanced fetch with retry logic
+// Enhanced fetch with retry logic and exponential backoff
 async function fetchWithRetry(url: string, maxRetries: number = 3): Promise<Response> {
   let lastError: Error | null = null;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Fetching ${url} (attempt ${attempt}/${maxRetries})`);
+      console.log(`🌐 Fetching ${url} (attempt ${attempt}/${maxRetries})`);
       
       const response = await fetch(url, {
         headers: {
           'User-Agent': getRandomUserAgent(),
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
-          'Accept-Encoding': 'gzip, deflate',
+          'Accept-Encoding': 'gzip, deflate, br',
           'DNT': '1',
           'Connection': 'keep-alive',
           'Upgrade-Insecure-Requests': '1',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+          'Cache-Control': 'max-age=0'
         },
-        signal: AbortSignal.timeout(15000), // 15 second timeout
+        signal: AbortSignal.timeout(20000), // 20 second timeout (increased)
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        console.log(`✅ Fetch successful (${response.status})`);
+        return response;
+      }
+      
+      // Handle specific error codes
+      if (response.status === 404) {
+        console.warn(`⚠️ Resource not found (404) - drug may not exist in this source`);
+        throw new Error(`HTTP 404: Drug not found`);
+      } else if (response.status === 429) {
+        console.warn(`⚠️ Rate limited (429) - waiting longer before retry`);
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        throw new Error(`HTTP 429: Rate limited`);
+      } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      return response;
     } catch (error) {
       lastError = error as Error;
-      console.error(`Attempt ${attempt} failed:`, error);
+      console.error(`❌ Attempt ${attempt} failed:`, (error as Error).message);
       
       if (attempt < maxRetries) {
+        // Exponential backoff: 1s, 2s, 4s
         const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-        console.log(`Waiting ${delay}ms before retry...`);
+        console.log(`⏳ Waiting ${delay}ms before retry...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
   
+  console.error(`❌ All ${maxRetries} fetch attempts failed for ${url}`);
   throw lastError || new Error('All fetch attempts failed');
 }
 
@@ -671,6 +693,119 @@ interface GeminiResponse {
   }>;
 }
 
+// New function to generate comprehensive data when scraping fails
+async function generateComprehensiveDataWithGemini(drugName: string): Promise<ComprehensiveDrugInfo | null> {
+  if (!GEMINI_API_KEY) {
+    console.log('Gemini API key not available, cannot generate data');
+    return null;
+  }
+
+  try {
+    console.log(`🤖 Generating comprehensive data with Gemini for: ${drugName}`);
+    
+    const prompt = `
+    You are a pharmaceutical database expert. Generate complete, accurate, and medically reliable information for the medication: ${drugName}
+    
+    Provide comprehensive drug information in this exact JSON format:
+    {
+      "name": "${drugName}",
+      "genericName": "Generic/chemical name",
+      "manufacturer": "Primary manufacturers (list top 2-3)",
+      "category": "Drug category (e.g., Analgesic, Antibiotic, Antihistamine)",
+      "drugClass": "Specific pharmacological class",
+      "description": "Comprehensive 4-5 sentence description explaining what this medication is, what it treats, and how it works",
+      "dosageAndAdmin": "Detailed dosage and administration instructions including typical adult/pediatric doses, frequency, route of administration, and special instructions",
+      "sideEffects": ["List 10-15 common side effects in order of frequency"],
+      "warnings": ["List 6-10 important warnings, precautions, and contraindications"],
+      "interactions": ["List 8-12 significant drug-drug, drug-food, or drug-condition interactions"],
+      "storage": "Complete storage instructions including temperature, light, moisture considerations",
+      "mechanism": "Detailed mechanism of action explaining how the drug works at a molecular/physiological level",
+      "indications": ["List 6-10 approved medical indications and uses"],
+      "contraindications": ["List 6-10 absolute and relative contraindications"],
+      "prescriptionStatus": "OTC/Prescription/Controlled Substance (specify schedule if controlled)",
+      "pregnancy": "Pregnancy safety category (A/B/C/D/X if applicable) and detailed guidance for pregnant/breastfeeding women",
+      "brandNames": ["List 8-12 common brand names globally"]
+    }
+    
+    CRITICAL REQUIREMENTS:
+    1. Provide REAL, ACCURATE medical information only
+    2. Do NOT make up or guess information
+    3. Be comprehensive but precise
+    4. This is for patient safety - accuracy is paramount
+    5. If you're unsure about any detail, provide the most reliable general information for that drug class
+    
+    Respond with ONLY the JSON object, no additional text.`;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 1,
+          topP: 0.8,
+          maxOutputTokens: 2048,
+        }
+      } as GeminiRequest)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data: GeminiResponse = await response.json();
+    const geminiText = data.candidates[0]?.content?.parts[0]?.text;
+
+    if (geminiText) {
+      try {
+        const jsonMatch = geminiText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const generatedData = JSON.parse(jsonMatch[0]) as Partial<ComprehensiveDrugInfo>;
+          
+          const comprehensiveInfo: ComprehensiveDrugInfo = {
+            name: drugName,
+            genericName: generatedData.genericName || '',
+            manufacturer: generatedData.manufacturer || '',
+            category: generatedData.category || '',
+            drugClass: generatedData.drugClass || '',
+            description: generatedData.description || '',
+            dosageAndAdmin: generatedData.dosageAndAdmin || '',
+            sideEffects: generatedData.sideEffects || [],
+            warnings: generatedData.warnings || [],
+            interactions: generatedData.interactions || [],
+            storage: generatedData.storage || '',
+            mechanism: generatedData.mechanism || '',
+            indications: generatedData.indications || [],
+            contraindications: generatedData.contraindications || [],
+            prescriptionStatus: generatedData.prescriptionStatus || 'Unknown',
+            pregnancy: generatedData.pregnancy || '',
+            brandNames: generatedData.brandNames || [],
+            sources: { gemini: 'AI Generated' },
+            verified: false,
+            completeness: 85 // High completeness since all fields are generated
+          };
+
+          console.log(`✅ Generated comprehensive data with ${comprehensiveInfo.completeness}% completeness`);
+          return comprehensiveInfo;
+        }
+      } catch (parseError) {
+        console.error('Failed to parse Gemini generated data:', parseError);
+      }
+    }
+  } catch (error) {
+    console.error('Gemini data generation failed:', error);
+  }
+
+  return null;
+}
+
 async function enhanceDrugInfoWithGemini(drugInfo: ComprehensiveDrugInfo): Promise<ComprehensiveDrugInfo> {
   if (!GEMINI_API_KEY) {
     console.log('Gemini API key not available, skipping enhancement');
@@ -819,7 +954,72 @@ Deno.serve(async (req: Request) => {
     // Fetch from multiple sources (existing + new)
     const { drugInfo, searchAttempts, sourcesUsed } = await collectDrugData(drugName);
 
-    // Enhance with Gemini
+    console.log(`\n📊 === SCRAPING RESULTS ===`);
+    console.log(`   Completeness: ${drugInfo.completeness}%`);
+    console.log(`   Sources succeeded: ${sourcesUsed.length}`);
+    console.log(`   Has name: ${!!drugInfo.name}`);
+    console.log(`   Has description: ${!!drugInfo.description}`);
+    console.log(`   Has side effects: ${drugInfo.sideEffects?.length || 0} items`);
+    console.log(`   Has warnings: ${drugInfo.warnings?.length || 0} items`);
+    console.log(`📊 === END SCRAPING RESULTS ===\n`);
+
+    // Only use Gemini fallback if scraping completely failed (< 15% completeness)
+    // This gives priority to real scraped data from authoritative sources
+    const hasMinimalData = drugInfo.completeness >= 15;
+    
+    if (!hasMinimalData) {
+      console.log(`❌ Scraping completely failed (${drugInfo.completeness}% < 15%), using Gemini as last resort...`);
+      // Use Gemini to generate comprehensive data when scraping fails
+      const geminiGenerated = await generateComprehensiveDataWithGemini(drugName);
+      if (geminiGenerated) {
+        console.log(`✓ Gemini generated comprehensive data (${geminiGenerated.completeness}% completeness)`);
+        // Merge any scraped data with Gemini data
+        const mergedInfo = {
+          ...geminiGenerated,
+          ...drugInfo, // Keep any successfully scraped data
+          sources: { ...geminiGenerated.sources, ...drugInfo.sources },
+          verified: false, // Mark as AI-generated
+          completeness: Math.max(geminiGenerated.completeness, drugInfo.completeness)
+        };
+        
+        // Save the merged info to cache
+        console.log(`💾 === CACHE SAVE START (Gemini-backed) ===`);
+        if (mergedInfo.completeness >= 30) {
+          console.log(`   Completeness: ${mergedInfo.completeness}% (>= 30%, saving...)`);
+          console.log(`   Sources used: Gemini AI (primary), ${sourcesUsed.join(', ')}`);
+          console.log(`   Drug name: ${drugName}`);
+          
+          saveDrugToCache(drugName, mergedInfo, ['Gemini AI', ...sourcesUsed])
+            .then(() => {
+              console.log(`✅ Successfully cached (Gemini-backed): ${drugName}`);
+              console.log(`💾 === CACHE SAVE END ===\n`);
+            })
+            .catch(err => {
+              console.error(`🔴 Cache save FAILED:`, err);
+              console.log(`💾 === CACHE SAVE END (FAILED) ===\n`);
+            });
+        }
+        
+        const response: ApiResponse = {
+          success: true,
+          data: mergedInfo,
+          searchAttempts: [...searchAttempts, 'Gemini AI Generation'],
+          processingTime: Math.round(performance.now() - startTime),
+          sourcesUsed: ['Gemini AI (primary)', ...sourcesUsed],
+          fromCache: false
+        };
+
+        console.log(`\n🎉 === FINAL RESPONSE (Gemini-backed) ===`);
+        console.log(`   Sources: ${response.sourcesUsed.length}`);
+        console.log(`   Completeness: ${mergedInfo.completeness}%`);
+        console.log(`   From cache: false`);
+        console.log(`   Processing time: ${response.processingTime}ms`);
+        console.log(`🎉 === REQUEST COMPLETE ===\n`);
+        return createResponse(response, 200);
+      }
+    }
+    
+    // Enhance with Gemini (fill gaps in scraped data)
     const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
 
     // NEW: Save to cache for future use (async, don't block)

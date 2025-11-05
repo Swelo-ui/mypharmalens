@@ -85,11 +85,63 @@ const DrugIdentify = () => {
   const [enhancedMode, setEnhancedMode] = useState(true);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingPhase, setProcessingPhase] = useState("");
+  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number | null>(null);
+  const [processingStartTime, setProcessingStartTime] = useState<number>(0);
   const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [processingMeta, setProcessingMeta] = useState<{ confidence?: string; fallbackUsed?: boolean; processingStages?: any[]; enhancedProcessing?: boolean } | null>(null);
   const navigate = useNavigate();
+
+  // User-friendly stage mapping with progress percentages and estimated durations
+  const stageMapping: Record<string, { message: string; progress: number; duration: number }> = {
+    'image-quality-analysis': { message: 'Analyzing image quality', progress: 8, duration: 1000 },
+    'dual-ocr-extraction': { message: 'Extracting text from image', progress: 20, duration: 3000 },
+    'gemini-analysis': { message: 'AI analyzing medication features', progress: 35, duration: 4500 },
+    'cache-hit': { message: 'Found in database', progress: 95, duration: 500 },
+    'cache-miss': { message: 'Searching medical databases', progress: 40, duration: 1000 },
+    'multi-source-enrichment': { message: 'Gathering comprehensive data', progress: 60, duration: 10000 },
+    'data-consolidation': { message: 'Validating medication information', progress: 70, duration: 2000 },
+    'cross-reference-verification': { message: 'Cross-checking data accuracy', progress: 78, duration: 1500 },
+    'imprint-search': { message: 'Searching by visual features', progress: 82, duration: 3500 },
+    'gemini-backup': { message: 'AI generating complete information', progress: 88, duration: 5000 },
+    'final-cross-verification': { message: 'Final quality verification', progress: 95, duration: 4000 }
+  };
+
+  // Calculate estimated time remaining
+  const updateProgress = (stage: string) => {
+    const stageInfo = stageMapping[stage];
+    if (stageInfo) {
+      setProcessingPhase(stageInfo.message);
+      setProcessingProgress(stageInfo.progress);
+      
+      // Calculate estimated time remaining based on elapsed time and remaining progress
+      if (processingStartTime > 0) {
+        const elapsed = Date.now() - processingStartTime;
+        const progressMade = stageInfo.progress;
+        const remainingProgress = 100 - progressMade;
+        
+        if (progressMade > 0) {
+          const avgTimePerPercent = elapsed / progressMade;
+          const estimatedRemaining = Math.ceil((avgTimePerPercent * remainingProgress) / 1000);
+          setEstimatedTimeRemaining(Math.max(1, estimatedRemaining)); // At least 1 second
+        }
+      }
+    }
+  };
+
+  // Simulate progressive updates for smooth UX
+  const simulateProgressUpdates = (stages: string[]) => {
+    stages.forEach((stage, index) => {
+      const stageInfo = stageMapping[stage];
+      if (stageInfo) {
+        setTimeout(() => {
+          updateProgress(stage);
+        }, index * 500); // Stagger updates by 500ms
+      }
+    });
+  };
 
   // Fetch user's previous identifications when component loads
   useEffect(() => {
@@ -275,18 +327,26 @@ const DrugIdentify = () => {
   // Enhanced function to identify drug using the new fault-tolerant system
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
     try {
+      // Start tracking time
+      const startTime = Date.now();
+      setProcessingStartTime(startTime);
+      
       // Track progress for better UX
-      setProcessingPhase("Initializing enhanced analysis pipeline");
-      setProcessingProgress(5);
+      setProcessingPhase("Preparing image for analysis");
+      setProcessingProgress(3);
+      setEstimatedTimeRemaining(35); // Initial estimate: 35 seconds
       
       // First check if this medication was previously identified
-      setProcessingPhase("Checking against previously identified medications");
-      setProcessingProgress(10);
+      setProcessingPhase("Checking your previous scans");
+      setProcessingProgress(8);
+      setEstimatedTimeRemaining(30);
+      
       const historicalMatch = await findMatchInHistory(base64Image);
       
       if (historicalMatch) {
-        setProcessingPhase("Match found in your history");
+        setProcessingPhase("✓ Match found in your history!");
         setProcessingProgress(100);
+        setEstimatedTimeRemaining(0);
         return {
           ...historicalMatch,
           fromHistory: true
@@ -294,29 +354,28 @@ const DrugIdentify = () => {
       }
       
       // No match found, proceed with enhanced multi-stage identification
-      setProcessingPhase("Starting multi-stage analysis");
-      setProcessingProgress(15);
+      setProcessingPhase("Starting advanced AI analysis");
+      setProcessingProgress(12);
+      setEstimatedTimeRemaining(28);
       
       // Try enhanced drug identification first
       let result = null;
       let fallbackUsed = false;
       
       try {
-        setProcessingPhase("Stage 1: Enhanced text extraction");
-        setProcessingProgress(25);
+        // Start progress tracking with smooth updates
+        updateProgress('image-quality-analysis');
         
         const { data: enhancedData, error: enhancedError } = await supabase.functions.invoke('enhanced-drug-identify', {
           body: { 
             imageBase64: base64Image,
             options: {
               enhancedMode: enhancedMode,
-              blurryMode: blurryMode || isImageLowRes
+              blurryMode: blurryMode || isImageLowRes,
+              bypassCache: enhancedMode
             }
           }
         });
-
-        setProcessingPhase("Stage 2: AI vision analysis");
-        setProcessingProgress(50);
 
         if (enhancedError) {
           console.warn('Enhanced identification failed, trying fallback:', enhancedError);
@@ -324,14 +383,30 @@ const DrugIdentify = () => {
         }
 
         if (enhancedData && enhancedData.success) {
-          setProcessingPhase("Stage 3: Data enrichment");
-          setProcessingProgress(75);
+          // Update progress based on actual backend stages
+          if (enhancedData.processingStages && Array.isArray(enhancedData.processingStages)) {
+            enhancedData.processingStages.forEach((stage: string, index: number) => {
+              setTimeout(() => {
+                updateProgress(stage);
+              }, index * 400); // Smooth staggered updates
+            });
+          } else {
+            // Fallback to generic progress
+            setProcessingPhase("Finalizing medication information");
+            setProcessingProgress(90);
+          }
           
           result = enhancedData.data;
           result.enhancedProcessing = true;
           result.processingStages = enhancedData.processingStages || [];
           result.confidence = enhancedData.confidence || 'medium';
           result.fallbackUsed = enhancedData.fallbackUsed || false;
+          setProcessingMeta({
+            confidence: result.confidence,
+            fallbackUsed: result.fallbackUsed,
+            processingStages: enhancedData.processingStages || [],
+            enhancedProcessing: true
+          });
           
           console.log('Enhanced identification successful:', result.name);
         } else {
@@ -342,8 +417,9 @@ const DrugIdentify = () => {
         fallbackUsed = true;
         
         // Fallback to original system
-        setProcessingPhase("Using fallback identification system");
-        setProcessingProgress(40);
+        setProcessingPhase("Trying alternative analysis method");
+        setProcessingProgress(45);
+        setEstimatedTimeRemaining(15);
         
         const { data: fallbackData, error: fallbackError } = await supabase.functions.invoke('identify-drug', {
           body: { 
@@ -352,8 +428,9 @@ const DrugIdentify = () => {
           }
         });
 
-        setProcessingPhase("Processing fallback results");
-        setProcessingProgress(70);
+        setProcessingPhase("Validating medication data");
+        setProcessingProgress(75);
+        setEstimatedTimeRemaining(8);
 
         if (fallbackError) {
           console.error('Fallback system also failed:', fallbackError);
@@ -365,6 +442,12 @@ const DrugIdentify = () => {
           result.enhancedProcessing = false;
           result.fallbackUsed = true;
           result.confidence = result.confidence || 'low';
+          setProcessingMeta({
+            confidence: result.confidence,
+            fallbackUsed: true,
+            processingStages: result.processingStages || [],
+            enhancedProcessing: false
+          });
           
           console.log('Fallback identification successful:', result.name);
         } else {
@@ -373,15 +456,17 @@ const DrugIdentify = () => {
       }
 
       // Final validation and processing
-      setProcessingPhase("Finalizing results and validation");
-      setProcessingProgress(90);
+      setProcessingPhase("Preparing your results");
+      setProcessingProgress(92);
+      setEstimatedTimeRemaining(3);
 
       if (!result || !result.name || result.name === "Unknown Medication") {
         // Last resort: try direct Drugs.com search if we have any text
         if (result?.imprint || result?.description) {
           try {
-            setProcessingPhase("Attempting direct database search");
-            setProcessingProgress(95);
+            setProcessingPhase("Searching additional databases");
+            setProcessingProgress(96);
+            setEstimatedTimeRemaining(2);
             
             const searchTerm = result.imprint || result.description.substring(0, 50);
             const { data: directSearchData } = await supabase.functions.invoke('drugs-com-api', {
@@ -408,7 +493,10 @@ const DrugIdentify = () => {
       result.enhancedMode = enhancedMode;
       result.blurryMode = blurryMode || isImageLowRes;
       
+      // Mark as complete
+      setProcessingPhase("✓ Analysis complete!");
       setProcessingProgress(100);
+      setEstimatedTimeRemaining(0);
       
       return result;
     } catch (error: any) {
@@ -508,35 +596,45 @@ const DrugIdentify = () => {
             const drugData = await identifyDrugFromImage(base64Image);
             setProcessingProgress(90);
 
-            // Check if the response indicates an error
-            if (drugData && drugData.success === false) {
-              throw new Error(drugData.message || drugData.error || 'Failed to identify medication');
-            }
+            // Always check if we have usable data, even if success is false
+            const hasUsableData = drugData && drugData.name && (
+              drugData.name !== "Unknown Medication" || 
+              drugData.name === "Unidentified Medication" ||
+              (drugData.recommendations && drugData.recommendations.length > 0)
+            );
 
-            if (drugData && drugData.success !== false) {
+            if (hasUsableData) {
               setProcessingProgress(95);
+              
+              // Check if this is an unidentified medication with recommendations
+              const isUnidentified = drugData.name === "Unidentified Medication";
+              
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
-                id: drugData.id,
+                id: drugData.id || crypto.randomUUID(),
                 name: drugData.name,
-                genericName: drugData.genericName || drugData.name,
-                manufacturer: drugData.manufacturer,
-                category: drugData.category || 'Unknown',
-                description: drugData.description,
+                genericName: drugData.genericName || (isUnidentified ? "Not Identified" : drugData.name),
+                manufacturer: drugData.manufacturer || (isUnidentified ? "Unknown" : "Not specified"),
+                category: drugData.category || (isUnidentified ? "Unknown" : 'Unknown'),
+                description: drugData.description || (isUnidentified ? "Unable to identify this medication from the provided image." : "No description available."),
                 dosageAndAdmin: drugData.dosageAndAdmin || 'Take as directed by your healthcare provider.',
-                sideEffects: drugData.sideEffects || [],
-                warnings: drugData.warnings || [],
+                sideEffects: drugData.sideEffects || (isUnidentified ? [] : ["No side effect information available"]),
+                warnings: drugData.warnings || (isUnidentified ? [] : ["Consult a healthcare provider before use"]),
                 interactions: drugData.interactions || [],
-                storage: drugData.storage || 'Store at room temperature away from moisture, heat, and light.',
-                mechanism: drugData.mechanism || 'Mechanism of action not specified.',
-                indications: drugData.indications || [],
+                storage: drugData.storage || 'Store at room temperature away from moisture, heat, and light. Keep out of reach of children.',
+                mechanism: drugData.mechanism || (isUnidentified ? "" : "Mechanism of action not specified."),
+                indications: drugData.indications || (drugData.recommendations || []),
                 contraindications: drugData.contraindications || [],
                 prescriptionStatus: drugData.prescriptionStatus || 'Unknown',
                 pregnancy: drugData.pregnancy || 'Consult your healthcare provider before using during pregnancy.',
-                verified: false,
+                verified: drugData.verified || false,
                 image: drugData.image,
-                drugClass: drugData.drugClass || 'Not specified',
-                brandNames: drugData.brandNames || []
+                drugClass: drugData.drugClass || (isUnidentified ? "" : 'Not specified'),
+                brandNames: drugData.brandNames || [],
+                imprint: drugData.imprint,
+                color: drugData.color,
+                shape: drugData.shape,
+                possibleNames: drugData.possibleNames
               };
               
               setIdentifiedDrug(formattedDrugData);
@@ -549,8 +647,24 @@ const DrugIdentify = () => {
               // Play drug identification completion sound
               playDrugIdentificationSound();
               
-              // Enhanced success messaging based on processing method
-              if (drugData.fromHistory) {
+              // Enhanced messaging based on identification result
+              if (isUnidentified) {
+                // Show helpful message for unidentified medications
+                toast.warning(`Unable to identify medication`, { 
+                  description: "We've provided recommendations to help you. Please see the details below.",
+                  duration: 6000
+                });
+                
+                // Show tips for better identification
+                if (drugData.possibleNames && drugData.possibleNames.length > 0) {
+                  setTimeout(() => {
+                    toast.info(`Possible matches found`, {
+                      description: `Consider: ${drugData.possibleNames.slice(0, 3).join(', ')}. Verify with a healthcare provider.`,
+                      duration: 8000
+                    });
+                  }, 1000);
+                }
+              } else if (drugData.fromHistory) {
                 toast.success(`Matched with previously identified ${drugData.name}!`, { 
                   description: "Using your history helped identify this medication faster."
                 });
@@ -561,14 +675,16 @@ const DrugIdentify = () => {
                 });
               } else if (drugData.enhancedProcessing) {
                 const confidenceMessage = {
-                  'high': "Enhanced analysis provided high confidence results.",
-                  'medium': "Enhanced analysis completed. Consider the alternatives listed if available.",
-                  'low': "Enhanced analysis completed with low confidence. Consider consulting a healthcare professional."
+                  'high': "Enhanced analysis provided high confidence results. ✓",
+                  'medium': "Enhanced analysis completed. Data from AI backup system.",
+                  'low': "Enhanced analysis completed with low confidence. Verify with a healthcare professional."
                 };
                 
+                const isBackupData = Array.isArray(drugData.processingStages) && drugData.processingStages.includes('gemini-backup');
+                
                 toast.success(`Medication identified: ${drugData.name}!`, { 
-                  description: confidenceMessage[drugData.confidence] || "Enhanced analysis completed.",
-                  duration: drugData.confidence === 'low' ? 6000 : 4000
+                  description: isBackupData ? "Data generated by AI backup system. Verify accuracy." : (confidenceMessage[drugData.confidence] || "Enhanced analysis completed."),
+                  duration: drugData.confidence === 'low' || isBackupData ? 6000 : 4000
                 });
               } else if (drugData.fallbackUsed) {
                 toast.success(`Medication identified using backup system: ${drugData.name}`, { 
@@ -595,7 +711,7 @@ const DrugIdentify = () => {
               }
               
               // Show processing stages if available
-              if (drugData.processingStages && drugData.processingStages.length > 0) {
+              if (Array.isArray(drugData.processingStages) && drugData.processingStages.length > 0) {
                 console.log('Processing stages used:', drugData.processingStages);
               }
               
@@ -606,15 +722,98 @@ const DrugIdentify = () => {
                 });
               }
             } else {
-              setErrorDetails("Could not identify medication from the image. Try uploading an image with clearer text or labeling.");
-              toast.error("Could not identify the medication. Please try again with a clearer image.");
+              // Complete failure - no usable data at all
+              console.error('No usable data returned from identification');
+              
+              // Create minimal error result to prevent blank screen
+              const errorData: DetailedDrugData = {
+                id: crypto.randomUUID(),
+                name: "Identification Failed",
+                genericName: "Unable to Process",
+                manufacturer: "N/A",
+                category: "Error",
+                description: "We were unable to process this image. This could be due to:",
+                dosageAndAdmin: "",
+                sideEffects: [
+                  "Image quality is too poor for identification",
+                  "No visible text or markings detected",
+                  "Medication type not recognized",
+                  "Technical error during processing"
+                ],
+                warnings: [
+                  "DO NOT consume any unidentified medication",
+                  "Take the medication to a pharmacy for professional identification",
+                  "Contact your healthcare provider if you have questions"
+                ],
+                interactions: [],
+                storage: "",
+                mechanism: "",
+                indications: [
+                  "Take a new photo with better lighting",
+                  "Ensure text and markings are visible and in focus",
+                  "Try capturing the medication from different angles",
+                  "Clean the medication/packaging before photographing",
+                  "Visit a pharmacy or healthcare provider for in-person identification"
+                ],
+                contraindications: [],
+                prescriptionStatus: "Unknown",
+                pregnancy: "",
+                verified: false,
+                drugClass: "",
+                brandNames: []
+              };
+              
+              setIdentifiedDrug(errorData);
+              setErrorDetails("Could not identify medication from the image. Please see recommendations below.");
+              toast.error("Could not identify the medication", {
+                description: "We've provided guidance on next steps. See details below.",
+                duration: 5000
+              });
             }
           } catch (error: any) {
             console.error('Error processing image:', error);
+            
+            // Even on error, provide helpful information instead of blank screen
+            const errorData: DetailedDrugData = {
+              id: crypto.randomUUID(),
+              name: "Processing Error",
+              genericName: "Error Occurred",
+              manufacturer: "N/A",
+              category: "Error",
+              description: `An error occurred during processing: ${error.message || "Unknown error"}`,
+              dosageAndAdmin: "",
+              sideEffects: [],
+              warnings: [
+                "DO NOT take any unidentified medication",
+                "Seek professional help for medication identification",
+                "Keep medication in original packaging for identification"
+              ],
+              interactions: [],
+              storage: "",
+              mechanism: "",
+              indications: [
+                "Try uploading a different, clearer image",
+                "Check your internet connection",
+                "If the problem persists, contact support",
+                "Visit a pharmacy for in-person identification"
+              ],
+              contraindications: [],
+              prescriptionStatus: "Unknown",
+              pregnancy: "",
+              verified: false,
+              drugClass: "",
+              brandNames: []
+            };
+            
+            setIdentifiedDrug(errorData);
             setErrorDetails(`Error: ${error.message || "Unknown error"}`);
-            toast.error("Failed to process the image. Please try another image.");
+            toast.error("Failed to process the image", {
+              description: "Please see recommendations and try again.",
+              duration: 5000
+            });
           } finally {
             setIsIdentifying(false);
+            setProcessingProgress(100);
           }
         }
       };
@@ -641,6 +840,8 @@ const DrugIdentify = () => {
     setIsImageLowRes(false);
     setProcessingProgress(0);
     setProcessingPhase("");
+    setEstimatedTimeRemaining(null);
+    setProcessingStartTime(0);
     setIsSaved(false);
   };
 
@@ -821,17 +1022,33 @@ const DrugIdentify = () => {
               )}
               
               {isIdentifying && (
-                <div className="mt-6 space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{processingPhase || "Analyzing medication..."}</span>
-                    <span>{processingProgress}%</span>
+                <div className="mt-6 space-y-3">
+                  <div className="flex items-center justify-between text-sm font-medium">
+                    <span className="text-pharma-700 dark:text-pharma-300">
+                      {processingPhase || "Analyzing medication..."}
+                    </span>
+                    <span className="text-pharma-600 dark:text-pharma-400 font-semibold">
+                      {processingProgress}%
+                    </span>
                   </div>
-                  <Progress value={processingProgress} className="h-2" />
-                  <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
-                    {enhancedMode 
-                      ? "Using enhanced multi-model analysis for optimal results" 
-                      : "Using standard analysis"}
-                  </p>
+                  <Progress value={processingProgress} className="h-2.5" />
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {enhancedMode 
+                        ? "Advanced AI Analysis" 
+                        : "Standard Analysis"}
+                    </span>
+                    {estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
+                      <span className="text-pharma-600 dark:text-pharma-400 font-medium">
+                        ~{estimatedTimeRemaining}s remaining
+                      </span>
+                    )}
+                    {processingProgress === 100 && (
+                      <span className="text-green-600 dark:text-green-400 font-medium">
+                        ✓ Complete
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -904,7 +1121,7 @@ const DrugIdentify = () => {
                 </div>
               </Alert>
             )}
-            <DrugDetails drug={identifiedDrug} />
+          <DrugDetails drug={identifiedDrug} />
           </div>
         )}
       </div>
