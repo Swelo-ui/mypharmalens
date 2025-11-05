@@ -100,9 +100,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Side Effects</h3>
               <ul className="space-y-2">
-                {(showLaymanTerms && drug.laymanExplanations?.sideEffects 
+                {((showLaymanTerms && drug.laymanExplanations?.sideEffects 
                   ? drug.laymanExplanations.sideEffects 
-                  : drug.sideEffects).map((effect, i) => (
+                  : drug.sideEffects) ?? []).map((effect, i) => (
                   <li key={i} className="flex items-start">
                     <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
@@ -114,9 +114,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Warnings & Precautions</h3>
               <ul className="space-y-2">
-                {(showLaymanTerms && drug.laymanExplanations?.warnings 
+                {((showLaymanTerms && drug.laymanExplanations?.warnings 
                   ? drug.laymanExplanations.warnings 
-                  : drug.warnings).map((warning, i) => (
+                  : drug.warnings) ?? []).map((warning, i) => (
                   <li key={i} className="flex items-start">
                     <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
@@ -128,9 +128,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Drug Interactions</h3>
               <ul className="space-y-2">
-                {(showLaymanTerms && drug.laymanExplanations?.interactions 
+                {((showLaymanTerms && drug.laymanExplanations?.interactions 
                   ? drug.laymanExplanations.interactions 
-                  : drug.interactions).map((interaction, i) => (
+                  : drug.interactions) ?? []).map((interaction, i) => (
                   <li key={i} className="flex items-start">
                     <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
@@ -147,9 +147,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Indications</h3>
               <ul className="space-y-2">
-                {(showLaymanTerms && drug.laymanExplanations?.indications 
+                {((showLaymanTerms && drug.laymanExplanations?.indications 
                   ? drug.laymanExplanations.indications 
-                  : drug.indications).map((indication, i) => (
+                  : drug.indications) ?? []).map((indication, i) => (
                   <li key={i} className="flex items-start">
                     <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
@@ -161,9 +161,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Contraindications</h3>
               <ul className="space-y-2">
-                {(showLaymanTerms && drug.laymanExplanations?.contraindications 
+                {((showLaymanTerms && drug.laymanExplanations?.contraindications 
                   ? drug.laymanExplanations.contraindications 
-                  : drug.contraindications).map((contraindication, i) => (
+                  : drug.contraindications) ?? []).map((contraindication, i) => (
                   <li key={i} className="flex items-start">
                     <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
@@ -202,7 +202,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <div className="glass-card p-4">
                 <h3 className="text-sm font-medium mb-3">Brand Names</h3>
                 <div className="flex flex-wrap gap-2">
-                  {drug.brandNames.map((brand, index) => (
+                  {(drug.brandNames ?? []).map((brand, index) => (
                     <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
                       <Tag className="h-3 w-3 mr-1" />
                       {brand}
@@ -218,7 +218,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             
             {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {drug.similarDrugs.map((similar) => (
+                {(drug.similarDrugs ?? []).map((similar) => (
                   <div key={similar.id} className="glass-card p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">

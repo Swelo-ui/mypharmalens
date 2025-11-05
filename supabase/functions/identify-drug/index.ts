@@ -1,8 +1,11 @@
+// deno-lint-ignore-file
 
-// @ts-ignore
+// @ts-ignore: Deno standard library import
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-// @ts-ignore
+// @ts-ignore: XHR polyfill for fetch compatibility
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+// Import cache integration for intelligent caching
+import { checkDrugCache, saveDrugToCache } from '../enhanced-drug-identify/cache-integration.ts';
 
 declare const Deno: any;
 
@@ -391,7 +394,7 @@ function parseHtmlForDrugInfo(html: string, drugName: string): any {
 }
 
 // Function to extract pill appearance information
-function extractPillAppearance(text: string) {
+function _extractPillAppearance(text: string) {
   const appearance = {
     color: "",
     shape: "",
@@ -523,7 +526,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     let primaryData = null;
     if (primaryResponse.status === 'fulfilled' && primaryResponse.value.ok) {
       try {
-        const responseData = await primaryResponse.value.json();
+        const responseData = await primaryResponse.value.json() as any;
         if (responseData.candidates?.[0]?.content?.parts?.[0]?.text) {
           const text = responseData.candidates[0].content.parts[0].text;
           console.log("Primary analysis result:", text);
@@ -550,7 +553,7 @@ async function analyzeImageWithMultipleModels(imageBase64: string): Promise<any>
     let secondaryData = null;
     if (secondaryResponse.status === 'fulfilled' && secondaryResponse.value.ok) {
       try {
-        const responseData = await secondaryResponse.value.json();
+        const responseData = await secondaryResponse.value.json() as any;
         if (responseData.candidates?.[0]?.content?.parts?.[0]?.text) {
           const text = responseData.candidates[0].content.parts[0].text;
           console.log("Secondary analysis result:", text);
@@ -609,7 +612,7 @@ function combineAnalysisResults(primaryData: any, secondaryData: any): any {
     );
     
     // Use the higher confidence level if available - handle both string and numeric confidence
-    const confidenceLevels = { low: 1, medium: 2, high: 3 };
+    const confidenceLevels: Record<string, number> = { low: 1, medium: 2, high: 3 };
     
     // Normalize confidence values to strings
     const normalizeConfidence = (conf: any): string => {
@@ -710,7 +713,7 @@ serve(async (req) => {
       );
     }
 
-    const { imageBase64, blurryMode } = requestData;
+    const { imageBase64 } = requestData;
     
     // Validate image data
     if (!imageBase64) {
@@ -855,7 +858,7 @@ serve(async (req) => {
     return createErrorResponse(
       "service_error", 
       "An unexpected error occurred while processing your request. Please try again.",
-      error.message
+      error instanceof Error ? error.message : String(error)
     );
   }
 });
@@ -863,7 +866,36 @@ serve(async (req) => {
 // Helper function to construct final response by combining all analyses
 async function constructFinalResponse(multiModelAnalysis: any, standardAnalysis: any, imageBase64: string): Promise<Response> {
   try {
-    // Combine results from all analyses
+    // STAGE 1: Check cache first for quick response
+    let drugNameForCache = '';
+    
+    // Extract drug name from available analyses for cache lookup
+    if (standardAnalysis?.name && !standardAnalysis.name.toLowerCase().includes('unknown')) {
+      drugNameForCache = standardAnalysis.name;
+    } else if (multiModelAnalysis?.name && !multiModelAnalysis.name.toLowerCase().includes('unknown')) {
+      drugNameForCache = multiModelAnalysis.name;
+    }
+    
+    if (drugNameForCache) {
+      console.log(`🔍 === IDENTIFY-DRUG CACHE CHECK ===`);
+      console.log(`   Checking cache for: "${drugNameForCache}"`);
+      
+      const cachedDrug = await checkDrugCache(drugNameForCache);
+      if (cachedDrug) {
+        console.log(`✅ === CACHE HIT IN IDENTIFY-DRUG! ===`);
+        console.log(`   Drug: ${drugNameForCache}`);
+        console.log(`   🚀 INSTANT RESPONSE: Returning cached data`);
+        
+        return createSuccessResponse({
+          ...cachedDrug,
+          cacheHit: true,
+          analysisMethod: 'identify-drug-cached'
+        });
+      }
+      console.log(`❌ Cache miss, proceeding with full analysis...`);
+    }
+    
+    // STAGE 2: Combine results from all analyses
     const combinedData: any = {
       id: crypto.randomUUID(),
       name: "Unknown Medication",
@@ -1067,17 +1099,91 @@ async function constructFinalResponse(multiModelAnalysis: any, standardAnalysis:
       }
     }
     
-    // Log the final processed result
-    console.log("Final identification result:", combinedData.name);
+    // CRITICAL: Sanitize all array fields to prevent frontend crashes
+    // This ensures the fallback function returns the same data contract as enhanced-drug-identify
+    const sanitizedData = {
+      ...combinedData,
+      sideEffects: Array.isArray(combinedData.sideEffects) ? combinedData.sideEffects : [],
+      warnings: Array.isArray(combinedData.warnings) ? combinedData.warnings : [],
+      interactions: Array.isArray(combinedData.interactions) ? combinedData.interactions : [],
+      indications: Array.isArray(combinedData.indications) ? combinedData.indications : [],
+      contraindications: Array.isArray(combinedData.contraindications) ? combinedData.contraindications : [],
+      brandNames: Array.isArray(combinedData.brandNames) ? combinedData.brandNames : [],
+      possibleNames: Array.isArray(combinedData.possibleNames) ? combinedData.possibleNames : []
+    };
     
-    return createSuccessResponse(combinedData);
+    // STAGE 3: Intelligent caching for high-quality results
+    if (sanitizedData.name && 
+        sanitizedData.name !== 'Unknown Medication' && 
+        !sanitizedData.name.toLowerCase().includes('unknown')) {
+      
+      // Calculate completeness score for caching decision
+      let completenessScore = 0;
+      const requiredFields = ['genericName', 'description', 'dosageAndAdmin', 'category'];
+      requiredFields.forEach(field => {
+        const fieldValue = sanitizedData[field];
+        if (fieldValue && String(fieldValue).trim().length > 5) {
+          completenessScore += 15;
+        }
+      });
+      
+      const arrayFields = ['sideEffects', 'warnings', 'interactions', 'indications'];
+      arrayFields.forEach(field => {
+        const fieldValue = sanitizedData[field];
+        if (Array.isArray(fieldValue) && fieldValue.length > 0) {
+          completenessScore += 10;
+        }
+      });
+      
+      completenessScore = Math.min(completenessScore, 100);
+      
+      console.log(`\n📊 === IDENTIFY-DRUG QUALITY ASSESSMENT ===`);
+      console.log(`   Drug: ${sanitizedData.name}`);
+      console.log(`   Completeness Score: ${completenessScore}%`);
+      console.log(`   Confidence: ${sanitizedData.confidence}`);
+      console.log(`   Verified: ${sanitizedData.verified}`);
+      
+      // Cache high-quality results (90+ completeness score)
+      if (completenessScore >= 90) {
+        console.log(`\n💾 === CACHING HIGH-QUALITY IDENTIFY-DRUG RESULT ===`);
+        console.log(`   Drug: ${sanitizedData.name}`);
+        console.log(`   Completeness: ${completenessScore}% (≥90% threshold met)`);
+        console.log(`   Source: identify-drug analysis system`);
+        console.log(`   Future cache hits: This drug will be instantly recognized!`);
+        
+        // Save to cache asynchronously (don't block response)
+        saveDrugToCache({
+          ...sanitizedData,
+          completeness: completenessScore,
+          cacheSource: 'identify_drug_system',
+          analysisMethod: 'identify-drug'
+        }).catch(err => {
+          console.error('🔴 === IDENTIFY-DRUG CACHE SAVE FAILED ===');
+          console.error('   Error:', err?.message);
+        });
+      } else {
+        console.log(`\n⚠️ === SKIPPING IDENTIFY-DRUG CACHE SAVE ===`);
+        console.log(`   Drug: ${sanitizedData.name}`);
+        console.log(`   Completeness: ${completenessScore}% (< 90% threshold)`);
+        console.log(`   Reason: Quality not high enough for caching`);
+      }
+      
+      // Add completeness score to response
+      sanitizedData.completeness = completenessScore;
+    }
+    
+    // Log the final processed result
+    console.log("Final identification result:", sanitizedData.name);
+    console.log("Data contract verified - all array fields are arrays");
+    
+    return createSuccessResponse(sanitizedData);
     
   } catch (error) {
     console.error("Error constructing final response:", error);
     return createErrorResponse(
       "processing_error", 
       "Failed to process the analysis results. Please try again.",
-      error.message
+      error instanceof Error ? error.message : String(error)
     );
   }
 }

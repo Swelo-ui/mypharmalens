@@ -219,12 +219,12 @@ const DrugIdentify = () => {
     }
   };
 
-  // Function to manually save drug identification to the database
-  const handleSaveToHistory = async () => {
+  // Function to manually save drug identification to cache
+  const handleSaveToCache = async () => {
     try {
       if (!identifiedDrug) return;
       if (!isAuthenticated) {
-        toast.info("Please sign in to save to history", {
+        toast.info("Please sign in to save to cache", {
           action: {
             label: "Sign In",
             onClick: () => navigate('/auth')
@@ -235,94 +235,53 @@ const DrugIdentify = () => {
 
       setIsSaving(true);
       
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        toast.error("Session expired. Please sign in again.");
-        setIsSaving(false);
-        return;
-      }
+      console.log('🔄 Attempting manual cache save for:', identifiedDrug.name);
       
-      // Check history count before saving
-      const { data: historyCount } = await supabase.functions.invoke('manage-drug-history', {
+      // Call the manual cache save function
+      const { data: cacheResult, error: cacheError } = await supabase.functions.invoke('manual-cache-save', {
         body: { 
-          action: 'getHistoryCount',
-          data: { userId: user?.id }
-        },
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`
+          drugData: identifiedDrug
         }
       });
-      
-      const count = historyCount?.data || 0;
-      if (count >= 10) {
-        toast.warning("History limit reached", {
-          description: "You can only store 10 identifications. The oldest one will be removed."
-        });
-      }
-      
-      const result = await saveDrugIdentification({
-        name: identifiedDrug.name,
-        drug_name: identifiedDrug.name,
-        // Don't save image to reduce server load
-        details: identifiedDrug
-      });
 
-      if (result) {
-        toast.success("Saved to history", {
-          description: count >= 10 ? "Oldest entry was removed to make space" : "You can store up to 10 identifications"
+      if (cacheError) {
+        console.error('Cache save error:', cacheError);
+        toast.error("Failed to save to cache", {
+          description: "Please try again later"
+        });
+        return;
+      }
+
+      if (cacheResult && cacheResult.success) {
+        console.log('✅ Manual cache save successful:', cacheResult);
+        toast.success("Saved to cache successfully!", {
+          description: `${identifiedDrug.name} will be instantly recognized in future scans`
         });
         setIsSaved(true);
       } else {
-        toast.error("Failed to save to history");
+        const errorMessage = cacheResult?.message || "Unknown error occurred";
+        const completenessScore = cacheResult?.details?.completenessScore;
+        
+        if (cacheResult?.error === 'incomplete_data') {
+          toast.warning("Information incomplete for caching", {
+            description: `Drug data is ${completenessScore}% complete. Cache requires 100% complete information for quality assurance.`
+          });
+        } else {
+          toast.error("Failed to save to cache", {
+            description: errorMessage
+          });
+        }
       }
     } catch (error) {
-      console.error("Error saving to history:", error);
-      toast.error("Failed to save to history");
+      console.error("Error saving to cache:", error);
+      toast.error("Failed to save to cache", {
+        description: "An unexpected error occurred"
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Function to save drug identification to the database
-  const saveDrugIdentification = async (drugData: any) => {
-    try {
-      if (!isAuthenticated || !user) {
-        console.log('User not authenticated, skipping history save');
-        return null;
-      }
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        throw new Error("No active session");
-      }
-
-      const response = await supabase.functions.invoke('manage-drug-history', {
-        body: { 
-          action: 'addIdentification',
-          data: {
-            userId: user.id,
-            drugName: drugData.drug_name || drugData.name,
-            imageUrl: drugData.image_url || drugData.image,
-            details: drugData,
-            imageFeatures: imageFeatures
-          }
-        },
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`
-        }
-      });
-
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to save identification");
-      }
-
-      console.log("Successfully saved drug identification to history:", response.data);
-      return response.data.data;
-    } catch (error) {
-      console.error("Error in saveDrugIdentification:", error);
-      throw error;
-    }
-  };
 
   // Enhanced function to identify drug using the new fault-tolerant system
   const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
@@ -1092,7 +1051,7 @@ const DrugIdentify = () => {
                   <Button 
                     variant="outline"
                     className="flex items-center gap-2"
-                    onClick={handleSaveToHistory}
+                    onClick={handleSaveToCache}
                     disabled={isSaving}
                   >
                     {isSaving ? (
@@ -1103,7 +1062,7 @@ const DrugIdentify = () => {
                     ) : (
                       <>
                         <BookmarkPlus className="h-4 w-4" />
-                        <span>Save to History</span>
+                        <span>Save to Cache</span>
                       </>
                     )}
                   </Button>
@@ -1117,7 +1076,7 @@ const DrugIdentify = () => {
               <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                   <BookmarkPlus className="h-4 w-4" />
-                  <span>Saved to your identification history</span>
+                  <span>Saved to cache - will be instantly recognized next time</span>
                 </div>
               </Alert>
             )}
