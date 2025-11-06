@@ -982,22 +982,12 @@ Deno.serve(async (req: Request) => {
           completeness: Math.max(geminiGenerated.completeness, drugInfo.completeness)
         };
         
-        // Save the merged info to cache
-        console.log(`💾 === CACHE SAVE START (Gemini-backed) ===`);
+        console.log(`💾 === AUTO-SAVE DISABLED (Gemini-backed) ===`);
         if (mergedInfo.completeness >= 30) {
-          console.log(`   Completeness: ${mergedInfo.completeness}% (>= 30%, saving...)`);
+          console.log(`   Completeness: ${mergedInfo.completeness}% (>= 30%, would qualify for caching)`);
           console.log(`   Sources used: Gemini AI (primary), ${sourcesUsed.join(', ')}`);
           console.log(`   Drug name: ${drugName}`);
-          
-          saveDrugToCache(drugName, mergedInfo, ['Gemini AI', ...sourcesUsed])
-            .then(() => {
-              console.log(`✅ Successfully cached (Gemini-backed): ${drugName}`);
-              console.log(`💾 === CACHE SAVE END ===\n`);
-            })
-            .catch(err => {
-              console.error(`🔴 Cache save FAILED:`, err);
-              console.log(`💾 === CACHE SAVE END (FAILED) ===\n`);
-            });
+          console.log(`   Auto-save disabled - use manual save button to cache this result`);
         }
         
         const response: ApiResponse = {
@@ -1022,26 +1012,15 @@ Deno.serve(async (req: Request) => {
     // Enhance with Gemini (fill gaps in scraped data)
     const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
 
-    // NEW: Save to cache for future use (async, don't block)
-    console.log(`\n💾 === CACHE SAVE START ===`);
+    // Auto-save disabled - use manual save only
+    console.log(`\n💾 === AUTO-SAVE DISABLED ===`);
     if (enhancedInfo.completeness >= 30) {
-      console.log(`   Completeness: ${enhancedInfo.completeness}% (>= 30%, saving...)`);
+      console.log(`   Completeness: ${enhancedInfo.completeness}% (>= 30%, would qualify for caching)`);
       console.log(`   Sources used: ${sourcesUsed.join(', ')}`);
       console.log(`   Drug name: ${drugName}`);
-      
-      saveDrugToCache(drugName, enhancedInfo, sourcesUsed)
-        .then(() => {
-          console.log(`✅ Successfully cached: ${drugName}`);
-          console.log(`💾 === CACHE SAVE END ===\n`);
-        })
-        .catch(err => {
-          console.error(`🔴 Cache save FAILED:`, err);
-          console.error(`   Error details:`, JSON.stringify(err, null, 2));
-          console.log(`💾 === CACHE SAVE END (FAILED) ===\n`);
-        });
+      console.log(`   Auto-save disabled - use manual save button to cache this result`);
     } else {
-      console.log(`   ⚠️ Completeness too low (${enhancedInfo.completeness}% < 30%), NOT saving`);
-      console.log(`💾 === CACHE SAVE END (SKIPPED) ===\n`);
+      console.log(`   ⚠️ Completeness too low (${enhancedInfo.completeness}% < 30%), would not qualify for caching anyway`);
     }
 
     const response: ApiResponse = {

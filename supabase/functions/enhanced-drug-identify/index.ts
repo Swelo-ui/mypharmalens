@@ -1,14 +1,18 @@
-import { serve } from "std/http/server";
 import "xhr";
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 
-// Narrow declaration for Deno env access when type information isn't available
-declare const Deno: { env: { get: (key: string) => string | undefined } };
+// Use edge runtime types via deno.json; no manual Deno declaration
 
 // Environment configuration
-const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
-const SUPABASE_ANON_KEY = Deno?.env?.get('SUPABASE_ANON_KEY') ?? '';
-const GEMINI_API_KEY = Deno?.env?.get('GEMINI_API_KEY') ?? '';
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
+const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
+
+// OpenRouter configuration
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const OPENROUTER_VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';
+const OPENROUTER_VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -154,6 +158,39 @@ interface TextExtractionData {
 }
 
 // Helper functions
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isLastAttempt = attempt === maxRetries;
+      const errorMessage = error instanceof Error ? error.message : '';
+      const isRateLimitError = errorMessage.includes('429');
+      const isQuotaExhausted = errorMessage.includes('QUOTA_EXHAUSTED');
+      
+      // Don't retry if quota is completely exhausted
+      if (isQuotaExhausted) {
+        console.error('❌ Quota exhausted - skipping retries');
+        throw error;
+      }
+      
+      if (isLastAttempt || !isRateLimitError) {
+        throw error;
+      }
+      
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`⏳ Rate limited, retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 function createResponse(data: unknown, status: number = 200): Response {
   return new Response(
     JSON.stringify(data),
@@ -214,7 +251,71 @@ async function stageTextExtraction(imageBase64: string): Promise<ProcessingStage
   }
 }
 
-// Gemini-based OCR extraction
+// OpenRouter-based OCR extraction (Fallback with dual model support)
+async function extractTextWithOpenRouter(imageBase64: string, useSecondary: boolean = false): Promise<string> {
+  const modelToUse = useSecondary ? OPENROUTER_VISION_MODEL_SECONDARY : OPENROUTER_VISION_MODEL_PRIMARY;
+  const modelName = useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL';
+  
+  try {
+    console.log(`🔄 Using OpenRouter OCR (${modelName}) as fallback...`);
+    const prompt = `Perform a deep OCR on this medication packaging. Extract ALL visible text, preserving the layout and line breaks. Pay special attention to text under these headings:
+- Brand Name (usually the largest text)
+- Generic Name or Active Ingredient(s)
+- Composition or Each tablet/5ml contains
+- Ingredients section
+- Dosage or How to Use
+- Manufactured by or company logo
+- Batch number, expiration date, NDC code
+
+Return ONLY the extracted text, line by line, maintaining the original structure. Do not summarize or explain.`;
+
+    const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': SUPABASE_URL,
+        'X-Title': 'PharmaLens Drug Identifier'
+      },
+      body: JSON.stringify({
+        model: modelToUse,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${cleanBase64}` } }
+          ]
+        }],
+        temperature: 0.1,
+        max_tokens: 1024
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter OCR (${modelName}) failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const extractedText = result.choices?.[0]?.message?.content || '';
+    
+    console.log(`✅ OpenRouter OCR (${modelName}) extracted: "${extractedText.substring(0, 100)}..."`);
+    return extractedText;
+  } catch (error) {
+    console.error(`❌ OpenRouter OCR (${modelName}) extraction failed:`, error);
+    
+    // If primary model failed, try secondary
+    if (!useSecondary && OPENROUTER_API_KEY) {
+      console.log('🔄 Primary OpenRouter model failed, trying Nvidia Nemotron...');
+      return await extractTextWithOpenRouter(imageBase64, true);
+    }
+    
+    return '';
+  }
+}
+
+// Gemini-based OCR extraction with OpenRouter fallback
 async function extractTextWithGemini(imageBase64: string): Promise<string> {
   try {
     const prompt = `Perform a deep OCR on this medication packaging. Extract ALL visible text, preserving the layout and line breaks. Pay special attention to text under these headings:
@@ -255,6 +356,12 @@ Return ONLY the extracted text, line by line, maintaining the original structure
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      // Check if quota exhausted - use OpenRouter fallback
+      if (response.status === 429 && (errorText.includes('quota') || errorText.includes('exceeded'))) {
+        console.warn('⚠️ Gemini quota exhausted, falling back to OpenRouter OCR');
+        return await extractTextWithOpenRouter(imageBase64);
+      }
       throw new Error(`Gemini OCR failed: ${response.status}`);
     }
 
@@ -265,6 +372,11 @@ Return ONLY the extracted text, line by line, maintaining the original structure
     return extractedText;
   } catch (error) {
     console.error('❌ Gemini OCR extraction failed:', error);
+    // Try OpenRouter as final fallback
+    if (OPENROUTER_API_KEY) {
+      console.log('🔄 Attempting OpenRouter fallback for OCR...');
+      return await extractTextWithOpenRouter(imageBase64);
+    }
     return '';
   }
 }
@@ -662,6 +774,63 @@ async function createFallbackAnalysisData(geminiText: string): Promise<FallbackA
   };
 }
 
+// OpenRouter Vision Analysis (Fallback with dual model support)
+async function analyzeImageWithOpenRouter(
+  imageBase64: string,
+  prompt: string,
+  opts?: { blurryMode?: boolean; advancedAnalysis?: boolean; useSecondary?: boolean }
+): Promise<string> {
+  const useSecondary = opts?.useSecondary || false;
+  const modelToUse = useSecondary ? OPENROUTER_VISION_MODEL_SECONDARY : OPENROUTER_VISION_MODEL_PRIMARY;
+  const modelName = useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL';
+  
+  console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
+  const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+
+  try {
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': SUPABASE_URL,
+        'X-Title': 'PharmaLens Drug Identifier'
+      },
+      body: JSON.stringify({
+        model: modelToUse,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${cleanBase64}` } }
+          ]
+        }],
+        temperature: opts?.blurryMode ? 0.2 : 0.1,
+        max_tokens: 1024
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter Vision (${modelName}) failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content || '';
+    console.log(`✅ OpenRouter Vision (${modelName}) succeeded`);
+    return content;
+  } catch (error) {
+    console.error(`❌ OpenRouter Vision (${modelName}) failed:`, error);
+    
+    // If primary model failed, try secondary
+    if (!useSecondary && OPENROUTER_API_KEY) {
+      console.log('🔄 Primary OpenRouter model failed, trying Nvidia Nemotron...');
+      return await analyzeImageWithOpenRouter(imageBase64, prompt, { ...opts, useSecondary: true });
+    }
+    
+    throw error;
+  }
+}
+
 async function stageGeminiAnalysis(
   imageBase64: string,
   _extractedText?: string,
@@ -725,35 +894,50 @@ FOR PILLS/TABLETS:
 
 ⚠️ REMEMBER: Extract EXACT text, don't invent names. Return JSON only:`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              },
-              {
-                inline_data: {
-                  mime_type: "image/jpeg",
-                  data: cleanBase64
+    // Use retry logic for critical Gemini Vision API call
+    const response = await retryWithBackoff(async () => {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt
+                },
+                {
+                  inline_data: {
+                    mime_type: "image/jpeg",
+                    data: cleanBase64
+                  }
                 }
-              }
-            ]
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: opts?.blurryMode ? 0.2 : 0.1,
+            topK: opts?.blurryMode ? 64 : 32,
+            topP: opts?.blurryMode ? 0.95 : 1,
+            maxOutputTokens: 1024,
           }
-        ],
-        generationConfig: {
-          temperature: opts?.blurryMode ? 0.2 : 0.1,
-          topK: opts?.blurryMode ? 64 : 32,
-          topP: opts?.blurryMode ? 0.95 : 1,
-          maxOutputTokens: 1024,
+        })
+      });
+      
+      if (!res.ok) {
+        const errorBody = await res.text();
+        // Check for quota exhaustion - don't retry if quota is completely gone
+        if (res.status === 429 && (errorBody.includes('quota') || errorBody.includes('exceeded'))) {
+          console.error('🚨 GEMINI API QUOTA EXHAUSTED - Skipping retries');
+          throw new Error(`QUOTA_EXHAUSTED: ${errorBody.substring(0, 200)}`);
         }
-      })
-    });
+        throw new Error(`${res.status}: ${errorBody}`);
+      }
+      
+      return res;
+    }, 3, 1000);
 
     if (!response.ok) {
       const errorBody = await response.text();
@@ -883,14 +1067,73 @@ FOR PILLS/TABLETS:
     };
   } catch (error) {
     const processingTime = Date.now() - startTime;
-    console.error(`Gemini analysis failed after ${processingTime}ms:`, error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`Gemini analysis failed after ${processingTime}ms:`, errorMessage);
+    
+    // Try OpenRouter as fallback if available
+    if (OPENROUTER_API_KEY && (errorMessage.includes('429') || errorMessage.includes('QUOTA'))) {
+      console.warn('⚠️ Gemini failed, attempting OpenRouter fallback for vision analysis...');
+      try {
+        const prompt = `You are a pharmaceutical OCR expert. Your PRIMARY task is to READ THE EXACT TEXT visible on this medication packaging/bottle/pill.
+
+🚨 CRITICAL RULES - FOLLOW EXACTLY:
+1. READ the EXACT brand name visible - DO NOT invent or modify names
+2. Extract REAL active ingredients from the composition/ingredients section
+3. NEVER create fictional drug names - only use visible text
+4. If unclear, return "Unknown" rather than guessing
+
+🎯 OUTPUT FORMAT (JSON only):
+{
+  "name": "EXACT brand name from package",
+  "genericName": "Active ingredient(s) from composition",
+  "imprint": "Imprint code if pill, or null",
+  "color": "Dominant color",
+  "shape": "bottle/box/round pill/oblong tablet",
+  "manufacturer": "Company name",
+  "confidence": "high/medium/low",
+  "physicalDescription": "Brief visual description",
+  "identificationNotes": "Key text you extracted",
+  "activeIngredients": [{ "name": "Ingredient", "strength": "Amount" }],
+  "formulation": "Syrup/Tablet/Capsule/etc.",
+  "possibleNames": ["Alternative names if confidence is low"],
+  "productType": "medication/supplement/other"
+}
+
+Return JSON only:`;
+
+        const openRouterResponse = await analyzeImageWithOpenRouter(imageBase64, prompt, opts);
+        
+        // Parse OpenRouter response
+        let analysisData;
+        const jsonMatch = openRouterResponse.match(/\{[\s\S]*\}/);
+        
+        if (jsonMatch) {
+          try {
+            analysisData = JSON.parse(jsonMatch[0]);
+            console.log(`✅ OpenRouter fallback succeeded: ${analysisData.name}`);
+            
+            return {
+              name: 'gemini-analysis',
+              success: true,
+              data: { ...analysisData, fallbackUsed: 'OpenRouter' },
+              processingTime: Date.now() - startTime,
+              error: undefined
+            };
+          } catch (parseError) {
+            console.error('Failed to parse OpenRouter JSON:', parseError);
+          }
+        }
+      } catch (openRouterError) {
+        console.error('OpenRouter fallback also failed:', openRouterError);
+      }
+    }
     
     return {
       name: 'gemini-analysis',
       success: false,
       data: undefined,
       processingTime,
-      error: error instanceof Error ? (error as Error).message : 'Unknown error'
+      error: errorMessage
     };
   }
 }
@@ -993,10 +1236,19 @@ Visual characteristics from image:
 - Color: ${visualInfo.color || 'Not identified'}
 - Shape: ${visualInfo.shape || 'Not identified'}` : '';
 
-    const prompt = `You are a pharmaceutical database expert. Generate comprehensive, accurate drug information for: ${drugName}
+    const prompt = `You are a pharmaceutical database expert. ONLY provide information for REAL, EXISTING medications.
+
+Drug to identify: ${drugName}
 ${visualContext}
 
-Provide complete, medically accurate information in JSON format:
+CRITICAL RULES:
+1. If you don't know this medication, respond with: {"error": "Unknown medication"}
+2. NEVER generate hypothetical, fictional, or made-up drug information
+3. NEVER use words like "hypothetical", "fictional", "example", "sample", "unoriginal" in your response
+4. ONLY provide data for medications that actually exist in the real world
+5. If uncertain, it's better to return an error than to fabricate information
+
+Provide complete, medically accurate information ONLY for real medications in JSON format:
 {
   "name": "${drugName}",
   "genericName": "Generic/chemical name",
@@ -1017,7 +1269,7 @@ Provide complete, medically accurate information in JSON format:
   "brandNames": ["List 5-10 brand names"]
 }
 
-IMPORTANT: Provide real, accurate medical information. This is critical for patient safety.`;
+CRITICAL: This is for PATIENT SAFETY. Only provide real, verified drug information. Never generate hypothetical data.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -1029,16 +1281,21 @@ IMPORTANT: Provide real, accurate medical information. This is critical for pati
           parts: [{ text: prompt }]
         }],
         generationConfig: {
-          temperature: 0.2,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
+          temperature: 0.1,
+          topK: 1,
+          topP: 0.8,
+          maxOutputTokens: 1024,
         }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini backup failed: ${response.status}`);
+      const errorText = await response.text();
+      if (response.status === 429) {
+        console.error('❌ Gemini API rate limit exceeded - skipping AI backup');
+        throw new Error('Rate limit exceeded - try again later');
+      }
+      throw new Error(`Gemini backup failed: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
@@ -1055,6 +1312,39 @@ IMPORTANT: Provide real, accurate medical information. This is critical for pati
 
     const backupData = JSON.parse(jsonMatch[0]);
     const processingTime = Date.now() - startTime;
+    
+    // Check if Gemini returned an error indicating unknown medication
+    if (backupData.error) {
+      console.log('Gemini indicated unknown medication:', backupData.error);
+      throw new Error(backupData.error);
+    }
+    
+    // CRITICAL VALIDATION: Reject hypothetical or made-up drug information
+    const returnedDrugName = (backupData.name || '').toLowerCase();
+    const returnedGenericName = (backupData.genericName || '').toLowerCase();
+    const returnedDescription = (backupData.description || '').toLowerCase();
+    const returnedCategory = (backupData.category || '').toLowerCase();
+    
+    const hypotheticalIndicators = [
+      'hypothetical', 'fictional', 'made-up', 'example', 'sample',
+      'placeholder', 'demo', 'test', 'unoriginal', 'fake', 'simulated',
+      'imaginary', 'not real', 'does not exist'
+    ];
+    
+    const containsHypothetical = hypotheticalIndicators.some(indicator => 
+      returnedDrugName.includes(indicator) || 
+      returnedGenericName.includes(indicator) || 
+      returnedDescription.includes(indicator) ||
+      returnedCategory.includes(indicator)
+    );
+    
+    if (containsHypothetical) {
+      console.error('❌ REJECTED: Gemini returned hypothetical/fictional drug information');
+      console.error(`   Drug name: ${backupData.name}`);
+      console.error(`   Generic: ${backupData.genericName}`);
+      console.error('   Reason: Medical safety - only real drug information allowed');
+      throw new Error('Hypothetical drug information rejected for patient safety');
+    }
     
     // Merge visual info if provided
     if (visualInfo) {
@@ -1092,69 +1382,21 @@ IMPORTANT: Provide real, accurate medical information. This is critical for pati
   }
 }
 
-async function stageImprintSearch(imprint: string, color?: string, shape?: string): Promise<ProcessingStage> {
+function stageImprintSearch(imprint: string, color?: string, shape?: string): Promise<ProcessingStage> {
   console.log('=== STAGE: Imprint Search ===');
   console.log(`Searching for imprint: "${imprint}", color: ${color || 'unknown'}, shape: ${shape || 'unknown'}`);
   const startTime = Date.now();
   
-  try {
-    if (!imprint || imprint.trim().length === 0) {
-      throw new Error('No imprint provided for search');
-    }
-
-    // Construct search URL for drugs.com imprint search
-    const searchParams = new URLSearchParams();
-    searchParams.append('imprint', imprint.trim());
-    if (color) searchParams.append('color', color);
-    if (shape) searchParams.append('shape', shape);
-    
-    const searchUrl = `https://www.drugs.com/imprints.php?${searchParams.toString()}`;
-    console.log(`Searching URL: ${searchUrl}`);
-
-    const response = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const html = await response.text();
-    const drugInfo = await parseImprintSearchResults(html);
-    const processingTime = Date.now() - startTime;
-    
-    console.log(`Imprint search completed in ${processingTime}ms`);
-    
-    if (drugInfo) {
-      console.log(`Found drug: ${drugInfo.name} (${drugInfo.confidence} confidence)`);
-      console.log(`Generic: ${drugInfo.genericName}, Manufacturer: ${drugInfo.manufacturer}`);
-    } else {
-      console.log('No drug information found in imprint search results');
-    }
-
-    return {
-      name: 'imprint-search',
-      success: !!drugInfo,
-      data: drugInfo ?? undefined,
-      processingTime,
-      error: drugInfo ? undefined : 'No matching drugs found'
-    };
-  } catch (error) {
-    const processingTime = Date.now() - startTime;
-    console.error(`Imprint search failed after ${processingTime}ms:`, error);
-    
-    return {
-      name: 'imprint-search',
-      success: false,
-      data: undefined,
-      processingTime,
-      error: error instanceof Error ? (error as Error).message : 'Unknown error'
-    };
-  }
+  // Temporarily disable direct scraping due to 403 errors
+  console.log('⚠️ Imprint search temporarily disabled due to access restrictions');
+  
+  return Promise.resolve({
+    name: 'imprint-search',
+    success: false,
+    data: undefined,
+    processingTime: Date.now() - startTime,
+    error: 'Imprint search temporarily unavailable'
+  });
 }
 
 // Helper function to parse HTML for drug information
@@ -1994,7 +2236,7 @@ function combineStageResults(stages: ProcessingStage[]): CombinedResult | null {
 }
 
 // Main serve function
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -2202,8 +2444,9 @@ serve(async (req: Request) => {
     
     const combinedResult = combineStageResults(stages);
 
-    // Stage 10: Final AI Cross-Verification & Quality Assurance (ALWAYS RUN)
-    if (combinedResult && combinedResult.name !== "Unknown Medication") {
+    // Stage 10: Final AI Cross-Verification & Quality Assurance (Run if we have ANY data)
+    // Relaxed criteria - run QA even for partial results
+    if (combinedResult && (combinedResult.name !== "Unknown Medication" || combinedResult.genericName || combinedResult.imprint)) {
       const finalQAStage = await stageFinalCrossVerification(combinedResult, stages);
       stages.push(finalQAStage);
       
@@ -2218,7 +2461,17 @@ serve(async (req: Request) => {
       }
     }
 
-    if (combinedResult && combinedResult.name !== "Unknown Medication") {
+    // Accept result if we have ANY useful drug information (relaxed criteria for reliability)
+    const hasUsefulData = combinedResult && (
+      combinedResult.name !== "Unknown Medication" ||
+      (combinedResult.imprint && combinedResult.imprint.length > 0) ||
+      (combinedResult.color && combinedResult.color.length > 0) ||
+      (combinedResult.shape && combinedResult.shape.length > 0) ||
+      (combinedResult.possibleNames && combinedResult.possibleNames.length > 0)
+    );
+    
+    if (hasUsefulData) {
+      console.log('✅ Accepting result with partial data (relaxed criteria for consistency)');
       // Calculate data completeness score
       let completenessScore = 0;
       const requiredFields = ['genericName', 'description', 'dosageAndAdmin', 'category'];
@@ -2309,28 +2562,17 @@ serve(async (req: Request) => {
               console.log(`   Fallback Confidence: ${fallbackResult.data.confidence}`);
               console.log(`   Original Score: ${completenessScore}% → Fallback Score: ${fallbackCompletenessScore}%`);
               
-              // Cache high-quality fallback results (90+ score) for future use
+              // Auto-save disabled - use manual save only for fallback results
               if (fallbackResult.data.name && 
                   fallbackResult.data.name !== 'Unknown Medication' && 
                   !fallbackResult.data.name.toLowerCase().includes('unknown') &&
                   fallbackCompletenessScore >= 90) {
                 
-                console.log(`\n💾 === CACHING HIGH-QUALITY FALLBACK RESULT ===`);
+                console.log(`\n💾 === HIGH-QUALITY FALLBACK RESULT (Auto-save disabled) ===`);
                 console.log(`   Drug: ${fallbackResult.data.name}`);
                 console.log(`   Completeness: ${fallbackCompletenessScore}% (≥90% threshold met)`);
                 console.log(`   Source: Smart fallback system`);
-                console.log(`   Future cache hits: This drug will be instantly recognized!`);
-                
-                // Save to cache asynchronously (don't block response)
-                saveDrugToCache({
-                  ...fallbackResult.data,
-                  completeness: fallbackCompletenessScore,
-                  smartFallbackUsed: true,
-                  cacheSource: 'smart_fallback_system'
-                }).catch(err => {
-                  console.error('🔴 === FALLBACK CACHE SAVE FAILED ===');
-                  console.error('   Error:', err?.message);
-                });
+                console.log(`   Auto-save disabled - use manual save button to cache this result`);
               } else if (fallbackResult.data.name && fallbackResult.data.name !== 'Unknown Medication') {
                 console.log(`\n⚠️ === SKIPPING FALLBACK CACHE SAVE ===`);
                 console.log(`   Drug: ${fallbackResult.data.name}`);
@@ -2367,29 +2609,22 @@ serve(async (req: Request) => {
         console.log(`✅ Data quality ACCEPTABLE (${completenessScore}% >= ${qualityThreshold}%)`);
       }
       
-      // NEW: Save successful identification to cache (async, don't block response) - Only save high-quality data (90+)
+      // Auto-save disabled - use manual save only
       if (combinedResult.name && 
           combinedResult.name !== 'Unknown Medication' && 
           !combinedResult.name.toLowerCase().includes('unknown') &&
           completenessScore >= 90) {
-        console.log(`\n💾 === ATTEMPTING HIGH-QUALITY CACHE SAVE ===`);
+        console.log(`\n💾 === HIGH-QUALITY RESULT (Auto-save disabled) ===`);
         console.log(`   Drug name: ${combinedResult.name}`);
         console.log(`   Completeness: ${completenessScore}% (≥90% threshold met)`);
         console.log(`   Confidence: ${combinedResult.confidence}`);
         console.log(`   Verified: ${combinedResult.verified}`);
-        
-        saveDrugToCache({
-          ...combinedResult,
-          completeness: completenessScore
-        }).catch(err => {
-          console.error('🔴 === CACHE SAVE FAILED ===');
-          console.error('   Error:', err?.message);
-        });
+        console.log(`   Auto-save disabled - use manual save button to cache this result`);
       } else if (combinedResult.name && combinedResult.name !== 'Unknown Medication') {
-        console.log(`\n⚠️ === SKIPPING CACHE SAVE ===`);
+        console.log(`\n⚠️ === CACHE SAVE CRITERIA NOT MET ===`);
         console.log(`   Drug name: ${combinedResult.name}`);
         console.log(`   Completeness: ${completenessScore}% (< 90% threshold)`);
-        console.log(`   Reason: Quality too low for caching`);
+        console.log(`   Reason: Quality too low for caching (auto-save disabled anyway)`);
       }
       
       const result: DrugIdentificationResult = {

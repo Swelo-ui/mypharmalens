@@ -1151,16 +1151,8 @@ async function constructFinalResponse(multiModelAnalysis: any, standardAnalysis:
         console.log(`   Source: identify-drug analysis system`);
         console.log(`   Future cache hits: This drug will be instantly recognized!`);
         
-        // Save to cache asynchronously (don't block response)
-        saveDrugToCache({
-          ...sanitizedData,
-          completeness: completenessScore,
-          cacheSource: 'identify_drug_system',
-          analysisMethod: 'identify-drug'
-        }).catch(err => {
-          console.error('🔴 === IDENTIFY-DRUG CACHE SAVE FAILED ===');
-          console.error('   Error:', err?.message);
-        });
+        // Auto-save disabled - use manual save only
+        console.log(`   Auto-save disabled - use manual save button to cache this result`);
       } else {
         console.log(`\n⚠️ === SKIPPING IDENTIFY-DRUG CACHE SAVE ===`);
         console.log(`   Drug: ${sanitizedData.name}`);

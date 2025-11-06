@@ -1,8 +1,8 @@
 // Enhanced Multi-Source Drug Information API with Caching
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import type { ComprehensiveDrugInfo, ApiResponse } from './types';
-import { getCachedDrug, saveDrugToCache, getCacheStats } from './cache';
-import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers';
+import "@supabase/functions-js/edge-runtime.d.ts";
+import type { ComprehensiveDrugInfo, ApiResponse } from './types.ts';
+import { getCachedDrug, saveDrugToCache, getCacheStats } from './cache.ts';
+import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers.ts';
 
 // Declare Deno for edge runtime
 declare const Deno: {
@@ -110,11 +110,9 @@ async function collectDrugDataEnhanced(drugName: string): Promise<{
     drugName
   );
   
-  // STEP 4: Save to cache for future use (async, don't wait)
+  // Auto-save disabled - use manual save only
   if (mergedDrug.completeness >= 30) {
-    saveDrugToCache(drugName, mergedDrug, sourcesUsed)
-      .then(() => console.log(`Saved ${drugName} to cache`))
-      .catch(err => console.error('Cache save failed:', err));
+    console.log(`Auto-save disabled for ${drugName} (${mergedDrug.completeness}% completeness) - use manual save button`);
   }
   
   return {
@@ -261,16 +259,16 @@ function calculateCompleteness(drug: ComprehensiveDrugInfo): number {
 }
 
 // Placeholder functions - these should be imported from existing code
-async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDrugInfo> | null> {
+function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDrugInfo> | null> {
   // Import from original index.ts
   console.log(`[Placeholder] Scraping Drugs.com for ${drugName}`);
-  return null;
+  return Promise.resolve(null);
 }
 
-async function scrapeMedlinePlus(drugName: string): Promise<Partial<ComprehensiveDrugInfo> | null> {
+function scrapeMedlinePlus(drugName: string): Promise<Partial<ComprehensiveDrugInfo> | null> {
   // Import from original index.ts
   console.log(`[Placeholder] Scraping MedlinePlus for ${drugName}`);
-  return null;
+  return Promise.resolve(null);
 }
 
 // Main API handler
