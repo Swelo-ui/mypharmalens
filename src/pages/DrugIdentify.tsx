@@ -76,6 +76,7 @@ const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
+  const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
@@ -325,26 +326,38 @@ const DrugIdentify = () => {
         // Start progress tracking with smooth updates
         updateProgress('image-quality-analysis');
         
-        const { data: enhancedData, error: enhancedError } = await supabase.functions.invoke('enhanced-drug-identify', {
+        // Log which mode we're using
+        console.log(`🚀 Identifying drug using ${analysisMode.toUpperCase()} mode`);
+        console.log(`Mode details:`, {
+          analysisMode,
+          enhancedMode,
+          blurryMode: blurryMode || isImageLowRes,
+          bypassCache: analysisMode === 'enhanced'
+        });
+        
+        // Use the appropriate function based on analysis mode
+        const functionName = analysisMode === 'enhanced' ? 'enhanced-drug-identify' : 'standard-drug-identify';
+        console.log(`🚀 Calling function: ${functionName} for ${analysisMode} mode`);
+        
+        const { data: drugData, error: drugError } = await supabase.functions.invoke(functionName, {
           body: { 
             imageBase64: base64Image,
             options: {
-              enhancedMode: enhancedMode,
               blurryMode: blurryMode || isImageLowRes,
-              bypassCache: enhancedMode
+              advancedAnalysis: analysisMode === 'enhanced'
             }
           }
         });
 
-        if (enhancedError) {
-          console.warn('Enhanced identification failed, trying fallback:', enhancedError);
-          throw new Error('Enhanced system unavailable');
+        if (drugError) {
+          console.error(`${functionName} failed:`, drugError);
+          throw new Error(`${analysisMode === 'enhanced' ? 'Enhanced' : 'Standard'} system unavailable`);
         }
 
-        if (enhancedData && enhancedData.success) {
+        if (drugData && drugData.success) {
           // Update progress based on actual backend stages
-          if (enhancedData.processingStages && Array.isArray(enhancedData.processingStages)) {
-            enhancedData.processingStages.forEach((stage: string, index: number) => {
+          if (drugData.processingStages && Array.isArray(drugData.processingStages)) {
+            drugData.processingStages.forEach((stage: string, index: number) => {
               setTimeout(() => {
                 updateProgress(stage);
               }, index * 400); // Smooth staggered updates
@@ -355,63 +368,31 @@ const DrugIdentify = () => {
             setProcessingProgress(90);
           }
           
-          result = enhancedData.data;
-          result.enhancedProcessing = true;
-          result.processingStages = enhancedData.processingStages || [];
-          result.confidence = enhancedData.confidence || 'medium';
-          result.fallbackUsed = enhancedData.fallbackUsed || false;
+          result = drugData.data;
+          result.enhancedProcessing = analysisMode === 'enhanced';
+          result.processingStages = drugData.processingStages || [];
+          result.confidence = drugData.confidence || 'medium';
+          result.fallbackUsed = drugData.fallbackUsed || false;
+          
+          // If there's an error message, log it but don't fail
+          if (drugData.error) {
+            console.warn(`${analysisMode} identification completed with issues:`, drugData.error);
+          }
+          
           setProcessingMeta({
             confidence: result.confidence,
             fallbackUsed: result.fallbackUsed,
-            processingStages: enhancedData.processingStages || [],
-            enhancedProcessing: true
+            processingStages: drugData.processingStages || [],
+            enhancedProcessing: analysisMode === 'enhanced'
           });
           
-          console.log('Enhanced identification successful:', result.name);
+          console.log(`${analysisMode} identification completed:`, result.name);
         } else {
-          throw new Error('Enhanced system returned no results');
+          throw new Error(`${analysisMode} system returned no results`);
         }
-      } catch (enhancedError) {
-        console.warn('Enhanced system failed, using fallback:', enhancedError);
-        fallbackUsed = true;
-        
-        // Fallback to original system
-        setProcessingPhase("Trying alternative analysis method");
-        setProcessingProgress(45);
-        setEstimatedTimeRemaining(15);
-        
-        const { data: fallbackData, error: fallbackError } = await supabase.functions.invoke('identify-drug', {
-          body: { 
-            imageBase64: base64Image,
-            blurryMode: blurryMode || isImageLowRes || enhancedMode
-          }
-        });
-
-        setProcessingPhase("Validating medication data");
-        setProcessingProgress(75);
-        setEstimatedTimeRemaining(8);
-
-        if (fallbackError) {
-          console.error('Fallback system also failed:', fallbackError);
-          throw new Error('All identification systems failed. Please try again with a clearer image.');
-        }
-
-        if (fallbackData && fallbackData.success !== false) {
-          result = fallbackData?.data || fallbackData;
-          result.enhancedProcessing = false;
-          result.fallbackUsed = true;
-          result.confidence = result.confidence || 'low';
-          setProcessingMeta({
-            confidence: result.confidence,
-            fallbackUsed: true,
-            processingStages: result.processingStages || [],
-            enhancedProcessing: false
-          });
-          
-          console.log('Fallback identification successful:', result.name);
-        } else {
-          throw new Error(fallbackData?.message || fallbackData?.error || 'Failed to identify medication');
-        }
+      } catch (drugError) {
+        console.error('Drug identification failed:', drugError);
+        throw new Error(`Identification failed: ${drugError.message || 'Please try again with a clearer image.'}`);
       }
 
       // Final validation and processing
@@ -557,16 +538,19 @@ const DrugIdentify = () => {
 
             // Always check if we have usable data, even if success is false
             const hasUsableData = drugData && drugData.name && (
-              drugData.name !== "Unknown Medication" || 
+              drugData.name === "Unknown Medication" || 
               drugData.name === "Unidentified Medication" ||
-              (drugData.recommendations && drugData.recommendations.length > 0)
+              drugData.name === "Partially Identified Medication" ||
+              drugData.name !== "Unknown Medication"
             );
 
             if (hasUsableData) {
               setProcessingProgress(95);
               
               // Check if this is an unidentified medication with recommendations
-              const isUnidentified = drugData.name === "Unidentified Medication";
+              const isUnidentified = drugData.name === "Unidentified Medication" || 
+                                     drugData.name === "Unknown Medication" ||
+                                     drugData.name === "Partially Identified Medication";
               
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
@@ -924,7 +908,7 @@ const DrugIdentify = () => {
                   : "Take a clear photo of the medication for identification"}
               </p>
               
-              <Tabs defaultValue="standard" className="mb-6">
+              <Tabs value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'standard' | 'enhanced')} className="mb-6">
                 <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-4">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
@@ -934,7 +918,7 @@ const DrugIdentify = () => {
                   <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
-                        <span className="text-sm font-medium">Basic Analysis</span>
+                        <span className="text-sm font-medium">Quick Search</span>
                       </div>
                       <Switch 
                         id="blur-mode" 
@@ -943,7 +927,7 @@ const DrugIdentify = () => {
                       />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Standard mode works best with clear, well-lit images. Enable blur mode for lower-quality images.
+                      Fast identification for common medications. Good for clear images.
                     </p>
                     {isImageLowRes && (
                       <p className="text-xs text-amber-500 mt-2">
@@ -958,7 +942,7 @@ const DrugIdentify = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         <Zap className="h-4 w-4 text-pharma-600" />
-                        <span className="text-sm font-medium">Advanced Analysis</span>
+                        <span className="text-sm font-medium">Deep Analysis</span>
                       </div>
                       <Switch 
                         id="enhanced-mode" 
@@ -967,8 +951,7 @@ const DrugIdentify = () => {
                       />
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-300">
-                      Enhanced mode uses multiple AI models to analyze the image from different angles, 
-                      improving accuracy for blurry or difficult-to-identify medications.
+                      Thorough analysis with complete information. Takes longer but more detailed.
                     </p>
                   </div>
                 </TabsContent>

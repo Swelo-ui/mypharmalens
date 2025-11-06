@@ -230,7 +230,7 @@ Return ONLY the extracted text, line by line, maintaining the original structure
 
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -675,64 +675,57 @@ async function stageGeminiAnalysis(
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
     console.log(`   Image data length: ${cleanBase64.length} characters`);
     
-    const prompt = `You are an expert pharmaceutical analyst with deep knowledge of international drug names. Analyze this medication's packaging/pill with extreme attention to detail.
+    const prompt = `You are a pharmaceutical OCR expert. Your PRIMARY task is to READ THE EXACT TEXT visible on this medication packaging/bottle/pill.
 
-IMPORTANT: First determine if this is PACKAGING (box/bottle/blister pack) or a PILL/TABLET.
+🚨 CRITICAL RULES - FOLLOW EXACTLY:
+1. READ the EXACT brand name visible - DO NOT invent or modify names
+2. If you see "Vitacure Syrup" → return "Vitacure Syrup" (not "Vitacure" or "VitaCure Multivitamin")
+3. If you see "Crocin Advance" → return "Crocin Advance" (not "Crocin" or "Crocin Pain Relief")
+4. Extract REAL active ingredients from the composition/ingredients section
+5. NEVER create fictional drug names - only use visible text
+6. If unclear, return "Unknown" rather than guessing
 
-FOR PACKAGING (boxes, bottles, blister packs):
-1. Identify the PRIMARY Brand Name: The most prominent text on the packaging (e.g., "Crocin", "Panadol", "T-DOM-10")
-2. **CRITICAL - Generic Name Extraction**: Identify the GENERIC/SCIENTIFIC NAME of the active ingredient:
-   - Look for smaller text below brand name (e.g., "Paracetamol", "Domperidone")
-   - If brand name is abbreviated (e.g., "T-DOM-10", "DOM-10"), deduce the generic name:
-     * T-DOM-10 / DOM-10 → Domperidone
-     * CROCIN / PANADOL → Paracetamol
-     * ASPIRIN → Acetylsalicylic acid
-     * IBUGESIC → Ibuprofen
-   - Check composition section for active ingredients
-   - ALWAYS provide the GENERIC NAME, even if you need to deduce it from the brand name
-3. Extract ALL Active Ingredients and Strengths: Look for "Composition," "Each tablet contains," etc.
-4. Determine the Formulation: "Tablet," "Syrup," "Capsule," "Ointment," etc.
-5. Extract Dosage Instructions: Any visible dosage information
-6. Identify the Manufacturer: Company name or logo
+📋 WHAT TO EXTRACT:
+
+FOR PACKAGING (bottles, boxes, blister packs):
+1. **Brand Name**: The PRIMARY product name EXACTLY as written
+   - Examples: "Vitacure Syrup", "Crocin Advance Tablet", "Panadol Extra"
+   
+2. **Generic/Active Ingredients**: From composition section
+   - Look for "Composition:", "Contains:", "Each tablet/5ml contains:"
+   - Examples: "Paracetamol 500mg", "Multivitamin (A, D3, E, B-complex)"
+   
+3. **Formulation**: Syrup, Tablet, Capsule, Ointment, Injection
+4. **Manufacturer**: Company name or logo
+5. **Strength/Dosage**: mg, ml, IU per dose
 
 FOR PILLS/TABLETS:
-1. Examine imprint/markings: Any text, numbers, logos, or symbols
-2. Assess physical characteristics: Color, shape, size, texture, coating
-3. Identify manufacturer clues: Logo shapes, distinctive markings
-4. For blurry images, provide educated guesses and list multiple possibilities
+1. Imprint codes (letters/numbers stamped on pill)
+2. Color, shape, size
+3. Any manufacturer logos
 
-CRITICAL RULES FOR GENERIC NAME:
-- If you see "T-DOM-10" → genericName: "Domperidone"
-- If you see "CROCIN" → genericName: "Paracetamol"  
-- If you see "PANADOL" → genericName: "Paracetamol"
-- If you see "ASPIRIN" → genericName: "Acetylsalicylic acid"
-- If composition shows "Domperidone 10mg" → genericName: "Domperidone"
-- NEVER leave genericName empty - always identify the active ingredient
-
-OUTPUT FORMAT (JSON only, be precise):
+🎯 OUTPUT FORMAT (JSON only):
 {
-  "name": "Primary brand name exactly as shown (e.g., 'T-DOM-10', 'Crocin Syrup')",
-  "genericName": "MUST BE GENERIC/SCIENTIFIC NAME (e.g., 'Domperidone', 'Paracetamol') - NEVER leave empty",
-  "imprint": "Imprint code for pills, or null for packaging",
-  "color": "Dominant color(s)",
-  "shape": "Shape (e.g., 'bottle', 'box', 'round pill', 'oblong tablet')",
-  "manufacturer": "Manufacturer name",
-  "confidence": "high/medium/low",
-  "physicalDescription": "Brief summary of the product",
-  "identificationNotes": "Key extracted text and features used for identification",
+  "name": "EXACT brand name from package (e.g., 'Vitacure Syrup', 'Crocin Advance')",
+  "genericName": "Active ingredient(s) from composition (e.g., 'Multivitamin', 'Paracetamol')",
+  "imprint": "Imprint code if pill, or null",
+  "color": "Dominant color",
+  "shape": "bottle/box/round pill/oblong tablet",
+  "manufacturer": "Company name",
+  "confidence": "high/medium/low based on text clarity",
+  "physicalDescription": "Brief visual description",
+  "identificationNotes": "Key text you extracted",
   "activeIngredients": [
-    { "name": "Ingredient 1 (GENERIC NAME)", "strength": "500mg" },
-    { "name": "Ingredient 2 (GENERIC NAME)", "strength": "30mg" }
+    { "name": "Ingredient name", "strength": "Amount with unit" }
   ],
-  "formulation": "Syrup/Tablet/Capsule/Ointment/etc.",
-  "possibleNames": ["Array of possible drug names if confidence is low"],
-  "blurryAnalysisNotes": "For unclear images: analytical assumptions made",
+  "formulation": "Syrup/Tablet/Capsule/etc.",
+  "possibleNames": ["Alternative names if confidence is low"],
   "productType": "medication/supplement/other"
 }
 
-Analyze the image and respond with JSON only:`;
+⚠️ REMEMBER: Extract EXACT text, don't invent names. Return JSON only:`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -768,14 +761,29 @@ Analyze the image and respond with JSON only:`;
       console.error(`   Error body: ${errorBody}`);
       console.error(`   API key present: ${!!GEMINI_API_KEY}`);
       console.error(`   API key length: ${GEMINI_API_KEY?.length || 0}`);
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorBody}`);
+      
+      // Return failure stage instead of throwing
+      return {
+        name: 'gemini-analysis',
+        success: false,
+        data: undefined,
+        processingTime: Date.now() - startTime,
+        error: `Gemini API error: ${response.status} - ${errorBody.substring(0, 200)}`
+      };
     }
 
     const result = await response.json();
     const geminiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!geminiText) {
-      throw new Error('No response from Gemini API');
+      console.error('🔴 No response text from Gemini API');
+      return {
+        name: 'gemini-analysis',
+        success: false,
+        data: undefined,
+        processingTime: Date.now() - startTime,
+        error: 'No response from Gemini API'
+      };
     }
 
     // Parse JSON response with improved error handling
@@ -1011,7 +1019,7 @@ Provide complete, medically accurate information in JSON format:
 
 IMPORTANT: Provide real, accurate medical information. This is critical for patient safety.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1415,7 +1423,7 @@ Tasks:
 
 Return JSON: { "verified": true/false, "qualityScore": 0-100, "warnings": ["warning1"], "recommendations": ["rec1"] }`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2049,180 +2057,10 @@ serve(async (req: Request) => {
     const productType = gemData?.productType;
     console.log(`Extracted drug name: "${drugName}", product type: "${productType}"`);
     
-    // Stage 2.5: LOCAL DATABASE LOOKUP (PRIORITY - Fastest, most accurate for known drugs!)
-    if (drugName && !drugName.toLowerCase().includes('unknown')) {
-      console.log(`🔍 Stage 2.5: Checking LOCAL DATABASE for: ${drugName}`);
-      console.log(`   SUPABASE_URL: ${SUPABASE_URL}`);
-      console.log(`   SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY ? 'SET' : 'MISSING'}`);
-      const localSearchStart = Date.now();
-      
-      try {
-        const fetchUrl = `${SUPABASE_URL}/functions/v1/local-drug-search`;
-        console.log(`   Fetching: ${fetchUrl}`);
-        
-        const localResponse = await fetch(fetchUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          },
-          body: JSON.stringify({ 
-            query: drugName,
-            threshold: 0.75 
-          })
-        });
-        
-        console.log(`   Response status: ${localResponse.status}`);
-        
-        if (localResponse.ok) {
-          const localData = await localResponse.json();
-          const localSearchTime = Date.now() - localSearchStart;
-          console.log(`   Local search completed in ${localSearchTime}ms`);
-          
-          if (localData.success && localData.matches && localData.matches.length > 0) {
-            const bestMatch = localData.matches[0];
-            const matchScore = bestMatch.match_score;
-            const matchType = bestMatch.match_type;
-            
-            console.log(`✅ LOCAL DATABASE MATCH! ${bestMatch.drug_data.name} (score: ${matchScore.toFixed(2)}, type: ${matchType}, time: ${localSearchTime}ms)`);
-            
-            // High confidence local match - return immediately!
-            if (matchScore >= 0.85) {
-              const localDrugData = bestMatch.drug_data;
-              
-              const result: DrugIdentificationResult = {
-                success: true,
-                data: {
-                  id: localDrugData.id,
-                  name: localDrugData.name,
-                  genericName: localDrugData.genericName || '',
-                  manufacturer: localDrugData.manufacturer || 'Various',
-                  category: localDrugData.category || '',
-                  description: localDrugData.description || '',
-                  dosageAndAdmin: localDrugData.dosageAndAdmin || '',
-                  sideEffects: localDrugData.sideEffects || [],
-                  warnings: localDrugData.warnings || [],
-                  interactions: localDrugData.interactions || [],
-                  storage: localDrugData.storage || '',
-                  mechanism: localDrugData.mechanism || '',
-                  indications: localDrugData.indications || [],
-                  contraindications: localDrugData.contraindications || [],
-                  prescriptionStatus: localDrugData.prescriptionStatus || 'Unknown',
-                  pregnancy: localDrugData.pregnancy || '',
-                  verified: true,
-                  image: imageBase64,
-                  drugClass: localDrugData.drugClass || '',
-                  brandNames: localDrugData.brandNames || [],
-                  confidence: matchScore >= 0.95 ? 'high' : 'medium',
-                  laymanExplanations: localDrugData.laymanExplanations
-                },
-                processingStages: ['image-quality', 'text-extraction', 'gemini-analysis', 'local-database-match'],
-                confidence: matchScore >= 0.95 ? 'high' : 'medium',
-                fallbackUsed: false,
-                processingTime: Date.now() - overallStartTime
-              };
-              
-              console.log(`🚀 FAST PATH: Returning verified local data in ${result.processingTime}ms (vs typical 5-8s)`);
-              
-              // Save to cache for even faster next time
-              saveDrugToCache(result.data).catch(err => console.error('Cache save error:', err));
-              
-              return createResponse(result);
-            } else {
-              console.log(`ℹ️ Local match score ${matchScore.toFixed(2)} below threshold, continuing with enrichment...`);
-            }
-          } else {
-            console.log(`❌ No local database match found for brand name: "${drugName}"`);
-            
-            // Try again with generic name if available
-            const genericName = gemData?.genericName;
-            if (genericName && genericName !== drugName && !genericName.toLowerCase().includes('unknown')) {
-              console.log(`🔄 Retrying local search with generic name: "${genericName}"`);
-              
-              try {
-                const genericResponse = await fetch(`${SUPABASE_URL}/functions/v1/local-drug-search`, {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({ 
-                    query: genericName,
-                    threshold: 0.75 
-                  })
-                });
-                
-                if (genericResponse.ok) {
-                  const genericData = await genericResponse.json();
-                  
-                  if (genericData.success && genericData.matches && genericData.matches.length > 0) {
-                    const bestMatch = genericData.matches[0];
-                    console.log(`✅ GENERIC NAME MATCH! ${bestMatch.drug_data.name} (score: ${bestMatch.match_score.toFixed(2)})`);
-                    
-                    // If high confidence match, use it
-                    if (bestMatch.match_score >= 0.85) {
-                      const localDrugData = bestMatch.drug_data;
-                      
-                      const result: DrugIdentificationResult = {
-                        success: true,
-                        data: {
-                          id: localDrugData.id,
-                          name: localDrugData.name,
-                          genericName: localDrugData.genericName || '',
-                          manufacturer: localDrugData.manufacturer || 'Various',
-                          category: localDrugData.category || '',
-                          description: localDrugData.description || '',
-                          dosageAndAdmin: localDrugData.dosageAndAdmin || '',
-                          sideEffects: localDrugData.sideEffects || [],
-                          warnings: localDrugData.warnings || [],
-                          interactions: localDrugData.interactions || [],
-                          storage: localDrugData.storage || '',
-                          mechanism: localDrugData.mechanism || '',
-                          indications: localDrugData.indications || [],
-                          contraindications: localDrugData.contraindications || [],
-                          prescriptionStatus: localDrugData.prescriptionStatus || 'Unknown',
-                          pregnancy: localDrugData.pregnancy || '',
-                          verified: true,
-                          image: imageBase64,
-                          drugClass: localDrugData.drugClass || '',
-                          brandNames: localDrugData.brandNames || [],
-                          confidence: bestMatch.match_score >= 0.95 ? 'high' : 'medium',
-                          laymanExplanations: localDrugData.laymanExplanations
-                        },
-                        processingStages: ['image-quality', 'text-extraction', 'gemini-analysis', 'local-database-generic-match'],
-                        confidence: bestMatch.match_score >= 0.95 ? 'high' : 'medium',
-                        fallbackUsed: false,
-                        processingTime: Date.now() - overallStartTime
-                      };
-                      
-                      console.log(`🚀 FAST PATH (Generic Match): Returning verified local data in ${result.processingTime}ms`);
-                      saveDrugToCache(result.data).catch(err => console.error('Cache save error:', err));
-                      return createResponse(result);
-                    }
-                  } else {
-                    console.log(`❌ No match found for generic name either`);
-                  }
-                }
-              } catch (genericError) {
-                console.error('⚠️ Generic name search error:', genericError);
-              }
-            }
-          }
-        } else {
-          console.error(`❌ Local database search failed with status: ${localResponse.status}`);
-          const errorText = await localResponse.text();
-          console.error(`   Error response: ${errorText}`);
-        }
-      } catch (localError) {
-        console.error('⚠️ Local database search error:', localError);
-        console.error('   Error details:', localError instanceof Error ? localError.message : String(localError));
-        // Continue with other methods
-      }
-    } else {
-      console.log(`⚠️ Skipping local database lookup: drugName="${drugName}"`);
-    }
+    // ⚡ ENHANCED MODE: Skip local database, go directly to cache and multi-source enrichment
+    console.log(`⚡ ENHANCED MODE: Skipping local database - using comprehensive multi-source enrichment`);
     
-    // Stage 3: Check cache if local DB didn't have high confidence match
+    // Stage 3: Cache Check (BEFORE enrichment to save API calls)
     if (!optBypassCache && drugName && !drugName.toLowerCase().includes('unknown')) {
       console.log(`🔍 Checking cache for: ${drugName}`);
       const cachedDrug = await checkDrugCache(drugName);

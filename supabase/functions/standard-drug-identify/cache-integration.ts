@@ -137,11 +137,12 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     console.log(`   Normalized: "${normalizeDrugName(drugName)}"`);
     
     // Strategy 1: Try exact RPC match first (fastest)
-    console.log(`\n   Strategy 1: Exact RPC match...`);
+    console.log(`\n   Strategy 1: Exact RPC match (by brand or generic)...`);
     const { data, error } = await supabase
       .rpc('get_cached_drug', {
+        // Pass the same input as both brand and generic so the RPC can match either
         p_drug_name: drugName,
-        p_generic_name: null,
+        p_generic_name: drugName,
         p_imprint: null
       })
       .single();
@@ -190,8 +191,10 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     const SIMILARITY_THRESHOLD = 0.75;  // 75% similarity required
     
     for (const cached of allCachedDrugs) {
-      const score = calculateNameSimilarity(drugName, cached.drug_name);
-      
+      const scoreBrand = calculateNameSimilarity(drugName, cached.drug_name);
+      const scoreGeneric = cached.generic_name ? calculateNameSimilarity(drugName, cached.generic_name) : 0;
+      const score = Math.max(scoreBrand, scoreGeneric);
+
       if (score > bestScore && score >= SIMILARITY_THRESHOLD) {
         bestScore = score;
         bestMatch = cached;
@@ -201,7 +204,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     if (bestMatch) {
       console.log(`\n🎯 FUZZY MATCH FOUND!`);
       console.log(`   Input: "${drugName}"`);
-      console.log(`   Matched: "${bestMatch.drug_name}"`);
+      console.log(`   Matched (brand): "${bestMatch.drug_name}" | (generic): "${bestMatch.generic_name || ''}"`);
       console.log(`   Similarity: ${(bestScore * 100).toFixed(1)}%`);
       console.log(`   Completeness: ${bestMatch.completeness_score}%`);
       
