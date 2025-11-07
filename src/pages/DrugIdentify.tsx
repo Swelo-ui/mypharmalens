@@ -18,6 +18,7 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { playDrugIdentificationSound } from '@/utils/audioService';
 
 // Helper function to extract image features for similarity comparison
@@ -110,25 +111,60 @@ const DrugIdentify = () => {
     'final-cross-verification': { message: 'Final quality verification', progress: 95, duration: 4000 }
   };
 
-  // Calculate estimated time remaining
+  // Smooth progress interpolation state
+  const [progressInterval, setProgressInterval] = useState<NodeJS.Timeout | null>(null);
+  const [targetProgress, setTargetProgress] = useState(0);
+  const [currentProgress, setCurrentProgress] = useState(0);
+
+  // Calculate estimated time remaining and smoothly interpolate progress
   const updateProgress = (stage: string) => {
     const stageInfo = stageMapping[stage];
     if (stageInfo) {
       setProcessingPhase(stageInfo.message);
-      setProcessingProgress(stageInfo.progress);
+      setTargetProgress(stageInfo.progress);
       
-      // Calculate estimated time remaining based on elapsed time and remaining progress
-      if (processingStartTime > 0) {
-        const elapsed = Date.now() - processingStartTime;
-        const progressMade = stageInfo.progress;
-        const remainingProgress = 100 - progressMade;
-        
-        if (progressMade > 0) {
-          const avgTimePerPercent = elapsed / progressMade;
-          const estimatedRemaining = Math.ceil((avgTimePerPercent * remainingProgress) / 1000);
-          setEstimatedTimeRemaining(Math.max(1, estimatedRemaining)); // At least 1 second
-        }
+      // Clear any existing interval
+      if (progressInterval) {
+        clearInterval(progressInterval);
       }
+      
+      // Smoothly interpolate to target progress over the stage duration
+      const startProgress = currentProgress;
+      const progressDiff = stageInfo.progress - startProgress;
+      const steps = stageInfo.duration / 50; // Update every 50ms
+      const progressPerStep = progressDiff / steps;
+      
+      let stepCount = 0;
+      const interval = setInterval(() => {
+        stepCount++;
+        const newProgress = Math.min(
+          stageInfo.progress,
+          startProgress + (progressPerStep * stepCount)
+        );
+        
+        setCurrentProgress(newProgress);
+        setProcessingProgress(Math.floor(newProgress));
+        
+        // Calculate time remaining
+        if (processingStartTime > 0) {
+          const elapsed = Date.now() - processingStartTime;
+          const remainingProgress = 100 - newProgress;
+          
+          if (newProgress > 0) {
+            const avgTimePerPercent = elapsed / newProgress;
+            const estimatedRemaining = Math.ceil((avgTimePerPercent * remainingProgress) / 1000);
+            setEstimatedTimeRemaining(Math.max(1, estimatedRemaining));
+          }
+        }
+        
+        // Stop when target reached
+        if (stepCount >= steps || newProgress >= stageInfo.progress) {
+          clearInterval(interval);
+          setProgressInterval(null);
+        }
+      }, 50);
+      
+      setProgressInterval(interval);
     }
   };
 
@@ -143,6 +179,15 @@ const DrugIdentify = () => {
       }
     });
   };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+    };
+  }, [progressInterval]);
 
   // Fetch user's previous identifications when component loads
   useEffect(() => {
@@ -777,11 +822,19 @@ const DrugIdentify = () => {
   };
 
   const handleRetry = () => {
+    // Clear any active progress interval
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      setProgressInterval(null);
+    }
+    
     setIdentifiedDrug(null);
     setErrorDetails(null);
     setCapturedImage(null);
     setIsImageLowRes(false);
     setProcessingProgress(0);
+    setCurrentProgress(0);
+    setTargetProgress(0);
     setProcessingPhase("");
     setEstimatedTimeRemaining(null);
     setProcessingStartTime(0);
@@ -922,8 +975,8 @@ const DrugIdentify = () => {
                       </div>
                       <Switch 
                         id="blur-mode" 
-                        checked={blurryMode}
-                        onCheckedChange={setBlurryMode}
+                        checked={true}
+                        disabled={false}
                       />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -1031,24 +1084,35 @@ const DrugIdentify = () => {
               <h2 className="text-2xl font-semibold">Identification Result</h2>
               <div className="flex gap-3">
                 {isAuthenticated && !isSaved && (
-                  <Button 
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={handleSaveToCache}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Saving...</span>
-                      </>
-                    ) : (
-                      <>
-                        <BookmarkPlus className="h-4 w-4" />
-                        <span>Save to Cache</span>
-                      </>
-                    )}
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          onClick={handleSaveToCache}
+                          disabled={isSaving || analysisMode === 'standard'}
+                        >
+                          {isSaving ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span>Saving...</span>
+                            </>
+                          ) : (
+                            <>
+                              <BookmarkPlus className="h-4 w-4" />
+                              <span>Save to Cache</span>
+                            </>
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      {analysisMode === 'standard' && (
+                        <TooltipContent>
+                          <p>Cache saving is only available in Enhanced Mode</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
                 <Button variant="outline" onClick={handleRetry}>
                   Identify Another

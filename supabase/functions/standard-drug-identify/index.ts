@@ -11,6 +11,78 @@ const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const OPENROUTER_VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';
 const OPENROUTER_VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free';
 
+// OCR Cross-Validation: Compare Gemini and OpenRouter results for accuracy
+async function crossValidateOCR(imageBase64: string, geminiResult: VisionResult | null): Promise<VisionResult | null> {
+  console.log('\n🔍 === OCR CROSS-VALIDATION ===');
+  console.log('   Strategy: Verify Gemini OCR with OpenRouter to reduce errors');
+  
+  if (!geminiResult || !geminiResult.name || geminiResult.name === 'Unknown') {
+    console.log('   ⚠️ Gemini result invalid, skipping validation');
+    return geminiResult;
+  }
+  
+  try {
+    // Get OpenRouter's opinion on the same image
+    console.log('   Calling OpenRouter for cross-validation...');
+    const openRouterResult = await performOpenRouterAnalysis(imageBase64);
+    
+    if (!openRouterResult || !openRouterResult.name || openRouterResult.name === 'Unknown') {
+      console.log('   ⚠️ OpenRouter validation failed, trusting Gemini');
+      return geminiResult;
+    }
+    
+    // Compare the two results
+    const geminiName = geminiResult.name.toLowerCase().trim();
+    const openRouterName = openRouterResult.name.toLowerCase().trim();
+    
+    // Calculate similarity (simple substring check)
+    const isMatch = geminiName.includes(openRouterName) || 
+                    openRouterName.includes(geminiName) ||
+                    geminiName === openRouterName;
+    
+    if (isMatch) {
+      console.log(`   ✅ VALIDATED: Both APIs agree`);
+      console.log(`      Gemini: "${geminiResult.name}"`);
+      console.log(`      OpenRouter: "${openRouterResult.name}"`);
+      return geminiResult; // Use Gemini result (it's usually more accurate)
+    } else {
+      console.log(`   ⚠️ MISMATCH DETECTED:`);
+      console.log(`      Gemini: "${geminiResult.name}"`);
+      console.log(`      OpenRouter: "${openRouterResult.name}"`);
+      console.log(`   → Using OpenRouter result (disagreement detected)`);
+      return openRouterResult; // Prefer OpenRouter when they disagree
+    }
+  } catch (error) {
+    console.error('   ❌ Cross-validation error:', error);
+    return geminiResult; // Fallback to Gemini on error
+  } finally {
+    console.log('🔍 === OCR CROSS-VALIDATION COMPLETE ===\n');
+  }
+}
+
+// Standard Mode data limiter - keep only essential info (4-5 items max per section)
+// Only for scraping/backup sources - NOT for cache/local DB (they're already validated)
+// deno-lint-ignore no-explicit-any
+function limitDataForStandardMode(data: any): any {
+  if (!data) return data;
+  
+  const MAX_ITEMS = 5; // Standard Mode: Top 5 items only (for scraping/backup)
+  
+  return {
+    ...data,
+    // Limit array fields to top 5 most important items
+    sideEffects: Array.isArray(data.sideEffects) ? data.sideEffects.slice(0, MAX_ITEMS) : [],
+    warnings: Array.isArray(data.warnings) ? data.warnings.slice(0, MAX_ITEMS) : [],
+    interactions: Array.isArray(data.interactions) ? data.interactions.slice(0, MAX_ITEMS) : [],
+    indications: Array.isArray(data.indications) ? data.indications.slice(0, MAX_ITEMS) : [],
+    contraindications: Array.isArray(data.contraindications) ? data.contraindications.slice(0, MAX_ITEMS) : [],
+    brandNames: Array.isArray(data.brandNames) ? data.brandNames.slice(0, MAX_ITEMS) : [],
+    // Keep scalar fields unchanged
+    standardModeOptimized: true,
+    note: (data.note || '') + ' [Standard Mode: Top 5 items for quick reference]'
+  };
+}
+
 // Typed shapes used across OCR and fallback flows
 type Confidence = 'high' | 'medium' | 'low';
 
@@ -302,118 +374,7 @@ function parseDrugsComHTML(html: string, drugName: string): unknown {
   }
 }
 
-/**
- * FREE Alternative OCR using OCR.space API (no API key needed for free tier!)
- * Fallback when Gemini OCR fails
- */
-async function performFreeOCR(imageBase64: string): Promise<VisionResult | null> {
-  try {
-    console.log('🆓 Trying FREE OCR.space API (backup OCR)...');
-    
-    // Prepare image data
-    const base64Data = imageBase64.includes('base64,') 
-      ? imageBase64.split('base64,')[1] 
-      : imageBase64;
-    
-    // Get OCR.space API key from Supabase secrets
-    const ocrApiKey = Deno.env.get("OCR_SPACE_API_KEY");
-    if (!ocrApiKey) {
-      console.log('❌ OCR_SPACE_API_KEY not found in environment');
-      return null;
-    }
-    
-    console.log(`   Using OCR.space API key: ${ocrApiKey.substring(0, 8)}...`);
-    
-    // OCR.space API with your personal free API key
-    const formData = new FormData();
-    formData.append('base64Image', `data:image/jpeg;base64,${base64Data}`);
-    formData.append('language', 'eng');
-    formData.append('isOverlayRequired', 'false');
-    formData.append('detectOrientation', 'true');
-    formData.append('scale', 'true');
-    formData.append('OCREngine', '2'); // Use OCR Engine 2 (better for photos)
-    formData.append('apikey', ocrApiKey); // Your personal free API key
-    
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      body: formData
-    });
-    
-    if (!response.ok) {
-      console.log(`❌ OCR.space API failed: ${response.status}`);
-      return null;
-    }
-    
-    const ocrResponse = await response.json();
-    
-    if (ocrResponse.IsErroredOnProcessing) {
-      console.log(`❌ OCR.space processing error: ${ocrResponse.ErrorMessage?.[0] || 'Unknown'}`);
-      return null;
-    }
-    
-    const extractedText = ocrResponse.ParsedResults?.[0]?.ParsedText || '';
-    
-    if (!extractedText || extractedText.length < 3) {
-      console.log('❌ OCR.space: No text extracted');
-      return null;
-    }
-    
-    console.log(`✅ OCR.space extracted text (${extractedText.length} chars)`);
-    console.log(`   First 200 chars: ${extractedText.substring(0, 200)}`);
-    
-    // Parse extracted text intelligently
-    const lines = extractedText.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
-    
-    // Try to identify drug name (usually in first 3 lines, in caps or prominent)
-    let drugName = 'Unknown';
-    let genericName = '';
-    
-    // Look for drug name (typically uppercase or title case in first lines)
-    for (const line of lines.slice(0, 5)) {
-      // Skip very long lines (likely descriptions)
-      if (line.length > 50) continue;
-      
-      // Drug name patterns: UPPERCASE, Title Case, or ends with numbers (like "Crocin 650")
-      if (/^[A-Z][A-Z\s-]+\d*$/.test(line) || /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s*-?\s*\d+)?$/.test(line)) {
-        drugName = line;
-        console.log(`   Identified drug name: "${drugName}"`);
-        break;
-      }
-    }
-    
-    // Look for generic name (composition, contains, active ingredient)
-    for (const line of lines) {
-      if (/composition|contains|ingredient|generic/i.test(line)) {
-        const nextLineIndex = lines.indexOf(line) + 1;
-        if (nextLineIndex < lines.length) {
-          genericName = lines[nextLineIndex].replace(/[^a-zA-Z\s]/g, '').trim();
-          console.log(`   Identified generic: "${genericName}"`);
-          break;
-        }
-      }
-    }
-    
-    // If still no drug name, use first substantial line
-    if (drugName === 'Unknown' && lines.length > 0) {
-      drugName = lines[0].substring(0, 50); // First line, max 50 chars
-      console.log(`   Using first line as drug name: "${drugName}"`);
-    }
-    
-    const visionResult: VisionResult = {
-      name: drugName,
-      genericName: genericName,
-      description: `Extracted via OCR.space: ${extractedText.substring(0, 200)}`,
-      confidence: 'medium',
-      ocrSource: 'ocr.space',
-      fullText: extractedText
-    };
-    return visionResult;
-    
-  } catch (error) {
-    console.error('❌ Free OCR error:', error);
-    return null;
-  }
-}
+// OpenRouter OCR removed - using performOpenRouterAnalysis() instead for unified vision fallback
 
 // OpenRouter Vision fallback (dual model support)
 async function performOpenRouterAnalysis(imageBase64: string, useSecondary: boolean = false): Promise<VisionResult | null> {
@@ -423,27 +384,21 @@ async function performOpenRouterAnalysis(imageBase64: string, useSecondary: bool
   try {
     console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
     
-    const prompt = `You are a pharmaceutical OCR expert. Your job is to READ THE EXACT TEXT from this medication image.
+    const prompt = `FAST pharmaceutical OCR for Standard Mode. Extract ONLY essential drug information.
 
-🚨 CRITICAL INSTRUCTIONS:
-1. READ EVERY VISIBLE TEXT on the packaging/bottle/box
-2. Return the EXACT brand name as written (e.g., "Vitacure Syrup", "Crocin 650mg")
-3. Look for composition/ingredients section and extract the generic/active ingredient
-4. DO NOT invent or guess - only return what you can actually see
-5. If you cannot read the text clearly, return "Unknown" for that field
+INSTRUCTIONS (Speed-optimized):
+1. Brand Name: Exact name on package (e.g., "Naxdom 500")
+2. Generic/Active Ingredient: From composition section
+3. Confidence: high/medium/low based on text clarity
 
-OUTPUT FORMAT (JSON only):
+OUTPUT (JSON only):
 {
-  "name": "EXACT brand name from package",
-  "genericName": "Active ingredient from composition",
-  "description": "Brief description if visible",
-  "confidence": "high/medium/low",
-  "color": "Dominant color",
-  "shape": "bottle/box/tablet/capsule",
-  "imprint": "Imprint code if visible"
+  "name": "Brand name",
+  "genericName": "Active ingredient",
+  "confidence": "high/medium/low"
 }
 
-Return ONLY valid JSON:`;
+Be FAST and ACCURATE. Return ONLY JSON:`;
 
     const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
 
@@ -465,7 +420,7 @@ Return ONLY valid JSON:`;
           ]
         }],
         temperature: 0.1,
-        max_tokens: 1024
+        max_tokens: 512 // Standard Mode: Fast response
       })
     });
 
@@ -519,37 +474,21 @@ async function performGeminiAnalysis(imageBase64: string): Promise<VisionResult 
     console.log(`   API Key present: ${!!apiKey}`);
     console.log(`   Image data length: ${imageBase64.length} chars`);
     
-    const prompt = `You are a pharmaceutical OCR expert. Your job is to READ THE EXACT TEXT from this medication image.
+    const prompt = `STANDARD MODE: Fast drug OCR. Extract essential info ONLY.
 
-🚨 CRITICAL INSTRUCTIONS:
-1. READ EVERY VISIBLE TEXT on the packaging/bottle/box
-2. Return the EXACT brand name as written (e.g., "Vitacure Syrup", "Crocin 650mg")
-3. Look for composition/ingredients section and extract the generic/active ingredient
-4. DO NOT invent or guess - only return what you can actually see
-5. If you cannot read the text clearly, return "Unknown" for that field
+RULES:
+1. Brand name: Exact text from package (e.g., "Naxdom 500")
+2. Generic: Active ingredient from composition
+3. NO guessing - return "Unknown" if unclear
 
-WHAT TO EXTRACT:
-- Brand Name: The main product name on the package
-- Generic Name: Active ingredient from "Composition:" or "Contains:" section
-- Any visible text that helps identify the drug
-
-EXAMPLES:
-✅ CORRECT: "Vitacure Syrup" → name: "Vitacure Syrup", genericName: "Multivitamin"
-✅ CORRECT: "Crocin Advance" → name: "Crocin Advance", genericName: "Paracetamol"
-❌ WRONG: Making up names like "VitaCure Multivitamin Complex"
-
-OUTPUT FORMAT (JSON only):
+OUTPUT (JSON):
 {
-  "name": "EXACT brand name from package",
-  "genericName": "Active ingredient from composition",
-  "description": "Brief description if visible",
-  "confidence": "high/medium/low",
-  "color": "Dominant color",
-  "shape": "bottle/box/tablet/capsule",
-  "imprint": "Imprint code if visible"
+  "name": "Brand name",
+  "genericName": "Active ingredient",
+  "confidence": "high/medium/low"
 }
 
-Return ONLY valid JSON, no markdown:`;
+Be FAST. Return JSON only:`;
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
       method: "POST",
@@ -565,7 +504,7 @@ Return ONLY valid JSON, no markdown:`;
             }}
           ]
         }],
-        generation_config: { temperature: 0.1, max_output_tokens: 2000 }
+        generation_config: { temperature: 0.1, max_output_tokens: 500 } // Standard Mode: Fast response
       })
     });
     
@@ -665,36 +604,48 @@ Deno.serve(async (req: Request) => {
       processingTime: Date.now() - overallStartTime
     });
 
-    let drugName = geminiResult?.name || 'Unknown';
-    let genericName = geminiResult?.genericName || '';
-    console.log(`📝 Extracted - Brand: "${drugName}", Generic: "${genericName}"`);
+    // Stage 1.2: OCR Cross-Validation (NEW!) - Reduce errors by validating with OpenRouter
+    const validatedResult = await crossValidateOCR(imageBase64, geminiResult);
+    if (validatedResult && validatedResult !== geminiResult) {
+      stages.push({
+        name: 'ocr-cross-validation',
+        success: true,
+        data: { message: 'OCR validated and corrected', validated: validatedResult },
+        processingTime: Date.now() - overallStartTime
+      });
+    }
 
-    // Stage 1.5: If Gemini OCR failed, try FREE alternative OCR first
-    if (!geminiResult || drugName === 'Unknown' || drugName.toLowerCase().includes('unknown')) {
-      console.log('\n🔄 === GEMINI OCR FAILED - TRYING FREE BACKUP OCR ===');
+    let drugName = validatedResult?.name || 'Unknown';
+    let genericName = validatedResult?.genericName || '';
+    console.log(`📝 Validated - Brand: "${drugName}", Generic: "${genericName}"`);
+
+    // Stage 1.5: If OCR failed, try OpenRouter Vision fallback (dual model)
+    if (!validatedResult || drugName === 'Unknown' || drugName.toLowerCase().includes('unknown')) {
+      console.log('\n🔄 === GEMINI OCR FAILED - TRYING OPENROUTER VISION FALLBACK ===');
       
-      // Try OCR.space (completely free, no API key needed!)
-      const freeOcrResult = await performFreeOCR(imageBase64);
+      // Try OpenRouter Vision (Qwen 2.5-VL → Nvidia Nemotron cascade)
+      const openRouterResult = await performOpenRouterAnalysis(imageBase64);
       
-      if (freeOcrResult && freeOcrResult?.name && freeOcrResult.name !== 'Unknown') {
-        console.log('✅ FREE OCR SUCCESS!');
-        console.log(`   Extracted drug name: "${freeOcrResult.name}"`);
-        console.log(`   Extracted generic: "${freeOcrResult.genericName || 'N/A'}"`);
+      if (openRouterResult && openRouterResult?.name && openRouterResult.name !== 'Unknown') {
+        console.log('✅ OPENROUTER VISION SUCCESS!');
+        console.log(`   Model used: ${openRouterResult.fallbackUsed || 'Qwen 2.5-VL'}`);
+        console.log(`   Extracted drug name: "${openRouterResult.name}"`);
+        console.log(`   Extracted generic: "${openRouterResult.genericName || 'N/A'}"`);
         
         // Update drugName and genericName for cache/local DB search
-        drugName = freeOcrResult.name;
-        genericName = freeOcrResult.genericName || '';
+        drugName = openRouterResult.name;
+        genericName = openRouterResult.genericName || '';
         
         stages.push({
-          name: 'free-ocr-backup',
+          name: 'openrouter-vision-fallback',
           success: true,
-          data: freeOcrResult,
+          data: openRouterResult,
           processingTime: Date.now() - overallStartTime
         });
         
-        console.log('✅ FREE OCR provided drug name - continuing to cache/local DB search...\n');
+        console.log('✅ OpenRouter Vision provided drug name - continuing to cache/local DB search...\n');
       } else {
-        console.log('❌ Free OCR also failed - trying multi-source comprehensive analysis...');
+        console.log('❌ OpenRouter Vision also failed - trying multi-source comprehensive analysis...');
         
         // Stage 1.6: Last resort - multi-source comprehensive analysis
         console.log('\n🔄 === ACTIVATING MULTI-SOURCE COMPREHENSIVE FALLBACK ===');
@@ -725,8 +676,9 @@ Deno.serve(async (req: Request) => {
             console.log(`   Completeness: ${completeness}%`);
             console.log(`   Verified: ${isVerified}`);
             
-            // Only return if verified or very high completeness
-            if (isVerified || completeness >= 80) {
+            // Accept results with moderate quality (50%+) to ensure Standard Mode works
+            // Standard Mode focuses on speed + basic accuracy, not comprehensive data
+            if (isVerified || completeness >= 50) {
               stages.push({
                 name: 'multi-source-comprehensive-fallback',
                 success: true,
@@ -743,7 +695,7 @@ Deno.serve(async (req: Request) => {
                 processingTime: Date.now() - overallStartTime
               });
             } else {
-              console.log(`⚠️ Multi-source data quality below threshold or unverified: ${completeness}%`);
+              console.log(`⚠️ Multi-source data quality moderate (${completeness}%), will try to improve with AI`);
               // Update drugName and genericName from multi-source for further processing
               if (multiSourceData.data.name && multiSourceData.data.name !== 'Unknown') {
                 drugName = multiSourceData.data.name;
@@ -801,7 +753,7 @@ Deno.serve(async (req: Request) => {
 
           return createResponse({
             success: true,
-            data: cachedResult,
+            data: cachedResult, // Cache hit: Return full validated data
             processingStages: stages.map(s => s.name),
             confidence: 'high',
             fallbackUsed: false,
@@ -872,7 +824,7 @@ Deno.serve(async (req: Request) => {
 
           return createResponse({
             success: true,
-            data: localResult,
+            data: localResult, // Local DB hit: Return full validated data
             processingStages: stages.map(s => s.name),
             confidence: threshold >= 0.75 ? 'high' : 'medium',
             fallbackUsed: false,
@@ -908,7 +860,7 @@ Deno.serve(async (req: Request) => {
 
         return createResponse({
           success: true,
-          data: oneMgResult,
+          data: limitDataForStandardMode(oneMgResult), // Standard Mode: Top 5 items only
           processingStages: stages.map(s => s.name),
           confidence: 'medium',
           fallbackUsed: true,
@@ -931,7 +883,7 @@ Deno.serve(async (req: Request) => {
 
         return createResponse({
           success: true,
-          data: drugsComResult,
+          data: limitDataForStandardMode(drugsComResult), // Standard Mode: Top 5 items only
           processingStages: stages.map(s => s.name),
           confidence: 'medium',
           fallbackUsed: true,
@@ -966,8 +918,8 @@ Deno.serve(async (req: Request) => {
             console.log(`   Data completeness: ${completeness}%`);
             console.log(`   Verified: ${isVerified}`);
             
-            // Validate data quality before returning: require verified or high completeness
-            if (isVerified || completeness >= 80) {
+            // Standard Mode: Accept results with 50%+ completeness (balance speed + accuracy)
+            if (isVerified || completeness >= 50) {
               stages.push({
                 name: 'multi-source-api-fallback',
                 success: true,
@@ -984,7 +936,7 @@ Deno.serve(async (req: Request) => {
                 processingTime: Date.now() - overallStartTime
               });
             } else {
-              console.log(`⚠️ Multi-source data quality too low or unverified. Completeness: ${completeness}%`);
+              console.log(`⚠️ Multi-source quality low (${completeness}%), trying AI enhancement...`);
             }
           }
         }
@@ -993,15 +945,81 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Stage 6: Data Quality Validation & Enhancement
-    console.log('🔍 Stage 6: Final Data Quality Check & Enhancement...');
+    // Stage 6: AI-Powered Final Fallback (NEW!)
+    // All cache/DB/scraping/API failed - use AI to re-analyze the image from scratch
+    console.log('🔍 Stage 6: AI-Powered Final Fallback...');
+    console.log(`\n🤖 === AI ENHANCEMENT ACTIVATED ===`);
+    console.log(`   Reason: All fast lookups failed (cache, DB, scraping, multi-source)`);
+    console.log(`   Strategy: Fresh AI image analysis (ignore potentially incorrect OCR)`);
+    console.log(`   OCR extracted: "${drugName}" (may be incorrect)`);
     
-    // Build fallback data for UI safety: DO NOT use generative fields
+    try {
+      // Call identify-drug API for fresh AI-powered identification
+      // Don't pass drugName - let AI analyze the image fresh to avoid OCR errors
+      console.log(`   Calling identify-drug API for complete re-analysis...`);
+      const aiFallbackResponse = await fetch(`${SUPABASE_URL}/functions/v1/identify-drug`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          imageBase64,
+          options: {
+            standardMode: true,  // Signal this is from Standard Mode
+            freshAnalysis: true  // Don't use OCR name, analyze fresh
+          }
+        }),
+      });
+      
+      if (aiFallbackResponse.ok) {
+        const aiResult = await aiFallbackResponse.json();
+        
+        if (aiResult.success && aiResult.data && aiResult.data.name !== "Unknown Medication") {
+          console.log(`✅ AI enhancement SUCCESSFUL!`);
+          console.log(`   AI identified: ${aiResult.data.name}`);
+          console.log(`   Confidence: ${aiResult.data.confidence || 'medium'}`);
+          
+          stages.push({
+            name: 'ai-powered-fallback',
+            success: true,
+            data: aiResult.data,
+            processingTime: Date.now() - overallStartTime
+          });
+          
+          // Return AI-enhanced result with Standard Mode optimizations
+          return createResponse({
+            success: true,
+            data: limitDataForStandardMode({ // Standard Mode: Top 5 items only
+              ...aiResult.data,
+              standardModeFallback: true
+            }),
+            processingStages: stages.map(s => s.name),
+            confidence: aiResult.data.confidence || 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          });
+        } else {
+          console.log(`⚠️ AI enhancement returned unknown or no data`);
+        }
+      } else {
+        console.log(`⚠️ AI enhancement API call failed: ${aiFallbackResponse.status}`);
+      }
+    } catch (aiError) {
+      console.error(`❌ AI enhancement error:`, aiError);
+    }
+    
+    console.log(`🤖 === AI ENHANCEMENT COMPLETE ===\n`);
+    
+    // Stage 7: Final Fallback - Return Safe Failure
+    console.log('🔍 Stage 7: Final Data Validation...');
+    
+    // Build fallback data for UI safety
     const fallbackData: PartialDrugData = {
       id: crypto.randomUUID(),
       name: "Unidentified Medication",
       genericName: "",
-      description: "Unable to verify medication from the image using authoritative sources.",
+      description: "Unable to verify medication from the image. Standard Mode exhausted all fast lookup methods. Try Enhanced Mode for deep analysis.",
       confidence: 'low',
       color: "",
       shape: "",
@@ -1014,9 +1032,10 @@ Deno.serve(async (req: Request) => {
       pregnancy: "",
       sideEffects: [] as string[],
       warnings: [
-        "⚠️ Unable to fully verify this medication from authoritative sources",
+        "⚠️ Standard Mode could not identify this medication",
+        "Try Enhanced Mode for comprehensive AI-powered analysis",
         "Do not take any unidentified medication",
-        "Consult a healthcare provider or pharmacist for proper identification"
+        "Consult a healthcare provider or pharmacist"
       ] as string[],
       interactions: [] as string[],
       indications: [] as string[],
@@ -1025,23 +1044,21 @@ Deno.serve(async (req: Request) => {
       prescriptionStatus: "Unknown",
       brandNames: [] as string[],
       recommendations: [
-        "Take a clearer, well-lit photo of the medication packaging",
-        "Include the brand name and composition details in the image",
-        "Visit a pharmacy with the medication for professional identification",
-        "Check the medication leaflet for complete information"
+        "Switch to Enhanced Mode for deep AI analysis",
+        "Take a clearer, well-lit photo of the packaging",
+        "Ensure brand name is clearly visible",
+        "Visit a pharmacy for professional identification"
       ] as string[]
     };
     
-    // Perform basic data validation - avoid unverified info
     const hasBasicInfo = false;
     const hasVisualInfo = false;
     
     console.log('📊 Final Data Quality Report:');
-    console.log(`   Has basic info (name): ${hasBasicInfo}`);
+    console.log(`   Has basic info: ${hasBasicInfo}`);
     console.log(`   Has visual info: ${hasVisualInfo}`);
-    console.log(`   Confidence: ${fallbackData.confidence}`);
+    console.log(`   All stages completed: ${stages.length}`);
     
-    // Add data quality metadata
     fallbackData.dataQuality = {
       hasBasicInfo,
       hasVisualInfo,
@@ -1052,16 +1069,16 @@ Deno.serve(async (req: Request) => {
     };
 
     stages.push({
-      name: 'partial-identification',
+      name: 'safe-failure',
       success: false,
       data: fallbackData,
       processingTime: Date.now() - overallStartTime
     });
 
-    // Return as safe failure to prevent hypothetical content in UI
+    // Return safe failure with recommendation to use Enhanced Mode
     return createResponse({
       success: false,
-      error: 'Unverified identification: insufficient authoritative data',
+      error: 'Standard Mode exhausted. Try Enhanced Mode for comprehensive analysis.',
       processingStages: stages.map(s => s.name),
       confidence: 'low',
       fallbackUsed: true,
