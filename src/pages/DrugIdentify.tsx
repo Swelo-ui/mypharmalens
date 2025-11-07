@@ -326,7 +326,13 @@ const DrugIdentify = () => {
         const errorMessage = cacheResult?.message || "Unknown error occurred";
         const completenessScore = cacheResult?.details?.completenessScore;
         
-        if (cacheResult?.error === 'incomplete_data') {
+        if (cacheResult?.error === 'already_cached') {
+          console.log('ℹ️ Drug already in cache:', cacheResult?.details);
+          toast.info("Already cached!", {
+            description: `"${identifiedDrug.name}" is already in the cache library. No need to save again.`
+          });
+          setIsSaved(true); // Mark as saved since it's already in cache
+        } else if (cacheResult?.error === 'incomplete_data') {
           toast.warning("Information incomplete for caching", {
             description: `Drug data is ${completenessScore}% complete. Cache requires 100% complete information for quality assurance.`
           });

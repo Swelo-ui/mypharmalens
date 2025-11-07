@@ -1,6 +1,6 @@
 import { serve } from "std/http/server";
 import "xhr";
-import { saveDrugToCache } from '../enhanced-drug-identify/cache-integration.ts';
+import { saveDrugToCache, checkDrugCache } from '../enhanced-drug-identify/cache-integration.ts';
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
@@ -115,8 +115,31 @@ serve(async (req) => {
       );
     }
 
-    // Data is complete, proceed with cache save
-    console.log(`✅ === HIGH-QUALITY DATA APPROVED FOR CACHE ===`);
+    // Check if drug already exists in cache
+    console.log(`\n🔍 === CHECKING FOR DUPLICATE IN CACHE ===`);
+    const existingCacheEntry = await checkDrugCache(drugData.name);
+    
+    if (existingCacheEntry) {
+      console.log(`⚠️ === DUPLICATE DETECTED ===`);
+      console.log(`   Drug: ${drugData.name}`);
+      console.log(`   Already cached with completeness: ${existingCacheEntry.cacheCompleteness || 'unknown'}%`);
+      
+      return createErrorResponse(
+        'already_cached',
+        `"${drugData.name}" is already cached in the library. This drug information has been previously saved and is available for identification.`,
+        {
+          drugName: drugData.name,
+          cachedDrugName: existingCacheEntry.name,
+          cacheCompleteness: existingCacheEntry.cacheCompleteness || 0,
+          message: 'Drug already exists in cache - no need to save again'
+        }
+      );
+    }
+    
+    console.log(`✅ No duplicate found - proceeding with save`);
+    
+    // Data is complete and unique, proceed with cache save
+    console.log(`\n✅ === HIGH-QUALITY DATA APPROVED FOR CACHE ===`);
     console.log(`   Completeness: ${completenessScore}% (100% threshold met)`);
     console.log(`   Source: Manual user save`);
     
