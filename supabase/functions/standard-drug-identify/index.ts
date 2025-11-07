@@ -1,4 +1,6 @@
 import { checkDrugCache as checkCache } from './cache-integration.ts';
+import { aiCompareDrugNames } from './ai-validator.ts';
+import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -97,6 +99,14 @@ interface VisionResult {
   ocrSource?: string;
   fullText?: string;
   fallbackUsed?: string;
+  // Image condition flags for Critical Vision trigger
+  imageChallenges?: string[];
+  needsCriticalAnalysis?: boolean;
+  imageQuality?: number;
+  blurry?: boolean;
+  tornOrCut?: boolean;
+  reflective?: boolean;
+  partialView?: boolean;
 }
 
 interface DataQualityMeta {
@@ -384,21 +394,37 @@ async function performOpenRouterAnalysis(imageBase64: string, useSecondary: bool
   try {
     console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
     
-    const prompt = `FAST pharmaceutical OCR for Standard Mode. Extract ONLY essential drug information.
+    const prompt = `You are a fast pharmaceutical drug identifier. Extract key info from this medicine image.
+
+CRITICAL: Also detect if the image has challenging conditions that need advanced analysis.
 
 INSTRUCTIONS (Speed-optimized):
 1. Brand Name: Exact name on package (e.g., "Naxdom 500")
 2. Generic/Active Ingredient: From composition section
 3. Confidence: high/medium/low based on text clarity
+4. **Image Challenges**: Detect if image has:
+   - "torn" or "cut" - Strip/blister is torn, cut, or damaged
+   - "blurry" - Text is unclear or out of focus
+   - "reflective" - Foil or packaging has glare/reflection
+   - "partial" - Only partial view of medicine/packaging
+   - "damaged" - Packaging is physically damaged
+5. **needsCriticalAnalysis**: Set to true if ANY of above challenges exist OR confidence is low
 
 OUTPUT (JSON only):
 {
   "name": "Brand name",
   "genericName": "Active ingredient",
-  "confidence": "high/medium/low"
+  "confidence": "high/medium/low",
+  "imageChallenges": ["torn", "blurry", etc.],
+  "needsCriticalAnalysis": true/false,
+  "imageQuality": 0-100,
+  "tornOrCut": true/false,
+  "blurry": true/false,
+  "reflective": true/false,
+  "partialView": true/false
 }
 
-Be FAST and ACCURATE. Return ONLY JSON:`;
+Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
 
     const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
 
@@ -476,19 +502,35 @@ async function performGeminiAnalysis(imageBase64: string): Promise<VisionResult 
     
     const prompt = `STANDARD MODE: Fast drug OCR. Extract essential info ONLY.
 
+CRITICAL: Also detect if the image has challenging conditions that need advanced analysis.
+
 RULES:
 1. Brand name: Exact text from package (e.g., "Naxdom 500")
 2. Generic: Active ingredient from composition
 3. NO guessing - return "Unknown" if unclear
+4. **Image Challenges**: Detect if image has:
+   - "torn" or "cut" - Strip/blister is torn, cut, or damaged
+   - "blurry" - Text is unclear or out of focus
+   - "reflective" - Foil or packaging has glare/reflection
+   - "partial" - Only partial view of medicine/packaging
+   - "damaged" - Packaging is physically damaged
+5. **needsCriticalAnalysis**: Set to true if ANY of above challenges exist OR confidence is low
 
 OUTPUT (JSON):
 {
   "name": "Brand name",
   "genericName": "Active ingredient",
-  "confidence": "high/medium/low"
+  "confidence": "high/medium/low",
+  "imageChallenges": ["torn", "blurry", etc.],
+  "needsCriticalAnalysis": true/false,
+  "imageQuality": 0-100,
+  "tornOrCut": true/false,
+  "blurry": true/false,
+  "reflective": true/false,
+  "partialView": true/false
 }
 
-Be FAST. Return JSON only:`;
+Be FAST. Detect challenging conditions. Return JSON only:`;
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
       method: "POST",
@@ -618,6 +660,87 @@ Deno.serve(async (req: Request) => {
     let drugName = validatedResult?.name || 'Unknown';
     let genericName = validatedResult?.genericName || '';
     console.log(`📝 Validated - Brand: "${drugName}", Generic: "${genericName}"`);
+
+    // 🔍 DEBUG: Log ALL challenge detection fields
+    console.log('\n🔍 === CHALLENGE DETECTION DEBUG (STANDARD MODE) ===');
+    console.log(`   needsCriticalAnalysis: ${validatedResult?.needsCriticalAnalysis}`);
+    console.log(`   tornOrCut: ${validatedResult?.tornOrCut}`);
+    console.log(`   blurry: ${validatedResult?.blurry}`);
+    console.log(`   reflective: ${validatedResult?.reflective}`);
+    console.log(`   partialView: ${validatedResult?.partialView}`);
+    console.log(`   imageChallenges: ${JSON.stringify(validatedResult?.imageChallenges)}`);
+    console.log(`   imageQuality: ${validatedResult?.imageQuality}`);
+    console.log(`   confidence: ${validatedResult?.confidence}`);
+
+    // Check if image has challenging conditions detected by OCR
+    // 🚨 MORE AGGRESSIVE: Also trigger on low confidence or "Unknown" drug name
+    const hasChallenges = validatedResult?.needsCriticalAnalysis || 
+                         validatedResult?.tornOrCut || 
+                         validatedResult?.blurry || 
+                         validatedResult?.reflective ||
+                         validatedResult?.partialView ||
+                         (validatedResult?.imageChallenges && validatedResult.imageChallenges.length > 0) ||
+                         (validatedResult?.imageQuality && validatedResult.imageQuality < 50) ||
+                         validatedResult?.confidence === 'low' ||
+                         drugName === 'Unknown' ||
+                         drugName.toLowerCase().includes('unknown');
+    
+    if (hasChallenges) {
+      console.log('\n⚠️ === CHALLENGING IMAGE CONDITIONS DETECTED ===');
+      console.log(`   Challenges: ${validatedResult?.imageChallenges?.join(', ') || 'Low quality/confidence'}`);
+      console.log(`   Image Quality: ${validatedResult?.imageQuality || 'Unknown'}%`);
+      console.log(`   Torn/Cut: ${validatedResult?.tornOrCut ? 'YES' : 'No'}`);
+      console.log(`   Blurry: ${validatedResult?.blurry ? 'YES' : 'No'}`);
+      console.log(`   Reflective: ${validatedResult?.reflective ? 'YES' : 'No'}`);
+      console.log(`   Partial View: ${validatedResult?.partialView ? 'YES' : 'No'}`);
+      console.log(`   🚨 TRIGGERING CRITICAL VISION ANALYSIS IMMEDIATELY...`);
+      
+      // Trigger Critical Vision Analysis for challenging images
+      try {
+        const criticalStage = await performCriticalVisionAnalysis(imageBase64, {
+          previousAttemptFailed: drugName === 'Unknown',
+          knownIssues: validatedResult?.imageChallenges || ['challenging_conditions'],
+          mode: 'standard'
+        });
+        
+        if (criticalStage.success && criticalStage.confidence >= 60 && criticalStage.data) {
+          console.log(`✅ CRITICAL VISION IDENTIFIED: ${criticalStage.data.name} (${criticalStage.confidence}% confidence)`);
+          console.log(`   Condition: ${criticalStage.data.physicalCondition}`);
+          console.log(`   Safe to use: ${criticalStage.data.safeToUse ? 'Yes ✅' : 'No ❌'}`);
+          
+          stages.push({
+            name: 'critical-vision-analysis',
+            success: true,
+            data: criticalStage.data,
+            processingTime: Date.now() - overallStartTime
+          });
+          
+          // Return immediately with critical vision results
+          const result: DrugIdentificationResult = {
+            success: true,
+            data: {
+              ...criticalStage.data,
+              criticalAnalysisUsed: true,
+              challengingImageHandled: true
+            },
+            processingStages: stages.map(s => s.name),
+            confidence: criticalStage.confidence >= 80 ? 'high' : 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          };
+          
+          console.log(`\n✅ Critical Vision Analysis handled challenging image successfully!`);
+          console.log(`=`.repeat(80));
+          return createResponse(result);
+        } else {
+          console.log(`⚠️ Critical Vision Analysis ran but confidence too low (${criticalStage.confidence}%)`);
+          console.log(`   Continuing with standard pipeline...`);
+        }
+      } catch (criticalError) {
+        console.error(`❌ Critical Vision Analysis error:`, criticalError);
+        console.log(`   Continuing with standard pipeline...`);
+      }
+    }
 
     // Stage 1.5: If OCR failed, try OpenRouter Vision fallback (dual model)
     if (!validatedResult || drugName === 'Unknown' || drugName.toLowerCase().includes('unknown')) {
@@ -812,8 +935,38 @@ Deno.serve(async (req: Request) => {
         const localResult = await checkLocalDatabase(query, threshold);
         
         if (localResult) {
-          console.log(`      🎉 ✅ MATCH FOUND with "${query}" at ${threshold * 100}% threshold!`);
-          console.log(`      Returning: ${(localResult as { name?: string } | null)?.name || 'Drug data'}`);
+          console.log(`      🎯 POTENTIAL MATCH FOUND with "${query}" at ${threshold * 100}% threshold!`);
+          const matchedDrugName = (localResult as { name?: string; genericName?: string } | null)?.name || '';
+          const matchedGenericName = (localResult as { name?: string; genericName?: string } | null)?.genericName;
+          console.log(`      Database match: "${matchedDrugName}" (Generic: "${matchedGenericName || 'N/A'}")`);
+          
+          // CRITICAL: Use AI to validate if this is truly the SAME drug (especially for lower thresholds)
+          if (threshold < 0.85) {
+            console.log(`\n      🔐 AI VALIDATION REQUIRED (fuzzy match at ${threshold * 100}%)`);
+            const aiValidation = await aiCompareDrugNames(
+              drugName,
+              genericName,
+              matchedDrugName,
+              matchedGenericName
+            );
+            
+            // Only accept database match if AI confirms it's the SAME drug
+            if (!aiValidation.isSame) {
+              console.log(`      ❌ AI REJECTED LOCAL DB MATCH!`);
+              console.log(`         Reason: ${aiValidation.reasoning}`);
+              console.log(`         This prevents incorrect drug information from being returned`);
+              console.log(`         Continuing to next search option...\n`);
+              continue; // Try next query/threshold instead of returning wrong data
+            }
+            
+            console.log(`      ✅ AI VALIDATED LOCAL DB MATCH!`);
+            console.log(`         AI Confidence: ${(aiValidation.confidence * 100).toFixed(1)}%`);
+            console.log(`         Reasoning: ${aiValidation.reasoning}`);
+          } else {
+            console.log(`      ✅ HIGH THRESHOLD MATCH (${threshold * 100}%) - AI validation skipped`);
+          }
+          
+          console.log(`      🎉 ✅ RETURNING VALIDATED MATCH: ${matchedDrugName}`);
           
           stages.push({
             name: 'local-database-smart-search',
@@ -824,9 +977,9 @@ Deno.serve(async (req: Request) => {
 
           return createResponse({
             success: true,
-            data: localResult, // Local DB hit: Return full validated data
+            data: localResult, // Local DB hit: Return AI-validated data
             processingStages: stages.map(s => s.name),
-            confidence: threshold >= 0.75 ? 'high' : 'medium',
+            confidence: threshold >= 0.85 ? 'high' : 'medium',
             fallbackUsed: false,
             processingTime: Date.now() - overallStartTime
           });
@@ -1010,6 +1163,58 @@ Deno.serve(async (req: Request) => {
     }
     
     console.log(`🤖 === AI ENHANCEMENT COMPLETE ===\n`);
+    
+    // Stage 6.5: Critical Vision Analysis (Qwen) for challenging images
+    console.log('🔬 Stage 6.5: Critical Vision Analysis...');
+    if (shouldUseCriticalAnalysis({ 
+      confidence: 'low', 
+      name: drugName || 'Unknown', 
+      ocrConfidence: 40,
+      imageQuality: 50 
+    })) {
+      console.log('🔬 === CRITICAL VISION ANALYSIS (Qwen) ACTIVATED ===');
+      console.log('   Reason: Low confidence or challenging image detected');
+      console.log('   Strategy: Deep vision analysis with text reconstruction');
+      
+      try {
+        const criticalResult = await performCriticalVisionAnalysis(imageBase64, {
+          previousAttemptFailed: !drugName || drugName === '' || drugName === 'Unknown',
+          knownIssues: ['low_ocr_confidence', 'partial_text', 'standard_mode_exhausted'],
+          mode: 'standard'
+        });
+        
+        if (criticalResult.success && criticalResult.confidence >= 60) {
+          console.log(`✅ Critical vision analysis succeeded!`);
+          console.log(`   Identified: ${criticalResult.data?.name}`);
+          console.log(`   Confidence: ${criticalResult.confidence}%`);
+          console.log(`   Physical condition: ${criticalResult.data?.physicalCondition}`);
+          console.log(`   Tampering detected: ${criticalResult.data?.tamperingDetected}`);
+          
+          stages.push({
+            name: 'critical-vision-analysis',
+            success: true,
+            data: criticalResult.data,
+            processingTime: Date.now() - overallStartTime
+          });
+          
+          return createResponse({
+            success: true,
+            data: criticalResult.data,
+            processingStages: stages.map(s => s.name),
+            confidence: criticalResult.confidence >= 80 ? 'high' : 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          });
+        } else if (criticalResult.retakeNeeded) {
+          console.log(`⚠️ Critical analysis suggests retaking photo`);
+          console.log(`   Tips: ${criticalResult.data?.retakeTips?.join(', ')}`);
+        }
+      } catch (criticalError) {
+        console.error(`❌ Critical vision analysis error:`, criticalError);
+      }
+    }
+    
+    console.log(`🔬 === CRITICAL VISION ANALYSIS COMPLETE ===\n`);
     
     // Stage 7: Final Fallback - Return Safe Failure
     console.log('🔍 Stage 7: Final Data Validation...');

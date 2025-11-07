@@ -96,19 +96,37 @@ const DrugIdentify = () => {
   const [processingMeta, setProcessingMeta] = useState<{ confidence?: string; fallbackUsed?: boolean; processingStages?: any[]; enhancedProcessing?: boolean } | null>(null);
   const navigate = useNavigate();
 
-  // User-friendly stage mapping with progress percentages and estimated durations
+  // PharmaLens-branded progress messages - Professional & User-Friendly
+  // Optimized for both Standard Mode (fast) and Enhanced Mode (comprehensive)
   const stageMapping: Record<string, { message: string; progress: number; duration: number }> = {
-    'image-quality-analysis': { message: 'Analyzing image quality', progress: 8, duration: 1000 },
-    'dual-ocr-extraction': { message: 'Extracting text from image', progress: 20, duration: 3000 },
-    'gemini-analysis': { message: 'AI analyzing medication features', progress: 35, duration: 4500 },
-    'cache-hit': { message: 'Found in database', progress: 95, duration: 500 },
-    'cache-miss': { message: 'Searching medical databases', progress: 40, duration: 1000 },
-    'multi-source-enrichment': { message: 'Gathering comprehensive data', progress: 60, duration: 10000 },
-    'data-consolidation': { message: 'Validating medication information', progress: 70, duration: 2000 },
-    'cross-reference-verification': { message: 'Cross-checking data accuracy', progress: 78, duration: 1500 },
-    'imprint-search': { message: 'Searching by visual features', progress: 82, duration: 3500 },
-    'gemini-backup': { message: 'AI generating complete information', progress: 88, duration: 5000 },
-    'final-cross-verification': { message: 'Final quality verification', progress: 95, duration: 4000 }
+    // === ENHANCED MODE STAGES (11 stages: 0-100%) ===
+    'image-quality-analysis': { message: 'Analyzing medication image', progress: 10, duration: 2000 },
+    'dual-ocr-extraction': { message: 'Reading medication details', progress: 20, duration: 3000 },
+    'text-extraction': { message: 'Reading medication details', progress: 20, duration: 3000 },
+    'gemini-analysis': { message: 'Analyzing medication features', progress: 30, duration: 4000 },
+    'openrouter-vision-fallback': { message: 'Processing medication image', progress: 40, duration: 3500 },
+    'cache-hit': { message: 'Found in PharmaLens database', progress: 50, duration: 500 },
+    'cache-miss': { message: 'Searching pharmaceutical databases', progress: 50, duration: 1000 },
+    'multi-source-enrichment': { message: 'Gathering medication information', progress: 60, duration: 8000 },
+    'data-consolidation': { message: 'Verifying medication details', progress: 70, duration: 2500 },
+    'imprint-search': { message: 'Searching by pill markings', progress: 80, duration: 3000 },
+    'gemini-backup': { message: 'Completing medication profile', progress: 90, duration: 4500 },
+    'critical-vision-analysis': { message: 'Deep analysis for challenging image', progress: 92, duration: 6000 },
+    'cross-reference-verification': { message: 'Validating information accuracy', progress: 95, duration: 2000 },
+    'final-cross-verification': { message: 'Final quality verification', progress: 98, duration: 1500 },
+    'smart-fallback-system': { message: 'Finalizing results', progress: 100, duration: 1000 },
+
+    // === STANDARD MODE STAGES (7 stages: 0-100%) ===
+    'gemini-ocr': { message: 'Reading medication label', progress: 15, duration: 2000 },
+    'ocr-cross-validation': { message: 'Verifying medication name', progress: 25, duration: 1000 },
+    'multi-source-comprehensive-fallback': { message: 'Searching pharmaceutical databases', progress: 40, duration: 3500 },
+    'cache-search': { message: 'Checking PharmaLens database', progress: 55, duration: 1500 },
+    'local-database-smart-search': { message: 'Searching local medication records', progress: 70, duration: 2500 },
+    '1mg-fallback': { message: 'Searching online pharmaceutical databases', progress: 85, duration: 4000 },
+    'drugs-com-fallback': { message: 'Searching online pharmaceutical databases', progress: 85, duration: 4000 },
+    'multi-source-api-fallback': { message: 'Gathering medication details', progress: 95, duration: 5000 },
+    'ai-powered-fallback': { message: 'Completing identification', progress: 98, duration: 3000 },
+    'safe-failure': { message: 'Identification complete', progress: 100, duration: 500 }
   };
 
   // Smooth progress interpolation state
@@ -366,11 +384,9 @@ const DrugIdentify = () => {
       // Try enhanced drug identification first
       let result = null;
       let fallbackUsed = false;
+      let progressSimulator: NodeJS.Timeout | null = null;
       
       try {
-        // Start progress tracking with smooth updates
-        updateProgress('image-quality-analysis');
-        
         // Log which mode we're using
         console.log(`🚀 Identifying drug using ${analysisMode.toUpperCase()} mode`);
         console.log(`Mode details:`, {
@@ -379,6 +395,27 @@ const DrugIdentify = () => {
           blurryMode: blurryMode || isImageLowRes,
           bypassCache: analysisMode === 'enhanced'
         });
+        
+        // Start simulated progress updates during API call
+        let simulatedProgress = 10;
+        progressSimulator = setInterval(() => {
+          simulatedProgress += 5;
+          if (simulatedProgress <= 85) {
+            setProcessingProgress(simulatedProgress);
+            setCurrentProgress(simulatedProgress);
+            
+            // Update phase based on progress
+            if (simulatedProgress <= 30) {
+              setProcessingPhase("Analyzing medication image");
+            } else if (simulatedProgress <= 50) {
+              setProcessingPhase(analysisMode === 'enhanced' ? "Gathering medication information" : "Checking PharmaLens database");
+            } else if (simulatedProgress <= 70) {
+              setProcessingPhase(analysisMode === 'enhanced' ? "Verifying medication details" : "Searching local medication records");
+            } else {
+              setProcessingPhase("Finalizing identification");
+            }
+          }
+        }, 1000); // Update every 1 second
         
         // Use the appropriate function based on analysis mode
         const functionName = analysisMode === 'enhanced' ? 'enhanced-drug-identify' : 'standard-drug-identify';
@@ -399,19 +436,21 @@ const DrugIdentify = () => {
           throw new Error(`${analysisMode === 'enhanced' ? 'Enhanced' : 'Standard'} system unavailable`);
         }
 
+        // Clear the progress simulator
+        clearInterval(progressSimulator);
+        
         if (drugData && drugData.success) {
-          // Update progress based on actual backend stages
-          if (drugData.processingStages && Array.isArray(drugData.processingStages)) {
-            drugData.processingStages.forEach((stage: string, index: number) => {
-              setTimeout(() => {
-                updateProgress(stage);
-              }, index * 400); // Smooth staggered updates
-            });
-          } else {
-            // Fallback to generic progress
-            setProcessingPhase("Finalizing medication information");
-            setProcessingProgress(90);
+          // Clear any existing progress intervals
+          if (progressInterval) {
+            clearInterval(progressInterval);
+            setProgressInterval(null);
           }
+          
+          // Immediately jump to 100% when result is received
+          setProcessingPhase("Identification complete");
+          setProcessingProgress(100);
+          setCurrentProgress(100);
+          setTargetProgress(100);
           
           result = drugData.data;
           result.enhancedProcessing = analysisMode === 'enhanced';
@@ -436,6 +475,10 @@ const DrugIdentify = () => {
           throw new Error(`${analysisMode} system returned no results`);
         }
       } catch (drugError) {
+        // Clear the progress simulator on error
+        if (progressSimulator) {
+          clearInterval(progressSimulator);
+        }
         console.error('Drug identification failed:', drugError);
         throw new Error(`Identification failed: ${drugError.message || 'Please try again with a clearer image.'}`);
       }
@@ -1019,27 +1062,27 @@ const DrugIdentify = () => {
               {isIdentifying && (
                 <div className="mt-6 space-y-3">
                   <div className="flex items-center justify-between text-sm font-medium">
-                    <span className="text-pharma-700 dark:text-pharma-300">
+                    <span className="text-gray-900 dark:text-white drop-shadow-md">
                       {processingPhase || "Analyzing medication..."}
                     </span>
-                    <span className="text-pharma-600 dark:text-pharma-400 font-semibold">
+                    <span className="text-gray-900 dark:text-white font-semibold drop-shadow-md">
                       {processingProgress}%
                     </span>
                   </div>
                   <Progress value={processingProgress} className="h-2.5" />
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="text-gray-700 dark:text-white/90">
                       {enhancedMode 
-                        ? "Advanced AI Analysis" 
-                        : "Standard Analysis"}
+                        ? "PharmaLens Deep Analysis" 
+                        : "PharmaLens Quick Search"}
                     </span>
                     {estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
-                      <span className="text-pharma-600 dark:text-pharma-400 font-medium">
+                      <span className="text-gray-700 dark:text-white/90 font-medium">
                         ~{estimatedTimeRemaining}s remaining
                       </span>
                     )}
                     {processingProgress === 100 && (
-                      <span className="text-green-600 dark:text-green-400 font-medium">
+                      <span className="text-green-600 dark:text-green-400 font-medium drop-shadow-md">
                         ✓ Complete
                       </span>
                     )}

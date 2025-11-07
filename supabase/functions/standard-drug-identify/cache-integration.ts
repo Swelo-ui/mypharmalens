@@ -3,6 +3,7 @@
 // Add this to enhanced-drug-identify/index.ts to enable caching
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { aiCompareDrugNames } from './ai-validator.ts';
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
@@ -79,6 +80,7 @@ function normalizeDrugName(name: string): string {
 /**
  * Calculate similarity between two drug names (0-1 score)
  * Uses Levenshtein-like approach with pharmaceutical awareness
+ * NOW USED AS FALLBACK ONLY - AI comparison is primary
  */
 function calculateNameSimilarity(name1: string, name2: string): number {
   const n1 = normalizeDrugName(name1);
@@ -202,11 +204,34 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     }
     
     if (bestMatch) {
-      console.log(`\n🎯 FUZZY MATCH FOUND!`);
+      console.log(`\n🎯 POTENTIAL FUZZY MATCH FOUND!`);
       console.log(`   Input: "${drugName}"`);
       console.log(`   Matched (brand): "${bestMatch.drug_name}" | (generic): "${bestMatch.generic_name || ''}"`);
-      console.log(`   Similarity: ${(bestScore * 100).toFixed(1)}%`);
+      console.log(`   String Similarity: ${(bestScore * 100).toFixed(1)}%`);
       console.log(`   Completeness: ${bestMatch.completeness_score}%`);
+      
+      // CRITICAL: Use AI to validate if this is truly the SAME drug
+      console.log(`\n🔐 AI VALIDATION REQUIRED - Verifying cache match...`);
+      const aiValidation = await aiCompareDrugNames(
+        drugName,
+        undefined, // We don't have extracted generic yet in cache check
+        bestMatch.drug_name,
+        bestMatch.generic_name
+      );
+      
+      // Only accept cache hit if AI confirms it's the SAME drug
+      if (!aiValidation.isSame) {
+        console.log(`\n❌ AI REJECTED CACHE HIT!`);
+        console.log(`   Reason: ${aiValidation.reasoning}`);
+        console.log(`   This prevents incorrect drug information from being returned`);
+        console.log(`   Will continue to fresh identification...`);
+        console.log(`🔍 === CACHE CHECK END (AI REJECTED) ===\n`);
+        return null;
+      }
+      
+      console.log(`\n✅ AI VALIDATED CACHE HIT!`);
+      console.log(`   AI Confidence: ${(aiValidation.confidence * 100).toFixed(1)}%`);
+      console.log(`   Reasoning: ${aiValidation.reasoning}`);
       
       // Fetch full data for the matched drug
       const { data: fullData, error: fullError } = await supabase
@@ -222,7 +247,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
       }
       
       console.log(`✅ Full data retrieved successfully`);
-      console.log(`🔍 === CACHE CHECK END (FUZZY HIT) ===\n`);
+      console.log(`🔍 === CACHE CHECK END (AI-VALIDATED HIT) ===\n`);
       return transformCacheData(fullData);
     }
     
