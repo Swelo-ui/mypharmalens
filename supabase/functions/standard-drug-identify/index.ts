@@ -12,10 +12,10 @@ const corsHeaders = {
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
-// Vision model hierarchy: Qwen (primary) → Nvidia (secondary) → Gemini 2.0 (fallback)
+// Vision model hierarchy: Qwen (primary) → Nvidia (secondary) → Meta Llama 4 (fallback)
 const VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';      // Best for pharmaceutical OCR
 const VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free'; // Fast alternative
-const VISION_MODEL_FALLBACK = 'google/gemini-2.0-flash-exp:free';      // Final fallback
+const VISION_MODEL_FALLBACK = 'meta-llama/llama-4-maverick:free';      // Final fallback
 
 // Web scraping model: DeepSeek R1T2 Chimera for intelligent HTML parsing
 const WEB_SCRAPING_MODEL = 'tngtech/deepseek-r1t2-chimera:free';       // Best for web scraping & reasoning
@@ -45,6 +45,76 @@ function limitDataForStandardMode(data: any): any {
     standardModeOptimized: true,
     note: (data.note || '') + ' [Standard Mode: Top 5 items for quick reference]'
   };
+}
+
+// Smart Pre-Processing Types
+interface PreProcessingResult {
+  imageComplexity: 'simple' | 'moderate' | 'complex';
+  suggestedMode: 'standard' | 'enhanced';
+  cachePreCheckAvailable: boolean;
+  qualityScore: number;
+  challenges: string[];
+  recommendations: string[];
+}
+
+interface QualityScore {
+  overall: number;
+  dataCompleteness: number;
+  sourceReliability: number;
+  validationLevel: number;
+  confidence: Confidence;
+}
+
+interface EnrichedMetadata {
+  processingPipeline: string[];
+  qualityMetrics: QualityScore;
+  dataSources: string[];
+  processingTime: number;
+  cacheStatus: 'hit' | 'miss' | 'partial';
+  aiValidationUsed: boolean;
+  fallbacksTriggered: string[];
+  timestamp: string;
+}
+
+// Drug data interface for type safety
+interface DrugData {
+  name?: string;
+  genericName?: string;
+  description?: string;
+  sideEffects?: string[];
+  warnings?: string[];
+  indications?: string[];
+  contraindications?: string[];
+  mechanism?: string;
+  dosageAndAdmin?: string;
+  manufacturer?: string;
+  category?: string;
+  drugClass?: string;
+  storage?: string;
+  prescriptionStatus?: string;
+  pregnancy?: string;
+  imprint?: string;
+  color?: string;
+  shape?: string;
+  brandNames?: string[];
+  possibleNames?: string[];
+  verified?: boolean;
+  completeness?: number;
+  [key: string]: unknown; // Allow additional properties
+}
+
+// Enriched response interface
+interface EnrichedResponse extends DrugData {
+  _metadata: EnrichedMetadata;
+  _preprocessing: {
+    imageComplexity: 'simple' | 'moderate' | 'complex';
+    suggestedMode: 'standard' | 'enhanced';
+    qualityScore: number;
+    challenges: string[];
+  };
+  qualityScore: number;
+  dataCompleteness: number;
+  sourceReliability: number;
 }
 
 // Typed shapes used across OCR and fallback flows
@@ -172,6 +242,227 @@ function createResponse(data: DrugIdentificationResult, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
+}
+
+// Smart Pre-Processing: Analyze image complexity and suggest mode
+async function performSmartPreProcessing(imageBase64: string): Promise<PreProcessingResult> {
+  console.log('\n🧠 === SMART PRE-PROCESSING STAGE ===');
+  const startTime = Date.now();
+  
+  try {
+    // Quick vision analysis to determine image complexity
+    const analysisPrompt = `Analyze this pharmaceutical image and determine:
+1. Image quality (0-100)
+2. Text clarity (high/medium/low)
+3. Lighting conditions (good/poor)
+4. Visible challenges (torn, blurry, reflective, partial view)
+5. Recommended processing mode (standard for clear images, enhanced for complex)
+
+Return ONLY JSON:
+{
+  "imageQuality": 0-100,
+  "textClarity": "high/medium/low",
+  "lighting": "good/poor",
+  "challenges": ["torn", "blurry", etc.],
+  "recommendedMode": "standard/enhanced"
+}`;
+
+    const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
+    
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+        'X-Title': 'PharmaLens Smart Pre-Processing'
+      },
+      body: JSON.stringify({
+        model: VISION_MODEL_PRIMARY,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: analysisPrompt },
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${cleanBase64}` } }
+          ]
+        }],
+        temperature: 0.1,
+        max_tokens: 256
+      })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content || '{}';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        const analysis = JSON.parse(jsonMatch[0]);
+        const imageQuality = analysis.imageQuality || 50;
+        const challenges = analysis.challenges || [];
+        const recommendedMode = analysis.recommendedMode || 'standard';
+        
+        // Determine complexity based on quality and challenges
+        let complexity: 'simple' | 'moderate' | 'complex' = 'simple';
+        if (imageQuality < 40 || challenges.length > 2) {
+          complexity = 'complex';
+        } else if (imageQuality < 70 || challenges.length > 0) {
+          complexity = 'moderate';
+        }
+        
+        const result: PreProcessingResult = {
+          imageComplexity: complexity,
+          suggestedMode: recommendedMode === 'enhanced' ? 'enhanced' : 'standard',
+          cachePreCheckAvailable: imageQuality > 60,
+          qualityScore: imageQuality,
+          challenges: challenges,
+          recommendations: [
+            complexity === 'complex' ? '⚠️ Enhanced Mode recommended for best results' : '✅ Standard Mode should work well',
+            challenges.includes('blurry') ? '💡 Consider retaking with better focus' : '',
+            challenges.includes('reflective') ? '💡 Reduce glare/reflection if possible' : '',
+            imageQuality < 50 ? '💡 Better lighting recommended' : ''
+          ].filter(r => r.length > 0)
+        };
+        
+        const processingTime = Date.now() - startTime;
+        console.log(`   Image Complexity: ${result.imageComplexity.toUpperCase()}`);
+        console.log(`   Quality Score: ${result.qualityScore}/100`);
+        console.log(`   Suggested Mode: ${result.suggestedMode.toUpperCase()}`);
+        console.log(`   Challenges: ${result.challenges.join(', ') || 'None'}`);
+        console.log(`   Processing Time: ${processingTime}ms`);
+        console.log(`🧠 === PRE-PROCESSING COMPLETE ===\n`);
+        
+        return result;
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Pre-processing error:`, error);
+  }
+  
+  // Fallback result if analysis fails
+  return {
+    imageComplexity: 'moderate',
+    suggestedMode: 'standard',
+    cachePreCheckAvailable: true,
+    qualityScore: 50,
+    challenges: [],
+    recommendations: ['📸 Image analysis unavailable, proceeding with standard mode']
+  };
+}
+
+// Calculate quality score based on data completeness and source reliability
+function calculateQualityScore(data: DrugData, sources: string[]): QualityScore {
+  let dataCompleteness = 0;
+  let sourceReliability = 0;
+  let validationLevel = 0;
+  
+  // Data completeness (0-100)
+  const requiredFields = ['name', 'genericName', 'description', 'sideEffects', 'warnings'];
+  const optionalFields = ['indications', 'contraindications', 'mechanism', 'dosageAndAdmin'];
+  
+  requiredFields.forEach(field => {
+    const value = data[field as keyof DrugData];
+    if (value && (typeof value === 'string' ? value.length > 0 : Array.isArray(value) && value.length > 0)) {
+      dataCompleteness += 15;
+    }
+  });
+  
+  optionalFields.forEach(field => {
+    const value = data[field as keyof DrugData];
+    if (value && (typeof value === 'string' ? value.length > 0 : Array.isArray(value) && value.length > 0)) {
+      dataCompleteness += 6.25;
+    }
+  });
+  
+  // Source reliability (0-100)
+  const reliableSourceScores: Record<string, number> = {
+    'cache-search': 95,
+    'local-database-smart-search': 90,
+    '1mg-intelligent-scraping': 75,
+    'drugs-com-intelligent-scraping': 75,
+    'multi-source-api-fallback': 85,
+    'multi-source-comprehensive-fallback': 80,
+    'openrouter-vision': 60,
+    'critical-vision-analysis': 70,
+    'ai-powered-fallback': 65
+  };
+  
+  sources.forEach(source => {
+    sourceReliability = Math.max(sourceReliability, reliableSourceScores[source] || 50);
+  });
+  
+  // Validation level (0-100)
+  if (sources.includes('cache-search') || sources.includes('local-database-smart-search')) {
+    validationLevel = 90; // AI validated
+  } else if (sources.some(s => s.includes('intelligent-scraping'))) {
+    validationLevel = 70; // AI corrected
+  } else if (sources.includes('multi-source-api-fallback')) {
+    validationLevel = 75; // Multi-source verified
+  } else {
+    validationLevel = 50; // Single source
+  }
+  
+  const overall = Math.round((dataCompleteness * 0.4 + sourceReliability * 0.35 + validationLevel * 0.25));
+  
+  let confidence: Confidence = 'low';
+  if (overall >= 80) confidence = 'high';
+  else if (overall >= 60) confidence = 'medium';
+  
+  return {
+    overall,
+    dataCompleteness: Math.round(dataCompleteness),
+    sourceReliability: Math.round(sourceReliability),
+    validationLevel: Math.round(validationLevel),
+    confidence
+  };
+}
+
+// Enrich response with metadata
+function enrichResponseMetadata(
+  data: DrugData,
+  stages: ProcessingStage[],
+  preProcessing: PreProcessingResult,
+  overallStartTime: number
+): EnrichedResponse {
+  const successfulStages = stages.filter(s => s.success).map(s => s.name);
+  const failedStages = stages.filter(s => !s.success).map(s => s.name);
+  
+  const qualityMetrics = calculateQualityScore(data, successfulStages);
+  
+  const cacheStatus: 'hit' | 'miss' | 'partial' = 
+    successfulStages.includes('cache-search') ? 'hit' :
+    successfulStages.includes('local-database-smart-search') ? 'partial' : 'miss';
+  
+  const aiValidationUsed = stages.some(s => 
+    s.name.includes('ai-powered') || 
+    s.name.includes('critical-vision') ||
+    s.name.includes('intelligent-scraping')
+  );
+  
+  const metadata: EnrichedMetadata = {
+    processingPipeline: successfulStages,
+    qualityMetrics,
+    dataSources: [...new Set(successfulStages)],
+    processingTime: Date.now() - overallStartTime,
+    cacheStatus,
+    aiValidationUsed,
+    fallbacksTriggered: failedStages,
+    timestamp: new Date().toISOString()
+  };
+  
+  return {
+    ...data,
+    _metadata: metadata,
+    _preprocessing: {
+      imageComplexity: preProcessing.imageComplexity,
+      suggestedMode: preProcessing.suggestedMode,
+      qualityScore: preProcessing.qualityScore,
+      challenges: preProcessing.challenges
+    },
+    qualityScore: qualityMetrics.overall,
+    dataCompleteness: qualityMetrics.dataCompleteness,
+    sourceReliability: qualityMetrics.sourceReliability
+  } as EnrichedResponse;
 }
 
 // Import functions from enhanced-drug-identify for reuse
@@ -627,10 +918,46 @@ Deno.serve(async (req: Request) => {
     const { imageBase64 } = await req.json();
     
     console.log('='.repeat(80));
-    console.log(`🔍 STANDARD MODE DRUG IDENTIFICATION`);
+    console.log(`🔍 STANDARD MODE DRUG IDENTIFICATION - COMPREHENSIVE PIPELINE`);
     console.log('='.repeat(80));
-    console.log('🔍 Fast search using local database, cache, and fallback mechanisms');
+    console.log('📋 Pipeline Stages:');
+    console.log('   1. Smart Pre-Processing (Image Analysis)');
+    console.log('   2. OpenRouter Vision (3-tier: Qwen → Nvidia → Gemini)');
+    console.log('   3. Critical Vision (if needed)');
+    console.log('   4. Enhanced Cache + AI Validation');
+    console.log('   5. Smart Local DB + Progressive Search');
+    console.log('   6. DeepSeek Intelligent Scraping');
+    console.log('   7. Multi-Source API');
+    console.log('   8. Unified Response Layer (Quality Scoring)');
     console.log('='.repeat(80));
+
+    // STAGE 0: Smart Pre-Processing
+    let preProcessingResult: PreProcessingResult;
+    try {
+      preProcessingResult = await performSmartPreProcessing(imageBase64);
+      stages.push({
+        name: 'smart-preprocessing',
+        success: true,
+        data: preProcessingResult,
+        processingTime: Date.now() - overallStartTime
+      });
+      
+      // Show recommendations to user (would be shown in UI)
+      if (preProcessingResult.recommendations.length > 0) {
+        console.log('\n📢 Pre-Processing Recommendations:');
+        preProcessingResult.recommendations.forEach(r => console.log(`   ${r}`));
+      }
+    } catch (error) {
+      console.error('⚠️ Pre-processing failed, continuing with defaults:', error);
+      preProcessingResult = {
+        imageComplexity: 'moderate',
+        suggestedMode: 'standard',
+        cachePreCheckAvailable: true,
+        qualityScore: 50,
+        challenges: [],
+        recommendations: []
+      };
+    }
 
     if (!imageBase64) {
       return createResponse({
@@ -738,23 +1065,29 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
           
-          // Return immediately with critical vision results
-          const result: DrugIdentificationResult = {
-            success: true,
-            data: {
+          // Enrich with metadata using Unified Response Layer
+          const enrichedData = enrichResponseMetadata(
+            {
               ...criticalStage.data,
               criticalAnalysisUsed: true,
               challengingImageHandled: true
             },
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
+          console.log(`\n✅ Critical Vision Analysis handled challenging image successfully!`);
+          console.log(`=`.repeat(80));
+          
+          return createResponse({
+            success: true,
+            data: enrichedData,
             processingStages: stages.map(s => s.name),
             confidence: criticalStage.confidence >= 80 ? 'high' : 'medium',
             fallbackUsed: true,
             processingTime: Date.now() - overallStartTime
-          };
-          
-          console.log(`\n✅ Critical Vision Analysis handled challenging image successfully!`);
-          console.log(`=`.repeat(80));
-          return createResponse(result);
+          });
         } else {
           console.log(`⚠️ Critical Vision Analysis ran but confidence too low (${criticalStage.confidence}%)`);
           console.log(`   Continuing with standard pipeline...`);
@@ -832,9 +1165,17 @@ Deno.serve(async (req: Request) => {
                 processingTime: Date.now() - overallStartTime
               });
 
+              // Enrich comprehensive fallback data with metadata  
+              const enrichedComprehensiveData = enrichResponseMetadata(
+                multiSourceData.data,
+                stages,
+                preProcessingResult,
+                overallStartTime
+              );
+              
               return createResponse({
                 success: true,
-                data: multiSourceData.data,
+                data: enrichedComprehensiveData,
                 processingStages: stages.map(s => s.name),
                 confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
                 fallbackUsed: true,
@@ -897,9 +1238,17 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
 
+          // Enrich cached data with metadata
+          const enrichedCacheData = enrichResponseMetadata(
+            cachedResult as DrugData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: cachedResult, // Cache hit: Return full validated data
+            data: enrichedCacheData, // Cache hit: Return full validated data
             processingStages: stages.map(s => s.name),
             confidence: 'high',
             fallbackUsed: false,
@@ -998,9 +1347,17 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
 
+          // Enrich local DB data with metadata
+          const enrichedLocalData = enrichResponseMetadata(
+            localResult as DrugData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: localResult, // Local DB hit: Return AI-validated data
+            data: enrichedLocalData, // Local DB hit: Return AI-validated data
             processingStages: stages.map(s => s.name),
             confidence: threshold >= 0.85 ? 'high' : 'medium',
             fallbackUsed: false,
@@ -1039,9 +1396,18 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
 
+          // Enrich 1mg scraping data with metadata
+          const limitedOneMgData = limitDataForStandardMode(oneMgResult);
+          const enrichedOneMgData = enrichResponseMetadata(
+            limitedOneMgData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: limitDataForStandardMode(oneMgResult), // Standard Mode: Top 5 items only
+            data: enrichedOneMgData, // Standard Mode: Top 5 items only
             processingStages: stages.map(s => s.name),
             confidence: (oneMgResult.dataQuality && oneMgResult.dataQuality > 80) ? 'high' : 'medium',
             fallbackUsed: true,
@@ -1076,9 +1442,18 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
 
+          // Enrich drugs.com scraping data with metadata
+          const limitedDrugsComData = limitDataForStandardMode(drugsComResult);
+          const enrichedDrugsComData = enrichResponseMetadata(
+            limitedDrugsComData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: limitDataForStandardMode(drugsComResult), // Standard Mode: Top 5 items only
+            data: enrichedDrugsComData, // Standard Mode: Top 5 items only
             processingStages: stages.map(s => s.name),
             confidence: (drugsComResult.dataQuality && drugsComResult.dataQuality > 80) ? 'high' : 'medium',
             fallbackUsed: true,
@@ -1131,9 +1506,17 @@ Deno.serve(async (req: Request) => {
                 processingTime: Date.now() - overallStartTime
               });
 
+              // Enrich multi-source API data with metadata
+              const enrichedMultiSourceApiData = enrichResponseMetadata(
+                multiSourceData.data,
+                stages,
+                preProcessingResult,
+                overallStartTime
+              );
+              
               return createResponse({
                 success: true,
-                data: multiSourceData.data,
+                data: enrichedMultiSourceApiData,
                 processingStages: stages.map(s => s.name),
                 confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
                 fallbackUsed: true,
@@ -1191,13 +1574,21 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
           
-          // Return AI-enhanced result with Standard Mode optimizations
+          // Return AI-enhanced result with Standard Mode optimizations and metadata
+          const limitedAiData = limitDataForStandardMode({ // Standard Mode: Top 5 items only
+            ...aiResult.data,
+            standardModeFallback: true
+          });
+          const enrichedAiData = enrichResponseMetadata(
+            limitedAiData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: limitDataForStandardMode({ // Standard Mode: Top 5 items only
-              ...aiResult.data,
-              standardModeFallback: true
-            }),
+            data: enrichedAiData,
             processingStages: stages.map(s => s.name),
             confidence: aiResult.data.confidence || 'medium',
             fallbackUsed: true,
@@ -1248,9 +1639,17 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
           
+          // Enrich critical vision data with metadata
+          const enrichedCriticalData = enrichResponseMetadata(
+            (criticalResult.data || {}) as DrugData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
           return createResponse({
             success: true,
-            data: criticalResult.data,
+            data: enrichedCriticalData,
             processingStages: stages.map(s => s.name),
             confidence: criticalResult.confidence >= 80 ? 'high' : 'medium',
             fallbackUsed: true,
