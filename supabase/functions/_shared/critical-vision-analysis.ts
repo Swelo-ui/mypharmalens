@@ -11,8 +11,8 @@ const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 
-// Use Qwen's most capable vision model for critical analysis
-const QWEN_VISION_MODEL = 'qwen/qwen-2-vl-72b-instruct';
+// Use free vision model for critical analysis (qwen-2-vl-72b requires credits)
+const QWEN_VISION_MODEL = 'qwen/qwen2.5-vl-32b-instruct:free';
 
 interface CriticalVisionData {
   // Core identification (matches frontend DrugCard & DrugDetails)

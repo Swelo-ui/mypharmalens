@@ -167,10 +167,10 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     // Strategy 2: Fuzzy matching with all cached drugs
     console.log(`\n   Strategy 2: Intelligent fuzzy matching...`);
     
-    // Get all cached drug names for fuzzy comparison
+    // Get all cached drug names for fuzzy comparison (include brand_names for better matching)
     const { data: allCachedDrugs, error: fetchError } = await supabase
       .from('drug_identification_cache')
-      .select('id, drug_name, generic_name, completeness_score')
+      .select('id, drug_name, generic_name, brand_names, completeness_score')
       .gte('completeness_score', 50)  // Only compare with quality entries
       .limit(1000);  // Reasonable limit
     
@@ -191,13 +191,28 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     // Find best match using intelligent similarity
     let bestMatch: any = null;
     let bestScore = 0;
-    const SIMILARITY_THRESHOLD = 0.70;  // Lowered to 70% for better matching
+    const SIMILARITY_THRESHOLD = 0.65;  // Lowered to 65% for better matching
     
     // Collect all candidates above threshold for debugging
     const candidates: Array<{drug: any, score: number}> = [];
     
     for (const cached of allCachedDrugs) {
-      const score = calculateNameSimilarity(drugName, cached.drug_name);
+      // Check similarity against drug_name, generic_name, and brand_names
+      let score = calculateNameSimilarity(drugName, cached.drug_name);
+      
+      // Also check generic name if available
+      if (cached.generic_name) {
+        const genericScore = calculateNameSimilarity(drugName, cached.generic_name);
+        score = Math.max(score, genericScore);
+      }
+      
+      // Check brand names array if available
+      if (Array.isArray(cached.brand_names) && cached.brand_names.length > 0) {
+        for (const brandName of cached.brand_names) {
+          const brandScore = calculateNameSimilarity(drugName, brandName);
+          score = Math.max(score, brandScore);
+        }
+      }
       
       // Log top candidates for debugging
       if (score >= 0.5) {  // Log anything above 50% similarity
