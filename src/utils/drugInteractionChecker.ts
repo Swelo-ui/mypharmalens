@@ -122,6 +122,40 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
     { classes: ['statin', 'macrolide'], severity: 'severe', note: 'Rhabdomyolysis risk increases.' },
     { classes: ['warfarin', 'antibiotic'], severity: 'severe', note: 'INR changes/bleeding risk.' },
     { classes: ['ace inhibitor', 'potassium-sparing diuretic'], severity: 'severe', note: 'Hyperkalemia risk.' },
+    
+    // Antibiotic-specific interactions
+    { classes: ['fluoroquinolone', 'nsaid'], severity: 'severe', note: 'CNS stimulation and seizure risk.' },
+    { classes: ['fluoroquinolone', 'corticosteroid'], severity: 'severe', note: 'Tendon rupture risk increases.' },
+    { classes: ['fluoroquinolone', 'antacid'], severity: 'moderate', note: 'Reduced antibiotic absorption.' },
+    { classes: ['fluoroquinolone', 'theophylline'], severity: 'severe', note: 'Theophylline toxicity risk.' },
+    { classes: ['tetracycline', 'antacid'], severity: 'moderate', note: 'Chelation reduces antibiotic absorption.' },
+    { classes: ['tetracycline', 'iron'], severity: 'moderate', note: 'Chelation reduces absorption.' },
+    { classes: ['tetracycline', 'calcium'], severity: 'moderate', note: 'Chelation reduces absorption.' },
+    { classes: ['macrolide', 'digoxin'], severity: 'severe', note: 'Digoxin toxicity risk.' },
+    { classes: ['macrolide', 'colchicine'], severity: 'contraindicated', note: 'Fatal colchicine toxicity.' },
+    { classes: ['macrolide', 'ergot'], severity: 'contraindicated', note: 'Ergot toxicity risk.' },
+    { classes: ['macrolide', 'antiarrhythmic'], severity: 'severe', note: 'QT prolongation and arrhythmia risk.' },
+    { classes: ['penicillin', 'methotrexate'], severity: 'severe', note: 'Methotrexate toxicity risk.' },
+    { classes: ['penicillin', 'allopurinol'], severity: 'moderate', note: 'Increased rash risk.' },
+    { classes: ['cephalosporin', 'alcohol'], severity: 'moderate', note: 'Disulfiram-like reaction.' },
+    { classes: ['nitroimidazole', 'alcohol'], severity: 'severe', note: 'Severe disulfiram-like reaction.' },
+    { classes: ['nitroimidazole', 'warfarin'], severity: 'severe', note: 'Increased bleeding risk.' },
+    { classes: ['nitroimidazole', 'lithium'], severity: 'moderate', note: 'Lithium toxicity risk.' },
+    { classes: ['aminoglycoside', 'loop diuretic'], severity: 'severe', note: 'Increased ototoxicity and nephrotoxicity.' },
+    { classes: ['aminoglycoside', 'vancomycin'], severity: 'severe', note: 'Increased nephrotoxicity risk.' },
+    { classes: ['vancomycin', 'loop diuretic'], severity: 'severe', note: 'Increased ototoxicity risk.' },
+    { classes: ['carbapenem', 'valproic acid'], severity: 'contraindicated', note: 'Seizure risk due to reduced valproate levels.' },
+    { classes: ['linezolid', 'ssri'], severity: 'contraindicated', note: 'Serotonin syndrome risk.' },
+    { classes: ['linezolid', 'tyramine'], severity: 'severe', note: 'Hypertensive crisis risk.' },
+    { classes: ['sulfonamide', 'methotrexate'], severity: 'severe', note: 'Bone marrow suppression.' },
+    { classes: ['sulfonamide', 'sulfonylurea'], severity: 'moderate', note: 'Hypoglycemia risk.' },
+    { classes: ['rifampin', 'contraceptive'], severity: 'moderate', note: 'Reduced contraceptive efficacy.' },
+    { classes: ['rifampin', 'warfarin'], severity: 'moderate', note: 'Reduced anticoagulation effect.' },
+    { classes: ['rifampin', 'immunosuppressant'], severity: 'severe', note: 'Reduced immunosuppressant levels.' },
+    { classes: ['isoniazid', 'paracetamol'], severity: 'moderate', note: 'Hepatotoxicity risk increases.' },
+    { classes: ['isoniazid', 'phenytoin'], severity: 'moderate', note: 'Phenytoin toxicity risk.' },
+    { classes: ['trimethoprim', 'ace inhibitor'], severity: 'moderate', note: 'Hyperkalemia risk.' },
+    { classes: ['trimethoprim', 'potassium-sparing diuretic'], severity: 'moderate', note: 'Hyperkalemia risk.' },
   ];
 
   const hasCombo = combos.find(c =>
@@ -173,7 +207,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
       layman: 'Both medicines thin your blood, which increases bleeding risk'
     },
     { 
-      test: t => /(serotonin|5-ht)/.test(t) || (drug1Class+drug2Class).includes('ssri') && (drug1Class+drug2Class).includes('maoi'), 
+      test: t => /(serotonin|5-ht)/.test(t) || (drug1Class+drug2Class).includes('ssri') && (drug1Class+drug2Class).includes('maoi') || (drug1Class+drug2Class).includes('linezolid') && (drug1Class+drug2Class).includes('ssri'), 
       mech: 'Excess serotonergic activity (serotonin syndrome risk)',
       layman: 'Too much serotonin in your brain can cause dangerous symptoms'
     },
@@ -198,10 +232,50 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
       layman: 'Both medicines lower blood pressure and together can cause dangerous drops'
     },
     { 
-      test: t => /(potassium|hyperkalemia)/.test(t) || (drug1Class+drug2Class).includes('potassium-sparing') && (drug1Class+drug2Class).includes('ace'), 
+      test: t => /(potassium|hyperkalemia)/.test(t) || (drug1Class+drug2Class).includes('potassium-sparing') && (drug1Class+drug2Class).includes('ace') || (drug1Class+drug2Class).includes('trimethoprim'), 
       mech: 'Hyperkalemia due to combined effects on potassium homeostasis',
       layman: 'Both medicines can increase potassium levels in your blood to dangerous levels'
     },
+    {
+      test: t => /(chelation|absorption|antacid|iron|calcium)/.test(t) || ((drug1Class+drug2Class).includes('tetracycline') || (drug1Class+drug2Class).includes('fluoroquinolone')) && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium')),
+      mech: 'Chelation formation reduces antibiotic absorption and effectiveness',
+      layman: 'These medicines bind together in your stomach, preventing the antibiotic from working'
+    },
+    {
+      test: t => /(tendon|rupture)/.test(t) || (drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('corticosteroid'),
+      mech: 'Additive collagen degradation increases tendon rupture risk',
+      layman: 'Both medicines weaken tendons and together greatly increase rupture risk'
+    },
+    {
+      test: t => /(seizure|cns stimulation)/.test(t) || (drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('nsaid'),
+      mech: 'GABA antagonism and CNS stimulation increases seizure risk',
+      layman: 'Both medicines can overstimulate the brain and cause seizures'
+    },
+    {
+      test: t => /(ototoxicity|hearing|nephrotoxicity|kidney)/.test(t) || (drug1Class+drug2Class).includes('aminoglycoside') && ((drug1Class+drug2Class).includes('vancomycin') || (drug1Class+drug2Class).includes('loop diuretic')),
+      mech: 'Additive ototoxicity and nephrotoxicity damage inner ear and kidneys',
+      layman: 'Both medicines can damage your hearing and kidneys when used together'
+    },
+    {
+      test: t => /(disulfiram|alcohol)/.test(t) || (drug1Class+drug2Class).includes('nitroimidazole') && (drug1Class+drug2Class).includes('alcohol'),
+      mech: 'Inhibition of aldehyde dehydrogenase causing disulfiram-like reaction',
+      layman: 'Taking alcohol with this antibiotic causes severe nausea, vomiting, and flushing'
+    },
+    {
+      test: t => /(valproic acid|valproate|seizure)/.test(t) || (drug1Class+drug2Class).includes('carbapenem') && (drug1Class+drug2Class).includes('valproic'),
+      mech: 'Reduced valproic acid levels decrease seizure threshold',
+      layman: 'This antibiotic lowers seizure medicine levels, increasing seizure risk'
+    },
+    {
+      test: t => /(contraceptive|birth control|pill)/.test(t) || (drug1Class+drug2Class).includes('rifampin') && (drug1Class+drug2Class).includes('contraceptive'),
+      mech: 'CYP enzyme induction reduces contraceptive steroid levels',
+      layman: 'This antibiotic makes birth control pills less effective, increasing pregnancy risk'
+    },
+    {
+      test: t => /(hepatotoxicity|liver)/.test(t) || (drug1Class+drug2Class).includes('isoniazid') && (drug1Class+drug2Class).includes('paracetamol'),
+      mech: 'Additive hepatotoxic effects increase liver damage risk',
+      layman: 'Both medicines can damage your liver, especially when used together'
+    }
   ];
   const mechResult = mechMap.find(m => m.test(textForMeta));
   const detectedMech = mechResult?.mech || (hasCombo ? hasCombo.note : undefined) || undefined;
@@ -224,10 +298,10 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   if (/(inr|warfarin|bleed)/.test(textForMeta) || classes.includes('anticoagulant')) {
     monitoring = 'Check INR (if on warfarin) and monitor for bleeding/bruising; avoid concurrent NSAIDs/antiplatelets if possible';
     laymanMonitoring = 'Get blood tests to check clotting; watch for unusual bleeding or bruising; avoid pain medicines like ibuprofen';
-  } else if (/(potassium|hyperkalemia)/.test(textForMeta) || classes.includes('potassium-sparing') || classes.includes('ace')) {
+  } else if (/(potassium|hyperkalemia)/.test(textForMeta) || classes.includes('potassium-sparing') || classes.includes('ace') || classes.includes('trimethoprim')) {
     monitoring = 'Monitor serum potassium and renal function (creatinine) within 1–2 weeks of initiation or dose change';
     laymanMonitoring = 'Get blood tests within 1-2 weeks to check potassium levels and kidney function';
-  } else if (/(qt prolong|torsade)/.test(textForMeta)) {
+  } else if (/(qt prolong|torsade)/.test(textForMeta) || (classes.includes('macrolide') && classes.includes('antiarrhythmic'))) {
     monitoring = 'Obtain baseline and follow-up ECG; correct electrolytes (K/Mg); avoid in congenital long QT';
     laymanMonitoring = 'Get heart rhythm tests (ECG) before and during treatment; correct low potassium/magnesium';
   } else if (/(macrolide|cyp3a4|statin)/.test(textForMeta) || (classes.includes('macrolide') && classes.includes('statin'))) {
@@ -239,6 +313,21 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   } else if ((classes.includes('nitrate') && classes.includes('pde5')) || /(hypotension|blood pressure)/.test(textForMeta)) {
     monitoring = 'Absolute avoidance recommended; if inadvertently combined, monitor blood pressure closely and seek medical attention for dizziness/syncope';
     laymanMonitoring = 'Never use together; if accidentally combined, check blood pressure often and get help if dizzy or faint';
+  } else if (/(tendon|rupture)/.test(textForMeta) || (classes.includes('fluoroquinolone') && classes.includes('corticosteroid'))) {
+    monitoring = 'Discontinue at first sign of tendon pain or swelling; avoid high-impact activities; consider alternative antibiotics';
+    laymanMonitoring = 'Stop medicine immediately if you feel tendon pain or swelling; avoid running or jumping; tell your doctor right away';
+  } else if (/(aminoglycoside|ototoxicity|nephrotoxicity)/.test(textForMeta) || classes.includes('aminoglycoside')) {
+    monitoring = 'Monitor drug levels, renal function (creatinine/BUN), and perform audiometry if long-term use; maintain hydration';
+    laymanMonitoring = 'Get blood tests for kidney function and drug levels; may need hearing tests; drink plenty of water';
+  } else if (/(hepatotoxicity|liver)/.test(textForMeta) || (classes.includes('isoniazid') && classes.includes('paracetamol'))) {
+    monitoring = 'Monitor liver enzymes (ALT/AST) baseline and periodically; watch for jaundice, dark urine, or abdominal pain';
+    laymanMonitoring = 'Get liver function tests regularly; watch for yellow skin/eyes, dark urine, or stomach pain';
+  } else if (/(valproic acid|carbapenem)/.test(textForMeta) || (classes.includes('carbapenem') && classes.includes('valproic'))) {
+    monitoring = 'Avoid combination; if unavoidable, check valproic acid levels and monitor for seizures; consider alternative antibiotic';
+    laymanMonitoring = 'This combination should be avoided; if used, watch closely for seizures and get medicine level tests';
+  } else if (/(contraceptive|rifampin)/.test(textForMeta) || (classes.includes('rifampin') && classes.includes('contraceptive'))) {
+    monitoring = 'Use additional barrier contraception during and 4-8 weeks after rifampin therapy; consider non-hormonal methods';
+    laymanMonitoring = 'Use backup birth control (condoms) during treatment and for 4-8 weeks after; birth control pills may not work';
   }
 
   const description = interactionText || 'Potential interaction detected.';
@@ -271,6 +360,43 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   if ((drug1Class+drug2Class).includes('pde5') && (drug1Class+drug2Class).includes('nitrate')) {
     recHints.push('Absolute avoidance: do not take nitrates within 24–48h of PDE5 inhibitors.');
     laymanRecHints.push('Never take these together - wait at least 24-48 hours between doses.');
+  }
+  // Antibiotic-specific recommendations
+  if ((drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('corticosteroid')) {
+    recHints.push('Consider alternative antibiotic or avoid corticosteroid if possible; stop immediately if tendon pain occurs.');
+    laymanRecHints.push('Ask about different antibiotics; stop taking if tendons hurt.');
+  }
+  if ((drug1Class+drug2Class).includes('fluoroquinolone') && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium'))) {
+    recHints.push('Separate antibiotic by 2–4 hours before or 6 hours after antacids/iron/calcium supplements.');
+    laymanRecHints.push('Take antibiotic 2-4 hours before or 6 hours after antacids, iron, or calcium.');
+  }
+  if ((drug1Class+drug2Class).includes('tetracycline') && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium'))) {
+    recHints.push('Separate antibiotic by 2–3 hours before or after antacids/iron/calcium/dairy products.');
+    laymanRecHints.push('Take antibiotic 2-3 hours before or after antacids, iron, calcium, or dairy.');
+  }
+  if ((drug1Class+drug2Class).includes('nitroimidazole') && (drug1Class+drug2Class).includes('alcohol')) {
+    recHints.push('Absolute avoidance of alcohol during and for 48-72 hours after completing antibiotic therapy.');
+    laymanRecHints.push('Never drink alcohol during treatment and for 48-72 hours after finishing the antibiotic.');
+  }
+  if ((drug1Class+drug2Class).includes('macrolide') && (drug1Class+drug2Class).includes('colchicine')) {
+    recHints.push('Absolute avoidance: choose alternative antibiotic (fluoroquinolone, β-lactam).');
+    laymanRecHints.push('Never take these together - get a different antibiotic.');
+  }
+  if ((drug1Class+drug2Class).includes('carbapenem') && (drug1Class+drug2Class).includes('valproic')) {
+    recHints.push('Avoid carbapenem; use alternative antibiotic class (fluoroquinolone, β-lactam); monitor seizures closely if unavoidable.');
+    laymanRecHints.push('Should not use together - ask for different antibiotic to prevent seizures.');
+  }
+  if ((drug1Class+drug2Class).includes('rifampin') && (drug1Class+drug2Class).includes('contraceptive')) {
+    recHints.push('Use additional non-hormonal contraception during and 4–8 weeks after rifampin therapy.');
+    laymanRecHints.push('Use backup birth control (condoms) during treatment and for 4-8 weeks after.');
+  }
+  if ((drug1Class+drug2Class).includes('aminoglycoside') && ((drug1Class+drug2Class).includes('vancomycin') || (drug1Class+drug2Class).includes('loop diuretic'))) {
+    recHints.push('Monitor renal function and drug levels closely; ensure adequate hydration; consider alternative if possible.');
+    laymanRecHints.push('Get regular kidney tests; drink plenty of water; may need different medicine.');
+  }
+  if ((drug1Class+drug2Class).includes('linezolid') && (drug1Class+drug2Class).includes('ssri')) {
+    recHints.push('Avoid combination; if necessary, use lowest SSRI dose and monitor for serotonin syndrome; consider alternative antibiotic.');
+    laymanRecHints.push('Should not use together - risk of serious brain reaction. Ask for different antibiotic.');
   }
   if (recHints.length) {
     recommendation = `${recommendation} ${recHints.join(' ')}`.trim();
@@ -447,6 +573,43 @@ const findAlternatives = (
       classes: ['nsaid', 'anticonvulsant', 'topical analgesic'],
       names: ['ibuprofen', 'naproxen', 'gabapentin', 'pregabalin', 'lidocaine'],
       reason: 'Non-opioid pain management alternative'
+    },
+    
+    // Antibiotics
+    'fluoroquinolone': {
+      classes: ['penicillin', 'cephalosporin', 'macrolide', 'beta-lactam'],
+      names: ['amoxicillin', 'azithromycin', 'cefixime', 'doxycycline'],
+      reason: 'Alternative antibiotic class with different interaction profile'
+    },
+    'macrolide': {
+      classes: ['fluoroquinolone', 'penicillin', 'cephalosporin', 'tetracycline'],
+      names: ['levofloxacin', 'amoxicillin', 'cefixime', 'doxycycline'],
+      reason: 'Alternative antibiotic with fewer metabolic interactions'
+    },
+    'carbapenem': {
+      classes: ['fluoroquinolone', 'penicillin', 'cephalosporin'],
+      names: ['levofloxacin', 'piperacillin', 'cefepime'],
+      reason: 'Alternative broad-spectrum antibiotic'
+    },
+    'tetracycline': {
+      classes: ['fluoroquinolone', 'macrolide', 'penicillin'],
+      names: ['levofloxacin', 'azithromycin', 'amoxicillin'],
+      reason: 'Alternative antibiotic without chelation issues'
+    },
+    'aminoglycoside': {
+      classes: ['fluoroquinolone', 'carbapenem', 'extended-spectrum penicillin'],
+      names: ['levofloxacin', 'meropenem', 'piperacillin'],
+      reason: 'Alternative antibiotic with lower ototoxicity/nephrotoxicity risk'
+    },
+    'nitroimidazole': {
+      classes: ['fluoroquinolone', 'penicillin', 'cephalosporin'],
+      names: ['ciprofloxacin', 'amoxicillin', 'cefixime'],
+      reason: 'Alternative antibiotic without disulfiram-like reaction'
+    },
+    'linezolid': {
+      classes: ['vancomycin', 'daptomycin', 'ceftaroline'],
+      names: ['vancomycin', 'daptomycin', 'ceftaroline'],
+      reason: 'Alternative for MRSA without serotonergic effects'
     }
   };
   
