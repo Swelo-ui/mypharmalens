@@ -2,19 +2,25 @@ import "xhr";
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
+import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
 
 // Use edge runtime types via deno.json; no manual Deno declaration
 
 // Environment configuration
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 
-// OpenRouter configuration
+// OpenRouter configuration - All vision models via OpenRouter (No direct Gemini)
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const OPENROUTER_VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';
-const OPENROUTER_VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free';
+
+// Vision model hierarchy: Qwen (primary) → Nvidia (secondary) → Gemini 2.0 (fallback)
+const VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';      // Best for pharmaceutical OCR
+const VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free'; // Fast alternative
+const VISION_MODEL_FALLBACK = 'google/gemini-2.0-flash-exp:free';      // Final fallback
+
+// Web scraping model: DeepSeek R1T2 Chimera for intelligent HTML parsing
+const WEB_SCRAPING_MODEL = 'tngtech/deepseek-r1t2-chimera:free';       // Best for web scraping & reasoning
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -261,10 +267,15 @@ async function stageTextExtraction(imageBase64: string): Promise<ProcessingStage
   }
 }
 
-// OpenRouter-based OCR extraction (Fallback with dual model support)
-async function extractTextWithOpenRouter(imageBase64: string, useSecondary: boolean = false): Promise<string> {
-  const modelToUse = useSecondary ? OPENROUTER_VISION_MODEL_SECONDARY : OPENROUTER_VISION_MODEL_PRIMARY;
-  const modelName = useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL';
+// OpenRouter-based OCR extraction (3-tier model support: Qwen → Nvidia → Gemini 2.0)
+async function extractTextWithOpenRouter(
+  imageBase64: string, 
+  useSecondary: boolean = false, 
+  useFallback: boolean = false
+): Promise<string> {
+  // Select model based on priority: Qwen (primary) → Nvidia (secondary) → Gemini 2.0 (fallback)
+  const modelToUse = useFallback ? VISION_MODEL_FALLBACK : (useSecondary ? VISION_MODEL_SECONDARY : VISION_MODEL_PRIMARY);
+  const modelName = useFallback ? 'Gemini 2.0 Flash' : (useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL');
   
   try {
     console.log(`🔄 Using OpenRouter OCR (${modelName}) as fallback...`);
@@ -321,7 +332,9 @@ Return ONLY the extracted text, line by line, maintaining the original structure
       return await extractTextWithOpenRouter(imageBase64, true);
     }
     
-    return '';
+    // If both models failed, throw user-friendly error
+    console.log('❌ All OpenRouter OCR models exhausted');
+    throw new Error('Server not responding. All vision analysis services are currently unavailable. Please try again later or contact us for support.');
   }
 }
 
@@ -339,47 +352,9 @@ async function extractTextWithGemini(imageBase64: string): Promise<string> {
 
 Return ONLY the extracted text, line by line, maintaining the original structure. Do not summarize or explain.`;
 
-    const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            { text: prompt },
-            {
-              inline_data: {
-                mime_type: "image/jpeg",
-                data: cleanBase64
-              }
-            }
-          ]
-        }],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 1024,
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      // Check if quota exhausted - use OpenRouter fallback
-      if (response.status === 429 && (errorText.includes('quota') || errorText.includes('exceeded'))) {
-        console.warn('⚠️ Gemini quota exhausted, falling back to OpenRouter OCR');
-        return await extractTextWithOpenRouter(imageBase64);
-      }
-      throw new Error(`Gemini OCR failed: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const extractedText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
-    console.log(`✅ Gemini OCR extracted: "${extractedText.substring(0, 100)}..."`);
-    return extractedText;
+    // Use OpenRouter for Gemini 2.0 Flash instead of calling Google API directly
+    console.log('🔄 Using OpenRouter Gemini 2.0 Flash for OCR...');
+    return await extractTextWithOpenRouter(imageBase64, false, true); // Use Gemini fallback model
   } catch (error) {
     console.error('❌ Gemini OCR extraction failed:', error);
     // Try OpenRouter as final fallback
@@ -784,17 +759,31 @@ async function createFallbackAnalysisData(geminiText: string): Promise<FallbackA
   };
 }
 
-// OpenRouter Vision Analysis (Fallback with dual model support)
+// OpenRouter Vision Analysis (3-tier fallback: Qwen → Nvidia → Gemini 2.0)
 async function analyzeImageWithOpenRouter(
   imageBase64: string,
   prompt: string,
-  opts?: { blurryMode?: boolean; advancedAnalysis?: boolean; useSecondary?: boolean }
+  opts?: { blurryMode?: boolean; advancedAnalysis?: boolean; useSecondary?: boolean; useFallback?: boolean }
 ): Promise<string> {
+  const useFallback = opts?.useFallback || false;
   const useSecondary = opts?.useSecondary || false;
-  const modelToUse = useSecondary ? OPENROUTER_VISION_MODEL_SECONDARY : OPENROUTER_VISION_MODEL_PRIMARY;
-  const modelName = useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL';
   
-  console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
+  // Select model based on priority: Qwen (primary) → Nvidia (secondary) → Gemini 2.0 (fallback)
+  let modelToUse: string;
+  let modelName: string;
+  
+  if (useFallback) {
+    modelToUse = VISION_MODEL_FALLBACK;
+    modelName = 'Gemini 2.0 Flash';
+  } else if (useSecondary) {
+    modelToUse = VISION_MODEL_SECONDARY;
+    modelName = 'Nvidia Nemotron';
+  } else {
+    modelToUse = VISION_MODEL_PRIMARY;
+    modelName = 'Qwen 2.5-VL';
+  }
+  
+  console.log(`🔄 Using OpenRouter Vision (${modelName})...`);
   const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
   try {
@@ -821,7 +810,8 @@ async function analyzeImageWithOpenRouter(
     });
 
     if (!response.ok) {
-      throw new Error(`OpenRouter Vision (${modelName}) failed: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`OpenRouter Vision (${modelName}) failed: ${response.status} - ${errorText.substring(0, 200)}`);
     }
 
     const result = await response.json();
@@ -829,15 +819,21 @@ async function analyzeImageWithOpenRouter(
     console.log(`✅ OpenRouter Vision (${modelName}) succeeded`);
     return content;
   } catch (error) {
-    console.error(`❌ OpenRouter Vision (${modelName}) failed:`, error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(`❌ OpenRouter Vision (${modelName}) failed:`, errorMsg);
     
-    // If primary model failed, try secondary
-    if (!useSecondary && OPENROUTER_API_KEY) {
-      console.log('🔄 Primary OpenRouter model failed, trying Nvidia Nemotron...');
+    // 3-tier cascade: Qwen → Nvidia → Gemini 2.0
+    if (!useSecondary && !useFallback) {
+      console.log('🔄 Qwen failed, trying Nvidia Nemotron...');
       return await analyzeImageWithOpenRouter(imageBase64, prompt, { ...opts, useSecondary: true });
+    } else if (useSecondary && !useFallback) {
+      console.log('🔄 Nvidia failed, trying Gemini 2.0 Flash...');
+      return await analyzeImageWithOpenRouter(imageBase64, prompt, { ...opts, useFallback: true });
     }
     
-    throw error;
+    // If all 3 models failed, throw user-friendly error
+    console.log('❌ All 3 OpenRouter vision models exhausted (Qwen → Nvidia → Gemini 2.0)');
+    throw new Error('Server not responding. All vision analysis services are currently unavailable. Please try again later or contact us for support.');
   }
 }
 
@@ -928,70 +924,23 @@ FOR PILLS/TABLETS:
 
 ⚠️ REMEMBER: Extract EXACT text, don't invent names. ALWAYS assess image quality. Return JSON only:`;
 
-    // Use retry logic for critical Gemini Vision API call
-    const response = await retryWithBackoff(async () => {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt
-                },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: cleanBase64
-                  }
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: opts?.blurryMode ? 0.2 : 0.1,
-            topK: opts?.blurryMode ? 64 : 32,
-            topP: opts?.blurryMode ? 0.95 : 1,
-            maxOutputTokens: 1024,
-          }
-        })
-      });
-      
-      if (!res.ok) {
-        const errorBody = await res.text();
-        // Check for quota exhaustion - don't retry if quota is completely gone
-        if (res.status === 429 && (errorBody.includes('quota') || errorBody.includes('exceeded'))) {
-          console.error('🚨 GEMINI API QUOTA EXHAUSTED - Skipping retries');
-          throw new Error(`QUOTA_EXHAUSTED: ${errorBody.substring(0, 200)}`);
-        }
-        throw new Error(`${res.status}: ${errorBody}`);
-      }
-      
-      return res;
-    }, 3, 1000);
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`🔴 Gemini API error: ${response.status} ${response.statusText}`);
-      console.error(`   Error body: ${errorBody}`);
-      console.error(`   API key present: ${!!GEMINI_API_KEY}`);
-      console.error(`   API key length: ${GEMINI_API_KEY?.length || 0}`);
-      
-      // Return failure stage instead of throwing
+    // Use OpenRouter for Gemini 2.0 Flash via analyzeImageWithOpenRouter
+    // This uses 3-tier cascade: Qwen → Nvidia → Gemini 2.0 Flash
+    console.log('🔄 Using OpenRouter 3-tier vision cascade for analysis...');
+    
+    let geminiText: string;
+    try {
+      geminiText = await analyzeImageWithOpenRouter(imageBase64, prompt, opts);
+    } catch (error) {
+      console.error('❌ All OpenRouter vision models failed:', error);
       return {
         name: 'gemini-analysis',
         success: false,
         data: undefined,
         processingTime: Date.now() - startTime,
-        error: `Gemini API error: ${response.status} - ${errorBody.substring(0, 200)}`
+        error: error instanceof Error ? error.message : 'Vision analysis failed'
       };
     }
-
-    const result = await response.json();
-    const geminiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!geminiText) {
       console.error('🔴 No response text from Gemini API');
@@ -1324,35 +1273,39 @@ Provide complete, medically accurate information ONLY for real medications in JS
 
 CRITICAL: This is for PATIENT SAFETY. Only provide real, verified drug information. Never generate hypothetical data.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+    // Use OpenRouter for Gemini 2.0 Flash (text-only generation)
+    console.log('Using OpenRouter Gemini 2.0 Flash for backup data generation...');
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': SUPABASE_URL,
+        'X-Title': 'PharmaLens Drug Identifier'
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
+        model: VISION_MODEL_FALLBACK, // google/gemini-2.0-flash-exp:free
+        messages: [{
+          role: 'user',
+          content: prompt
         }],
-        generationConfig: {
-          temperature: 0.1,
-          topK: 1,
-          topP: 0.8,
-          maxOutputTokens: 1024,
-        }
+        temperature: 0.1,
+        max_tokens: 1024,
+        response_format: { type: 'json_object' }
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      if (response.status === 429) {
-        console.error('❌ Gemini API rate limit exceeded - skipping AI backup');
-        throw new Error('Rate limit exceeded - try again later');
+      if (response.status === 429 || response.status === 402) {
+        console.error('OpenRouter rate limit/credit issue - skipping AI backup');
+        throw new Error('Rate limit or credit issue - try again later');
       }
-      throw new Error(`Gemini backup failed: ${response.status} - ${errorText}`);
+      throw new Error(`OpenRouter backup failed: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
-    const geminiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const geminiText = result.choices?.[0]?.message?.content;
     
     if (!geminiText) {
       throw new Error('No response from Gemini backup');
@@ -1718,26 +1671,34 @@ Tasks:
 
 Return JSON: { "verified": true/false, "qualityScore": 0-100, "warnings": ["warning1"], "recommendations": ["rec1"] }`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+    // Use OpenRouter for Gemini 2.0 Flash (text-only QA)
+    console.log('🔄 Using OpenRouter Gemini 2.0 Flash for final QA...');
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': SUPABASE_URL,
+        'X-Title': 'PharmaLens Drug Identifier'
+      },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
+        model: VISION_MODEL_FALLBACK, // google/gemini-2.0-flash-exp:free
+        messages: [{
+          role: 'user',
+          content: prompt
         }],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 1000
-        }
+        temperature: 0.2,
+        max_tokens: 1000,
+        response_format: { type: 'json_object' }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = result.choices?.[0]?.message?.content || '';
     
     // Try to extract JSON
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -2283,6 +2244,34 @@ function combineStageResults(stages: ProcessingStage[]): CombinedResult | null {
       combinedResult[field] = [] as never;
     }
   }
+
+  // Clean all text fields to remove asterisks and markdown formatting
+  console.log(`🧹 Cleaning text fields to remove asterisks and markdown...`);
+  
+  // Clean string fields
+  combinedResult.name = cleanText(combinedResult.name);
+  combinedResult.genericName = cleanText(combinedResult.genericName);
+  combinedResult.manufacturer = cleanText(combinedResult.manufacturer);
+  combinedResult.category = cleanText(combinedResult.category);
+  combinedResult.drugClass = cleanText(combinedResult.drugClass);
+  combinedResult.description = cleanText(combinedResult.description);
+  combinedResult.dosageAndAdmin = cleanText(combinedResult.dosageAndAdmin);
+  combinedResult.storage = cleanText(combinedResult.storage);
+  combinedResult.mechanism = cleanMechanismText(combinedResult.mechanism);
+  combinedResult.prescriptionStatus = cleanText(combinedResult.prescriptionStatus);
+  combinedResult.pregnancy = cleanText(combinedResult.pregnancy);
+  combinedResult.imprint = cleanText(combinedResult.imprint);
+  combinedResult.color = cleanText(combinedResult.color);
+  combinedResult.shape = cleanText(combinedResult.shape);
+  
+  // Clean array fields
+  combinedResult.sideEffects = cleanTextArray(combinedResult.sideEffects);
+  combinedResult.warnings = cleanTextArray(combinedResult.warnings);
+  combinedResult.interactions = cleanTextArray(combinedResult.interactions);
+  combinedResult.indications = cleanTextArray(combinedResult.indications);
+  combinedResult.contraindications = cleanTextArray(combinedResult.contraindications);
+  combinedResult.brandNames = cleanTextArray(combinedResult.brandNames);
+  combinedResult.possibleNames = cleanTextArray(combinedResult.possibleNames);
 
   console.log(`Final combined result: ${combinedResult.name} (${combinedResult.confidence} confidence, verified: ${combinedResult.verified})`);
   return combinedResult;

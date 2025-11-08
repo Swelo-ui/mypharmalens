@@ -2,6 +2,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { getCachedDrug, saveDrugToCache } from './cache.ts';
 import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers.ts';
+import { cleanText as cleanTextContent, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
 
 // Declare Deno for edge runtime
 declare const Deno: {
@@ -771,22 +772,22 @@ async function generateComprehensiveDataWithGemini(drugName: string): Promise<Co
           
           const comprehensiveInfo: ComprehensiveDrugInfo = {
             name: drugName,
-            genericName: generatedData.genericName || '',
-            manufacturer: generatedData.manufacturer || '',
-            category: generatedData.category || '',
-            drugClass: generatedData.drugClass || '',
-            description: generatedData.description || '',
-            dosageAndAdmin: generatedData.dosageAndAdmin || '',
-            sideEffects: generatedData.sideEffects || [],
-            warnings: generatedData.warnings || [],
-            interactions: generatedData.interactions || [],
-            storage: generatedData.storage || '',
-            mechanism: generatedData.mechanism || '',
-            indications: generatedData.indications || [],
-            contraindications: generatedData.contraindications || [],
-            prescriptionStatus: generatedData.prescriptionStatus || 'Unknown',
-            pregnancy: generatedData.pregnancy || '',
-            brandNames: generatedData.brandNames || [],
+            genericName: cleanTextContent(generatedData.genericName || ''),
+            manufacturer: cleanTextContent(generatedData.manufacturer || ''),
+            category: cleanTextContent(generatedData.category || ''),
+            drugClass: cleanTextContent(generatedData.drugClass || ''),
+            description: cleanTextContent(generatedData.description || ''),
+            dosageAndAdmin: cleanTextContent(generatedData.dosageAndAdmin || ''),
+            sideEffects: cleanTextArray(generatedData.sideEffects || []),
+            warnings: cleanTextArray(generatedData.warnings || []),
+            interactions: cleanTextArray(generatedData.interactions || []),
+            storage: cleanTextContent(generatedData.storage || ''),
+            mechanism: cleanMechanismText(generatedData.mechanism || ''),
+            indications: cleanTextArray(generatedData.indications || []),
+            contraindications: cleanTextArray(generatedData.contraindications || []),
+            prescriptionStatus: cleanTextContent(generatedData.prescriptionStatus || 'Unknown'),
+            pregnancy: cleanTextContent(generatedData.pregnancy || ''),
+            brandNames: cleanTextArray(generatedData.brandNames || []),
             sources: { gemini: 'AI Generated' },
             verified: false,
             completeness: 85 // High completeness since all fields are generated

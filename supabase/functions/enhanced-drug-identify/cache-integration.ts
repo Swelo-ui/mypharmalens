@@ -71,6 +71,10 @@ function normalizeDrugName(name: string): string {
     .trim()
     // Remove special characters and trademarks
     .replace(/[®™©]/g, '')
+    // Remove dosage forms that don't affect identity (for fuzzy matching)
+    .replace(/\s+(tablet|tablets|capsule|capsules|syrup|syrups|injection|injections|drops|cream|ointment|gel|powder|suspension|solution)s?\s*$/i, '')
+    // Remove strength/dosage numbers for base drug matching (e.g., "Paracetamol 500mg" → "Paracetamol")
+    .replace(/\s*\d+\s*(mg|mcg|g|ml|iu|units?)\s*/gi, ' ')
     .replace(/\s+/g, ' ')  // Normalize whitespace
     .replace(/[^\w\s-]/g, '')  // Remove special chars except hyphen
     .trim();
@@ -187,10 +191,18 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     // Find best match using intelligent similarity
     let bestMatch: any = null;
     let bestScore = 0;
-    const SIMILARITY_THRESHOLD = 0.75;  // 75% similarity required
+    const SIMILARITY_THRESHOLD = 0.70;  // Lowered to 70% for better matching
+    
+    // Collect all candidates above threshold for debugging
+    const candidates: Array<{drug: any, score: number}> = [];
     
     for (const cached of allCachedDrugs) {
       const score = calculateNameSimilarity(drugName, cached.drug_name);
+      
+      // Log top candidates for debugging
+      if (score >= 0.5) {  // Log anything above 50% similarity
+        candidates.push({ drug: cached, score });
+      }
       
       if (score > bestScore && score >= SIMILARITY_THRESHOLD) {
         bestScore = score;
@@ -198,8 +210,18 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
       }
     }
     
+    // Sort and log top candidates for debugging
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => b.score - a.score);
+      console.log(`\n   📊 TOP SIMILAR DRUGS FOUND (showing top ${Math.min(5, candidates.length)}):`);
+      candidates.slice(0, 5).forEach((c, i) => {
+        const marker = c.score >= SIMILARITY_THRESHOLD ? '✅' : '⚠️';
+        console.log(`      ${marker} ${i + 1}. "${c.drug.drug_name}" - ${(c.score * 100).toFixed(1)}% match`);
+      });
+    }
+    
     if (bestMatch) {
-      console.log(`\n🎯 FUZZY MATCH FOUND!`);
+      console.log(`\n🎯 FUZZY MATCH FOUND (ABOVE ${(SIMILARITY_THRESHOLD * 100).toFixed(0)}% THRESHOLD)!`);
       console.log(`   Input: "${drugName}"`);
       console.log(`   Matched: "${bestMatch.drug_name}"`);
       console.log(`   Similarity: ${(bestScore * 100).toFixed(1)}%`);

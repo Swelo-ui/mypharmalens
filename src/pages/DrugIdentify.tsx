@@ -308,14 +308,23 @@ const DrugIdentify = () => {
         }
       });
 
+      // Handle Supabase function invocation errors (network issues, etc.)
       if (cacheError) {
-        console.error('Cache save error:', cacheError);
-        toast.error("Failed to save to cache", {
-          description: "Please try again later"
-        });
-        return;
+        console.error('Cache save invocation error:', cacheError);
+        // Check if response has error details even with cacheError
+        if (cacheResult && cacheResult.error) {
+          // Function executed but returned an error - handle it below
+          console.log('Function returned error despite invocation error:', cacheResult);
+        } else {
+          // True invocation failure (network, auth, etc.)
+          toast.error("Failed to save to cache", {
+            description: "Network error. Please try again later."
+          });
+          return;
+        }
       }
 
+      // Handle function response (success or application-level errors)
       if (cacheResult && cacheResult.success) {
         console.log('✅ Manual cache save successful:', cacheResult);
         toast.success("Saved to cache successfully!", {

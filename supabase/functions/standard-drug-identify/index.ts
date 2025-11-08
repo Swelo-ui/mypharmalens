@@ -1,66 +1,24 @@
 import { checkDrugCache as checkCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
+import { cleanText, cleanTextArray, cleanMechanismText } from '../_shared/text-cleaner.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// OpenRouter configuration for fallback
+// OpenRouter configuration - All vision models via OpenRouter (No direct Gemini)
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const OPENROUTER_VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';
-const OPENROUTER_VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free';
 
-// OCR Cross-Validation: Compare Gemini and OpenRouter results for accuracy
-async function crossValidateOCR(imageBase64: string, geminiResult: VisionResult | null): Promise<VisionResult | null> {
-  console.log('\n🔍 === OCR CROSS-VALIDATION ===');
-  console.log('   Strategy: Verify Gemini OCR with OpenRouter to reduce errors');
-  
-  if (!geminiResult || !geminiResult.name || geminiResult.name === 'Unknown') {
-    console.log('   ⚠️ Gemini result invalid, skipping validation');
-    return geminiResult;
-  }
-  
-  try {
-    // Get OpenRouter's opinion on the same image
-    console.log('   Calling OpenRouter for cross-validation...');
-    const openRouterResult = await performOpenRouterAnalysis(imageBase64);
-    
-    if (!openRouterResult || !openRouterResult.name || openRouterResult.name === 'Unknown') {
-      console.log('   ⚠️ OpenRouter validation failed, trusting Gemini');
-      return geminiResult;
-    }
-    
-    // Compare the two results
-    const geminiName = geminiResult.name.toLowerCase().trim();
-    const openRouterName = openRouterResult.name.toLowerCase().trim();
-    
-    // Calculate similarity (simple substring check)
-    const isMatch = geminiName.includes(openRouterName) || 
-                    openRouterName.includes(geminiName) ||
-                    geminiName === openRouterName;
-    
-    if (isMatch) {
-      console.log(`   ✅ VALIDATED: Both APIs agree`);
-      console.log(`      Gemini: "${geminiResult.name}"`);
-      console.log(`      OpenRouter: "${openRouterResult.name}"`);
-      return geminiResult; // Use Gemini result (it's usually more accurate)
-    } else {
-      console.log(`   ⚠️ MISMATCH DETECTED:`);
-      console.log(`      Gemini: "${geminiResult.name}"`);
-      console.log(`      OpenRouter: "${openRouterResult.name}"`);
-      console.log(`   → Using OpenRouter result (disagreement detected)`);
-      return openRouterResult; // Prefer OpenRouter when they disagree
-    }
-  } catch (error) {
-    console.error('   ❌ Cross-validation error:', error);
-    return geminiResult; // Fallback to Gemini on error
-  } finally {
-    console.log('🔍 === OCR CROSS-VALIDATION COMPLETE ===\n');
-  }
-}
+// Vision model hierarchy: Qwen (primary) → Nvidia (secondary) → Gemini 2.0 (fallback)
+const VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';      // Best for pharmaceutical OCR
+const VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free'; // Fast alternative
+const VISION_MODEL_FALLBACK = 'google/gemini-2.0-flash-exp:free';      // Final fallback
+
+// Web scraping model: DeepSeek R1T2 Chimera for intelligent HTML parsing
+const WEB_SCRAPING_MODEL = 'tngtech/deepseek-r1t2-chimera:free';       // Best for web scraping & reasoning
 
 // Standard Mode data limiter - keep only essential info (4-5 items max per section)
 // Only for scraping/backup sources - NOT for cache/local DB (they're already validated)
@@ -72,14 +30,18 @@ function limitDataForStandardMode(data: any): any {
   
   return {
     ...data,
-    // Limit array fields to top 5 most important items
-    sideEffects: Array.isArray(data.sideEffects) ? data.sideEffects.slice(0, MAX_ITEMS) : [],
-    warnings: Array.isArray(data.warnings) ? data.warnings.slice(0, MAX_ITEMS) : [],
-    interactions: Array.isArray(data.interactions) ? data.interactions.slice(0, MAX_ITEMS) : [],
-    indications: Array.isArray(data.indications) ? data.indications.slice(0, MAX_ITEMS) : [],
-    contraindications: Array.isArray(data.contraindications) ? data.contraindications.slice(0, MAX_ITEMS) : [],
-    brandNames: Array.isArray(data.brandNames) ? data.brandNames.slice(0, MAX_ITEMS) : [],
-    // Keep scalar fields unchanged
+    // Clean and limit array fields to top 5 most important items (remove asterisks/markdown)
+    sideEffects: Array.isArray(data.sideEffects) ? cleanTextArray(data.sideEffects.slice(0, MAX_ITEMS)) : [],
+    warnings: Array.isArray(data.warnings) ? cleanTextArray(data.warnings.slice(0, MAX_ITEMS)) : [],
+    interactions: Array.isArray(data.interactions) ? cleanTextArray(data.interactions.slice(0, MAX_ITEMS)) : [],
+    indications: Array.isArray(data.indications) ? cleanTextArray(data.indications.slice(0, MAX_ITEMS)) : [],
+    contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications.slice(0, MAX_ITEMS)) : [],
+    brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames.slice(0, MAX_ITEMS)) : [],
+    // Clean scalar fields to remove asterisks and markdown
+    description: data.description ? cleanText(data.description) : data.description,
+    mechanism: data.mechanism ? cleanMechanismText(data.mechanism) : data.mechanism,
+    dosageAndAdmin: data.dosageAndAdmin ? cleanText(data.dosageAndAdmin) : data.dosageAndAdmin,
+    // Keep other scalar fields unchanged
     standardModeOptimized: true,
     note: (data.note || '') + ' [Standard Mode: Top 5 items for quick reference]'
   };
@@ -99,6 +61,48 @@ interface VisionResult {
   ocrSource?: string;
   fullText?: string;
   fallbackUsed?: string;
+  needsCriticalAnalysis?: boolean;
+  tornOrCut?: boolean;
+  blurry?: boolean;
+  reflective?: boolean;
+  partialView?: boolean;
+  imageChallenges?: string[];
+  imageQuality?: number;
+}
+
+interface ScrapedDrugData {
+  name: string;
+  genericName?: string;
+  manufacturer?: string;
+  category?: string;
+  dosageForm?: string;
+  strength?: string;
+  description?: string;
+  mechanism?: string;
+  indications?: string[];
+  sideEffects?: string[];
+  contraindications?: string[];
+  interactions?: string[];
+  warnings?: string[];
+  dosageAndAdmin?: string;
+  storage?: string;
+  prescriptionStatus?: string;
+  pregnancy?: string;
+  brandNames?: string[];
+  price?: string;
+  availability?: string;
+  extractionQuality?: number;
+  dataCompleteness?: number;
+  sourceUrl?: string;
+  scrapingMethod?: string;
+  source?: string;
+  scrapedAt?: string;
+  dataQuality?: number;
+  completeness?: number;
+  corrections?: string[];
+  validationNotes?: string;
+  correctedAt?: string;
+  correctionMethod?: string;
   // Image condition flags for Critical Vision trigger
   imageChallenges?: string[];
   needsCriticalAnalysis?: boolean;
@@ -212,184 +216,19 @@ async function checkDrugCache(drugName: string): Promise<unknown> {
   return null;
 }
 
-async function try1mgScraping(drugName: string): Promise<unknown> {
-  try {
-    console.log(`🔍 Scraping 1mg.com for: ${drugName}`);
-    
-    const searchUrl = `https://www.1mg.com/search/all?name=${encodeURIComponent(drugName)}`;
-    
-    const response = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
-    
-    if (!response.ok) {
-      console.log(`❌ 1mg.com search failed: ${response.status}`);
-      return null;
-    }
-    
-    const html = await response.text();
-    
-    // Extract drug information from HTML
-    const nameMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
-    const descMatch = html.match(/<div class="saltInfo">([^<]+)<\/div>/);
-    
-    if (nameMatch || descMatch) {
-      return {
-        name: nameMatch?.[1]?.trim() || drugName,
-        genericName: descMatch?.[1]?.trim() || '',
-        description: `Information from 1mg.com for ${drugName}`,
-        source: '1mg.com'
-      };
-    }
-    
-    console.log('❌ No data extracted from 1mg.com');
-    return null;
-  } catch (error) {
-    console.error(`Error scraping 1mg.com: ${error}`);
-    return null;
-  }
-}
-
-async function tryDrugsComScraping(drugName: string): Promise<unknown> {
-  try {
-    console.log(`🔍 Scraping drugs.com for: ${drugName}`);
-    
-    const formattedDrugName = drugName.toLowerCase().replace(/\s+/g, '-');
-    const url = `https://www.drugs.com/${formattedDrugName}.html`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    });
-    
-    if (!response.ok) {
-      const searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
-      const searchResponse = await fetch(searchUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-      });
-      
-      if (!searchResponse.ok) return null;
-      
-      const searchHtml = await searchResponse.text();
-      const firstResultMatch = searchHtml.match(/<a href="(\/[^"]+)" class="ddc-link-[^"]+">/);
-      
-      if (firstResultMatch?.[1]) {
-        const resultUrl = `https://www.drugs.com${firstResultMatch[1]}`;
-        const detailResponse = await fetch(resultUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-          }
-        });
-        
-        if (detailResponse.ok) {
-          return parseDrugsComHTML(await detailResponse.text(), drugName);
-        }
-      }
-      return null;
-    }
-    
-    const html = await response.text();
-    return parseDrugsComHTML(html, drugName);
-  } catch (error) {
-    console.error(`Error scraping drugs.com: ${error}`);
-    return null;
-  }
-}
-
-function parseDrugsComHTML(html: string, drugName: string): unknown {
-  try {
-    const drugInfo = {
-      id: crypto.randomUUID(),
-      name: drugName,
-      genericName: "",
-      brandNames: [] as string[],
-      manufacturer: "",
-      category: "",
-      description: "",
-      dosageAndAdmin: "",
-      sideEffects: [] as string[],
-      warnings: [] as string[],
-      interactions: [] as string[],
-      storage: "Store at room temperature away from moisture, heat, and light. Keep out of reach of children.",
-      mechanism: "",
-      indications: [] as string[],
-      contraindications: [] as string[],
-      prescriptionStatus: "Unknown",
-      pregnancy: "",
-      drugClass: "",
-      color: "",
-      shape: "",
-      imprint: ""
-    };
-    
-    // Extract generic name
-    const genericNameMatch = html.match(/<p class="drug-subtitle">(.*?)<\/p>/s);
-    if (genericNameMatch?.[1]) {
-      drugInfo.genericName = genericNameMatch[1].trim();
-    }
-    
-    // Extract description
-    const descriptionMatch = html.match(/<div class="contentBox">[\s\S]*?<p>([\s\S]*?)<\/p>/);
-    if (descriptionMatch?.[1]) {
-      drugInfo.description = descriptionMatch[1]
-        .replace(/<[^>]*>/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-    
-    // Extract side effects
-    const sideEffectsMatch = html.match(/<h2[^>]*>Side Effects<\/h2>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/);
-    if (sideEffectsMatch?.[1]) {
-      const sideEffects = sideEffectsMatch[1].match(/<li[^>]*>([\s\S]*?)<\/li>/g);
-      if (sideEffects) {
-        drugInfo.sideEffects = sideEffects.map((item: string) => {
-          return item
-            .replace(/<li[^>]*>/, '')
-            .replace(/<\/li>/, '')
-            .replace(/<[^>]*>/g, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-        });
-      }
-    }
-    
-    // Extract drug class
-    const drugClassMatch = html.match(/<strong>Drug class:<\/strong>\s*([^<]+)(?:<|$)/i);
-    if (drugClassMatch?.[1]) {
-      drugInfo.drugClass = drugClassMatch[1].trim();
-    }
-    
-    // Extract indications
-    const indicationsMatch = html.match(/<h2[^>]*>Uses<\/h2>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
-    if (indicationsMatch?.[1]) {
-      const indicationsText = indicationsMatch[1]
-        .replace(/<[^>]*>/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      drugInfo.indications = indicationsText.split(/\.\s+/).filter((item: string) => item.length > 5)
-        .map((item: string) => item.trim() + (item.endsWith('.') ? '' : '.'));
-    }
-    
-    console.log(`Successfully parsed drugs.com data for: ${drugName}`);
-    return drugInfo;
-  } catch (error) {
-    console.error(`Error parsing drugs.com HTML: ${error}`);
-    return null;
-  }
-}
-
-// OpenRouter OCR removed - using performOpenRouterAnalysis() instead for unified vision fallback
-
-// OpenRouter Vision fallback (dual model support)
-async function performOpenRouterAnalysis(imageBase64: string, useSecondary: boolean = false): Promise<VisionResult | null> {
-  const modelToUse = useSecondary ? OPENROUTER_VISION_MODEL_SECONDARY : OPENROUTER_VISION_MODEL_PRIMARY;
-  const modelName = useSecondary ? 'Nvidia Nemotron' : 'Qwen 2.5-VL';
+// OpenRouter Vision with 3-tier fallback: Qwen → Nvidia → Gemini 2.0
+async function performOpenRouterAnalysis(imageBase64: string, modelIndex: number = 0): Promise<VisionResult | null> {
+  // Select model based on index: 0 = Qwen, 1 = Nvidia, 2 = Gemini 2.0
+  const models = [
+    { id: VISION_MODEL_PRIMARY, name: 'Qwen 2.5-VL' },
+    { id: VISION_MODEL_SECONDARY, name: 'Nvidia Nemotron' },
+    { id: VISION_MODEL_FALLBACK, name: 'Gemini 2.0 Flash' }
+  ];
+  
+  const currentModel = models[modelIndex];
+  if (!currentModel) return null; // All models exhausted
+  
+  const { id: modelToUse, name: modelName } = currentModel;
   
   try {
     console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
@@ -473,139 +312,307 @@ Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
   } catch (error) {
     console.error(`❌ OpenRouter Vision (${modelName}) failed:`, error);
     
-    // If primary model failed, try secondary
-    if (!useSecondary && OPENROUTER_API_KEY) {
-      console.log('🔄 Primary OpenRouter model failed, trying Nvidia Nemotron...');
-      return await performOpenRouterAnalysis(imageBase64, true);
+    // Try next model in cascade: Qwen → Nvidia → Gemini 2.0
+    const nextModelIndex = modelIndex + 1;
+    if (nextModelIndex < 3 && OPENROUTER_API_KEY) {
+      const nextModelName = models[nextModelIndex]?.name || 'Next model';
+      console.log(`🔄 ${modelName} failed, trying ${nextModelName}...`);
+      return await performOpenRouterAnalysis(imageBase64, nextModelIndex);
     }
     
-    return null;
+    console.log('❌ All 3 OpenRouter vision models exhausted');
+    
+    // Return user-friendly error instead of null
+    throw new Error('Server not responding. All vision analysis services are currently unavailable. Please try again later or contact us for support.');
   }
 }
 
-async function performGeminiAnalysis(imageBase64: string): Promise<VisionResult | null> {
+// Intelligent Web Scraping with DeepSeek R1T2 Chimera
+async function intelligentWebScraping(drugName: string, source: '1mg' | 'drugs.com'): Promise<ScrapedDrugData> {
+  console.log(`🕷️ Intelligent web scraping for "${drugName}" from ${source}...`);
+  
   try {
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) {
-      console.error('❌ GEMINI_API_KEY not found!');
-      // Try OpenRouter as immediate fallback
-      if (OPENROUTER_API_KEY) {
-        console.log('🔄 Gemini key missing, trying OpenRouter...');
-        return await performOpenRouterAnalysis(imageBase64);
-      }
-      return null;
+    // Step 1: Fetch the HTML content
+    let url: string;
+    let searchUrl: string;
+    
+    if (source === '1mg') {
+      searchUrl = `https://www.1mg.com/search/all?name=${encodeURIComponent(drugName)}`;
+      url = searchUrl; // Will be updated after search
+    } else {
+      searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
+      url = searchUrl; // Will be updated after search
     }
     
-    console.log('🤖 Calling Gemini API for OCR...');
-    console.log(`   API Key present: ${!!apiKey}`);
-    console.log(`   Image data length: ${imageBase64.length} chars`);
+    console.log(`   Fetching: ${searchUrl}`);
     
-    const prompt = `STANDARD MODE: Fast drug OCR. Extract essential info ONLY.
+    const response = await fetch(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const html = await response.text();
+    console.log(`   HTML fetched: ${html.length} characters`);
+    
+    // Step 2: Use DeepSeek R1T2 Chimera to intelligently extract drug data
+    const extractionPrompt = `You are an expert web scraper specializing in pharmaceutical data extraction. Analyze this HTML content from ${source} and extract comprehensive drug information.
 
-CRITICAL: Also detect if the image has challenging conditions that need advanced analysis.
+TARGET DRUG: "${drugName}"
 
-RULES:
-1. Brand name: Exact text from package (e.g., "Naxdom 500")
-2. Generic: Active ingredient from composition
-3. NO guessing - return "Unknown" if unclear
-4. **Image Challenges**: Detect if image has:
-   - "torn" or "cut" - Strip/blister is torn, cut, or damaged
-   - "blurry" - Text is unclear or out of focus
-   - "reflective" - Foil or packaging has glare/reflection
-   - "partial" - Only partial view of medicine/packaging
-   - "damaged" - Packaging is physically damaged
-5. **needsCriticalAnalysis**: Set to true if ANY of above challenges exist OR confidence is low
+EXTRACTION REQUIREMENTS:
+1. **Drug Identification**:
+   - Brand name (exact match for "${drugName}")
+   - Generic name / Active ingredient
+   - Manufacturer / Company
+   - Drug class / Category
 
-OUTPUT (JSON):
+2. **Physical Properties**:
+   - Dosage form (tablet, syrup, injection, etc.)
+   - Strength/Dosage (mg, ml, etc.)
+   - Color, shape, imprint (if available)
+
+3. **Medical Information**:
+   - Mechanism of action (how it works)
+   - Indications (what it treats) - list 5-8 conditions
+   - Side effects - list 8-10 common ones
+   - Contraindications - list 5-8 conditions to avoid
+   - Drug interactions - list 5-8 important ones
+   - Warnings and precautions - list 5-8 key warnings
+
+4. **Usage Information**:
+   - Dosage and administration instructions
+   - Storage conditions
+   - Prescription status (OTC/Prescription/Controlled)
+   - Pregnancy category/safety
+
+5. **Additional Data**:
+   - Brand variations/alternate names
+   - Price information (if available)
+   - Availability status
+
+CRITICAL INSTRUCTIONS:
+- Focus ONLY on the drug "${drugName}" - ignore other search results
+- Extract EXACT text from the webpage - don't invent information
+- If information is not available, mark as "Not available" or leave empty
+- Prioritize accuracy over completeness
+- Look for structured data in tables, lists, and sections
+
+HTML CONTENT:
+${html.substring(0, 15000)} ${html.length > 15000 ? '...[truncated]' : ''}
+
+OUTPUT FORMAT (JSON):
 {
   "name": "Brand name",
   "genericName": "Active ingredient",
-  "confidence": "high/medium/low",
-  "imageChallenges": ["torn", "blurry", etc.],
-  "needsCriticalAnalysis": true/false,
-  "imageQuality": 0-100,
-  "tornOrCut": true/false,
-  "blurry": true/false,
-  "reflective": true/false,
-  "partialView": true/false
+  "manufacturer": "Company name",
+  "category": "Drug class",
+  "dosageForm": "tablet/syrup/etc",
+  "strength": "mg/ml amount",
+  "description": "Brief description",
+  "mechanism": "How it works",
+  "indications": ["condition1", "condition2", ...],
+  "sideEffects": ["effect1", "effect2", ...],
+  "contraindications": ["condition1", "condition2", ...],
+  "interactions": ["drug1", "drug2", ...],
+  "warnings": ["warning1", "warning2", ...],
+  "dosageAndAdmin": "Usage instructions",
+  "storage": "Storage conditions",
+  "prescriptionStatus": "OTC/Prescription/Controlled",
+  "pregnancy": "Safety category",
+  "brandNames": ["brand1", "brand2", ...],
+  "price": "Price if available",
+  "availability": "Available/Out of stock",
+  "extractionQuality": 0-100,
+  "dataCompleteness": 0-100,
+  "sourceUrl": "${url}"
 }
 
-Be FAST. Detect challenging conditions. Return JSON only:`;
+Return ONLY valid JSON. Be thorough but accurate.`;
+
+    console.log(`   Using DeepSeek R1T2 Chimera for intelligent extraction...`);
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const aiResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+        'X-Title': 'PharmaLens Intelligent Web Scraper'
+      },
       body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [
-            { text: prompt },
-            { inline_data: {
-              mime_type: "image/jpeg",
-              data: imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64
-            }}
-          ]
+        model: WEB_SCRAPING_MODEL,
+        messages: [{
+          role: 'user',
+          content: extractionPrompt
         }],
-        generation_config: { temperature: 0.1, max_output_tokens: 500 } // Standard Mode: Fast response
+        temperature: 0.1, // Low temperature for accuracy
+        max_tokens: 2048,
+        top_p: 0.9
       })
     });
     
-    console.log(`   Response status: ${response.status}`);
+    if (!aiResponse.ok) {
+      throw new Error(`DeepSeek API error: ${aiResponse.status} ${aiResponse.statusText}`);
+    }
     
-    if (response.ok) {
-      const data = await response.json();
-      console.log(`   Gemini response received`);
-      
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        console.log(`   Raw Gemini text (first 200 chars): ${text.substring(0, 200)}`);
+    const aiResult = await aiResponse.json();
+    const extractedContent = aiResult.choices?.[0]?.message?.content || '';
+    
+    console.log(`   DeepSeek response: ${extractedContent.substring(0, 200)}...`);
+    
+    // Parse JSON from AI response
+    const jsonMatch = extractedContent.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        const parsedData = JSON.parse(jsonMatch[0]);
+        console.log(`✅ Intelligent scraping success: ${parsedData.name} (${parsedData.dataCompleteness}% complete)`);
         
-        // Try to extract JSON
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          try {
-            const parsed = JSON.parse(jsonMatch[0]);
-            console.log(`✅ Gemini OCR Success:`);
-            console.log(`   Name: "${parsed.name}"`);
-            console.log(`   Generic: "${parsed.genericName}"`);
-            console.log(`   Confidence: ${parsed.confidence}`);
-            return parsed;
-          } catch (parseError) {
-            console.error(`❌ JSON parse error: ${parseError}`);
-            console.error(`   Attempted to parse: ${jsonMatch[0].substring(0, 100)}...`);
-          }
-        } else {
-          console.error(`❌ No JSON found in Gemini response`);
-          console.error(`   Full response: ${text}`);
-        }
-      } else {
-        console.error(`❌ No text in Gemini response`);
-        console.error(`   Response structure:`, JSON.stringify(data, null, 2).substring(0, 500));
+        // Add metadata
+        parsedData.scrapingMethod = 'DeepSeek R1T2 Chimera';
+        parsedData.source = source;
+        parsedData.scrapedAt = new Date().toISOString();
+        
+        return parsedData;
+      } catch (parseError) {
+        console.error(`❌ JSON parse error:`, parseError);
+        throw new Error('Failed to parse extracted data');
       }
     } else {
-      const errorText = await response.text();
-      console.error(`❌ Gemini API error: ${response.status}`);
-      console.error(`   Error: ${errorText.substring(0, 200)}`);
-      
-      // Check if quota exhausted - use OpenRouter fallback
-      if (response.status === 429 && (errorText.includes('quota') || errorText.includes('exceeded')) && OPENROUTER_API_KEY) {
-        console.warn('⚠️ Gemini quota exhausted, falling back to OpenRouter...');
-        return await performOpenRouterAnalysis(imageBase64);
-      }
+      console.error(`❌ No JSON found in DeepSeek response`);
+      throw new Error('No structured data extracted');
     }
+    
   } catch (error) {
-    console.error('❌ Gemini analysis exception:', error);
-    console.error(`   Error details: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`❌ Intelligent web scraping failed for ${source}:`, error);
+    throw error;
   }
+}
+
+// Data correction and validation using DeepSeek R1T2 Chimera
+async function correctAndValidateData(rawData: ScrapedDrugData, drugName: string): Promise<ScrapedDrugData> {
+  console.log(`🔍 Correcting and validating data for "${drugName}"...`);
   
-  // Try OpenRouter as final fallback before giving up
-  if (OPENROUTER_API_KEY) {
-    console.log('🔄 Gemini OCR failed - attempting OpenRouter fallback...');
-    return await performOpenRouterAnalysis(imageBase64);
+  try {
+    const correctionPrompt = `You are a pharmaceutical data validator and corrector. Review this extracted drug data and correct any errors, inconsistencies, or missing information.
+
+TARGET DRUG: "${drugName}"
+
+RAW EXTRACTED DATA:
+${JSON.stringify(rawData, null, 2)}
+
+VALIDATION TASKS:
+1. **Data Accuracy**: Check if all information is medically accurate and consistent
+2. **Completeness**: Identify missing critical information
+3. **Formatting**: Standardize formats (dosages, drug names, etc.)
+4. **Deduplication**: Remove duplicate entries in arrays
+5. **Medical Validation**: Ensure side effects, interactions, and indications are realistic
+6. **Consistency**: Check that generic name matches brand name
+7. **Quality Scoring**: Rate the overall data quality 0-100
+
+CORRECTION RULES:
+- Fix obvious typos and formatting issues
+- Standardize drug names (proper capitalization)
+- Ensure dosage formats are consistent (e.g., "500mg" not "500 mg")
+- Remove HTML artifacts or encoding issues
+- Validate that side effects are real medical terms
+- Check that indications match the drug's actual uses
+- Ensure interactions are with real drug names
+- Standardize manufacturer names
+
+OUTPUT FORMAT (JSON):
+{
+  "name": "Corrected brand name",
+  "genericName": "Corrected generic name",
+  "manufacturer": "Standardized manufacturer",
+  "category": "Corrected drug class",
+  "dosageForm": "Standardized form",
+  "strength": "Standardized strength",
+  "description": "Corrected description",
+  "mechanism": "Validated mechanism",
+  "indications": ["validated_condition1", "validated_condition2", ...],
+  "sideEffects": ["validated_effect1", "validated_effect2", ...],
+  "contraindications": ["validated_contraindication1", ...],
+  "interactions": ["validated_drug1", "validated_drug2", ...],
+  "warnings": ["validated_warning1", "validated_warning2", ...],
+  "dosageAndAdmin": "Corrected instructions",
+  "storage": "Standardized storage",
+  "prescriptionStatus": "Validated status",
+  "pregnancy": "Corrected pregnancy info",
+  "brandNames": ["corrected_brand1", "corrected_brand2", ...],
+  "price": "Formatted price",
+  "availability": "Validated availability",
+  "dataQuality": 0-100,
+  "completeness": 0-100,
+  "corrections": ["correction1", "correction2", ...],
+  "validationNotes": "Any important notes about the data quality"
+}
+
+Return ONLY valid JSON with corrected and validated data.`;
+
+    console.log(`   Using DeepSeek R1T2 Chimera for data correction...`);
+    
+    const correctionResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+        'X-Title': 'PharmaLens Data Validator'
+      },
+      body: JSON.stringify({
+        model: WEB_SCRAPING_MODEL,
+        messages: [{
+          role: 'user',
+          content: correctionPrompt
+        }],
+        temperature: 0.05, // Very low temperature for accuracy
+        max_tokens: 2048,
+        top_p: 0.8
+      })
+    });
+    
+    if (!correctionResponse.ok) {
+      throw new Error(`DeepSeek correction API error: ${correctionResponse.status}`);
+    }
+    
+    const correctionResult = await correctionResponse.json();
+    const correctedContent = correctionResult.choices?.[0]?.message?.content || '';
+    
+    // Parse corrected JSON
+    const jsonMatch = correctedContent.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        const correctedData = JSON.parse(jsonMatch[0]);
+        console.log(`✅ Data correction complete: Quality ${correctedData.dataQuality}%, Completeness ${correctedData.completeness}%`);
+        
+        // Add correction metadata
+        correctedData.correctedAt = new Date().toISOString();
+        correctedData.correctionMethod = 'DeepSeek R1T2 Chimera';
+        
+        return correctedData;
+      } catch (parseError) {
+        console.error(`❌ Correction JSON parse error:`, parseError);
+        return rawData; // Return original if correction fails
+      }
+    } else {
+      console.error(`❌ No JSON in correction response`);
+      return rawData; // Return original if correction fails
+    }
+    
+  } catch (error) {
+    console.error(`❌ Data correction failed:`, error);
+    return rawData; // Return original data if correction fails
   }
-  
-  console.log('⚠️ All vision APIs failed - returning null');
-  return null;
 }
 
 Deno.serve(async (req: Request) => {
@@ -636,26 +643,42 @@ Deno.serve(async (req: Request) => {
       }, 400);
     }
 
-    // Stage 1: Gemini OCR + Text Extraction
-    console.log('🔍 Stage 1: Gemini OCR + Text Extraction...');
-    const geminiResult = await performGeminiAnalysis(imageBase64);
+    // Stage 1: OpenRouter Vision (Qwen → Nvidia → Gemini 2.0 cascade)
+    console.log('🔍 Stage 1: OpenRouter Vision Analysis (Qwen → Nvidia → Gemini 2.0)...');
+    
+    let visionResult;
+    try {
+      visionResult = await performOpenRouterAnalysis(imageBase64);
+    } catch (error) {
+      // Handle the case when all 3 vision models fail
+      console.error('❌ All vision models failed:', error);
+      
+      stages.push({
+        name: 'openrouter-vision',
+        success: false,
+        data: null,
+        processingTime: Date.now() - overallStartTime
+      });
+
+      return createResponse({
+        success: false,
+        error: error instanceof Error ? error.message : 'Server not responding. All vision analysis services are currently unavailable. Please try again later or contact us for support.',
+        processingStages: stages.map(s => s.name),
+        confidence: 'low',
+        fallbackUsed: true,
+        processingTime: Date.now() - overallStartTime
+      }, 503); // 503 Service Unavailable
+    }
+    
     stages.push({
-      name: 'gemini-ocr',
-      success: !!geminiResult,
-      data: geminiResult,
+      name: 'openrouter-vision',
+      success: !!visionResult,
+      data: visionResult,
       processingTime: Date.now() - overallStartTime
     });
 
-    // Stage 1.2: OCR Cross-Validation (NEW!) - Reduce errors by validating with OpenRouter
-    const validatedResult = await crossValidateOCR(imageBase64, geminiResult);
-    if (validatedResult && validatedResult !== geminiResult) {
-      stages.push({
-        name: 'ocr-cross-validation',
-        success: true,
-        data: { message: 'OCR validated and corrected', validated: validatedResult },
-        processingTime: Date.now() - overallStartTime
-      });
-    }
+    // Use the OpenRouter vision result directly (already has 3-tier fallback built-in)
+    const validatedResult = visionResult;
 
     let drugName = validatedResult?.name || 'Unknown';
     let genericName = validatedResult?.genericName || '';
@@ -993,53 +1016,81 @@ Deno.serve(async (req: Request) => {
     console.log(`      Tried ${uniqueQueries.length} queries across ${thresholds.length} thresholds`);
     console.log(`      Total attempts: ${uniqueQueries.length * thresholds.length}`);
 
-    // Stage 4: Fallback Mechanism - 1mg.com + Drugs.com Web Scraping
-    console.log('🔄 Stage 4: Fallback - Web Scraping (1mg.com + Drugs.com)...');
+    // Stage 4: Intelligent Web Scraping with DeepSeek R1T2 Chimera
+    console.log('🔄 Stage 4: Intelligent Web Scraping (DeepSeek + 1mg.com + Drugs.com)...');
     if (drugName && drugName !== 'Unknown') {
       const searchTerm = drugName;
       
-      // Try 1mg.com first (Indian database)
-      console.log(`   Trying 1mg.com for: "${searchTerm}"`);
-      const oneMgResult = await try1mgScraping(searchTerm);
-      
-      if (oneMgResult) {
-        console.log('✅ 1mg.com scraping successful!');
-        stages.push({
-          name: '1mg-fallback',
-          success: true,
-          data: oneMgResult,
-          processingTime: Date.now() - overallStartTime
-        });
+      // Try intelligent 1mg.com scraping first (Indian database)
+      console.log(`   🧠 Intelligent scraping 1mg.com for: "${searchTerm}"`);
+      try {
+        const oneMgRawData = await intelligentWebScraping(searchTerm, '1mg');
+        
+        if (oneMgRawData) {
+          console.log('✅ 1mg.com intelligent scraping successful!');
+          
+          // Correct and validate the scraped data
+          const oneMgResult = await correctAndValidateData(oneMgRawData, searchTerm);
+          
+          stages.push({
+            name: '1mg-intelligent-scraping',
+            success: true,
+            data: oneMgResult,
+            processingTime: Date.now() - overallStartTime
+          });
 
-        return createResponse({
-          success: true,
-          data: limitDataForStandardMode(oneMgResult), // Standard Mode: Top 5 items only
-          processingStages: stages.map(s => s.name),
-          confidence: 'medium',
-          fallbackUsed: true,
+          return createResponse({
+            success: true,
+            data: limitDataForStandardMode(oneMgResult), // Standard Mode: Top 5 items only
+            processingStages: stages.map(s => s.name),
+            confidence: (oneMgResult.dataQuality && oneMgResult.dataQuality > 80) ? 'high' : 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          });
+        }
+      } catch (error) {
+        console.error(`❌ Intelligent 1mg scraping failed:`, error);
+        stages.push({
+          name: '1mg-intelligent-scraping',
+          success: false,
+          data: null,
           processingTime: Date.now() - overallStartTime
         });
       }
       
-      // Try Drugs.com as backup
-      console.log(`   Trying drugs.com for: "${searchTerm}"`);
-      const drugsComResult = await tryDrugsComScraping(searchTerm);
-      
-      if (drugsComResult) {
-        console.log('✅ Drugs.com scraping successful!');
-        stages.push({
-          name: 'drugs-com-fallback',
-          success: true,
-          data: drugsComResult,
-          processingTime: Date.now() - overallStartTime
-        });
+      // Try intelligent Drugs.com scraping as backup
+      console.log(`   🧠 Intelligent scraping drugs.com for: "${searchTerm}"`);
+      try {
+        const drugsComRawData = await intelligentWebScraping(searchTerm, 'drugs.com');
+        
+        if (drugsComRawData) {
+          console.log('✅ Drugs.com intelligent scraping successful!');
+          
+          // Correct and validate the scraped data
+          const drugsComResult = await correctAndValidateData(drugsComRawData, searchTerm);
+          
+          stages.push({
+            name: 'drugs-com-intelligent-scraping',
+            success: true,
+            data: drugsComResult,
+            processingTime: Date.now() - overallStartTime
+          });
 
-        return createResponse({
-          success: true,
-          data: limitDataForStandardMode(drugsComResult), // Standard Mode: Top 5 items only
-          processingStages: stages.map(s => s.name),
-          confidence: 'medium',
-          fallbackUsed: true,
+          return createResponse({
+            success: true,
+            data: limitDataForStandardMode(drugsComResult), // Standard Mode: Top 5 items only
+            processingStages: stages.map(s => s.name),
+            confidence: (drugsComResult.dataQuality && drugsComResult.dataQuality > 80) ? 'high' : 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          });
+        }
+      } catch (error) {
+        console.error(`❌ Intelligent drugs.com scraping failed:`, error);
+        stages.push({
+          name: 'drugs-com-intelligent-scraping',
+          success: false,
+          data: null,
           processingTime: Date.now() - overallStartTime
         });
       }
