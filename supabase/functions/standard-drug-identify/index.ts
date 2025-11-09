@@ -28,30 +28,27 @@ const VISION_MODEL_FALLBACK = 'meta-llama/llama-4-maverick:free';      // Final 
 // Web scraping model: DeepSeek R1T2 Chimera for intelligent HTML parsing
 const WEB_SCRAPING_MODEL = 'tngtech/deepseek-r1t2-chimera:free';       // Best for web scraping & reasoning
 
-// Standard Mode data limiter - keep only essential info (4-5 items max per section)
-// Only for scraping/backup sources - NOT for cache/local DB (they're already validated)
+// Standard Mode data cleaner - Clean all data but NO rate limiting
+// Removes markdown/asterisks but returns FULL data (no item limits)
 // deno-lint-ignore no-explicit-any
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
   
-  const MAX_ITEMS = 5; // Standard Mode: Top 5 items only (for scraping/backup)
-  
   return {
     ...data,
-    // Clean and limit array fields to top 5 most important items (remove asterisks/markdown)
-    sideEffects: Array.isArray(data.sideEffects) ? cleanTextArray(data.sideEffects.slice(0, MAX_ITEMS)) : [],
-    warnings: Array.isArray(data.warnings) ? cleanTextArray(data.warnings.slice(0, MAX_ITEMS)) : [],
-    interactions: Array.isArray(data.interactions) ? cleanTextArray(data.interactions.slice(0, MAX_ITEMS)) : [],
-    indications: Array.isArray(data.indications) ? cleanTextArray(data.indications.slice(0, MAX_ITEMS)) : [],
-    contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications.slice(0, MAX_ITEMS)) : [],
-    brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames.slice(0, MAX_ITEMS)) : [],
+    // Clean array fields - remove asterisks/markdown but keep ALL items
+    sideEffects: Array.isArray(data.sideEffects) ? cleanTextArray(data.sideEffects) : [],
+    warnings: Array.isArray(data.warnings) ? cleanTextArray(data.warnings) : [],
+    interactions: Array.isArray(data.interactions) ? cleanTextArray(data.interactions) : [],
+    indications: Array.isArray(data.indications) ? cleanTextArray(data.indications) : [],
+    contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications) : [],
+    brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames) : [],
     // Clean scalar fields to remove asterisks and markdown
     description: data.description ? cleanText(data.description) : data.description,
     mechanism: data.mechanism ? cleanMechanismText(data.mechanism) : data.mechanism,
     dosageAndAdmin: data.dosageAndAdmin ? cleanText(data.dosageAndAdmin) : data.dosageAndAdmin,
-    // Keep other scalar fields unchanged
-    standardModeOptimized: true,
-    note: (data.note || '') + ' [Standard Mode: Top 5 items for quick reference]'
+    storage: data.storage ? cleanText(data.storage) : data.storage,
+    pregnancy: data.pregnancy ? cleanText(data.pregnancy) : data.pregnancy
   };
 }
 
