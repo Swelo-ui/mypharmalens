@@ -685,6 +685,14 @@ EXTRACTION REQUIREMENTS:
    - Drug interactions - list 5-8 important ones
    - Warnings and precautions - list 5-8 key warnings
 
+FORMATTING RULES (CRITICAL):
+- Use PLAIN TEXT ONLY - NO markdown formatting
+- NEVER use asterisks (**text**), underscores (__text__), or any markdown
+- Write naturally without bold/italic markers
+- Do NOT use phrases like "not explicitly listed" or "not visible on packaging"
+- If information is unavailable, simply omit it or use "Not available"
+- All text should be clean, professional, and ready for direct display
+
 4. **Usage Information**:
    - Dosage and administration instructions
    - Storage conditions
@@ -702,6 +710,9 @@ CRITICAL INSTRUCTIONS:
 - If information is not available, mark as "Not available" or leave empty
 - Prioritize accuracy over completeness
 - Look for structured data in tables, lists, and sections
+- Use PLAIN TEXT ONLY - NO markdown, asterisks, or formatting markers
+- NEVER use phrases like "not explicitly listed" or "not visible on packaging"
+- All extracted text must be clean and ready for direct user display
 
 HTML CONTENT:
 ${html.substring(0, 15000)} ${html.length > 15000 ? '...[truncated]' : ''}
@@ -824,6 +835,10 @@ CORRECTION RULES:
 - Check that indications match the drug's actual uses
 - Ensure interactions are with real drug names
 - Standardize manufacturer names
+- REMOVE ALL MARKDOWN FORMATTING (**, __, *, etc.)
+- Remove phrases like "not explicitly listed" or "not visible on packaging"
+- Ensure all text is plain, clean, and ready for direct user display
+- Replace any bold markers with plain text
 
 OUTPUT FORMAT (JSON):
 {

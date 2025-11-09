@@ -32,6 +32,12 @@ export function cleanText(text: string): string {
     // Remove HTML tags if any
     .replace(/<[^>]*>/g, '')
     
+    // Remove misleading phrases about packaging/visibility
+    .replace(/not explicitly listed on (the )?visible packaging\.?/gi, '')
+    .replace(/not (explicitly )?listed on (the )?packaging\.?/gi, '')
+    .replace(/not visible on (the )?packaging\.?/gi, '')
+    .replace(/information not available on (the )?package\.?/gi, '')
+    
     // Remove extra whitespace and normalize
     .replace(/\s+/g, ' ')
     .trim();
@@ -51,6 +57,7 @@ export function cleanTextArray(textArray: string[]): string[] {
 /**
  * Clean all text fields in a drug data object
  */
+// deno-lint-ignore no-explicit-any
 export function cleanDrugData(drugData: Record<string, any>): Record<string, any> {
   if (!drugData || typeof drugData !== 'object') return drugData;
   
