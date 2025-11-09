@@ -528,6 +528,351 @@ export const symptoms: Symptom[] = [
     relatedDrugClasses: ['Thyroid hormone'],
     relatedCategories: ['Endocrine', 'Dermatological'],
     keywords: ['anhidrosis', 'no perspiration', 'dry skin']
+  },
+
+  // Dental & Oral Health
+  {
+    id: 'DENTAL001',
+    nameEn: 'Toothache',
+    nameHi: 'Daant dard',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Analgesic', 'Antibiotic', 'Local anesthetic'],
+    relatedCategories: ['Pain Management', 'Dental'],
+    keywords: ['tooth pain', 'dental pain', 'cavity']
+  },
+  {
+    id: 'DENTAL002',
+    nameEn: 'Gum bleeding',
+    nameHi: 'Mussodo se khoon aana',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Antiseptic mouthwash', 'Vitamin K'],
+    relatedCategories: ['Dental', 'Supplement'],
+    keywords: ['gingivitis', 'gum disease', 'bleeding gums']
+  },
+  {
+    id: 'DENTAL003',
+    nameEn: 'Bad breath',
+    nameHi: 'Mooh ki badbu',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Antiseptic mouthwash', 'Digestive enzyme'],
+    relatedCategories: ['Dental', 'Gastrointestinal'],
+    keywords: ['halitosis', 'oral odor']
+  },
+  {
+    id: 'DENTAL004',
+    nameEn: 'Mouth ulcers',
+    nameHi: 'Mooh ke chhale',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Antiseptic gel', 'Vitamin B12', 'Topical corticosteroid'],
+    relatedCategories: ['Dental', 'Supplement'],
+    keywords: ['canker sores', 'aphthous ulcers', 'oral lesions']
+  },
+  {
+    id: 'DENTAL005',
+    nameEn: 'Sensitivity in teeth',
+    nameHi: 'Daant mein jhanjhanahat',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Desensitizing toothpaste', 'Fluoride'],
+    relatedCategories: ['Dental'],
+    keywords: ['tooth sensitivity', 'cold sensitivity', 'hot sensitivity']
+  },
+  {
+    id: 'DENTAL006',
+    nameEn: 'Dry mouth',
+    nameHi: 'Mooh sukhna',
+    category: 'Dental & Oral Health',
+    relatedDrugClasses: ['Saliva substitute', 'Pilocarpine'],
+    relatedCategories: ['Dental', 'Endocrine'],
+    keywords: ['xerostomia', 'dry lips', 'thirst']
+  },
+
+  // Women's Health
+  {
+    id: 'WOMEN001',
+    nameEn: 'Menstrual cramps / Period pain',
+    nameHi: 'Maahvaari ka dard',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Mefenamic acid', 'Tranexamic acid', 'Norethisterone', 'NSAID', 'Analgesic', 'Antispasmodic'],
+    relatedCategories: ['Pain Management', 'Gynecology'],
+    keywords: ['dysmenorrhea', 'menstrual pain', 'period cramps', 'mefenamic', 'drotaverine']
+  },
+  {
+    id: 'WOMEN002',
+    nameEn: 'Heavy menstrual bleeding',
+    nameHi: 'Zyada maasivaari',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Tranexamic acid', 'Norethisterone', 'Medroxyprogesterone', 'Progestin', 'Iron supplement', 'Ethamsylate'],
+    relatedCategories: ['Gynecology', 'Supplement'],
+    keywords: ['menorrhagia', 'heavy periods', 'excessive bleeding', 'tranexamic', 'norethisterone']
+  },
+  {
+    id: 'WOMEN003',
+    nameEn: 'Irregular periods',
+    nameHi: 'Maahvaari mein gadbadi',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Norethisterone', 'Medroxyprogesterone', 'Dydrogesterone', 'Oral contraceptive', 'Hormone', 'Metformin'],
+    relatedCategories: ['Gynecology', 'Endocrine'],
+    keywords: ['irregular menstruation', 'amenorrhea', 'oligomenorrhea', 'PCOS', 'diane-35', 'yasmin', 'meprate']
+  },
+  {
+    id: 'WOMEN004',
+    nameEn: 'Hot flashes',
+    nameHi: 'Garam lagna',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Conjugated estrogen', 'Estradiol', 'Tibolone', 'Hormone replacement', 'SSRI', 'SNRI'],
+    relatedCategories: ['Gynecology', 'Endocrine'],
+    keywords: ['menopause', 'vasomotor symptoms', 'night sweats', 'HRT', 'estrogen', 'paroxetine']
+  },
+  {
+    id: 'WOMEN005',
+    nameEn: 'White discharge',
+    nameHi: 'Safed paani jana',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Fluconazole', 'Clotrimazole', 'Metronidazole', 'Secnidazole', 'Antifungal', 'Antibiotic', 'Antiseptic'],
+    relatedCategories: ['Gynecology', 'Antibiotic'],
+    keywords: ['leucorrhea', 'vaginal discharge', 'infection', 'candidiasis', 'bacterial vaginosis']
+  },
+  {
+    id: 'WOMEN006',
+    nameEn: 'Breast tenderness',
+    nameHi: 'Stan mein dard',
+    category: 'Women\'s Health',
+    relatedDrugClasses: ['Vitamin E', 'Evening primrose oil', 'Danazol', 'Bromocriptine', 'Analgesic', 'NSAID'],
+    relatedCategories: ['Gynecology', 'Supplement'],
+    keywords: ['mastalgia', 'breast pain', 'tender breasts', 'cyclic mastalgia']
+  },
+
+  // Mental Health & Sleep
+  {
+    id: 'MENTAL001',
+    nameEn: 'Depression / Low mood',
+    nameHi: 'Udaasi',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Antidepressant', 'SSRI', 'SNRI'],
+    relatedCategories: ['Psychiatry', 'Central Nervous System'],
+    keywords: ['sadness', 'depression', 'low energy', 'hopelessness']
+  },
+  {
+    id: 'MENTAL002',
+    nameEn: 'Mood swings',
+    nameHi: 'Mizaaj badalna',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Mood stabilizer', 'Antipsychotic'],
+    relatedCategories: ['Psychiatry'],
+    keywords: ['irritability', 'emotional instability', 'bipolar']
+  },
+  {
+    id: 'MENTAL003',
+    nameEn: 'Panic attacks',
+    nameHi: 'Ghabrahat ka daura',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Benzodiazepine', 'SSRI', 'Beta blocker'],
+    relatedCategories: ['Psychiatry', 'Cardiovascular'],
+    keywords: ['anxiety attack', 'panic disorder', 'hyperventilation']
+  },
+  {
+    id: 'MENTAL004',
+    nameEn: 'Poor concentration / Memory issues',
+    nameHi: 'Yaad kamzor hona',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Nootropic', 'Multivitamin', 'Ginkgo biloba'],
+    relatedCategories: ['Central Nervous System', 'Supplement'],
+    keywords: ['memory loss', 'focus problems', 'brain fog', 'cognitive']
+  },
+  {
+    id: 'MENTAL005',
+    nameEn: 'Excessive sleepiness / Drowsiness',
+    nameHi: 'Zyada neend aana',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Stimulant', 'Modafinil', 'Caffeine'],
+    relatedCategories: ['Central Nervous System'],
+    keywords: ['hypersomnia', 'excessive sleep', 'fatigue', 'narcolepsy']
+  },
+  {
+    id: 'MENTAL006',
+    nameEn: 'Nightmares / Disturbed sleep',
+    nameHi: 'Neend mein khlab',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Sedative', 'Anxiolytic'],
+    relatedCategories: ['Psychiatry', 'Central Nervous System'],
+    keywords: ['bad dreams', 'sleep disturbance', 'night terror']
+  },
+  {
+    id: 'MENTAL007',
+    nameEn: 'Stress / Tension',
+    nameHi: 'Tension',
+    category: 'Mental Health & Sleep',
+    relatedDrugClasses: ['Anxiolytic', 'Adaptogen', 'Magnesium'],
+    relatedCategories: ['Psychiatry', 'Supplement'],
+    keywords: ['stress', 'tension', 'overwhelmed', 'pressure']
+  },
+
+  // Allergy & Immune
+  {
+    id: 'ALLERGY001',
+    nameEn: 'Sneezing',
+    nameHi: 'Chhink aana',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Antihistamine', 'Decongestant'],
+    relatedCategories: ['Allergy', 'Respiratory'],
+    keywords: ['sneeze', 'allergic rhinitis', 'hay fever']
+  },
+  {
+    id: 'ALLERGY002',
+    nameEn: 'Watery nose / Rhinitis',
+    nameHi: 'Naak se paani',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Antihistamine', 'Nasal corticosteroid'],
+    relatedCategories: ['Allergy', 'Respiratory'],
+    keywords: ['runny nose', 'nasal drip', 'postnasal drip']
+  },
+  {
+    id: 'ALLERGY003',
+    nameEn: 'Hives / Skin rash from allergy',
+    nameHi: 'Allergy se daane',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Antihistamine', 'Corticosteroid'],
+    relatedCategories: ['Allergy', 'Dermatological'],
+    keywords: ['urticaria', 'allergic rash', 'welts', 'wheals']
+  },
+  {
+    id: 'ALLERGY004',
+    nameEn: 'Wheezing / Asthma attack',
+    nameHi: 'Saans mein seeti',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Bronchodilator', 'Corticosteroid', 'Leukotriene inhibitor'],
+    relatedCategories: ['Respiratory', 'Emergency'],
+    keywords: ['asthma', 'bronchospasm', 'whistling breath']
+  },
+  {
+    id: 'ALLERGY005',
+    nameEn: 'Food allergy reaction',
+    nameHi: 'Khane se allergy',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Antihistamine', 'Epinephrine', 'Corticosteroid'],
+    relatedCategories: ['Allergy', 'Emergency'],
+    keywords: ['anaphylaxis', 'allergic reaction', 'food intolerance']
+  },
+  {
+    id: 'ALLERGY006',
+    nameEn: 'Seasonal allergies',
+    nameHi: 'Mausam ki allergy',
+    category: 'Allergy & Immune',
+    relatedDrugClasses: ['Antihistamine', 'Nasal spray', 'Eye drops'],
+    relatedCategories: ['Allergy', 'Respiratory'],
+    keywords: ['hay fever', 'pollen allergy', 'allergic conjunctivitis']
+  },
+
+  // Chronic Conditions
+  {
+    id: 'CHRONIC001',
+    nameEn: 'High blood sugar / Diabetes symptoms',
+    nameHi: 'Sugar badh jaana',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Antidiabetic', 'Insulin'],
+    relatedCategories: ['Endocrine', 'Diabetes'],
+    keywords: ['hyperglycemia', 'diabetes', 'glucose', 'polyuria', 'polydipsia']
+  },
+  {
+    id: 'CHRONIC002',
+    nameEn: 'Low blood sugar / Hypoglycemia',
+    nameHi: 'Sugar kam hona',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Glucose', 'Glucagon'],
+    relatedCategories: ['Endocrine', 'Emergency'],
+    keywords: ['hypoglycemia', 'low glucose', 'shaking', 'sweating']
+  },
+  {
+    id: 'CHRONIC003',
+    nameEn: 'High blood pressure symptoms',
+    nameHi: 'Blood pressure badh jaana',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Antihypertensive', 'ACE inhibitor', 'Beta blocker'],
+    relatedCategories: ['Cardiovascular'],
+    keywords: ['hypertension', 'BP high', 'headache', 'nosebleed']
+  },
+  {
+    id: 'CHRONIC004',
+    nameEn: 'Low blood pressure symptoms',
+    nameHi: 'Blood pressure kam hona',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Vasopressor', 'Fluids'],
+    relatedCategories: ['Cardiovascular'],
+    keywords: ['hypotension', 'BP low', 'dizziness', 'fainting']
+  },
+  {
+    id: 'CHRONIC005',
+    nameEn: 'Thyroid problems / Goiter',
+    nameHi: 'Thyroid ki samasya',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Thyroid hormone', 'Antithyroid'],
+    relatedCategories: ['Endocrine'],
+    keywords: ['hypothyroidism', 'hyperthyroidism', 'TSH', 'neck swelling']
+  },
+  {
+    id: 'CHRONIC006',
+    nameEn: 'Anemia symptoms / Pallor',
+    nameHi: 'Khoon ki kami',
+    category: 'Chronic Conditions',
+    relatedDrugClasses: ['Iron supplement', 'Vitamin B12', 'Folic acid'],
+    relatedCategories: ['Supplement', 'Hematology'],
+    keywords: ['pale skin', 'weakness', 'fatigue', 'low hemoglobin']
+  },
+
+  // Age-Related & Neurological
+  {
+    id: 'NEURO001',
+    nameEn: 'Tremors / Shaking hands',
+    nameHi: 'Haath kaampna',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Antiparkinson', 'Beta blocker', 'Anticonvulsant'],
+    relatedCategories: ['Neurology', 'Central Nervous System'],
+    keywords: ['tremor', 'parkinson', 'essential tremor', 'shaking']
+  },
+  {
+    id: 'NEURO002',
+    nameEn: 'Numbness / Tingling',
+    nameHi: 'Sunn hona',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Vitamin B12', 'Neuropathic pain agent', 'Gabapentin'],
+    relatedCategories: ['Neurology', 'Supplement'],
+    keywords: ['paresthesia', 'pins and needles', 'neuropathy']
+  },
+  {
+    id: 'NEURO003',
+    nameEn: 'Confusion / Disorientation',
+    nameHi: 'Confusion hona',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Dementia medication', 'Nootropic'],
+    relatedCategories: ['Neurology', 'Psychiatry'],
+    keywords: ['delirium', 'confusion', 'alzheimer', 'dementia']
+  },
+  {
+    id: 'NEURO004',
+    nameEn: 'Seizures / Fits',
+    nameHi: 'Daura padna',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Anticonvulsant', 'Antiepileptic'],
+    relatedCategories: ['Neurology', 'Emergency'],
+    keywords: ['epilepsy', 'convulsions', 'fits', 'seizure disorder']
+  },
+  {
+    id: 'NEURO005',
+    nameEn: 'Loss of balance / Vertigo',
+    nameHi: 'Santulan bigadna',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Antivertigo', 'Antihistamine'],
+    relatedCategories: ['Neurology', 'ENT'],
+    keywords: ['imbalance', 'vertigo', 'vestibular', 'BPPV']
+  },
+  {
+    id: 'NEURO006',
+    nameEn: 'Speech difficulty',
+    nameHi: 'Bolne mein dikkat',
+    category: 'Age-Related & Neurological',
+    relatedDrugClasses: ['Stroke medication', 'Neuroprotective'],
+    relatedCategories: ['Neurology', 'Emergency'],
+    keywords: ['dysarthria', 'slurred speech', 'stroke', 'aphasia']
   }
 ];
 
@@ -566,6 +911,36 @@ export const symptomCategories = [
     icon: 'ENT',
     title: 'Eye, Ear, Nose, Throat',
     symptoms: symptoms.filter(s => s.category === 'Eye, Ear, Nose, Throat')
+  },
+  {
+    icon: 'DENTAL',
+    title: 'Dental & Oral Health',
+    symptoms: symptoms.filter(s => s.category === 'Dental & Oral Health')
+  },
+  {
+    icon: 'WOMEN',
+    title: 'Women\'s Health',
+    symptoms: symptoms.filter(s => s.category === 'Women\'s Health')
+  },
+  {
+    icon: 'MENTAL',
+    title: 'Mental Health & Sleep',
+    symptoms: symptoms.filter(s => s.category === 'Mental Health & Sleep')
+  },
+  {
+    icon: 'ALLERGY',
+    title: 'Allergy & Immune',
+    symptoms: symptoms.filter(s => s.category === 'Allergy & Immune')
+  },
+  {
+    icon: 'CHRONIC',
+    title: 'Chronic Conditions',
+    symptoms: symptoms.filter(s => s.category === 'Chronic Conditions')
+  },
+  {
+    icon: 'NEURO',
+    title: 'Age-Related & Neurological',
+    symptoms: symptoms.filter(s => s.category === 'Age-Related & Neurological')
   },
   {
     icon: 'OTHER',

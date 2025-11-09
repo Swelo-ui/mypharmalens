@@ -166,6 +166,174 @@ const SymptomChecker = () => {
         ['ibuprofen','paracetamol','ciprofloxacin'].forEach(n => addName(n, 35));
       }
       
+      // DENTAL & ORAL
+      if (name.includes('tooth') || name.includes('dental')) {
+        addClass('analgesic', 50); addClass('antibiotic', 40); addClass('local anesthetic', 30);
+        ['ibuprofen','paracetamol','amoxicillin','clindamycin'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('gum') || name.includes('mouth ulcer')) {
+        addClass('antiseptic', 50); addClass('vitamin b12', 40);
+        ['chlorhexidine','benzydamine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('dry mouth') || name.includes('bad breath')) {
+        addClass('saliva substitute', 40); addClass('antiseptic mouthwash', 40);
+      }
+      
+      // WOMEN'S HEALTH (GYNECOLOGICAL - TOP PRIORITY)
+      if (name.includes('menstrual') || name.includes('period') || name.includes('cramp')) {
+        // Gynecologist's first-line drugs for menstrual cramps
+        addClass('nsaid', 70); addClass('analgesic', 60); addClass('antispasmodic', 55);
+        // TOP PRIORITY: Specific gynecological drugs
+        ['mefenamic acid','tranexamic acid','norethisterone'].forEach(n => addName(n, 70)); // Gynecologist favorites
+        ['naproxen','ibuprofen','drotaverine','hyoscine'].forEach(n => addName(n, 50));
+        ['paracetamol','dicyclomine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('heavy') && name.includes('bleeding')) {
+        // Gynecologist's drugs for heavy menstrual bleeding (menorrhagia)
+        addClass('tranexamic acid', 80); addClass('progestin', 70); addClass('iron supplement', 50);
+        // TOP PRIORITY: Specific gynecological drugs
+        ['tranexamic acid','norethisterone','medroxyprogesterone'].forEach(n => addName(n, 75)); // Stop heavy bleeding
+        ['ethamsylate','ferrous sulfate','ferrous fumarate'].forEach(n => addName(n, 45));
+        ['folic acid','vitamin c'].forEach(n => addName(n, 30)); // For anemia support
+      }
+      if (name.includes('irregular period') || name.includes('pcos')) {
+        // Gynecologist's drugs for irregular periods / PCOS
+        addClass('oral contraceptive', 80); addClass('progestin', 70); addClass('hormone', 60);
+        // TOP PRIORITY: Specific gynecological hormonal drugs
+        ['norethisterone','medroxyprogesterone','dydrogesterone'].forEach(n => addName(n, 75)); // Cycle regulation
+        ['diane-35','yasmin','meprate'].forEach(n => addName(n, 65)); // PCOS management
+        ['metformin','myo-inositol'].forEach(n => addName(n, 45)); // PCOS support
+      }
+      if (name.includes('white discharge') || name.includes('vaginal')) {
+        // Gynecologist's drugs for vaginal discharge / infections
+        addClass('antifungal', 75); addClass('antibiotic', 65); addClass('antiseptic', 50);
+        // TOP PRIORITY: Specific gynecological drugs
+        ['fluconazole','clotrimazole','itraconazole'].forEach(n => addName(n, 70)); // Antifungal first
+        ['metronidazole','secnidazole','tinidazole'].forEach(n => addName(n, 60)); // Bacterial vaginosis
+        ['clindamycin','povidone iodine'].forEach(n => addName(n, 45)); // Topical/oral antibiotics
+      }
+      if (name.includes('hot flash') || name.includes('menopause')) {
+        // Gynecologist's drugs for menopausal symptoms
+        addClass('hormone replacement', 75); addClass('ssri', 50); addClass('snri', 45);
+        // TOP PRIORITY: Specific gynecological HRT drugs
+        ['conjugated estrogen','estradiol','tibolone'].forEach(n => addName(n, 70)); // HRT first-line
+        ['paroxetine','venlafaxine','desvenlafaxine'].forEach(n => addName(n, 50)); // Non-hormonal option
+        ['clonidine','gabapentin'].forEach(n => addName(n, 35)); // Alternative
+      }
+      if (name.includes('breast') || name.includes('mastalgia')) {
+        // Gynecologist's drugs for breast tenderness / pain
+        addClass('vitamin e', 65); addClass('evening primrose oil', 60); addClass('nsaid', 50);
+        // TOP PRIORITY: Specific gynecological drugs for breast pain
+        ['vitamin e','evening primrose oil','danazol'].forEach(n => addName(n, 65)); // First-line for mastalgia
+        ['bromocriptine','tamoxifen'].forEach(n => addName(n, 55)); // Severe cases
+        ['ibuprofen','naproxen'].forEach(n => addName(n, 40)); // Pain relief
+      }
+      
+      // MENTAL HEALTH & SLEEP
+      if (name.includes('depression') || name.includes('low mood')) {
+        addClass('antidepressant', 60); addClass('ssri', 60); addClass('snri', 40);
+        ['sertraline','fluoxetine','escitalopram','venlafaxine'].forEach(n => addName(n, 40));
+        addNegClass('benzodiazepine', 30);
+      }
+      if (name.includes('panic') || name.includes('severe anxiety')) {
+        addClass('benzodiazepine', 60); addClass('ssri', 40);
+        ['alprazolam','clonazepam','lorazepam'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('mood swing') || name.includes('bipolar')) {
+        addClass('mood stabilizer', 60); addClass('antipsychotic', 40);
+        ['lithium','valproate','quetiapine'].forEach(n => addName(n, 35));
+      }
+      if (name.includes('memory') || name.includes('concentration') || name.includes('brain fog')) {
+        addClass('nootropic', 50); addClass('multivitamin', 40);
+        ['piracetam','ginkgo','vitamin b12'].forEach(n => addName(n, 30));
+      }
+      if (name.includes('stress') || name.includes('tension headache')) {
+        addClass('anxiolytic', 50); addClass('magnesium', 40); addClass('adaptogen', 30);
+        ['magnesium','ashwagandha'].forEach(n => addName(n, 30));
+      }
+      if (name.includes('excessive sleep') || name.includes('drowsiness')) {
+        addClass('stimulant', 50); addClass('modafinil', 40);
+        addNegClass('sedative', 60);
+      }
+      if (name.includes('nightmare') || name.includes('disturbed sleep')) {
+        addClass('sedative', 40); addClass('anxiolytic', 40);
+        ['zolpidem','eszopiclone'].forEach(n => addName(n, 30));
+      }
+      
+      // ALLERGY & IMMUNE
+      if (name.includes('sneez') || name.includes('rhinitis') || name.includes('hay fever')) {
+        addClass('antihistamine', 60); addClass('nasal corticosteroid', 40);
+        ['cetirizine','loratadine','fexofenadine','fluticasone'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('hives') || name.includes('urticaria')) {
+        addClass('antihistamine', 60); addClass('corticosteroid', 40);
+        ['cetirizine','loratadine','prednisolone'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('wheez') || name.includes('asthma')) {
+        addClass('bronchodilator', 60); addClass('corticosteroid', 50);
+        ['salbutamol','albuterol','budesonide','montelukast'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('food allergy') || name.includes('anaphyla')) {
+        addClass('antihistamine', 60); addClass('epinephrine', 50); addClass('corticosteroid', 40);
+        ['epinephrine','prednisolone'].forEach(n => addName(n, 50));
+      }
+      if (name.includes('seasonal allergy') || name.includes('pollen')) {
+        addClass('antihistamine', 60); addClass('nasal spray', 40);
+        ['cetirizine','loratadine','mometasone'].forEach(n => addName(n, 35));
+      }
+      
+      // CHRONIC CONDITIONS
+      if (name.includes('diabetes') || name.includes('high blood sugar') || name.includes('hyperglyce')) {
+        addClass('antidiabetic', 60); addClass('insulin', 50);
+        ['metformin','glimepiride','insulin','sitagliptin'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('low blood sugar') || name.includes('hypoglyce')) {
+        addClass('glucose', 60);
+        ['glucose','glucagon'].forEach(n => addName(n, 50));
+      }
+      if (name.includes('high blood pressure') || name.includes('hypertension')) {
+        addClass('antihypertensive', 60); addClass('ace inhibitor', 50); addClass('beta blocker', 40);
+        ['amlodipine','enalapril','losartan','metoprolol'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('low blood pressure') || name.includes('hypotension')) {
+        addClass('vasopressor', 50);
+        addNegClass('antihypertensive', 60);
+      }
+      if (name.includes('thyroid') || name.includes('goiter')) {
+        addClass('thyroid hormone', 60); addClass('antithyroid', 40);
+        ['levothyroxine','carbimazole'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('anemia') || name.includes('pallor') || name.includes('pale')) {
+        addClass('iron supplement', 60); addClass('vitamin b12', 50); addClass('folic acid', 40);
+        ['ferrous','folic','vitamin b12'].forEach(n => addName(n, 40));
+      }
+      
+      // NEUROLOGICAL
+      if (name.includes('tremor') || name.includes('shak') || name.includes('parkinson')) {
+        addClass('antiparkinson', 60); addClass('beta blocker', 40);
+        ['levodopa','carbidopa','propranolol'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('numbness') || name.includes('tingling') || name.includes('neuropathy')) {
+        addClass('vitamin b12', 60); addClass('neuropathic pain agent', 50);
+        ['vitamin b12','gabapentin','pregabalin'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('confusion') || name.includes('alzheimer') || name.includes('dementia')) {
+        addClass('dementia medication', 60); addClass('nootropic', 40);
+        ['donepezil','rivastigmine','memantine'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('seizure') || name.includes('epilepsy') || name.includes('fit')) {
+        addClass('anticonvulsant', 60); addClass('antiepileptic', 60);
+        ['phenytoin','carbamazepine','valproate','levetiracetam'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('vertigo') || name.includes('balance')) {
+        addClass('antivertigo', 60); addClass('antihistamine', 40);
+        ['betahistine','meclizine'].forEach(n => addName(n, 40));
+      }
+      if (name.includes('speech') || name.includes('stroke')) {
+        addClass('stroke medication', 60); addClass('neuroprotective', 40);
+        ['aspirin','clopidogrel'].forEach(n => addName(n, 40));
+      }
+      
       // OTHER
       if (name.includes('burn') && name.includes('urinat')) {
         addClass('antibiotic', 60); addClass('urinary alkalizer', 40);
