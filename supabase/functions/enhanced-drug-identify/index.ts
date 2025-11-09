@@ -3497,12 +3497,255 @@ Deno.serve(async (req: Request) => {
       console.log(`Drug identification completed: ${combinedResult.name} (${result.confidence} confidence, ${completenessScore}% complete)`);
       return createResponse(result);
     } else {
+      // 🚨 EMERGENCY OFFLINE FALLBACK - All AI models failed
+      console.log('🆘 === ACTIVATING EMERGENCY OFFLINE FALLBACK ===');
+      console.log('   All AI models rate limited/failed - using offline methods...');
+      
+      // Try basic pattern-based extraction from image filename or metadata
+      let offlineResult: Record<string, unknown> | null = null;
+      
+      try {
+        // Emergency pattern-based drug name extraction - EXPANDED DATABASE
+        const commonDrugPatterns = [
+          // Common Pain & Fever
+          /paracetamol|acetaminophen|crocin|dolo|tylenol/i,
+          /ibuprofen|brufen|advil|combiflam/i, 
+          /aspirin|dispirin|ecosprin/i,
+          /aceclofenac|hifenac|zerodol/i,
+          /diclofenac|voveran|volini/i,
+          /nimesulide|nimulid|nise/i,
+          /tramadol|ultram|tramal/i,
+          
+          // Antibiotics
+          /azithromycin|zithromax|azee/i,
+          /amoxicillin|augmentin|mox/i,
+          /ciprofloxacin|cipro|ciplox/i,
+          /doxycycline|doxy|vibramycin/i,
+          /cephalexin|sporidex|keflex/i,
+          /metronidazole|flagyl|metrogyl/i,
+          
+          // Stomach & Digestion
+          /omeprazole|prilosec|omez/i,
+          /pantoprazole|protonix|pan/i,
+          /ranitidine|zantac|aciloc/i,
+          /domperidone|motilium|domstal/i,
+          /loperamide|imodium|eldoper/i,
+          
+          // Heart & BP
+          /amlodipine|norvasc|amlong/i,
+          /atorvastatin|lipitor|atorva/i,
+          /metoprolol|lopressor|met xl/i,
+          /enalapril|vasotec|enace/i,
+          /losartan|cozaar|losar/i,
+          
+          // Diabetes
+          /metformin|glucophage|glycomet/i,
+          /glimepiride|amaryl|glimpid/i,
+          /insulin|humulin|lantus/i,
+          
+          // Allergy & Cold
+          /cetirizine|zyrtec|alerid/i,
+          /loratadine|claritin|lorfast/i,
+          /chlorpheniramine|piriton|avil/i,
+          /pseudoephedrine|sudafed/i,
+          
+          // Vitamins & Supplements
+          /vitamin d|calcitriol|uprise/i,
+          /vitamin b12|methylcobalamin|neurobion/i,
+          /iron|ferrous|orofer/i,
+          /calcium|shelcal|calcimax/i,
+          
+          // Mental Health
+          /sertraline|zoloft|daxid/i,
+          /fluoxetine|prozac|fludac/i,
+          /alprazolam|xanax|alprax/i,
+          /clonazepam|klonopin|lonazep/i,
+          
+          // Women's Health
+          /mifepristone|mifeprex/i,
+          /levonorgestrel|plan b|unwanted/i,
+          /folic acid|folate|folvite/i,
+          
+          // Respiratory
+          /salbutamol|ventolin|asthalin/i,
+          /montelukast|singulair|montair/i,
+          /prednisolone|predmet|omnacortil/i,
+          
+          // Eye & Ear
+          /tobramycin|tobrex/i,
+          /ciprofloxacin.*eye|ciplox.*d/i,
+          
+          // Skin
+          /betamethasone|betnovate/i,
+          /clobetasol|dermovate/i,
+          /clotrimazole|candid/i,
+          
+          // Any medicine name pattern (backup)
+          /\b[a-z]{4,}\s*(?:tablet|capsule|syrup|injection|cream|ointment|drops)/i,
+          /\b(?:dr\.?\s*)?[a-z]+(?:'s)?\s+(?:tablet|capsule|syrup|injection)/i
+        ];
+        
+        // Check if any drug patterns were detected in previous attempts
+        const allStageData = stages.map(s => JSON.stringify(s.data || {})).join(' ');
+        let detectedDrug = null;
+        let detectedPattern = null;
+        
+        for (const pattern of commonDrugPatterns) {
+          const match = allStageData.match(pattern);
+          if (match) {
+            detectedDrug = match[0].toLowerCase();
+            detectedPattern = pattern;
+            console.log(`✅ Offline fallback detected: ${detectedDrug}`);
+            break;
+          }
+        }
+        
+        // If no pattern match, try generic drug name extraction
+        if (!detectedDrug) {
+          // Look for any potential drug names in the data
+          const drugNamePatterns = [
+            /(?:name|drug|medicine|medication)[":\s]+([a-z]+(?:\s+[a-z]+)?)/i,
+            /"name":\s*"([^"]+)"/i,
+            /identified:\s*([a-z]+(?:\s+[a-z]+)?)/i,
+            /product[_\s]?name[:"\s]*([a-z]+(?:\s+[a-z]+)?)/i
+          ];
+          
+          for (const namePattern of drugNamePatterns) {
+            const nameMatch = allStageData.match(namePattern);
+            if (nameMatch && nameMatch[1] && nameMatch[1].length > 2) {
+              detectedDrug = nameMatch[1].toLowerCase().trim();
+              console.log(`✅ Generic drug name extraction: ${detectedDrug}`);
+              break;
+            }
+          }
+        }
+        
+        if (detectedDrug) {
+          // COMPREHENSIVE OFFLINE DRUG DATABASE
+          const drugDatabase: Record<string, Record<string, unknown>> = {
+            // Pain & Fever
+            'paracetamol': { name: 'Paracetamol', genericName: 'Paracetamol', category: 'Analgesic', description: 'Pain reliever and fever reducer', warnings: ['Max 4g/day', 'Liver damage risk'], sideEffects: ['Nausea', 'Allergic reactions'], dosageAndAdmin: '500-1000mg every 4-6 hours' },
+            'acetaminophen': { name: 'Acetaminophen', genericName: 'Paracetamol', category: 'Analgesic', description: 'Pain reliever and fever reducer', warnings: ['Max 4g/day', 'Liver damage risk'], sideEffects: ['Nausea', 'Allergic reactions'], dosageAndAdmin: '500-1000mg every 4-6 hours' },
+            'ibuprofen': { name: 'Ibuprofen', genericName: 'Ibuprofen', category: 'NSAID', description: 'Anti-inflammatory pain reliever', warnings: ['Take with food', 'Stomach irritation'], sideEffects: ['Stomach pain', 'Nausea'], dosageAndAdmin: '200-400mg every 4-6 hours' },
+            'aceclofenac': { name: 'Aceclofenac', genericName: 'Aceclofenac', category: 'NSAID', description: 'Anti-inflammatory pain reliever', warnings: ['Take after meals', 'GI irritation risk'], sideEffects: ['Stomach upset', 'Nausea'], dosageAndAdmin: '100mg twice daily' },
+            'diclofenac': { name: 'Diclofenac', genericName: 'Diclofenac', category: 'NSAID', description: 'Anti-inflammatory pain reliever', warnings: ['Take with food', 'Heart risk'], sideEffects: ['Stomach pain', 'Dizziness'], dosageAndAdmin: '50mg 2-3 times daily' },
+            'aspirin': { name: 'Aspirin', genericName: 'Acetylsalicylic Acid', category: 'NSAID', description: 'Pain reliever and blood thinner', warnings: ['Bleeding risk', 'Not for children'], sideEffects: ['Stomach irritation', 'Bleeding'], dosageAndAdmin: '300-600mg every 4 hours' },
+            
+            // Antibiotics
+            'azithromycin': { name: 'Azithromycin', genericName: 'Azithromycin', category: 'Antibiotic', description: 'Bacterial infection treatment', warnings: ['Complete full course', 'Heart rhythm risk'], sideEffects: ['Nausea', 'Diarrhea'], dosageAndAdmin: '500mg once daily for 3 days' },
+            'amoxicillin': { name: 'Amoxicillin', genericName: 'Amoxicillin', category: 'Antibiotic', description: 'Bacterial infection treatment', warnings: ['Allergic reactions', 'Complete course'], sideEffects: ['Nausea', 'Diarrhea', 'Rash'], dosageAndAdmin: '250-500mg every 8 hours' },
+            'ciprofloxacin': { name: 'Ciprofloxacin', genericName: 'Ciprofloxacin', category: 'Antibiotic', description: 'Bacterial infection treatment', warnings: ['Tendon rupture risk', 'Avoid dairy'], sideEffects: ['Nausea', 'Diarrhea'], dosageAndAdmin: '250-500mg twice daily' },
+            
+            // Stomach & Digestion
+            'omeprazole': { name: 'Omeprazole', genericName: 'Omeprazole', category: 'PPI', description: 'Stomach acid reducer', warnings: ['Long-term use risks', 'Bone fracture risk'], sideEffects: ['Headache', 'Nausea'], dosageAndAdmin: '20mg once daily before meals' },
+            'pantoprazole': { name: 'Pantoprazole', genericName: 'Pantoprazole', category: 'PPI', description: 'Stomach acid reducer', warnings: ['Long-term use risks', 'Magnesium deficiency'], sideEffects: ['Headache', 'Diarrhea'], dosageAndAdmin: '40mg once daily' },
+            'ranitidine': { name: 'Ranitidine', genericName: 'Ranitidine', category: 'H2 Blocker', description: 'Stomach acid reducer', warnings: ['NDMA contamination concern'], sideEffects: ['Headache', 'Constipation'], dosageAndAdmin: '150mg twice daily' },
+            
+            // Heart & Blood Pressure
+            'amlodipine': { name: 'Amlodipine', genericName: 'Amlodipine', category: 'Calcium Channel Blocker', description: 'Blood pressure medication', warnings: ['Ankle swelling', 'Grapefruit interaction'], sideEffects: ['Swelling', 'Dizziness'], dosageAndAdmin: '2.5-10mg once daily' },
+            'atorvastatin': { name: 'Atorvastatin', genericName: 'Atorvastatin', category: 'Statin', description: 'Cholesterol lowering medication', warnings: ['Muscle pain', 'Liver monitoring'], sideEffects: ['Muscle pain', 'Headache'], dosageAndAdmin: '10-80mg once daily' },
+            'metoprolol': { name: 'Metoprolol', genericName: 'Metoprolol', category: 'Beta Blocker', description: 'Heart rate and blood pressure medication', warnings: ['Do not stop suddenly', 'Diabetes masking'], sideEffects: ['Fatigue', 'Dizziness'], dosageAndAdmin: '25-100mg twice daily' },
+            
+            // Diabetes
+            'metformin': { name: 'Metformin', genericName: 'Metformin', category: 'Antidiabetic', description: 'Blood sugar control medication', warnings: ['Lactic acidosis risk', 'Kidney function'], sideEffects: ['Nausea', 'Diarrhea'], dosageAndAdmin: '500-1000mg twice daily with meals' },
+            'glimepiride': { name: 'Glimepiride', genericName: 'Glimepiride', category: 'Sulfonylurea', description: 'Blood sugar control medication', warnings: ['Hypoglycemia risk', 'Weight gain'], sideEffects: ['Low blood sugar', 'Nausea'], dosageAndAdmin: '1-4mg once daily with breakfast' },
+            
+            // Allergy & Cold
+            'cetirizine': { name: 'Cetirizine', genericName: 'Cetirizine', category: 'Antihistamine', description: 'Allergy and cold symptom relief', warnings: ['Drowsiness', 'Kidney disease'], sideEffects: ['Drowsiness', 'Dry mouth'], dosageAndAdmin: '10mg once daily' },
+            'loratadine': { name: 'Loratadine', genericName: 'Loratadine', category: 'Antihistamine', description: 'Non-drowsy allergy relief', warnings: ['Liver disease', 'Kidney disease'], sideEffects: ['Headache', 'Fatigue'], dosageAndAdmin: '10mg once daily' }
+          };
+          
+          // Get drug info ONLY from verified database - NO generic info for unknown drugs
+          offlineResult = drugDatabase[detectedDrug.toLowerCase()] || null;
+          
+          // If drug not found in verified database, don't provide any medication info
+          if (!offlineResult) {
+            console.log(`❌ Unknown drug "${detectedDrug}" - not in verified database`);
+            detectedDrug = null; // Reset to null so we don't provide dangerous generic info
+          }
+          
+          console.log('✅ Offline fallback successful - using basic drug info');
+        }
+      } catch (offlineError) {
+        console.error('❌ Offline fallback also failed:', offlineError);
+      }
+      
       // All stages failed or returned Unknown - create minimal viable result with partial data
       console.error('⚠️ All identification stages failed or returned unknown medication');
       
       // Find any partial data from the Gemini stage
       const geminiStage = stages.find(s => s.name === 'gemini-analysis');
       const partialData = geminiStage?.success ? (geminiStage.data as GeminiAnalysisData) : null;
+      
+      // Use offline result if available, otherwise build error description
+      if (offlineResult) {
+        console.log('✅ Using offline fallback result');
+        
+        // Type-safe helpers for offline result
+        const getOfflineString = (key: string, fallback = ""): string => {
+          const value = offlineResult?.[key];
+          return typeof value === 'string' ? value : fallback;
+        };
+        
+        const getOfflineArray = (key: string): string[] => {
+          const value = offlineResult?.[key];
+          return Array.isArray(value) ? value.filter(v => typeof v === 'string') : [];
+        };
+        
+        const offlineData: Partial<CombinedResult> & {
+          description: string;
+          sideEffects: string[];
+          warnings: string[];
+          recommendations: string[];
+          confidence: 'low' | 'medium' | 'high';
+          verified: boolean;
+          storage: string;
+          prescriptionStatus: string;
+          processingStages: string[];
+        } = {
+          id: generateDrugId(),
+          name: getOfflineString('name', 'Unknown Medication'),
+          genericName: getOfflineString('genericName') || getOfflineString('name', 'Unknown'),
+          description: getOfflineString('description', 'Medication identified via offline fallback') + " (Identified via offline fallback)",
+          sideEffects: getOfflineArray('sideEffects'),
+          warnings: [...getOfflineArray('warnings'), "Identified via offline fallback - verify with healthcare provider"],
+          interactions: [],
+          indications: [],
+          contraindications: [],
+          brandNames: [],
+          recommendations: [
+            "This medication was identified using offline fallback",
+            "Please verify with a healthcare provider or pharmacist",
+            "All AI vision models were temporarily unavailable"
+          ],
+          confidence: 'medium', // Better than unknown
+          verified: false,
+          storage: "Store as directed on original packaging",
+          prescriptionStatus: "Unknown - verify with healthcare provider",
+          processingStages: [...stages.map(s => s.name), 'offline-fallback'],
+          imprint: "",
+          color: partialData?.color || "",
+          shape: partialData?.shape || "",
+          possibleNames: [getOfflineString('name', 'Unknown Medication')],
+          manufacturer: "",
+          category: getOfflineString('category', 'Medication'),
+          drugClass: getOfflineString('category', ''),
+          dosageAndAdmin: getOfflineString('dosageAndAdmin', 'As directed by healthcare provider'),
+          mechanism: "",
+          pregnancy: ""
+        };
+        
+        const offlineResultResponse: DrugIdentificationResult = {
+          success: true, // Mark as success since we found something
+          data: offlineData,
+          processingStages: [...stages.map(s => s.name), 'offline-fallback'],
+          confidence: 'medium',
+          fallbackUsed: true,
+          processingTime: Date.now() - overallStartTime
+        };
+
+        return createResponse(offlineResultResponse);
+      }
       
       // Build a more informative description based on what we could detect
       const descriptionParts: string[] = [];
@@ -3550,16 +3793,14 @@ Deno.serve(async (req: Request) => {
         id: generateDrugId(),
         name: "Unidentified Medication",
         genericName: partialData?.genericName || "",
-        description: descriptionParts.join(' '),
+        description: "Identification failed. Please try again after some time or contact support.",
         sideEffects: [
-          "Image quality may have been too low for accurate identification",
-          "Medication packaging may be from a regional or specialty manufacturer",
-          "The visible text or markings were insufficient for database matching"
+          "IDENTIFICATION FAILED - No medication information available"
         ],
         warnings: [
-          "Do not take any medication without proper identification",
-          "Consult with a pharmacist or healthcare provider for identification",
-          "Take the medication to a pharmacy for professional identification"
+          "🚨 CRITICAL: Do NOT take any unidentified medication",
+          "Identification failed - AI systems temporarily unavailable",
+          "Contact healthcare provider immediately for medication identification"
         ],
         // Ensure all array fields are present (prevents .map errors in frontend)
         interactions: [],
@@ -3567,11 +3808,11 @@ Deno.serve(async (req: Request) => {
         contraindications: [],
         brandNames: [],
         recommendations: [
-          "Take a clearer, well-lit photo of the front of the packaging",
-          "Ensure the brand name and any active ingredients are clearly visible",
-          "Avoid glare and shadows on the text",
-          "Capture the entire label including composition and manufacturer details",
-          "Visit a pharmacy or healthcare provider with the actual medication"
+          "Wait and try again after some time (AI systems may be temporarily overloaded)",
+          "Contact our support team to report this identification failure",
+          "Take the medication to a pharmacy for professional identification",
+          "DO NOT consume any unidentified medication",
+          "If urgent, contact emergency medical services"
         ],
         confidence: 'low',
         verified: false,
@@ -3595,7 +3836,7 @@ Deno.serve(async (req: Request) => {
       const result: DrugIdentificationResult = {
         success: false,
         data: minimalData,
-        error: "Unable to identify medication with confidence. Please see recommendations.",
+        error: "Identification failed. Try again after some time or contact support for assistance.",
         processingStages: stages.map(s => s.name),
         confidence: 'low',
         fallbackUsed: true,

@@ -244,12 +244,165 @@ export async function performCriticalVisionAnalysis(
     const processingTime = Date.now() - startTime;
     console.error(`❌ Critical vision analysis failed after ${processingTime}ms:`, error);
     
+    // 🚀 AI FALLBACK FOR CRITICAL VISION ANALYSIS
+    console.log('🤖 === ACTIVATING CRITICAL VISION AI FALLBACK ===');
+    console.log('   Primary Qwen model failed, trying AI fallback...');
+    
+    try {
+      // Import AI helpers for fallback
+      const { extractDrugFromImage } = await import('./ai-helpers.ts');
+      
+      // Create enhanced prompt for critical analysis
+      const fallbackPrompt = `You are analyzing a challenging medicine image with known issues: ${context?.knownIssues?.join(', ') || 'unknown'}.
+      
+CRITICAL ANALYSIS REQUIRED - This is a torn/cut/reflective medicine strip or blister pack.
+
+Extract ALL possible information even from partial text. Use inference for damaged areas.
+
+Return detailed JSON with:
+{
+  "name": "medicine name",
+  "genericName": "active ingredient", 
+  "manufacturer": "company name",
+  "strength": "dosage strength",
+  "batchNumber": "batch/lot number",
+  "expDate": "expiry date",
+  "mfgDate": "manufacturing date",
+  "composition": "full composition",
+  "imprint": "any markings/codes",
+  "color": "medicine color",
+  "shape": "tablet/capsule/strip",
+  "confidence": "high/medium/low",
+  "imageQuality": 0-100,
+  "tamperingDetected": true/false,
+  "safeToUse": true/false,
+  "retakeNeeded": true/false,
+  "physicalCondition": "condition description",
+  "ocrText": "all readable text",
+  "warnings": ["safety warnings"],
+  "category": "medicine category"
+}
+
+Focus on pharmaceutical accuracy. This is for patient safety.`;
+
+      const fallbackResponse = await extractDrugFromImage(imageBase64, fallbackPrompt);
+      
+      if (fallbackResponse.success && fallbackResponse.data) {
+        console.log('✅ Critical Vision AI Fallback succeeded!');
+        
+        // Transform fallback data to expected format with type guards
+        const fallbackData = fallbackResponse.data as Record<string, unknown>;
+        
+        // Helper function to safely get string value
+        const getString = (key: string): string => {
+          const value = fallbackData[key];
+          return typeof value === 'string' ? value : '';
+        };
+        
+        // Helper function to safely get array value
+        const getStringArray = (key: string): string[] => {
+          const value = fallbackData[key];
+          return Array.isArray(value) ? value.filter(v => typeof v === 'string') : [];
+        };
+        
+        // Helper function to safely get boolean value
+        const getBoolean = (key: string, defaultValue: boolean): boolean => {
+          const value = fallbackData[key];
+          return typeof value === 'boolean' ? value : defaultValue;
+        };
+        
+        // Helper function to safely get number value
+        const getNumber = (key: string, defaultValue: number): number => {
+          const value = fallbackData[key];
+          return typeof value === 'number' ? value : defaultValue;
+        };
+        
+        const confidenceStr = getString('confidence');
+        const confidence = confidenceStr === 'high' ? 80 : confidenceStr === 'medium' ? 60 : 40;
+        
+        const criticalData: CriticalVisionData = {
+          id: crypto.randomUUID(),
+          name: getString('name') || 'Unknown Medication',
+          genericName: getString('genericName'),
+          manufacturer: getString('manufacturer'),
+          category: getString('category') || 'medication',
+          description: getString('composition') || 'Medication identified via AI fallback',
+          dosageAndAdmin: getString('strength') || 'Consult physician',
+          strength: getString('strength'),
+          dosageForm: getString('shape'),
+          sideEffects: [],
+          warnings: getStringArray('warnings'),
+          interactions: [],
+          indications: [],
+          contraindications: [],
+          storage: '',
+          mechanism: '',
+          pregnancy: '',
+          prescriptionStatus: '',
+          imprint: getString('imprint'),
+          color: getString('color'),
+          shape: getString('shape'),
+          composition: getString('composition'),
+          activeIngredients: getString('genericName') ? [getString('genericName')] : [],
+          drugClass: '',
+          brandNames: [],
+          batchNumber: getString('batchNumber'),
+          mfgDate: getString('mfgDate'),
+          expDate: getString('expDate'),
+          mrp: '',
+          imageQuality: getNumber('imageQuality', 50),
+          imageChallenges: context?.knownIssues || [],
+          confidence: confidenceStr || 'medium',
+          confidenceScore: confidence,
+          verified: confidence >= 70,
+          totalSlots: 0,
+          filledSlots: 0,
+          emptySlots: 0,
+          damagedSlots: 0,
+          slotConditionMap: [],
+          usageEstimated: '0%',
+          physicalCondition: getString('physicalCondition') || 'torn/damaged',
+          tamperingDetected: getBoolean('tamperingDetected', true),
+          tamperingSigns: ['torn', 'cut'],
+          safeToUse: getBoolean('safeToUse', false),
+          safetyWarnings: getStringArray('warnings').length > 0 ? getStringArray('warnings') : ['Medication appears damaged'],
+          riskLevel: 'medium',
+          ocrConfidence: 60,
+          rawOcrText: getString('ocrText'),
+          cleanedText: getString('ocrText'),
+          partialReads: [],
+          inferenceUsed: true,
+          alternatives: [],
+          retakeNeeded: getBoolean('retakeNeeded', true),
+          retakeTips: ['Try better lighting', 'Capture full packaging', 'Avoid reflections'],
+          retakeReason: 'Image appears torn or damaged',
+          analysisMethod: 'ai-fallback-critical',
+          processingMode: 'fallback',
+          modelUsed: fallbackResponse.modelUsed || 'AI Fallback',
+          detectedLanguages: ['English'],
+          disclaimer: 'Analysis performed via AI fallback due to primary model failure'
+        };
+        
+        return {
+          success: true,
+          data: criticalData,
+          confidence,
+          retakeNeeded: getBoolean('retakeNeeded', true),
+          processingTime: Date.now() - startTime
+        };
+      } else {
+        console.error('❌ Critical Vision AI Fallback also failed');
+      }
+    } catch (fallbackError) {
+      console.error('❌ Critical Vision AI Fallback error:', fallbackError);
+    }
+    
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       confidence: 0,
       retakeNeeded: true,
-      processingTime
+      processingTime: Date.now() - startTime
     };
   }
 }

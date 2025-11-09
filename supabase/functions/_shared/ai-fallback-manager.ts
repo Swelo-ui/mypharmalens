@@ -235,8 +235,8 @@ export const VISION_MODEL_POOL: AIModel[] = [
 ];
 
 // --- CIRCUIT BREAKER CONFIGURATION ---
-const FAILURE_THRESHOLD = 3; // Mark unavailable after 3 consecutive failures
-const RECOVERY_TIME = 5 * 60 * 1000; // Try again after 5 minutes
+const FAILURE_THRESHOLD = 999; // Disabled - never mark models unavailable
+const RECOVERY_TIME = 0; // Disabled - immediate recovery
 
 // --- REQUEST CONFIGURATION ---
 export interface AIRequest {
@@ -321,21 +321,15 @@ function selectBestModel(taskType: TaskType, isVision: boolean = false): AIModel
 }
 
 /**
- * Records a model failure and updates circuit breaker state
+ * Records a model failure for circuit breaker - DISABLED
  */
 function recordFailure(modelId: string, pool: AIModel[]): void {
   const model = pool.find(m => m.id === modelId);
   if (!model) return;
 
-  model.failureCount++;
-  model.lastFailure = Date.now();
-
-  if (model.failureCount >= FAILURE_THRESHOLD) {
-    model.available = false;
-    console.log(`🔴 Circuit breaker OPEN for ${model.name} (${model.failureCount} failures)`);
-  } else {
-    console.log(`⚠️ Model failure recorded: ${model.name} (${model.failureCount}/${FAILURE_THRESHOLD})`);
-  }
+  // Circuit breaker disabled - just log the failure but keep model available
+  console.log(`⚠️ ${model.name} rate limited/forbidden (429), trying next model...`);
+  // Don't increment failure count or mark unavailable
 }
 
 /**
@@ -381,7 +375,7 @@ export async function callAIWithFallback(
       console.log(`🔄 Trying ${model.name}...`);
       const startTime = Date.now();
 
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         model: model.id,
         messages: isVision && request.imageBase64
           ? [{
