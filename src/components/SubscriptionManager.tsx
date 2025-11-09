@@ -276,18 +276,18 @@ const SubscriptionManager: React.FC = () => {
     switch (status) {
       case 'active':
         return isSpecialAccess 
-          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300">✨ Special Access</Badge>
-          : <Badge className="bg-green-100 text-green-800">Active</Badge>;
+          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:text-yellow-900 border border-yellow-300 text-xs sm:text-sm font-semibold">Special Access</Badge>
+          : <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 text-xs sm:text-sm">Active</Badge>;
       case 'expiring':
-        return <Badge className="bg-yellow-100 text-yellow-800">Expiring Soon</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 text-xs sm:text-sm">Expiring Soon</Badge>;
       case 'expired':
-        return <Badge variant="destructive">Expired</Badge>;
+        return <Badge variant="destructive" className="text-xs sm:text-sm">Expired</Badge>;
       case 'free':
         return isSpecialAccess 
-          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300">✨ Special Access</Badge>
-          : <Badge variant="outline">Free Plan</Badge>;
+          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:text-yellow-900 border border-yellow-300 text-xs sm:text-sm font-semibold">Special Access</Badge>
+          : <Badge variant="outline" className="text-xs sm:text-sm">Free Plan</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary" className="text-xs sm:text-sm">Unknown</Badge>;
     }
   };
 
@@ -319,45 +319,45 @@ const SubscriptionManager: React.FC = () => {
 
   return (
     <>
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Subscription Management</h2>
-          <p className="text-gray-600">Manage your subscription and view usage</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-start sm:items-center justify-between gap-3">
+        <div className="flex-1">
+          <h2 className="text-xl sm:text-2xl font-bold">Subscription Management</h2>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Manage your subscription and view usage</p>
         </div>
         <Button
           variant="outline"
           size="sm"
           onClick={fetchUserData}
           disabled={isLoading}
+          className="shrink-0"
         >
           {isLoading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
           ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           )}
-          Refresh
+          <span className="text-xs sm:text-sm">Refresh</span>
         </Button>
       </div>
 
       {/* Current Subscription Status */}
       <Card className={isSpecialAccessAccount() ? 'border-2 border-yellow-300 dark:border-yellow-600 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20' : ''}>
-        <CardHeader>
-          <CardTitle className={`flex items-center gap-2 ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300' : ''}`}>
-            <Crown className={`w-5 h-5 ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400' : ''}`} />
-            {isSpecialAccessAccount() ? '✨ Special Access Subscription' : 'Current Subscription'}
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Crown className="w-4 h-4 sm:w-5 sm:h-5" />
+            Current Subscription
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className={`text-lg font-semibold ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400 flex items-center gap-2' : ''}`}>
-                {isSpecialAccessAccount() && <span className="text-xl">✨</span>}
+            <div className="flex-1">
+              <h3 className={`text-base sm:text-lg font-semibold ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-400' : ''}`}>
                 {isSpecialAccessAccount() ? 'Special Access' : (currentPlan ? currentPlan.name : 'Free Plan')}
               </h3>
-              <p className={`${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-600'}`}>
+              <p className={`text-xs sm:text-sm ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400'}`}>
                 {isSpecialAccessAccount()
-                  ? '🌟 Premium unlimited access - No expiration'
+                  ? 'Premium unlimited access - No expiration'
                   : subscriptionStatus.status === 'active'
                   ? 'Active subscription'
                   : subscriptionStatus.status === 'expired'
@@ -368,10 +368,10 @@ const SubscriptionManager: React.FC = () => {
                 }
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end gap-1">
               {getStatusBadge(subscriptionStatus.status)}
-              {subscriptionStatus.status === 'active' && subscriptionStatus.daysLeft > 0 && (
-                <p className="text-sm text-gray-600 mt-1">
+              {subscriptionStatus.status === 'active' && subscriptionStatus.daysLeft > 0 && !isSpecialAccessAccount() && (
+                <p className="text-xs text-gray-600 dark:text-gray-400">
                   {subscriptionStatus.daysLeft} days left
                 </p>
               )}
@@ -381,14 +381,14 @@ const SubscriptionManager: React.FC = () => {
           {/* Usage Progress */}
           <div className="space-y-2">
             {subLoading ? (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Loader2 className="w-4 h-4 animate-spin" /> Loading usage...
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> Loading usage...
               </div>
             ) : (
               <>
-                <div className={`flex justify-between text-sm ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300 font-medium' : ''}`}>
-                  <span>{isSpecialAccessAccount() ? '✨ Monthly Identifications Used' : 'Monthly Identifications Used'}</span>
-                  <span className={isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400 font-semibold' : ''}>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className={isSpecialAccessAccount() ? 'font-medium' : ''}>Monthly Identifications Used</span>
+                  <span className={`font-semibold ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-400' : ''}`}>
                     {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit}
                   </span>
                 </div>
@@ -396,14 +396,14 @@ const SubscriptionManager: React.FC = () => {
                   <Progress value={usagePercentage} className={`h-2 ${isSpecialAccessAccount() ? '[&>div]:bg-gradient-to-r [&>div]:from-yellow-400 [&>div]:to-amber-500' : ''}`} />
                 )}
                 {usageStats.monthlyLimit !== -1 && usagePercentage >= 80 && !isSpecialAccessAccount() && (
-                  <p className="text-sm text-amber-600 flex items-center gap-1">
-                    <AlertTriangle className="w-4 h-4" />
+                  <p className="text-xs sm:text-sm text-amber-600 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
                     You're approaching your monthly limit
                   </p>
                 )}
                 {isSpecialAccessAccount() && (
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300 flex items-center gap-1 italic">
-                    🎉 Unlimited AI identifications included with Special Access
+                  <p className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300 italic">
+                    Unlimited AI identifications included with Special Access
                   </p>
                 )}
               </>
@@ -414,16 +414,17 @@ const SubscriptionManager: React.FC = () => {
 
       {/* Available Plans */}
       <Card>
-        <CardHeader>
-          <CardTitle>Available Plans</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">Available Plans</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Choose a plan that fits your needs
           </CardDescription>
-          <div className="flex items-center gap-4 pt-2">
+          <div className="flex items-center gap-2 sm:gap-4 pt-2">
             <Button
               variant={billingCycle === 'monthly' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setBillingCycle('monthly')}
+              className="text-xs sm:text-sm"
             >
               Monthly
             </Button>
@@ -431,6 +432,7 @@ const SubscriptionManager: React.FC = () => {
               variant={billingCycle === 'yearly' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setBillingCycle('yearly')}
+              className="text-xs sm:text-sm"
             >
               Yearly (Save 20%)
             </Button>
