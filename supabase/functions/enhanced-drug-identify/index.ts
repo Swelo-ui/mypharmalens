@@ -2473,7 +2473,7 @@ Deno.serve(async (req: Request) => {
         confidence: 'low',
         fallbackUsed: false,
         processingTime: Date.now() - overallStartTime
-      }, 400);
+      }, 200); // Return 200 so frontend can handle gracefully
     }
 
     console.log('Starting enhanced drug identification pipeline...');
@@ -3512,6 +3512,8 @@ Deno.serve(async (req: Request) => {
       processingTime: Date.now() - overallStartTime
     };
 
-    return createResponse(result, 500);
+    // Return 200 status even for errors so frontend can handle gracefully
+    // Status 500 should only be for true server crashes, not identification failures
+    return createResponse(result, 200);
   }
 });

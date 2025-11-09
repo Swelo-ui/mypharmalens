@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Upload, X, Loader2, Image as ImageIcon, Info } from 'lucide-react';
+import { Camera, Upload, X, Loader2, Image as ImageIcon, Info, AlertCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,7 +13,13 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [imageQualityWarning, setImageQualityWarning] = useState(false);
+  const [imageQualityWarning, setImageQualityWarning] = useState<{
+    type: 'very-low' | 'low' | 'blurry' | 'dark' | 'small' | null;
+    message: string;
+    recommendation: string;
+    color: string;
+    icon: 'info' | 'alert-circle' | 'alert-triangle';
+  } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
@@ -68,23 +74,35 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
       return;
     }
     
-    // Enhanced quality assessment
+    // Enhanced quality assessment with detailed warnings
     if (file.size < 30 * 1024) {
-      setImageQualityWarning(true);
+      setImageQualityWarning({
+        type: 'very-low',
+        message: 'Very low quality image detected',
+        recommendation: 'This image may be too small for accurate identification. Enhanced Mode is recommended.',
+        color: 'bg-red-500/80',
+        icon: 'alert-circle'
+      });
       toast({
         title: "Very low quality image detected",
-        description: "This image may be too small for accurate identification. Enhanced processing will be used automatically.",
+        description: "This image may be too small for accurate identification. Enhanced Mode will be used automatically.",
         variant: "default"
       });
     } else if (file.size < 100 * 1024) {
-      setImageQualityWarning(true);
+      setImageQualityWarning({
+        type: 'low',
+        message: 'Low resolution image detected',
+        recommendation: 'Consider using a higher resolution image for better results. Enhanced Mode is recommended.',
+        color: 'bg-orange-500/80',
+        icon: 'alert-triangle'
+      });
       toast({
         title: "Low quality image detected",
-        description: "Consider using a higher resolution image for better results. Enhanced mode will be enabled.",
+        description: "Consider using a higher resolution image for better results. Enhanced Mode will be enabled.",
         variant: "default"
       });
     } else {
-      setImageQualityWarning(false);
+      setImageQualityWarning(null);
     }
     
     // Enhanced image processing with compression if needed
@@ -102,8 +120,72 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
             return;
           }
           
-          // Optimize image size while maintaining quality
+          // Advanced quality checks
           let { width, height } = img;
+          
+          // Check for very small dimensions
+          if (width < 300 || height < 300) {
+            setImageQualityWarning({
+              type: 'small',
+              message: 'Image dimensions too small',
+              recommendation: 'Image is smaller than 300px. Enhanced Mode is strongly recommended for better accuracy.',
+              color: 'bg-red-500/80',
+              icon: 'alert-circle'
+            });
+          }
+          // Check for low resolution
+          else if (width < 600 || height < 600) {
+            setImageQualityWarning({
+              type: 'low',
+              message: 'Low resolution image',
+              recommendation: 'Image resolution is below optimal. Enhanced Mode is recommended.',
+              color: 'bg-orange-500/80',
+              icon: 'alert-triangle'
+            });
+          }
+          // Check brightness and contrast
+          else {
+            // Sample pixels to check brightness
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0);
+            
+            const imageData = ctx.getImageData(0, 0, Math.min(width, 100), Math.min(height, 100));
+            const data = imageData.data;
+            let totalBrightness = 0;
+            let pixelCount = 0;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+              totalBrightness += brightness;
+              pixelCount++;
+            }
+            
+            const avgBrightness = totalBrightness / pixelCount;
+            
+            // Check if image is too dark
+            if (avgBrightness < 50) {
+              setImageQualityWarning({
+                type: 'dark',
+                message: 'Image appears too dark',
+                recommendation: 'Image may be underexposed. Enhanced Mode with advanced processing is recommended.',
+                color: 'bg-purple-500/80',
+                icon: 'alert-triangle'
+              });
+            }
+            // Check if image is too bright (overexposed)
+            else if (avgBrightness > 220) {
+              setImageQualityWarning({
+                type: 'blurry',
+                message: 'Image appears overexposed',
+                recommendation: 'Image may be too bright. Enhanced Mode can help with difficult images.',
+                color: 'bg-yellow-500/80',
+                icon: 'info'
+              });
+            }
+          }
+          
+          // Optimize image size while maintaining quality
           const maxDimension = 1920; // Max dimension for processing
           
           if (width > maxDimension || height > maxDimension) {
@@ -165,7 +247,7 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
   
   const clearImage = () => {
     setPreviewImage(null);
-    setImageQualityWarning(false);
+    setImageQualityWarning(null);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -245,12 +327,18 @@ const ImageUpload = ({ onImageCapture, className }: ImageUploadProps) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="p-2.5 sm:p-2 rounded-full bg-yellow-500/80 text-white touch-manipulation">
-                      <Info className="h-4 w-4" />
+                    <div className={cn(
+                      "p-2.5 sm:p-2 rounded-full text-white touch-manipulation",
+                      imageQualityWarning.color
+                    )}>
+                      {imageQualityWarning.icon === 'alert-circle' && <AlertCircle className="h-4 w-4" />}
+                      {imageQualityWarning.icon === 'alert-triangle' && <AlertTriangle className="h-4 w-4" />}
+                      {imageQualityWarning.icon === 'info' && <Info className="h-4 w-4" />}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>This image may be too low quality for accurate identification</p>
+                    <p className="font-medium">{imageQualityWarning.message}</p>
+                    <p className="text-xs mt-1">{imageQualityWarning.recommendation}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

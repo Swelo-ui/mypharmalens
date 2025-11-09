@@ -43,7 +43,7 @@ function createErrorResponse(error: string, message: string, details?: unknown):
       details 
     }),
     { 
-      status: 400, 
+      status: 200, // Return 200 for application-level errors so Supabase doesn't treat as invocation error
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     }
   );

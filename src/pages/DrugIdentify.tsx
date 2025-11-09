@@ -308,24 +308,17 @@ const DrugIdentify = () => {
         }
       });
 
-      // Handle Supabase function invocation errors (network issues, etc.)
+      // Handle true invocation errors (network issues, auth failures, etc.)
       if (cacheError) {
         console.error('Cache save invocation error:', cacheError);
-        // Check if response has error details even with cacheError
-        if (cacheResult && cacheResult.error) {
-          // Function executed but returned an error - handle it below
-          console.log('Function returned error despite invocation error:', cacheResult);
-        } else {
-          // True invocation failure (network, auth, etc.)
-          toast.error("Failed to save to cache", {
-            description: "Network error. Please try again later."
-          });
-          return;
-        }
+        toast.error("Failed to save to cache", {
+          description: "Network error. Please check your connection and try again."
+        });
+        return;
       }
 
       // Handle function response (success or application-level errors)
-      if (cacheResult && cacheResult.success) {
+      if (cacheResult?.success) {
         console.log('✅ Manual cache save successful:', cacheResult);
         toast.success("Saved to cache successfully!", {
           description: `${identifiedDrug.name} will be instantly recognized in future scans`
@@ -446,15 +439,17 @@ const DrugIdentify = () => {
           }
         });
 
+        // Handle true invocation errors (network, auth, server crash)
         if (drugError) {
-          console.error(`${functionName} failed:`, drugError);
-          throw new Error(`${analysisMode === 'enhanced' ? 'Enhanced' : 'Standard'} system unavailable`);
+          console.error(`${functionName} invocation failed:`, drugError);
+          throw new Error(`Network error. Please check your connection and try again.`);
         }
 
         // Clear the progress simulator
         clearInterval(progressSimulator);
         
-        if (drugData && drugData.success) {
+        // Handle successful identification
+        if (drugData?.success) {
           // Clear any existing progress intervals
           if (progressInterval) {
             clearInterval(progressInterval);
@@ -486,8 +481,13 @@ const DrugIdentify = () => {
           });
           
           console.log(`${analysisMode} identification completed:`, result.name);
+        } else if (drugData?.success === false) {
+          // Function executed but couldn't identify the drug
+          console.warn(`${analysisMode} identification failed:`, drugData.error);
+          throw new Error(drugData.error || 'Unable to identify this medication. Please try again with a clearer image.');
         } else {
-          throw new Error(`${analysisMode} system returned no results`);
+          // Unexpected response format
+          throw new Error(`${analysisMode} system returned invalid response`);
         }
       } catch (drugError) {
         // Clear the progress simulator on error
@@ -1042,7 +1042,7 @@ const DrugIdentify = () => {
                     </p>
                     {isImageLowRes && (
                       <p className="text-xs text-amber-500 mt-2">
-                        Your image appears to be low resolution. Blur mode is recommended.
+                        Your image appears to be low resolution. Enhanced Mode is recommended.
                       </p>
                     )}
                   </div>
