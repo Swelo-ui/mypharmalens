@@ -1,7 +1,15 @@
-import { checkDrugCache as checkCache } from './cache-integration.ts';
+import "xhr";
+import { checkDrugCache as checkCacheIntegration } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanTextArray, cleanMechanismText } from '../_shared/text-cleaner.ts';
+import { cleanText, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
+// AI fallback imports (will be used when adding intelligent fallbacks)
+// import {
+//   extractDrugFromImage,
+//   extractDataFromHTML,
+//   correctScrapedData,
+//   logAIUsage
+// } from '../_shared/ai-helpers.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -500,7 +508,7 @@ async function checkLocalDatabase(drugName: string, threshold: number = 0.75): P
 
 async function checkDrugCache(drugName: string): Promise<unknown> {
   try {
-    return await checkCache(drugName);
+    return await checkCacheIntegration(drugName);
   } catch (error) {
     console.error('Cache check error:', error);
   }

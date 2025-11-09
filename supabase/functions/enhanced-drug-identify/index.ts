@@ -3,6 +3,16 @@ import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
 import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
+import {
+  extractDrugFromImage,
+  extractTextFromImage,
+  performCriticalVisionAI,
+  extractDataFromHTML,
+  correctScrapedData,
+  generateDrugData,
+  performQualityCheck,
+  logAIUsage
+} from '../_shared/ai-helpers.ts';
 
 // Use edge runtime types via deno.json; no manual Deno declaration
 
@@ -969,13 +979,38 @@ FOR PILLS/TABLETS:
       geminiText = await analyzeImageWithOpenRouter(imageBase64, prompt, opts);
     } catch (error) {
       console.error('❌ All OpenRouter vision models failed:', error);
-      return {
-        name: 'gemini-analysis',
-        success: false,
-        data: undefined,
-        processingTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Vision analysis failed'
-      };
+      
+      // 🚀 INTELLIGENT AI FALLBACK - 17 Models Automatic Selection
+      console.log('🤖 === ACTIVATING INTELLIGENT AI FALLBACK SYSTEM ===');
+      console.log('   Trying 17 AI models with automatic selection...');
+      
+      try {
+        const fallbackResponse = await extractDrugFromImage(imageBase64, prompt);
+        logAIUsage('Vision Analysis Fallback', fallbackResponse);
+        
+        if (fallbackResponse.success) {
+          console.log('✅ AI Fallback System succeeded where OpenRouter failed!');
+          geminiText = JSON.stringify(fallbackResponse.data);
+        } else {
+          console.error('❌ AI Fallback System also failed after trying all models');
+          return {
+            name: 'gemini-analysis',
+            success: false,
+            data: undefined,
+            processingTime: Date.now() - startTime,
+            error: `All vision systems failed: OpenRouter + AI Fallback (${fallbackResponse.error})`
+          };
+        }
+      } catch (fallbackError) {
+        console.error('❌ AI Fallback System error:', fallbackError);
+        return {
+          name: 'gemini-analysis',
+          success: false,
+          data: undefined,
+          processingTime: Date.now() - startTime,
+          error: error instanceof Error ? error.message : 'Vision analysis failed'
+        };
+      }
     }
     
     if (!geminiText) {
@@ -1262,6 +1297,9 @@ async function stageMultiSourceEnrichment(drugName: string): Promise<ProcessingS
 async function intelligentWebScraping(drugName: string, source: '1mg' | 'medlineplus'): Promise<ScrapedDrugData> {
   console.log(`🕷️ STAGE 5: Intelligent web scraping for "${drugName}" from ${source}...`);
   
+  // Store html content at function scope for fallback access
+  let html: string = '';
+  
   try {
     // Step 1: Fetch the HTML content
     let searchUrl: string;
@@ -1286,7 +1324,7 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    const html = await response.text();
+    html = await response.text();
     console.log(`   HTML fetched: ${html.length} characters`);
     
     // Step 2: Use DeepSeek R1T2 Chimera to intelligently extract drug data
@@ -1336,7 +1374,37 @@ HTML (truncated): ${html.substring(0, 12000)}`;
     
   } catch (error) {
     console.error(`❌ Intelligent web scraping failed for ${source}:`, error);
-    throw error;
+    
+    // 🚀 INTELLIGENT AI FALLBACK - 14 Text Models Automatic Selection
+    console.log('🤖 === ACTIVATING WEB SCRAPING AI FALLBACK ===');
+    console.log('   Trying 14 text AI models with intelligent selection...');
+    
+    try {
+      // Check if html was successfully fetched before trying fallback
+      if (!html) {
+        console.error('❌ No HTML content available for AI fallback');
+        throw error;
+      }
+      
+      // Use the html content already fetched
+      const fallbackResponse = await extractDataFromHTML(html, drugName, source);
+      logAIUsage('Web Scraping Fallback', fallbackResponse);
+      
+      if (fallbackResponse.success) {
+        console.log('✅ Web Scraping AI Fallback succeeded where DeepSeek failed!');
+        const fallbackData = fallbackResponse.data as ScrapedDrugData;
+        fallbackData.scrapingMethod = `AI Fallback (${fallbackResponse.modelUsed})`;
+        fallbackData.source = source;
+        fallbackData.scrapedAt = new Date().toISOString();
+        return fallbackData;
+      } else {
+        console.error('❌ Web Scraping AI Fallback also failed after trying all models');
+        throw new Error(`All web scraping systems failed: DeepSeek + AI Fallback (${fallbackResponse.error})`);
+      }
+    } catch (fallbackError) {
+      console.error('❌ Web Scraping AI Fallback error:', fallbackError);
+      throw error;
+    }
   }
 }
 
@@ -1548,13 +1616,50 @@ CRITICAL: This is for PATIENT SAFETY. Only provide real, verified drug informati
     const processingTime = Date.now() - startTime;
     console.error(`Gemini backup failed after ${processingTime}ms:`, error);
     
-    return {
-      name: 'gemini-backup',
-      success: false,
-      data: undefined,
-      processingTime,
-      error: error instanceof Error ? (error as Error).message : 'Unknown error'
-    };
+    // 🚀 INTELLIGENT AI FALLBACK - 14 Text Models Automatic Selection
+    console.log('🤖 === ACTIVATING GEMINI BACKUP AI FALLBACK ===');
+    console.log('   Trying 14 text AI models with intelligent selection...');
+    
+    try {
+      const fallbackResponse = await generateDrugData(drugName, {});
+      logAIUsage('Gemini Backup Fallback', fallbackResponse);
+      
+      if (fallbackResponse.success) {
+        console.log('✅ Gemini Backup AI Fallback succeeded where Llama failed!');
+        const fallbackData = fallbackResponse.data;
+        
+        return {
+          name: 'gemini-backup',
+          success: true,
+          data: fallbackData,
+          processingTime: Date.now() - startTime,
+          error: undefined,
+          metadata: {
+            sourcesUsed: [`AI Fallback: ${fallbackResponse.modelUsed}`],
+            completeness: 80,
+            apiProcessingTime: fallbackResponse.latency
+          }
+        };
+      } else {
+        console.error('❌ Gemini Backup AI Fallback also failed after trying all models');
+        return {
+          name: 'gemini-backup',
+          success: false,
+          data: undefined,
+          processingTime: Date.now() - startTime,
+          error: `All backup systems failed: Llama + AI Fallback (${fallbackResponse.error})`
+        };
+      }
+    } catch (fallbackError) {
+      console.error('❌ Gemini Backup AI Fallback error:', fallbackError);
+      return {
+        name: 'gemini-backup',
+        success: false,
+        data: undefined,
+        processingTime,
+        error: error instanceof Error ? (error as Error).message : 'Unknown error'
+      };
+    }
   }
 }
 
