@@ -1,14 +1,26 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "@supabase/supabase-js";
-declare const Deno: any;
+import "@supabase/functions-js/edge-runtime.d.ts";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+
+interface DenoEnv {
+  get(key: string): string | undefined;
+}
+
+declare const Deno: {
+  env: DenoEnv;
+  serve: (handler: (req: Request) => Promise<Response>) => void;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-razorpay-signature',
 };
 
+interface LogData {
+  [key: string]: unknown;
+}
+
 // Enhanced logging function
-function logEvent(level: 'info' | 'error' | 'warn', message: string, data?: any) {
+function logEvent(level: 'info' | 'error' | 'warn', message: string, data?: LogData) {
   const timestamp = new Date().toISOString();
   console[level](`[${timestamp}] ${message}`, data ? JSON.stringify(data, null, 2) : '');
 }
@@ -37,13 +49,25 @@ async function verifySignature(rawBody: string, signature: string | null): Promi
     logEvent('info', 'Signature verification result', { isValid, expectedLength: expected.length, receivedLength: signature.length });
     return isValid;
   } catch (error) {
-    logEvent('error', 'Signature verification error', error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logEvent('error', 'Signature verification error', { error: errorMsg });
     return false;
   }
 }
 
+interface SubscriptionTransaction {
+  transaction_id: string;
+  user_id: string;
+  plan_id: string;
+  billing_cycle: string;
+  amount: number;
+}
+
 // Enhanced subscription update function with validation
-async function updateSubscriptionStatus(supabase: any, transaction: any): Promise<{ success: boolean; error?: string }> {
+async function updateSubscriptionStatus(
+  supabase: SupabaseClient,
+  transaction: SubscriptionTransaction
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { user_id, plan_id, billing_cycle } = transaction;
     
@@ -74,7 +98,7 @@ async function updateSubscriptionStatus(supabase: any, transaction: any): Promis
       .eq('status', 'active');
 
     if (deactivateError) {
-      logEvent('warn', 'Error deactivating old subscriptions', deactivateError);
+      logEvent('warn', 'Error deactivating old subscriptions', { error: deactivateError.message });
     }
 
     // Insert new active subscription
@@ -91,7 +115,7 @@ async function updateSubscriptionStatus(supabase: any, transaction: any): Promis
       .single();
 
     if (subError) {
-      logEvent('error', 'Subscription update failed', subError);
+      logEvent('error', 'Subscription update failed', { error: subError.message });
       return { success: false, error: subError.message };
     }
 
@@ -110,9 +134,74 @@ async function updateSubscriptionStatus(supabase: any, transaction: any): Promis
 
     logEvent('info', 'Subscription updated successfully', { subscription_id: subscription.id, user_id });
     return { success: true };
-  } catch (error: any) {
-    logEvent('error', 'Subscription update error', error);
-    return { success: false, error: error?.message || 'Unknown error' };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logEvent('error', 'Subscription update error', { error: errorMessage });
+    return { success: false, error: errorMessage };
+  }
+}
+
+interface TopUpTransaction {
+  transaction_id: string;
+  user_id: string;
+  pack_id: string;
+  identifications_count: number;
+  amount: number;
+}
+
+// Handle top-up pack purchase
+async function updateTopUpPurchase(
+  supabase: SupabaseClient,
+  transaction: TopUpTransaction
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { user_id, pack_id, identifications_count, transaction_id, amount } = transaction;
+    
+    if (!user_id || !pack_id) {
+      return { success: false, error: 'Missing user_id or pack_id in transaction' };
+    }
+
+    logEvent('info', 'Processing top-up purchase', { user_id, pack_id, identifications_count });
+
+    // Record the purchase in history
+    const { error: purchaseError } = await supabase
+      .from('user_identification_purchases')
+      .insert({
+        user_id,
+        pack_id,
+        identifications_added: identifications_count,
+        amount_paid: amount,
+        transaction_id: transaction_id,
+        payment_status: 'completed'
+      });
+    
+    if (purchaseError) {
+      logEvent('error', 'Failed to record pack purchase', { error: purchaseError.message });
+      return { success: false, error: purchaseError.message };
+    }
+    
+    // Add identifications to user's profile using RPC function
+    const { error: profileError } = await supabase.rpc('increment_extra_identifications', {
+      p_user_id: user_id,
+      p_amount: identifications_count
+    });
+    
+    if (profileError) {
+      logEvent('error', 'Failed to add identifications to profile', { error: profileError.message });
+      return { success: false, error: profileError.message };
+    }
+
+    logEvent('info', 'Top-up purchase processed successfully', {
+      user_id,
+      pack_id,
+      identifications_added: identifications_count
+    });
+    
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logEvent('error', 'Top-up purchase error', { error: errorMessage });
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -129,10 +218,16 @@ Deno.serve(async (req: Request) => {
     const rawBody = await req.text();
     const sig = req.headers.get('x-razorpay-signature');
 
+    // Build headers object without using entries()
+    const headersObj: Record<string, string> = {};
+    req.headers.forEach((value, key) => {
+      headersObj[key] = value;
+    });
+
     logEvent('info', 'Webhook received', { 
       hasSignature: !!sig, 
       bodyLength: rawBody.length,
-      headers: Object.fromEntries(req.headers.entries())
+      headers: headersObj
     });
 
     const valid = await verifySignature(rawBody, sig);
@@ -144,12 +239,28 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    let payload: any = {};
+    interface WebhookPayload {
+      event?: string;
+      type?: string;
+      payload?: {
+        payment?: {
+          entity?: Record<string, unknown>;
+        };
+        order?: {
+          entity?: Record<string, unknown>;
+        };
+      };
+      payment?: Record<string, unknown>;
+      order?: Record<string, unknown>;
+    }
+
+    let payload: WebhookPayload = {};
     try { 
-      payload = JSON.parse(rawBody); 
-      logEvent('info', 'Webhook payload parsed', payload);
+      payload = JSON.parse(rawBody) as WebhookPayload;
+      logEvent('info', 'Webhook payload parsed', payload as LogData);
     } catch (parseError) { 
-      logEvent('error', 'Failed to parse webhook payload', parseError);
+      const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown error';
+      logEvent('error', 'Failed to parse webhook payload', { error: errorMsg });
       payload = {};
     }
 
@@ -157,8 +268,8 @@ Deno.serve(async (req: Request) => {
     const entity = payload?.payload?.payment?.entity || payload?.payload?.order?.entity || payload?.payment || payload?.order || {};
 
     let status: string = 'pending';
-    let razorpay_order_id: string | null = entity?.order_id || payload?.payload?.order?.entity?.id || null;
-    let razorpay_payment_id: string | null = entity?.id || payload?.payload?.payment?.entity?.id || null;
+    const razorpay_order_id: string | null = (entity as Record<string, unknown>)?.order_id as string || (payload?.payload?.order?.entity as Record<string, unknown>)?.id as string || null;
+    const razorpay_payment_id: string | null = (entity as Record<string, unknown>)?.id as string || (payload?.payload?.payment?.entity as Record<string, unknown>)?.id as string || null;
 
     logEvent('info', 'Processing webhook event', { event, razorpay_order_id, razorpay_payment_id });
 
@@ -170,7 +281,8 @@ Deno.serve(async (req: Request) => {
 
     // Update transaction with enhanced error handling
     if (razorpay_order_id) {
-      const { data: tx, error: txErr } = await supabase
+      // First, try to find in subscription transactions (payment_transactions)
+      const { data: subTx, error: subTxErr } = await supabase
         .from('payment_transactions')
         .update({
           status,
@@ -183,13 +295,38 @@ Deno.serve(async (req: Request) => {
         .select('*')
         .maybeSingle();
 
-      if (txErr) {
-        logEvent('error', 'Transaction update failed', txErr);
-        return new Response(JSON.stringify({ error: 'Transaction update failed', details: txErr.message }), { 
+      // If not found in subscriptions, try top-up transactions
+      const { data: topupTx, error: topupTxErr } = await supabase
+        .from('topup_transactions')
+        .update({
+          status,
+          razorpay_payment_id,
+          razorpay_response: payload,
+          completed_at: status === 'success' ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('razorpay_order_id', razorpay_order_id)
+        .select('*')
+        .maybeSingle();
+
+      // Check if both failed
+      if (subTxErr && topupTxErr) {
+        logEvent('error', 'Transaction update failed in both tables', {
+          subError: subTxErr.message,
+          topupError: topupTxErr.message
+        });
+        return new Response(JSON.stringify({ 
+          error: 'Transaction update failed',
+          details: 'Could not find transaction in any table'
+        }), { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         });
       }
+
+      // Determine which transaction was found
+      const tx = subTx || topupTx;
+      const isTopUp = !!topupTx;
 
       if (!tx) {
         logEvent('warn', 'Transaction not found', { razorpay_order_id });
@@ -199,21 +336,65 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      logEvent('info', 'Transaction updated successfully', { transaction_id: tx.transaction_id, status });
+      logEvent('info', 'Transaction updated successfully', {
+        transaction_id: tx.transaction_id,
+        status,
+        type: isTopUp ? 'topup' : 'subscription'
+      });
 
-      // Handle successful payment with enhanced subscription update
+      // Handle successful payment
       if (status === 'success') {
-        const subscriptionResult = await updateSubscriptionStatus(supabase, tx);
-        
-        if (!subscriptionResult.success) {
-          logEvent('error', 'Subscription update failed', { error: subscriptionResult.error, transaction_id: tx.transaction_id });
-          // Don't return error here as payment was successful, just log the issue
-        } else {
-          logEvent('info', 'Payment and subscription processed successfully', { 
-            transaction_id: tx.transaction_id, 
+        if (isTopUp) {
+          // Handle top-up pack purchase
+          const topupTransaction: TopUpTransaction = {
+            transaction_id: tx.transaction_id,
             user_id: tx.user_id,
-            plan_id: tx.plan_id
-          });
+            pack_id: tx.pack_id,
+            identifications_count: tx.identifications_count,
+            amount: tx.amount
+          };
+          
+          const topupResult = await updateTopUpPurchase(supabase, topupTransaction);
+          
+          if (!topupResult.success) {
+            logEvent('error', 'Top-up purchase failed', {
+              error: topupResult.error,
+              transaction_id: tx.transaction_id
+            });
+            // Don't return error here as payment was successful, just log the issue
+          } else {
+            logEvent('info', 'Payment and top-up processed successfully', { 
+              transaction_id: tx.transaction_id, 
+              user_id: tx.user_id,
+              pack_id: tx.pack_id,
+              identifications_added: tx.identifications_count
+            });
+          }
+        } else {
+          // Handle subscription purchase
+          const subscriptionTransaction: SubscriptionTransaction = {
+            transaction_id: tx.transaction_id,
+            user_id: tx.user_id,
+            plan_id: tx.plan_id,
+            billing_cycle: tx.billing_cycle,
+            amount: tx.amount
+          };
+          
+          const subscriptionResult = await updateSubscriptionStatus(supabase, subscriptionTransaction);
+          
+          if (!subscriptionResult.success) {
+            logEvent('error', 'Subscription update failed', {
+              error: subscriptionResult.error,
+              transaction_id: tx.transaction_id
+            });
+            // Don't return error here as payment was successful, just log the issue
+          } else {
+            logEvent('info', 'Payment and subscription processed successfully', { 
+              transaction_id: tx.transaction_id, 
+              user_id: tx.user_id,
+              plan_id: tx.plan_id
+            });
+          }
         }
       }
     } else {
@@ -230,11 +411,12 @@ Deno.serve(async (req: Request) => {
       status: 200, 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     });
-  } catch (error: any) {
-    logEvent('error', 'Webhook processing error', error);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logEvent('error', 'Webhook processing error', { error: errorMessage });
     return new Response(JSON.stringify({ 
       error: 'Internal error', 
-      message: error.message,
+      message: errorMessage,
       timestamp: new Date().toISOString()
     }), { 
       status: 500, 

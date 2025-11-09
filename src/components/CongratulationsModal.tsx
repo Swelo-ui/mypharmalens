@@ -9,16 +9,22 @@ interface CongratulationsModalProps {
   isOpen: boolean;
   onClose: () => void;
   planName: string;
-  billingCycle: string;
+  billingCycle?: string;
   planFeatures?: string[];
+  type?: 'subscription' | 'topup';
+  identificationsCount?: number;
+  amount?: number;
 }
 
 const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
   isOpen,
   onClose,
   planName,
-  billingCycle,
-  planFeatures
+  billingCycle = 'monthly',
+  planFeatures,
+  type = 'subscription',
+  identificationsCount = 0,
+  amount = 0
 }) => {
   const { width, height } = useWindowSize();
   const isMobile = (width || 0) <= 480;
@@ -93,7 +99,9 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
                 </h2>
                 
                 <p className="text-base md:text-lg text-gray-200 mb-5 md:mb-6">
-                  Your subscription has been activated successfully!
+                  {type === 'topup' 
+                    ? 'Your top-up pack has been added successfully!' 
+                    : 'Your subscription has been activated successfully!'}
                 </p>
 
                 {/* Plan Details */}
@@ -107,7 +115,9 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
                     {planName}
                   </p>
                   <p className="text-xs md:text-sm text-white/80 text-center mt-1">
-                    You now have access to all premium features!
+                    {type === 'topup'
+                      ? `${identificationsCount} AI identifications added to your account!`
+                      : 'You now have access to all premium features!'}
                   </p>
                 </div>
 
@@ -119,10 +129,31 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
                   className="text-left space-y-2 mb-5 md:mb-6"
                 >
                   <p className="text-sm md:text-base font-semibold text-gray-200 mb-2 md:mb-3 flex items-center gap-2">
-                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">📦</span>
-                    What's included:
+                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">
+                      {type === 'topup' ? '🎁' : '📦'}
+                    </span>
+                    {type === 'topup' ? 'Pack Details:' : 'What\'s included:'}
                   </p>
-                  {(planFeatures && planFeatures.length > 0) ? (
+                  {type === 'topup' ? (
+                    <>
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                        {identificationsCount} AI identifications added
+                      </div>
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                        Valid for 1 year
+                      </div>
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                        Use anytime
+                      </div>
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                        Instant activation
+                      </div>
+                    </>
+                  ) : (planFeatures && planFeatures.length > 0) ? (
                     planFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center text-xs md:text-sm text-gray-300">
                         <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />

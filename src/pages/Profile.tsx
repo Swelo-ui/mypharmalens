@@ -24,6 +24,7 @@ const Profile = () => {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [extraIdentifications, setExtraIdentifications] = useState(0);
   
   // Password change states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -50,7 +51,7 @@ const Profile = () => {
           // Fetch user profile from profiles table
           const { data, error } = await supabase
             .from('profiles')
-            .select('display_name')
+            .select('display_name, extra_identifications')
             .eq('id', user.id)
             .single();
             
@@ -61,6 +62,7 @@ const Profile = () => {
           
           if (data) {
             setDisplayName((data as { display_name: string | null }).display_name || '');
+            setExtraIdentifications((data as any).extra_identifications || 0);
           }
           
           // Set email from auth user
@@ -398,11 +400,44 @@ const Profile = () => {
                           <CreditCard className="w-4 h-4" />
                           <span className="font-medium">AI Identifications Usage</span>
                         </div>
-                        <div className="text-sm space-y-1">
-                          <p>Used this month: <span className="font-semibold">{usageStats.identificationsUsed}</span>{usageStats.monthlyLimit >= 0 ? ` / ${usageStats.monthlyLimit}` : ' (Unlimited)'}</p>
+                        <div className="text-sm space-y-2">
+                          <p>Total Used: <span className="font-semibold">{usageStats.identificationsUsed}</span>{usageStats.monthlyLimit >= 0 ? ` / ${(() => {
+                            const planName = usageStats.planName || 'Free';
+                            let monthlyLimit = 5;
+                            if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+                              monthlyLimit = 5;
+                            } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+                              monthlyLimit = 39;
+                            } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+                              monthlyLimit = 101;
+                            }
+                            return monthlyLimit + extraIdentifications;
+                          })()}` : ' (Unlimited)'}</p>
+                          {extraIdentifications > 0 && (
+                            <p className={`text-xs flex items-center gap-1 ${
+                              extraIdentifications >= 50 ? 'text-violet-600 dark:text-violet-400' :
+                              extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
+                              extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
+                              extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
+                              'text-red-600 dark:text-red-400'
+                            }`}>
+                              <span className="inline-block">⚡</span>{extraIdentifications} bonus remaining
+                            </p>
+                          )}
                           {usageStats.monthlyLimit >= 0 && (
                             <div className="w-full h-2 bg-gray-200 rounded">
-                              <div className="h-2 bg-[#0384c6] rounded" style={{ width: `${Math.min(100, (usageStats.identificationsUsed / Math.max(usageStats.monthlyLimit, 1)) * 100)}%` }} />
+                              <div className="h-2 bg-[#0384c6] rounded" style={{ width: `${Math.min(100, (usageStats.identificationsUsed / Math.max((() => {
+                                const planName = usageStats.planName || 'Free';
+                                let monthlyLimit = 5;
+                                if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+                                  monthlyLimit = 5;
+                                } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+                                  monthlyLimit = 39;
+                                } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+                                  monthlyLimit = 101;
+                                }
+                                return monthlyLimit + extraIdentifications;
+                              })(), 1)) * 100)}%` }} />
                             </div>
                           )}
                         </div>

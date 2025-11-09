@@ -79,6 +79,8 @@ const DrugIdentify = () => {
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [extraIdentifications, setExtraIdentifications] = useState(0);
+  const [forceRefresh, setForceRefresh] = useState(0);
 
   // Helper function to check if user is Special Access based on email
   const isSpecialAccessAccount = () => {
@@ -212,6 +214,31 @@ const DrugIdentify = () => {
       }
     };
   }, [progressInterval]);
+
+  // Fetch extra identifications from profile
+  useEffect(() => {
+    const fetchExtraIdentifications = async () => {
+      if (user) {
+        console.log('🔄 Fetching extra identifications for user:', user.id);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('extra_identifications')
+          .eq('id', user.id)
+          .single();
+        
+        if (!error && data) {
+          console.log('✅ Extra identifications fetched:', data.extra_identifications);
+          setExtraIdentifications(data.extra_identifications || 0);
+        } else {
+          console.error('❌ Error fetching extra identifications:', error);
+        }
+      }
+    };
+    
+    if (user) {
+      fetchExtraIdentifications();
+    }
+  }, [user, usageStats?.identificationsUsed]); // Refresh when usage changes
 
   // Fetch user's previous identifications when component loads
   useEffect(() => {
@@ -595,33 +622,107 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
-      // Check subscription limits before processing, guard loading first
-      if (loading) {
-        toast.info("Loading your subscription details... please wait a moment.");
-        return;
+      // Force refresh bonus identifications before checking limits
+      if (user) {
+        console.log('🔄 Force refreshing bonus identifications before limit check...');
+        const { data: freshProfile } = await supabase
+          .from('profiles')
+          .select('extra_identifications')
+          .eq('id', user.id)
+          .single();
+        
+        if (freshProfile) {
+          const freshBonus = freshProfile.extra_identifications || 0;
+          setExtraIdentifications(freshBonus);
+          setForceRefresh(prev => prev + 1); // Force re-render
+          console.log('✅ Fresh bonus identifications:', freshBonus);
+        }
       }
 
-      // Use unified usageStats for consistency with the top usage bar
-      const used = usageStats?.identificationsUsed ?? 0;
-      const limit = usageStats?.monthlyLimit ?? 5;
-      const isUnlimited = limit === -1;
-      
-      console.log('🔍 Identification check:', { used, limit, isUnlimited, planName: usageStats?.planName });
-      
-      // Strict enforcement: block if at or above limit
-      if (!isUnlimited && used >= limit) {
-        toast.error(`You've reached your AI identification limit (${used}/${limit}). Please upgrade your plan to continue.`, {
-          description: `Current plan: ${usageStats?.planName || 'Free'}`
-        });
-        return;
-      }
+      // Special access bypass for specific users
+      if (isSpecialAccessAccount()) {
+        console.log('✨ Special access granted - unlimited identifications');
+        // Continue with processing
+      } else {
+        // Check subscription limits before processing, guard loading first
+        if (loading) {
+          toast.info("Loading your subscription details... please wait a moment.");
+          return;
+        }
 
-      // Double-check with canPerformIdentification for safety
-      if (!canPerformIdentification()) {
-        toast.error(`You've reached your identification limit. Please upgrade to continue.`, {
-          description: `Used: ${used}/${limit === -1 ? 'Unlimited' : limit}`
+        // Get fresh bonus value from the refresh above
+        const currentBonus = user ? (await supabase
+          .from('profiles')
+          .select('extra_identifications')
+          .eq('id', user.id)
+          .single()).data?.extra_identifications || 0 : 0;
+
+        // Use unified usageStats for consistency with the top usage bar
+        const used = usageStats?.identificationsUsed ?? 0;
+        const monthlyLimit = usageStats?.monthlyLimit ?? 5;
+        const planName = usageStats?.planName || 'Free';
+        const isUnlimited = monthlyLimit === -1;
+        
+        // Determine total limit based on plan type using fresh bonus
+        let totalLimit = monthlyLimit;
+        
+        // Free plan and paid plans can use bonus identifications
+        if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+          // Free plan: 5 monthly + bonus allowed
+          totalLimit = 5 + currentBonus;
+        } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+          // Lite plan: 39 monthly + bonus allowed
+          totalLimit = 39 + currentBonus;
+        } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+          // Pro plan: 101 monthly + bonus allowed
+          totalLimit = 101 + currentBonus;
+        } else {
+          // Default: use monthly limit + bonus
+          totalLimit = monthlyLimit + currentBonus;
+        }
+        
+        console.log('🔍 Comprehensive identification check:', { 
+          used, 
+          monthlyLimit, 
+          staleBonus: extraIdentifications,
+          freshBonus: currentBonus, 
+          totalLimit, 
+          isUnlimited, 
+          planName,
+          canProceed: used < totalLimit,
+          calculation: `${monthlyLimit} + ${currentBonus} = ${totalLimit}`,
+          usageStatsLimit: usageStats?.monthlyLimit,
+          displayWillShow: `${used}/${totalLimit}`
         });
-        return;
+        
+        // FIRST CHECK: Strict enforcement based on calculated total limit
+        if (!isUnlimited && used >= totalLimit) {
+          const bonusText = currentBonus > 0 ? ` (includes ${currentBonus} bonus)` : '';
+          toast.error(`You've reached your AI identification limit (${used}/${totalLimit}). Please upgrade your plan or buy more identifications.`, {
+            description: `Current plan: ${planName}${bonusText}`,
+            duration: 6000
+          });
+          return;
+        }
+
+        // SECOND CHECK: Double-check with canPerformIdentification for safety
+        if (!canPerformIdentification()) {
+          const bonusText = extraIdentifications > 0 ? ` (includes ${extraIdentifications} bonus)` : '';
+          toast.error(`You've reached your identification limit. Please upgrade to continue.`, {
+            description: `Used: ${used}/${isUnlimited ? 'Unlimited' : totalLimit}${bonusText}`,
+            duration: 6000
+          });
+          return;
+        }
+
+        // THIRD CHECK: Verify user is authenticated for paid features
+        if (!isAuthenticated && used >= 3) {
+          toast.error('Guest limit reached. Please sign in to continue.', {
+            description: 'Sign in to get 5 free identifications per month',
+            duration: 6000
+          });
+          return;
+        }
       }
 
       setIsIdentifying(true);
@@ -694,7 +795,21 @@ const DrugIdentify = () => {
               setProcessingProgress(100);
               
               // Increment usage count for successful identification
-              await incrementIdentificationUsage();
+              const usageIncremented = await incrementIdentificationUsage();
+              
+              // Refresh bonus identifications from profile after usage
+              if (usageIncremented && user) {
+                const { data: profileData } = await supabase
+                  .from('profiles')
+                  .select('extra_identifications')
+                  .eq('id', user.id)
+                  .single();
+                
+                if (profileData) {
+                  setExtraIdentifications(profileData.extra_identifications || 0);
+                  console.log('🔄 Refreshed bonus identifications:', profileData.extra_identifications);
+                }
+              }
               
               // Play drug identification completion sound
               playDrugIdentificationSound();
@@ -1000,14 +1115,76 @@ const DrugIdentify = () => {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span>Used this month:</span>
+                        <span>Total Used:</span>
                         <span className="font-medium">
-                          {usageStats?.identificationsUsed} / {usageStats?.monthlyLimit === -1 ? '∞' : usageStats?.monthlyLimit}
+                          {usageStats?.identificationsUsed} / {usageStats?.monthlyLimit === -1 ? '∞' : (() => {
+                            const planName = usageStats?.planName || 'Free';
+                            let monthlyLimit = 5;
+                            if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+                              monthlyLimit = 5;
+                            } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+                              monthlyLimit = 39;
+                            } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+                              monthlyLimit = 101;
+                            }
+                            const totalForDisplay = monthlyLimit + extraIdentifications;
+                            console.log('📊 Display calculation:', {
+                              planName,
+                              monthlyLimit,
+                              extraIdentifications,
+                              totalForDisplay,
+                              usageStatsLimit: usageStats?.monthlyLimit,
+                              used: usageStats?.identificationsUsed
+                            });
+                            return totalForDisplay;
+                          })()}
                         </span>
                       </div>
+                      {extraIdentifications > 0 && (
+                        <div className={`flex items-center gap-2 px-2 py-1 rounded border ${
+                          extraIdentifications >= 50 
+                            ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800' 
+                            : extraIdentifications >= 30 
+                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                            : extraIdentifications >= 10 
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                            : extraIdentifications >= 5
+                            ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                        }`}>
+                          <Zap className={`w-3 h-3 flex-shrink-0 ${
+                            extraIdentifications >= 50 ? 'text-violet-600' :
+                            extraIdentifications >= 30 ? 'text-green-600' :
+                            extraIdentifications >= 10 ? 'text-blue-600' :
+                            extraIdentifications >= 5 ? 'text-amber-600' :
+                            'text-red-600'
+                          }`} />
+                          <p className={`text-xs font-medium ${
+                            extraIdentifications >= 50 ? 'text-violet-700 dark:text-violet-300' :
+                            extraIdentifications >= 30 ? 'text-green-700 dark:text-green-300' :
+                            extraIdentifications >= 10 ? 'text-blue-700 dark:text-blue-300' :
+                            extraIdentifications >= 5 ? 'text-amber-700 dark:text-amber-300' :
+                            'text-red-700 dark:text-red-300'
+                          }`}>
+                            {extraIdentifications} bonus remaining
+                          </p>
+                        </div>
+                      )}
                       {usageStats?.monthlyLimit !== -1 && (
                         <Progress 
-                          value={((usageStats?.identificationsUsed || 0) / (usageStats?.monthlyLimit || 1)) * 100} 
+                          value={(() => {
+                            const planName = usageStats?.planName || 'Free';
+                            let monthlyLimit = 5;
+                            if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+                              monthlyLimit = 5;
+                            } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+                              monthlyLimit = 39;
+                            } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+                              monthlyLimit = 101;
+                            }
+                            const totalLimit = monthlyLimit + extraIdentifications;
+                            return ((usageStats?.identificationsUsed || 0) / totalLimit) * 100;
+                          })()} 
                           className="h-2"
                         />
                       )}

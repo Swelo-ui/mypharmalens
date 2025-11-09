@@ -338,8 +338,8 @@ const Index = () => {
               {/* Free Plan */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 animate-on-scroll">
                 <div className="text-center mb-6">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-                    <Pill className="h-6 w-6 text-gray-600" />
+                  <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mx-auto mb-4">
+                    <Pill className="h-6 w-6 text-pharma-600" />
                   </div>
                   <h3 className="text-xl font-bold mb-2">Free Plan</h3>
                   <div className="text-3xl font-bold text-pharma-600 mb-2">₹0<span className="text-lg font-normal text-gray-500">/month</span></div>
@@ -370,15 +370,19 @@ const Index = () => {
                 </Link>
               </div>
 
-              {/* Weekly Plan */}
+              {/* Lite Plan */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-pharma-300 animate-on-scroll delay-150">
                 <div className="text-center mb-6">
                   <div className="w-12 h-12 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mx-auto mb-4">
                     <Clock className="h-6 w-6 text-pharma-600" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Weekly Plan</h3>
-                  <div className="text-3xl font-bold text-pharma-600 mb-2">₹39<span className="text-lg font-normal text-gray-500">/week</span></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">For regular users</p>
+                  <h3 className="text-xl font-bold mb-2">Lite Plan</h3>
+                  <div className="mb-2">
+                    <span className="text-lg text-gray-400 line-through">₹79</span>
+                    <div className="text-3xl font-bold text-pharma-600">₹49<span className="text-lg font-normal text-gray-500">/month</span></div>
+                  </div>
+                  <p className="text-sm text-green-600 font-semibold">Save ₹30/month</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">39 AI identifications/month</p>
                 </div>
                 
                 <ul className="space-y-3 mb-8">
@@ -388,11 +392,11 @@ const Index = () => {
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">21 AI identifications per week</span>
+                    <span className="text-sm">Advanced search (249 results)</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">500+ medicines database</span>
+                    <span className="text-sm">1200+ medicines database</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -400,16 +404,16 @@ const Index = () => {
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">No ads</span>
+                    <span className="text-sm">PWA offline access</span>
                   </li>
                 </ul>
                 
                 <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all">
-                  Choose Weekly
+                  Choose Lite
                 </Link>
               </div>
 
-              {/* Premium Plan */}
+              {/* Pro Plan */}
               <div className="bg-gradient-to-br from-pharma-50 to-pharma-100 dark:from-pharma-900/20 dark:to-pharma-800/20 rounded-2xl p-8 shadow-xl border border-pharma-500 relative animate-on-scroll delay-300">
                 <div className="absolute top-0 left-0 right-0 bg-pharma-600 text-white text-center py-2 text-sm font-medium rounded-t-2xl">
                   <Crown className="w-4 h-4 inline mr-1" />
@@ -420,23 +424,27 @@ const Index = () => {
                   <div className="w-12 h-12 rounded-full bg-pharma-600 flex items-center justify-center mx-auto mb-4">
                     <Crown className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Premium Plan</h3>
-                  <div className="text-3xl font-bold text-pharma-600 mb-2">₹199<span className="text-lg font-normal text-gray-500">/month</span></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">For power users & families</p>
+                  <h3 className="text-xl font-bold mb-2">Pro Plan</h3>
+                  <div className="mb-2">
+                    <span className="text-lg text-gray-400 line-through">₹199</span>
+                    <div className="text-3xl font-bold text-pharma-600">₹99<span className="text-lg font-normal text-gray-500">/month</span></div>
+                  </div>
+                  <p className="text-sm text-green-600 font-semibold">Save ₹100/month</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">101 AI identifications/month</p>
                 </div>
                 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">All Weekly Plan features</span>
+                    <span className="text-sm">All Lite Plan features</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">Unlimited AI identifications</span>
+                    <span className="text-sm">Advanced search (500 results)</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">1000+ database drugs</span>
+                    <span className="text-sm">1200+ medicines database</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -444,7 +452,7 @@ const Index = () => {
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">History feature</span>
+                    <span className="text-sm">History feature (unlimited)</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -453,7 +461,7 @@ const Index = () => {
                 </ul>
                 
                 <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg">
-                  Choose Premium
+                  Choose Pro
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </div>

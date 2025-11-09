@@ -1,15 +1,40 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "@supabase/supabase-js";
-declare const Deno: any;
 
-interface OrderRequest {
+interface DenoEnv {
+  get(key: string): string | undefined;
+}
+
+declare const Deno: {
+  env: DenoEnv;
+  serve: (handler: (req: Request) => Promise<Response>) => void;
+};
+
+interface SubscriptionOrderRequest {
   planId: string;
   userId: string;
   userEmail: string;
   userName: string;
   amount: number;
   billingCycle: 'monthly' | 'yearly' | 'weekly';
+  type?: 'subscription';
 }
+
+interface TopUpOrderRequest {
+  amount: number;
+  currency: string;
+  receipt: string;
+  notes: {
+    user_id: string;
+    pack_id: string;
+    identifications_count: number;
+    type: string;
+    transaction_id: string;
+  };
+  type?: 'topup';
+}
+
+type OrderRequest = SubscriptionOrderRequest | TopUpOrderRequest;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -86,79 +111,156 @@ Deno.serve(async (req: Request) => {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const body: OrderRequest & { action?: string } = await req.json();
-    const action = body.action || 'create_order';
-
-    if (action !== 'create_order') {
-      return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    const required = ['planId','userId','userEmail','userName','amount','billingCycle'] as const;
-    for (const f of required) {
-      if ((body as any)[f] === undefined || (body as any)[f] === null || (typeof (body as any)[f] === 'string' && !(body as any)[f])) {
-        console.error(`Missing required field: ${f}`, { body });
-        return new Response(JSON.stringify({ error: `Missing required field: ${f}` }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      }
-    }
-
-    // Validate amount is a positive number
-    const amount = Number(body.amount);
-    if (isNaN(amount) || amount <= 0) {
-      console.error('Invalid amount:', body.amount);
-      return new Response(JSON.stringify({ error: 'Invalid amount. Must be a positive number.' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    const txnid = `TXN_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
-    const amountPaise = toPaise(amount);
+    const body = await req.json() as {
+      amount?: number;
+      currency?: string;
+      receipt?: string;
+      notes?: {
+        user_id?: string;
+        pack_id?: string;
+        identifications_count?: number;
+        type?: string;
+        transaction_id?: string;
+      };
+      type?: string;
+      planId?: string;
+      userId?: string;
+      userEmail?: string;
+      userName?: string;
+      billingCycle?: string;
+    };
     
-    console.log('Creating Razorpay order:', { planId: body.planId, userId: body.userId, amount, amountPaise, billingCycle: body.billingCycle });
+    // Detect order type
+    const isTopUp = body.notes?.type === 'identification_pack' || body.type === 'topup';
+    
+    console.log('Order request type:', isTopUp ? 'TOP-UP' : 'SUBSCRIPTION', { body });
 
-    const order = await createRazorpayOrder(amountPaise, txnid, {
-      planId: body.planId,
-      userId: body.userId,
-      billingCycle: body.billingCycle,
-    });
+    if (isTopUp) {
+      // Handle top-up pack order
+      if (!body.amount || !body.notes || !body.notes.user_id || !body.notes.pack_id) {
+        console.error('Missing required top-up fields', { body });
+        return new Response(
+          JSON.stringify({ error: 'Missing required fields for top-up order' }), 
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
-    const { error: insertError } = await supabase
-      .from('payment_transactions')
-      .insert({
-        transaction_id: txnid,
-        user_id: body.userId,
-        plan_id: body.planId,
-        amount: body.amount,
-        currency: 'INR',
-        status: 'pending',
-        payment_method: 'razorpay',
-        billing_cycle: body.billingCycle,
-        razorpay_order_id: order.id,
-        razorpay_response: order
+      const amount = Number(body.amount);
+      if (isNaN(amount) || amount <= 0) {
+        console.error('Invalid amount:', body.amount);
+        return new Response(
+          JSON.stringify({ error: 'Invalid amount. Must be a positive number.' }), 
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const txnid = body.receipt || `TOPUP_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
+      const amountPaise = toPaise(amount);
+      
+      console.log('Creating Razorpay order for top-up:', { 
+        user_id: body.notes!.user_id, 
+        pack_id: body.notes!.pack_id, 
+        amount, 
+        amountPaise 
       });
-    if (insertError) {
-      throw new Error(`Failed to insert transaction: ${insertError.message}`);
+
+      const order = await createRazorpayOrder(amountPaise, txnid, {
+        user_id: body.notes!.user_id!,
+        pack_id: body.notes!.pack_id!,
+        identifications_count: String(body.notes!.identifications_count!),
+        type: 'identification_pack'
+      });
+
+      // Note: topup_transactions record is created by frontend before calling this
+      // Just return the order details
+
+      return new Response(JSON.stringify({
+        order_id: order.id,
+        amount: amountPaise,
+        currency: 'INR',
+        key_id: Deno.env.get('RAZORPAY_KEY_ID')
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    } else {
+      // Handle subscription order
+      const required = ['planId','userId','userEmail','userName','amount','billingCycle'] as const;
+      for (const f of required) {
+        if (body[f] === undefined || body[f] === null || (typeof body[f] === 'string' && !body[f])) {
+          console.error(`Missing required field: ${f}`, { body });
+          return new Response(
+            JSON.stringify({ error: `Missing required field: ${f}` }), 
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
+      // Validate amount is a positive number
+      const amount = Number(body.amount);
+      if (isNaN(amount) || amount <= 0) {
+        console.error('Invalid amount:', body.amount);
+        return new Response(
+          JSON.stringify({ error: 'Invalid amount. Must be a positive number.' }), 
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const txnid = `TXN_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
+      const amountPaise = toPaise(amount);
+      
+      console.log('Creating Razorpay order for subscription:', { 
+        planId: body.planId, 
+        userId: body.userId, 
+        amount, 
+        amountPaise, 
+        billingCycle: body.billingCycle 
+      });
+
+      const order = await createRazorpayOrder(amountPaise, txnid, {
+        planId: String(body.planId),
+        userId: String(body.userId),
+        billingCycle: String(body.billingCycle),
+      });
+
+      const { error: insertError } = await supabase
+        .from('payment_transactions')
+        .insert({
+          transaction_id: txnid,
+          user_id: String(body.userId),
+          plan_id: String(body.planId),
+          amount: Number(body.amount),
+          currency: 'INR',
+          status: 'pending',
+          payment_method: 'razorpay',
+          billing_cycle: String(body.billingCycle),
+          razorpay_order_id: order.id,
+          razorpay_response: order
+        });
+      if (insertError) {
+        throw new Error(`Failed to insert transaction: ${insertError.message}`);
+      }
+
+      const appUrl = Deno.env.get('APP_URL') || 'http://localhost:8080';
+      const callbackUrl = `${appUrl}/payment-result`;
+
+      return new Response(JSON.stringify({
+        keyId: Deno.env.get('RAZORPAY_KEY_ID'),
+        amount: amountPaise,
+        currency: 'INR',
+        orderId: order.id,
+        callbackUrl,
+        transactionId: txnid
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-
-    const appUrl = Deno.env.get('APP_URL') || 'http://localhost:8080';
-    const callbackUrl = `${appUrl}/payment-result`;
-
-    return new Response(JSON.stringify({
-      keyId: Deno.env.get('RAZORPAY_KEY_ID'),
-      amount: amountPaise,
-      currency: 'INR',
-      orderId: order.id,
-      callbackUrl,
-      transactionId: txnid
-    }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error: any) {
+  } catch (error) {
     console.error('razorpay-order error:', error);
-    const message = error?.message || 'Unknown error';
-    const stack = error?.stack || '';
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const stack = error instanceof Error ? error.stack || '' : '';
     
     // Log detailed error for debugging
     console.error('Error details:', {
       message,
       stack,
-      name: error?.name,
-      cause: error?.cause
+      name: error instanceof Error ? error.name : 'Unknown',
+      cause: error instanceof Error ? (error as Error & { cause?: unknown }).cause : undefined
     });
     
     return new Response(

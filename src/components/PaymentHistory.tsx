@@ -20,12 +20,16 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Tables } from '@/types/database.types';
 
 type PaymentTransaction = Tables<"payment_transactions">;
+type TopUpTransaction = Tables<"topup_transactions">;
 type SubscriptionHistoryItem = Tables<"user_subscriptions">;
 
+type CombinedTransaction = (PaymentTransaction | TopUpTransaction) & {
+  transaction_type: 'subscription' | 'topup';
+};
 
 const PaymentHistory: React.FC = () => {
   const { user } = useAuthStatus();
-  const [paymentTransactions, setPaymentTransactions] = useState<PaymentTransaction[]>([]);
+  const [paymentTransactions, setPaymentTransactions] = useState<CombinedTransaction[]>([]);
   const [subscriptionHistory, setSubscriptionHistory] = useState<SubscriptionHistoryItem[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +46,7 @@ const PaymentHistory: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Fetch payment transactions
+      // Fetch subscription payment transactions
       const { data: payments, error: paymentsError } = await supabase
         .from('payment_transactions')
         .select('*')
@@ -50,21 +54,39 @@ const PaymentHistory: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (paymentsError) {
-        throw paymentsError;
+        console.error('Error fetching subscription payments:', paymentsError);
       }
+
+      // Fetch top-up transactions
+      const { data: topups, error: topupsError } = await supabase
+        .from('topup_transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (topupsError) {
+        console.error('Error fetching top-up transactions:', topupsError);
+      }
+
+      // Combine and mark transaction types
+      const combined: CombinedTransaction[] = [
+        ...(payments || []).map(p => ({ ...p, transaction_type: 'subscription' as const })),
+        ...(topups || []).map(t => ({ ...t, transaction_type: 'topup' as const }))
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setPaymentTransactions(combined);
 
       // Fetch subscription history
       const { data: history, error: historyError } = await supabase
         .from('user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false});
 
       if (historyError) {
-        throw historyError;
+        console.error('Error fetching subscription history:', historyError);
       }
 
-      setPaymentTransactions(payments || []);
       setSubscriptionHistory(history || []);
     } catch (error) {
       console.error('Error fetching payment history:', error);
@@ -198,21 +220,21 @@ const PaymentHistory: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold">Payment History</h2>
-          <p className="text-sm sm:text-base text-gray-600">View your payment transactions and subscription history</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">Payment History</h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">View your payment transactions and subscription history</p>
         </div>
-        <Button
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          onClick={fetchPaymentHistory}
-          disabled={isLoading}
+        <Button 
+          onClick={() => {
+            setIsRefreshing(true);
+            fetchPaymentHistory().finally(() => setIsRefreshing(false));
+          }}
+          variant="outline"
+          className="flex items-center gap-2"
+          disabled={isRefreshing}
         >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
-          )}
+          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
@@ -239,16 +261,27 @@ const PaymentHistory: React.FC = () => {
               </CardContent>
             </Card>
           ) : (
-            paymentTransactions.map((transaction) => (
+            paymentTransactions.map((transaction) => {
+              const isTopUp = transaction.transaction_type === 'topup';
+              const transactionTitle = isTopUp
+                ? ('pack_name' in transaction ? transaction.pack_name : 'Top-Up Pack')
+                : ('plan_id' in transaction ? formatPlanName(transaction.plan_id) : 'Subscription');
+              
+              return (
               <Card key={transaction.id}>
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(transaction.status)}
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-sm sm:text-base truncate">
-                          {formatPlanName(transaction.plan_id)}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">
+                            {transactionTitle}
+                          </h3>
+                          <Badge variant="outline" className="text-xs">
+                            {isTopUp ? '🎁 Top-Up' : '📦 Subscription'}
+                          </Badge>
+                        </div>
                         <p className="text-xs sm:text-sm text-gray-600 truncate">
                           ID: {transaction.transaction_id}
                         </p>
@@ -266,8 +299,14 @@ const PaymentHistory: React.FC = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
                     <div className="min-w-0">
-                      <p className="text-gray-600 text-xs sm:text-sm">Billing Cycle</p>
-                      <p className="font-medium capitalize text-sm truncate">{transaction.billing_cycle}</p>
+                      <p className="text-gray-600 text-xs sm:text-sm">
+                        {isTopUp ? 'Identifications' : 'Billing Cycle'}
+                      </p>
+                      <p className="font-medium capitalize text-sm truncate">
+                        {isTopUp
+                          ? ('identifications_count' in transaction ? `${transaction.identifications_count} IDs` : '-')
+                          : ('billing_cycle' in transaction ? transaction.billing_cycle : '-')}
+                      </p>
                     </div>
                     <div className="min-w-0">
                       <p className="text-gray-600 text-xs sm:text-sm">Payment Method</p>
@@ -288,7 +327,7 @@ const PaymentHistory: React.FC = () => {
                     </div>
                   </div>
 
-                  {transaction.error_message && (
+                  {'error_message' in transaction && transaction.error_message && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-xs sm:text-sm text-red-700 break-words">
                         <strong>Error:</strong> {transaction.error_message}
@@ -308,7 +347,8 @@ const PaymentHistory: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </TabsContent>
 

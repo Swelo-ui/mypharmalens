@@ -10,6 +10,9 @@ interface CongratulationsMessageProps {
   onDismiss: () => void;
   billingCycle?: string;
   planFeatures?: string[];
+  type?: 'subscription' | 'topup';
+  identificationsCount?: number;
+  amount?: number;
 }
 
 const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
@@ -17,7 +20,10 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
   planName,
   onDismiss,
   billingCycle = 'monthly',
-  planFeatures
+  planFeatures,
+  type = 'subscription',
+  identificationsCount = 0,
+  amount = 0
 }) => {
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -202,7 +208,9 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                   </div>
                   
                   <p className="text-base md:text-lg text-gray-200">
-                    Your subscription has been successfully activated!
+                    {type === 'topup'
+                      ? 'Your top-up pack has been successfully added!'
+                      : 'Your subscription has been successfully activated!'}
                   </p>
                 </motion.div>
 
@@ -222,7 +230,9 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                     {planName}
                   </p>
                   <p className="text-xs md:text-sm text-white/80 text-center">
-                    You now have access to all premium features!
+                    {type === 'topup'
+                      ? `${identificationsCount} AI identifications added to your account!`
+                      : 'You now have access to all premium features!'}
                   </p>
                 </motion.div>
 
@@ -234,11 +244,52 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                   className="space-y-2 text-left"
                 >
                   <p className="text-sm md:text-base font-semibold text-gray-200 mb-2 flex items-center gap-2">
-                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">📦</span>
-                    What's included:
+                    <span className="h-6 w-6 rounded-full bg-pharma-500 flex items-center justify-center text-xs">
+                      {type === 'topup' ? '🎁' : '📦'}
+                    </span>
+                    {type === 'topup' ? 'Pack Details:' : 'What\'s included:'}
                   </p>
                   <div className="space-y-2">
-                    {(planFeatures && planFeatures.length > 0) ? (
+                    {type === 'topup' ? (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.9, duration: 0.3 }}
+                          className="flex items-center text-xs md:text-sm text-gray-300"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                          {identificationsCount} AI identifications added
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.0, duration: 0.3 }}
+                          className="flex items-center text-xs md:text-sm text-gray-300"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                          Valid for 1 year
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.1, duration: 0.3 }}
+                          className="flex items-center text-xs md:text-sm text-gray-300"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                          Use anytime with your plan
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.2, duration: 0.3 }}
+                          className="flex items-center text-xs md:text-sm text-gray-300"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
+                          Instant activation
+                        </motion.div>
+                      </>
+                    ) : (planFeatures && planFeatures.length > 0) ? (
                       planFeatures.map((feature, index) => (
                         <motion.div
                           key={index}

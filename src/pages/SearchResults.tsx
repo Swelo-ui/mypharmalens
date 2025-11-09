@@ -10,13 +10,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DrugData } from '@/components/DrugCard';
 import { loadAllDrugs } from '@/data/drugDataLoader';
-import { fetchDrugs } from '@/integrations/supabase/client';
+import { fetchDrugs, supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import DrugCard from '@/components/DrugCard';
+import SearchLimitBar from '@/components/SearchLimitBar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 
@@ -53,7 +54,7 @@ const SearchResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isAuthenticated } = useAuthStatus();
+  const { isAuthenticated, user } = useAuthStatus();
   const { usageStats, getDatabaseSearchLimit } = useSubscription();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('q') || '';
@@ -265,7 +266,30 @@ const SearchResults = () => {
     setCurrentPage(1);
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    // Check search limit before performing search
+    if (isAuthenticated && user) {
+      try {
+        // Try to call search limit function, fallback to simple check
+        try {
+          const { data } = await supabase.rpc('check_and_decrement_search_limit', {
+            p_user_id: user.id
+          }) as { data: { can_search: boolean; searches_used: number; searches_limit: number; message?: string } | null };
+          
+          if (data && !data.can_search) {
+            toast.error(data.message || 'Search limit reached! Upgrade your plan to continue searching.');
+            return;
+          }
+        } catch (funcError) {
+          console.log('Search limit function not available, allowing search');
+        }
+      } catch (error) {
+        console.error('Error checking search limit:', error);
+      }
+    }
+    
     const params = new URLSearchParams();
     if (query) {
       params.set('q', query);
@@ -463,26 +487,13 @@ const SearchResults = () => {
                     )}
                   </div>
 
-                  {/* Database Search Usage Display */}
+                  {/* Search Limit Bar */}
                   {isAuthenticated && (
-                    <div className="mb-6 p-4 bg-pharma-50 dark:bg-pharma-900/20 rounded-lg border border-pharma-200 dark:border-pharma-800">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="text-sm text-pharma-700 dark:text-pharma-300">
-                            <span className="font-medium">Database Search Limit:</span> {getDatabaseSearchLimit()} results per search
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate('/subscription-manager')}
-                          className="text-pharma-600 border-pharma-300 hover:bg-pharma-100 dark:text-pharma-400 dark:border-pharma-600 dark:hover:bg-pharma-900/30"
-                        >
-                          Upgrade Plan
-                        </Button>
-                      </div>
+                    <div className="mb-6">
+                      <SearchLimitBar onLimitReached={() => toast.error('Search limit reached! Upgrade your plan to continue.')} />
                     </div>
                   )}
+
 
                   {/* Results Grid */}
                   {displayedResults.length > 0 ? (

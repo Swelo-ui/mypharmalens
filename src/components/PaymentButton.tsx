@@ -55,7 +55,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
         });
         
-        toast.success('Subscription updated successfully!');
+        toast.success('🎉 Subscription Activated!', {
+          description: `Congratulations! Your ${subscription.plan_id.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} is now active.`,
+          duration: 5000
+        });
         onPaymentSuccess?.(subscription.plan_id);
       }
     });
@@ -115,49 +118,30 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
       currentUser = user;
 
+      // Calculate amount - use discounted_price if available, otherwise use price
+      const planExtended = currentPlan as any;
+      const amount = planExtended.discounted_price || currentPlan.price || 0;
+      
       // Log payment initiation
       transactionLogger.logPaymentInitiated(user.id, {
         planId: currentPlan.id,
-        amount: currentPlan.price,
+        amount: amount,
         currency: 'INR',
         paymentMethod: 'razorpay'
       });
 
-      // Detect billing cycle from plan features or plan ID
-      const planFeatures = currentPlan.features as any;
-      let currentBillingCycle: 'weekly' | 'monthly' | 'yearly' = 'monthly';
-      
-      if (planFeatures?.billing_period === 'weekly' || planFeatures?.billing_cycle === 'weekly' || currentPlan.id.includes('weekly')) {
-        currentBillingCycle = 'weekly';
-      } else if (currentPlan.id.includes('yearly') || planFeatures?.billing_period === 'yearly') {
-        currentBillingCycle = 'yearly';
-      } else {
-        currentBillingCycle = billingCycle || 'monthly';
-      }
-      
-      // Compute charge amount based on billing cycle
-      let amount = currentPlan.price || 0;
-      if (currentBillingCycle === 'weekly') {
-        const weeklyPrice = Number((planFeatures && (planFeatures as any).weekly_price) || amount);
-        amount = weeklyPrice;
-      } else if (currentBillingCycle === 'yearly') {
-        const yearlyFromFeatures = Number((planFeatures && (planFeatures as any).yearly_price) || 0);
-        amount = yearlyFromFeatures > 0 ? yearlyFromFeatures : Math.round(((currentPlan.price || 0) * 12) * 0.8);
-      } else {
-        // monthly
-        amount = currentPlan.price || 0;
-      }
+      // All plans are now monthly only
+      const currentBillingCycle: 'monthly' = 'monthly';
 
       if (!amount || amount <= 0) {
-        console.error('Invalid plan pricing computed:', { plan: currentPlan, currentBillingCycle, planFeatures, amount });
+        console.error('Invalid plan pricing computed:', { plan: currentPlan, currentBillingCycle, amount });
         throw new Error('Invalid plan pricing. Please refresh and try again.');
       }
 
       console.log('Payment details:', {
         planId: currentPlan.id,
         amount,
-        billingCycle: currentBillingCycle,
-        planFeatures
+        billingCycle: currentBillingCycle
       });
 
       // Create Razorpay order via Supabase function with retry
@@ -294,6 +278,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           }
         }
       };
+
+      // Check if Razorpay SDK is loaded
+      if (!(window as any).Razorpay) {
+        toast.error('Payment system is loading. Please try again in a moment.');
+        setIsProcessing(false);
+        return;
+      }
 
       const rzp = new (window as any).Razorpay(options);
       rzp.open();

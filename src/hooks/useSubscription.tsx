@@ -25,6 +25,7 @@ export const useSubscription = () => {
 
   // Fetch identifications_used from profiles
   const [profileIdentificationsUsed, setProfileIdentificationsUsed] = useState<number>(0);
+  const [extraIdentifications, setExtraIdentifications] = useState<number>(0);
 
   // Fetch profile usage data - ensures profile exists and is initialized
   const fetchProfileUsage = async () => {
@@ -56,7 +57,7 @@ export const useSubscription = () => {
       // Now fetch the actual data
       const { data, error } = await supabase
         .from('profiles')
-        .select('identifications_used, last_reset_date')
+        .select('identifications_used, last_reset_date, extra_identifications')
         .eq('id', user.id)
         .single();
 
@@ -74,6 +75,8 @@ export const useSubscription = () => {
 
       const lastReset = data.last_reset_date ? new Date(data.last_reset_date) : null;
       const currentUsed = data.identifications_used ?? 0;
+      const currentExtra = (data as any).extra_identifications ?? 0;
+      setExtraIdentifications(currentExtra);
 
       // Check if we need to reset based on billing cycle (30 days since last reset)
       // This ensures reset happens on subscription anniversary, not calendar month
@@ -276,6 +279,7 @@ export const useSubscription = () => {
       
       setCurrentSubscription(specialSubscription);
       await calculateUsageStats(specialSubscription, true);
+      await reconcileBonusIdentifications();
       return;
     }
 
@@ -319,10 +323,12 @@ export const useSubscription = () => {
         
         setCurrentSubscription(activeSubscription as UserSubscription);
         await calculateUsageStats(activeSubscription as UserSubscription, true);
+        await reconcileBonusIdentifications();
       } else if (allActiveSubscriptions && allActiveSubscriptions.length === 1) {
         // Single active subscription - use it
         setCurrentSubscription(allActiveSubscriptions[0] as UserSubscription);
         await calculateUsageStats(allActiveSubscriptions[0] as UserSubscription, true);
+        await reconcileBonusIdentifications();
       } else {
         // No active subscription found - assign free plan
         await assignFreePlan();
@@ -374,6 +380,119 @@ export const useSubscription = () => {
     }
   };
 
+  // Reconcile bonus identifications based on actual usage
+  const reconcileBonusIdentifications = async () => {
+    if (!user?.id || !currentSubscription) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('identifications_used, extra_identifications')
+        .eq('id', user.id)
+        .single();
+      
+      if (error || !data) return;
+      
+      const currentUsed = data.identifications_used ?? 0;
+      const currentExtra = data.extra_identifications ?? 0;
+      
+      if (currentExtra === 0) return; // No bonus to reconcile
+      
+      // Get monthly limit
+      const plan = currentSubscription.plan;
+      const planId = plan?.id || currentSubscription.plan_id || '';
+      const planName = plan?.name || '';
+      
+      let monthlyLimit = 5;
+      if (planId === 'special-plan') {
+        monthlyLimit = -1;
+      } else if (planId === 'free-plan') {
+        monthlyLimit = 5;
+      } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
+        monthlyLimit = 39;
+      } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
+        monthlyLimit = 101;
+      }
+      
+      // Check if usage or bonus needs reconciliation
+      if (monthlyLimit !== -1 && currentUsed >= monthlyLimit) {
+        let needsUpdate = false;
+        let updates: any = {};
+        
+        // CRITICAL: identifications_used should NEVER exceed monthlyLimit
+        // If it does, cap it at monthlyLimit
+        if (currentUsed > monthlyLimit) {
+          console.log('🔧 CRITICAL: Usage exceeds monthly limit, capping at limit:', {
+            currentUsed,
+            monthlyLimit,
+            capping: `${currentUsed} → ${monthlyLimit}`
+          });
+          updates.identifications_used = monthlyLimit;
+          needsUpdate = true;
+        }
+        
+        // Check if bonus needs reconciliation
+        const bonusAlreadyUsed = Math.max(0, currentUsed - monthlyLimit);
+        
+        if (bonusAlreadyUsed > currentExtra) {
+          // Bonus was fully consumed, should be 0
+          if (currentExtra > 0) {
+            console.log('🔧 AUTO-RECONCILING: Bonus fully consumed:', {
+              currentUsed,
+              monthlyLimit,
+              bonusAlreadyUsed,
+              currentExtra,
+              setting: 0
+            });
+            updates.extra_identifications = 0;
+            needsUpdate = true;
+          }
+        } else if (bonusAlreadyUsed > 0) {
+          // Some bonus was used
+          const bonusShouldRemain = currentExtra - bonusAlreadyUsed;
+          
+          if (bonusShouldRemain !== currentExtra && bonusShouldRemain >= 0) {
+            console.log('🔧 AUTO-RECONCILING partial bonus usage:', {
+              currentUsed,
+              monthlyLimit,
+              bonusWas: currentExtra,
+              bonusShouldBe: bonusShouldRemain,
+              bonusUsed: bonusAlreadyUsed
+            });
+            updates.extra_identifications = bonusShouldRemain;
+            needsUpdate = true;
+          }
+        }
+        
+        // Apply updates if needed
+        if (needsUpdate) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update(updates)
+            .eq('id', user.id);
+          
+          if (!updateError) {
+            if (updates.identifications_used !== undefined) {
+              setProfileIdentificationsUsed(updates.identifications_used);
+            }
+            if (updates.extra_identifications !== undefined) {
+              setExtraIdentifications(updates.extra_identifications);
+            }
+            
+            if (updates.identifications_used !== undefined) {
+              toast.info(`Usage corrected to monthly limit`, {
+                description: `Usage was ${currentUsed}, capped at ${monthlyLimit}`,
+                duration: 4000
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reconciling bonus identifications:', error);
+    }
+  };
+
   // Calculate usage statistics
   const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = true) => {
     const plan = subscription.plan;
@@ -386,22 +505,30 @@ export const useSubscription = () => {
     // Determine limits based on plan features, billing period, and plan id
     const hasUnlimited = Array.isArray(plan?.features) && plan!.features!.includes('unlimited_identifications');
     const billingPeriod = plan?.billing_period || subscription.plan?.billing_period || 'monthly';
+    const planId = plan?.id || subscription.plan_id || '';
+    const planName = plan?.name || '';
+    
+    console.log('📊 Plan detection:', { planId, planName, billingPeriod, subscriptionPlanId: subscription.plan_id });
     
     // If expired, force free tier limits (5), otherwise use plan limits
     let monthlyLimit: number;
     if (isExpired) {
       monthlyLimit = 5; // Expired subscriptions get free tier limits
       console.log('⚠️ Subscription expired - applying free tier limits');
-    } else if (hasUnlimited || plan?.id === 'special-plan') {
+    } else if (hasUnlimited || planId === 'special-plan') {
       monthlyLimit = -1; // Unlimited
-    } else if (plan?.id === 'free-plan') {
+    } else if (planId === 'free-plan') {
       monthlyLimit = 5; // Free tier
-    } else if (billingPeriod === 'weekly') {
-      monthlyLimit = 21; // Weekly plan: 21 identifications per week
-    } else if (billingPeriod === 'yearly') {
-      monthlyLimit = 1200; // Yearly plan: 100/month * 12 months
+    } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
+      monthlyLimit = 39; // Lite plan: 39 identifications per month
+      console.log('✅ Lite plan detected - 39 identifications');
+    } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
+      monthlyLimit = 101; // Pro plan: 101 identifications per month
+      console.log('✅ Pro plan detected - 101 identifications');
     } else {
-      monthlyLimit = 100; // Monthly plan default
+      // Fallback to 5 for unknown plans to be safe
+      monthlyLimit = 5;
+      console.warn('⚠️ Unknown plan, defaulting to free tier limits:', { planId, planName });
     }
     
     // Always get fresh usage data from profiles to ensure sync across devices
@@ -459,41 +586,52 @@ export const useSubscription = () => {
       const now = new Date();
       const endsAt = currentSubscription.ends_at ? new Date(currentSubscription.ends_at) : null;
       if (endsAt && now > endsAt) {
-        console.warn('⚠️ Subscription expired - limiting to free tier');
-        // Expired paid subscription = free tier limits (5 identifications)
+        console.warn('⚠️ Subscription expired - limiting to free tier (no bonus allowed)');
+        // Expired paid subscription = free tier limits (5 identifications, NO BONUS)
         const canProceed = currentUsage < 5;
-        console.log('🔒 Free tier check (expired):', { currentUsage, limit: 5, canProceed });
+        console.log('🔒 Free tier check (expired):', { currentUsage, limit: 5, canProceed, bonusIgnored: true });
         return canProceed;
       }
     }
     
     // While subscription info is loading or unavailable, default to Free plan limits
     if (!currentSubscription?.plan) {
-      const canProceed = currentUsage < 5;
-      console.log('🔒 Free tier check (no subscription):', { currentUsage, limit: 5, canProceed });
+      // No subscription = free tier with bonus allowed
+      const totalLimit = 5 + extraIdentifications;
+      const canProceed = currentUsage < totalLimit;
+      console.log('🔒 Free tier check (no subscription):', { currentUsage, monthlyLimit: 5, bonusIds: extraIdentifications, totalLimit, canProceed });
       return canProceed;
     }
-    const plan = currentSubscription.plan;
-    const billingPeriod = plan.billing_period || 'monthly';
     
-    // Use default limits based on plan type and billing period
+    const plan = currentSubscription.plan;
+    const planId = plan?.id || currentSubscription.plan_id || '';
+    const planName = plan?.name || '';
+    
+    console.log('🔍 canPerformIdentification - Plan check:', { planId, planName });
+    
+    // Use default limits based on plan type
     let limit: number;
-    if (plan.id === 'special-plan') {
+    if (planId === 'special-plan') {
       limit = -1; // Unlimited
-    } else if (plan.id === 'free-plan') {
-      limit = 5;
-    } else if (billingPeriod === 'weekly') {
-      limit = 21; // Weekly plan
-    } else if (billingPeriod === 'yearly') {
-      limit = 1200; // Yearly plan
+    } else if (planId === 'free-plan') {
+      limit = 5; // Free plan: 5 identifications
+    } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
+      limit = 39; // Lite plan: 39 identifications  
+      console.log('✅ Lite plan detected in canPerform - limit: 39');
+    } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
+      limit = 101; // Pro plan: 101 identifications
+      console.log('✅ Pro plan detected in canPerform - limit: 101');
     } else {
-      limit = 100; // Monthly plan
+      limit = 5; // Default to free tier for unknown plans
+      console.warn('⚠️ Unknown plan in canPerform, defaulting to free:', { planId, planName });
     }
     
     if (limit === -1) return true; // Unlimited
     
-    const canProceed = currentUsage < limit;
-    console.log('🔒 Limit check:', { currentUsage, limit, planId: plan.id, canProceed });
+    // Include bonus identifications in the total limit
+    const totalLimit = limit + extraIdentifications;
+    const canProceed = currentUsage < totalLimit;
+    console.log('🔒 Limit check:', { currentUsage, monthlyLimit: limit, bonusIds: extraIdentifications, totalLimit, planId, canProceed });
     return canProceed;
   };
 
@@ -562,10 +700,10 @@ export const useSubscription = () => {
           }
         );
       
-      // Fetch current usage and last reset
+      // Fetch current usage, extra_identifications, and last reset
       const { data: existing, error: fetchErr } = await supabase
         .from('profiles')
-        .select('id, identifications_used, last_reset_date')
+        .select('id, identifications_used, last_reset_date, extra_identifications')
         .eq('id', user.id)
         .single();
 
@@ -575,21 +713,123 @@ export const useSubscription = () => {
       }
 
       const currentUsed = existing?.identifications_used ?? 0;
+      const currentExtra = (existing as any)?.extra_identifications ?? 0;
       const lastReset = existing?.last_reset_date ? new Date(existing.last_reset_date) : null;
 
       let newUsed = currentUsed + 1;
+      let newExtra = currentExtra;
       let payload: Partial<Tables<'profiles'>> & { id: string } = { id: user.id } as any;
+
+      // Get monthly limit based on plan
+      let monthlyLimit = 5; // Default free tier
+      if (currentSubscription?.plan) {
+        const plan = currentSubscription.plan;
+        const planId = plan?.id || currentSubscription.plan_id || '';
+        const planName = plan?.name || '';
+        
+        if (planId === 'special-plan') {
+          monthlyLimit = -1; // Unlimited
+        } else if (planId === 'free-plan') {
+          monthlyLimit = 5; // Free plan: 5 identifications
+        } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
+          monthlyLimit = 39; // Lite plan: 39 identifications  
+        } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
+          monthlyLimit = 101; // Pro plan: 101 identifications
+        } else {
+          monthlyLimit = 5; // Default to free tier for safety
+        }
+      }
+
+      // RECONCILIATION: Fix usage and bonus if they don't match
+      if (monthlyLimit !== -1 && currentUsed > monthlyLimit) {
+        const bonusAlreadyUsed = currentUsed - monthlyLimit;
+        
+        // If bonusAlreadyUsed > currentExtra, bonus was fully consumed, reset usage
+        if (bonusAlreadyUsed > currentExtra) {
+          console.log('🔧 RECONCILING: Bonus fully consumed, resetting to monthly limit:', {
+            currentUsed,
+            monthlyLimit,
+            bonusAlreadyUsed,
+            currentExtra,
+            resetting: `${currentUsed} → ${monthlyLimit}`
+          });
+          
+          // Reset usage to monthly limit and clear bonus
+          await supabase
+            .from('profiles')
+            .update({ 
+              identifications_used: monthlyLimit,
+              extra_identifications: 0 
+            })
+            .eq('id', user.id);
+          
+          setProfileIdentificationsUsed(monthlyLimit);
+          setExtraIdentifications(0);
+          
+          // Update local variables for the current increment
+          newUsed = monthlyLimit + 1; // Will be the new usage after this identification
+          newExtra = 0;
+        } else if (bonusAlreadyUsed > 0 && currentExtra > 0) {
+          // Partial bonus usage
+          const bonusShouldRemain = currentExtra - bonusAlreadyUsed;
+          
+          if (bonusShouldRemain !== currentExtra && bonusShouldRemain >= 0) {
+            console.log('🔧 RECONCILING partial bonus usage:', {
+              currentUsed,
+              monthlyLimit,
+              bonusWas: currentExtra,
+              bonusShouldBe: bonusShouldRemain
+            });
+            
+            newExtra = bonusShouldRemain;
+            await supabase
+              .from('profiles')
+              .update({ extra_identifications: newExtra })
+              .eq('id', user.id);
+            setExtraIdentifications(newExtra);
+          }
+        }
+      }
 
       // If last_reset_date exists and is before current month, reset then increment
       if (lastReset && lastReset < monthStart) {
         console.log('📅 Monthly reset triggered - resetting usage count');
         newUsed = 1; // reset to 0 then add 1
+        // Keep bonus identifications during monthly reset - they don't reset
         payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
       } else if (!lastReset) {
         // If missing, initialize last_reset_date without affecting count logic
         payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
       } else {
-        payload = { id: user.id, identifications_used: newUsed } as any;
+        // Normal usage increment
+        // Check if we're at or beyond monthly limit
+        if (monthlyLimit !== -1 && currentUsed >= monthlyLimit) {
+          // At monthly limit - can only proceed if we have bonus
+          if (currentExtra > 0) {
+            // Using bonus identifications - decrease extra_identifications
+            // Keep identifications_used AT monthlyLimit, don't increment it
+            newUsed = monthlyLimit; // Stay at monthly limit (39 for Lite, 101 for Pro)
+            newExtra = Math.max(0, currentExtra - 1);
+            
+            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra } as any;
+            console.log('🎁 Using bonus identification:', { 
+              monthlyLimit,
+              identifications_used: newUsed, // Stays at monthly limit
+              bonusUsed: currentExtra - newExtra, 
+              bonusRemaining: newExtra 
+            });
+          } else {
+            // No bonus available - cannot proceed, keep at monthly limit
+            newUsed = monthlyLimit;
+            newExtra = 0;
+            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra } as any;
+            console.log('⚠️ At limit with no bonus - cannot increment:', { monthlyLimit, newUsed });
+          }
+        } else {
+          // Normal usage within monthly limit - increment identifications_used normally
+          payload = { id: user.id, identifications_used: newUsed } as any;
+          console.log('📊 Normal usage within limit:', { monthlyLimit, newUsed, bonusAvailable: currentExtra });
+        }
       }
 
       const { error } = await supabase
@@ -598,8 +838,9 @@ export const useSubscription = () => {
 
       if (error) throw error;
 
-      console.log('✅ Usage incremented to:', newUsed, 'for user:', user.id);
+      console.log('✅ Usage incremented:', { newUsed, newExtra, monthlyLimit });
       setProfileIdentificationsUsed(newUsed);
+      setExtraIdentifications(newExtra);
       
       // Always update usage stats, even for free tier users without subscription
       if (currentSubscription) {
