@@ -1259,7 +1259,7 @@ async function stageMultiSourceEnrichment(drugName: string): Promise<ProcessingS
 }
 
 // 🕷️ STAGE 5: INTELLIGENT WEB SCRAPING (Ported from Standard Mode)
-async function intelligentWebScraping(drugName: string, source: '1mg' | 'drugs.com'): Promise<ScrapedDrugData> {
+async function intelligentWebScraping(drugName: string, source: '1mg' | 'medlineplus'): Promise<ScrapedDrugData> {
   console.log(`🕷️ STAGE 5: Intelligent web scraping for "${drugName}" from ${source}...`);
   
   try {
@@ -1269,7 +1269,7 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'drugs.c
     if (source === '1mg') {
       searchUrl = `https://www.1mg.com/search/all?name=${encodeURIComponent(drugName)}`;
     } else {
-      searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
+      searchUrl = `https://medlineplus.gov/druginfo/meds/${encodeURIComponent(drugName.toLowerCase().replace(/\s+/g, ''))}.html`;
     }
     
     console.log(`   Fetching: ${searchUrl}`);

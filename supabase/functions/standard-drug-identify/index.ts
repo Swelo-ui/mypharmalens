@@ -379,7 +379,7 @@ function calculateQualityScore(data: DrugData, sources: string[]): QualityScore 
     'cache-search': 95,
     'local-database-smart-search': 90,
     '1mg-intelligent-scraping': 75,
-    'drugs-com-intelligent-scraping': 75,
+    'medlineplus-intelligent-scraping': 80,
     'multi-source-api-fallback': 85,
     'multi-source-comprehensive-fallback': 80,
     'openrouter-vision': 60,
@@ -619,19 +619,19 @@ Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
 }
 
 // Intelligent Web Scraping with DeepSeek R1T2 Chimera
-async function intelligentWebScraping(drugName: string, source: '1mg' | 'drugs.com'): Promise<ScrapedDrugData> {
+async function intelligentWebScraping(drugName: string, source: '1mg' | 'medlineplus'): Promise<ScrapedDrugData> {
   console.log(`🕷️ Intelligent web scraping for "${drugName}" from ${source}...`);
   
   try {
-    // Step 1: Fetch the HTML content
-    let url: string;
+    // Step 1: Construct search URL
     let searchUrl: string;
+    let url: string;
     
     if (source === '1mg') {
       searchUrl = `https://www.1mg.com/search/all?name=${encodeURIComponent(drugName)}`;
       url = searchUrl; // Will be updated after search
     } else {
-      searchUrl = `https://www.drugs.com/search.php?searchterm=${encodeURIComponent(drugName)}`;
+      searchUrl = `https://medlineplus.gov/druginfo/meds/${encodeURIComponent(drugName.toLowerCase().replace(/\s+/g, ''))}.html`;
       url = searchUrl; // Will be updated after search
     }
     
@@ -926,13 +926,13 @@ Deno.serve(async (req: Request) => {
     console.log('   3. Critical Vision (if needed, ~1s)');
     console.log('   4. ⚡ PARALLEL Cache + Local DB (~100ms) - NEW!');
     console.log('   5. ⚡ Extended AI Validation (70-90%) - NEW!');
-    console.log('   6. ⚡ PARALLEL Web Scraping (~1.5s vs 3s) - NEW!');
+    console.log('   6. ⚡ PARALLEL Web Scraping (1mg + MedlinePlus) - NEW!');
     console.log('   7. Multi-Source API (~1s)');
     console.log('   8. ⚡ Early Exit (5-10x faster for high-confidence)');
     console.log('='.repeat(80));
     console.log('⚡ Optimizations:');
     console.log('   • Parallel cache + DB search (was sequential)');
-    console.log('   • Parallel web scraping (2x faster)');
+    console.log('   • Parallel web scraping: 1mg + MedlinePlus (2x faster)');
     console.log('   • Early exit for 95%+ complete results');
     console.log('   • AI validation extended to 70-90% matches');
     console.log('='.repeat(80));
@@ -1398,10 +1398,10 @@ Deno.serve(async (req: Request) => {
     // (Old Stage 3 removed - now using parallel cache + DB search above)
 
     // ⚡ OPTIMIZATION 2: PARALLEL WEB SCRAPING (2x faster!)
-    console.log('⚡ Stage 4: PARALLEL Web Scraping (1mg + Drugs.com - OPTIMIZED)...');
+    console.log('⚡ Stage 4: PARALLEL Web Scraping (1mg + MedlinePlus - OPTIMIZED)...');
     if (drugName && drugName !== 'Unknown') {
       const searchTerm = drugName;
-      console.log(`⚡ Launching PARALLEL scraping: 1mg.com + Drugs.com`);
+      console.log(`⚡ Launching PARALLEL scraping: 1mg.com + MedlinePlus`);
       
       const scrapingStart = Date.now();
       
@@ -1410,9 +1410,9 @@ Deno.serve(async (req: Request) => {
         intelligentWebScraping(searchTerm, '1mg')
           .then(raw => raw ? correctAndValidateData(raw, searchTerm) : null)
           .then(data => ({ source: '1mg', data })),
-        intelligentWebScraping(searchTerm, 'drugs.com')
+        intelligentWebScraping(searchTerm, 'medlineplus')
           .then(raw => raw ? correctAndValidateData(raw, searchTerm) : null)
-          .then(data => ({ source: 'drugs.com', data }))
+          .then(data => ({ source: 'medlineplus', data }))
       ]);
       
       const scrapingTime = Date.now() - scrapingStart;
@@ -1457,19 +1457,19 @@ Deno.serve(async (req: Request) => {
         stages.push({ name: '1mg-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
       }
       
-      // Process Drugs.com result
-      const drugsComResult = scrapingResults[1].status === 'fulfilled' ? scrapingResults[1].value : null;
-      if (drugsComResult?.data) {
-        console.log(`✅ Drugs.com: ${drugsComResult.data.dataQuality || 0}% quality`);
+      // Process MedlinePlus result
+      const medlinePlusResult = scrapingResults[1].status === 'fulfilled' ? scrapingResults[1].value : null;
+      if (medlinePlusResult?.data) {
+        console.log(`✅ MedlinePlus: ${medlinePlusResult.data.dataQuality || 0}% quality`);
         
         stages.push({
-          name: 'drugs-com-intelligent-scraping',
+          name: 'medlineplus-intelligent-scraping',
           success: true,
-          data: drugsComResult.data,
+          data: medlinePlusResult.data,
           processingTime: Date.now() - overallStartTime
         });
 
-        const limitedData = limitDataForStandardMode(drugsComResult.data);
+        const limitedData = limitDataForStandardMode(medlinePlusResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
         
         // ⚡ EARLY EXIT CHECK
@@ -1478,7 +1478,7 @@ Deno.serve(async (req: Request) => {
             success: true,
             data: enrichedData,
             processingStages: stages.map(s => s.name),
-            confidence: (drugsComResult.data.dataQuality && drugsComResult.data.dataQuality > 80) ? 'high' : 'medium',
+            confidence: (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 80) ? 'high' : 'medium',
             fallbackUsed: true,
             processingTime: Date.now() - overallStartTime
           });
@@ -1488,12 +1488,12 @@ Deno.serve(async (req: Request) => {
           success: true,
           data: enrichedData,
           processingStages: stages.map(s => s.name),
-          confidence: (drugsComResult.data.dataQuality && drugsComResult.data.dataQuality > 80) ? 'high' : 'medium',
+          confidence: (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 80) ? 'high' : 'medium',
           fallbackUsed: true,
           processingTime: Date.now() - overallStartTime
         });
       } else {
-        stages.push({ name: 'drugs-com-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
+        stages.push({ name: 'medlineplus-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
       }
       
       console.log('❌ Both parallel web scraping attempts failed');

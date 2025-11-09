@@ -79,6 +79,12 @@ const DrugIdentify = () => {
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');
   const [isIdentifying, setIsIdentifying] = useState(false);
+
+  // Helper function to check if user is Special Access based on email
+  const isSpecialAccessAccount = () => {
+    const specialAccessEmails = ['imgamer.ms@gmail.com'];
+    return user?.email && specialAccessEmails.includes(user.email.toLowerCase());
+  };
   const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -1006,7 +1012,9 @@ const DrugIdentify = () => {
                         />
                       )}
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        Current plan: <span className="font-medium">{usageStats?.planName}</span>
+                        Current plan: <span className={`font-medium ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400' : ''}`}>
+                          {isSpecialAccessAccount() ? '✨ Special Access' : usageStats?.planName}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -1132,6 +1140,41 @@ const DrugIdentify = () => {
                 <li className="flex items-start">
                   <Zap className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-pharma-600" />
                   <span>Use Enhanced Mode for blurry images or hard-to-identify medications</span>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Medical Disclaimer & Important Warnings - Matching Tips Section Style */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto">
+              <h3 className="font-medium text-lg sm:text-xl mb-4 sm:mb-6 text-amber-900 dark:text-amber-100">Important Medical Disclaimer:</h3>
+              <ul className="list-disc list-inside space-y-3 sm:space-y-4 text-gray-700 dark:text-gray-300">
+                <li className="flex items-start">
+                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 text-amber-600" />
+                  <span className="text-sm sm:text-base"><strong>99% Accuracy:</strong> Our AI achieves 99% identification accuracy, but no system is perfect. Always verify results with a healthcare professional.</span>
+                </li>
+                <li className="flex items-start">
+                  <RotateCw className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 text-amber-600" />
+                  <span className="text-sm sm:text-base"><strong>Cross-Check Results:</strong> If you receive an unexpected or incorrect result, switch to Enhanced Mode for deeper analysis and verification.</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 bg-amber-100 dark:bg-amber-800 rounded" />
+                  <span className="text-sm sm:text-base"><strong>Not Medical Advice:</strong> This tool provides drug information only. It does not diagnose conditions or recommend treatments.</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 rounded-full border-2 border-amber-600" />
+                  <span className="text-sm sm:text-base"><strong>Consult Healthcare Professionals:</strong> Always consult a doctor or pharmacist before taking any medication, especially if you have concerns.</span>
+                </li>
+                <li className="flex items-start">
+                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-1 flex-shrink-0 text-amber-600" />
+                  <span className="text-sm sm:text-base"><strong>Emergency Situations:</strong> In case of poisoning or adverse reactions, contact emergency services immediately. Do not rely solely on this app.</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="h-4 w-4 mr-2 mt-1 flex-shrink-0 bg-amber-200 dark:bg-amber-700 rounded-sm" />
+                  <span className="text-sm sm:text-base"><strong>Prescription Medications:</strong> Never take prescription medications without a valid prescription from a licensed healthcare provider.</span>
+                </li>
+                <li className="flex items-start">
+                  <Zap className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-amber-600" />
+                  <span className="text-sm sm:text-base"><strong>Use Both Modes:</strong> For critical decisions, use both Standard and Enhanced modes to compare results and ensure accuracy.</span>
                 </li>
               </ul>
             </div>

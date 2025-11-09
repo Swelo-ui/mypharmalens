@@ -263,16 +263,29 @@ const SubscriptionManager: React.FC = () => {
     return plans.find(plan => plan.id === planId);
   };
 
+  // Helper function to check if user is Special Access based on email
+  const isSpecialAccessAccount = () => {
+    const specialAccessEmails = ['imgamer.ms@gmail.com'];
+    return user?.email && specialAccessEmails.includes(user.email.toLowerCase());
+  };
+
   const getStatusBadge = (status: string) => {
+    // Check if this is a Special Access account by email or plan name
+    const isSpecialAccess = isSpecialAccessAccount() || currentPlan?.name === 'Special Access';
+    
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return isSpecialAccess 
+          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300">✨ Special Access</Badge>
+          : <Badge className="bg-green-100 text-green-800">Active</Badge>;
       case 'expiring':
         return <Badge className="bg-yellow-100 text-yellow-800">Expiring Soon</Badge>;
       case 'expired':
         return <Badge variant="destructive">Expired</Badge>;
       case 'free':
-        return <Badge variant="outline">Free Plan</Badge>;
+        return isSpecialAccess 
+          ? <Badge className="bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300">✨ Special Access</Badge>
+          : <Badge variant="outline">Free Plan</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -328,21 +341,24 @@ const SubscriptionManager: React.FC = () => {
       </div>
 
       {/* Current Subscription Status */}
-      <Card>
+      <Card className={isSpecialAccessAccount() ? 'border-2 border-yellow-300 dark:border-yellow-600 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20' : ''}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Crown className="w-5 h-5" />
-            Current Subscription
+          <CardTitle className={`flex items-center gap-2 ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300' : ''}`}>
+            <Crown className={`w-5 h-5 ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400' : ''}`} />
+            {isSpecialAccessAccount() ? '✨ Special Access Subscription' : 'Current Subscription'}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">
-                {currentPlan ? currentPlan.name : 'Free Plan'}
+              <h3 className={`text-lg font-semibold ${isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400 flex items-center gap-2' : ''}`}>
+                {isSpecialAccessAccount() && <span className="text-xl">✨</span>}
+                {isSpecialAccessAccount() ? 'Special Access' : (currentPlan ? currentPlan.name : 'Free Plan')}
               </h3>
-              <p className="text-gray-600">
-                {subscriptionStatus.status === 'active'
+              <p className={`${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-600'}`}>
+                {isSpecialAccessAccount()
+                  ? '🌟 Premium unlimited access - No expiration'
+                  : subscriptionStatus.status === 'active'
                   ? 'Active subscription'
                   : subscriptionStatus.status === 'expired'
                   ? 'Subscription expired - moved to free plan'
@@ -370,41 +386,27 @@ const SubscriptionManager: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="flex justify-between text-sm">
-                  <span>Monthly Identifications Used</span>
-                  <span>
+                <div className={`flex justify-between text-sm ${isSpecialAccessAccount() ? 'text-yellow-700 dark:text-yellow-300 font-medium' : ''}`}>
+                  <span>{isSpecialAccessAccount() ? '✨ Monthly Identifications Used' : 'Monthly Identifications Used'}</span>
+                  <span className={isSpecialAccessAccount() ? 'text-yellow-600 dark:text-yellow-400 font-semibold' : ''}>
                     {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : usageStats.monthlyLimit}
                   </span>
                 </div>
                 {usageStats.monthlyLimit !== -1 && (
-                  <Progress value={usagePercentage} className="h-2" />
+                  <Progress value={usagePercentage} className={`h-2 ${isSpecialAccessAccount() ? '[&>div]:bg-gradient-to-r [&>div]:from-yellow-400 [&>div]:to-amber-500' : ''}`} />
                 )}
-                {usageStats.monthlyLimit !== -1 && usagePercentage >= 80 && (
+                {usageStats.monthlyLimit !== -1 && usagePercentage >= 80 && !isSpecialAccessAccount() && (
                   <p className="text-sm text-amber-600 flex items-center gap-1">
                     <AlertTriangle className="w-4 h-4" />
                     You're approaching your monthly limit
                   </p>
                 )}
-              </>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-4">
-            {currentSubscription?.plan_id !== 'free-plan' && (
-              <Button
-                variant="outline"
-                onClick={handleCancelSubscription}
-                disabled={isUpdating}
-                className="text-red-600 hover:text-red-700"
-              >
-                {isUpdating ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Settings className="w-4 h-4 mr-2" />
+                {isSpecialAccessAccount() && (
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 flex items-center gap-1 italic">
+                    🎉 Unlimited AI identifications included with Special Access
+                  </p>
                 )}
-                Cancel Subscription
-              </Button>
+              </>
             )}
           </div>
         </CardContent>
