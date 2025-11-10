@@ -485,7 +485,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             const planName = plan.name || '';
             if (planName === 'Free Plan' || planName === 'Free') {
               return [
-                'Advanced search (50 results limit)',
+                'Advanced search (100 results limit)',
                 '100 drugs database access',
                 'Basic drug information',
                 'Drug interaction checker',

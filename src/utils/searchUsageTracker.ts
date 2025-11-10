@@ -23,6 +23,29 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
     const currentYear = now.getFullYear();
 
     if (existing) {
+      // Get current plan limit
+      const { data: subscription } = await supabase
+        .from('user_subscriptions')
+        .select(`
+          *,
+          plan:subscription_plans(*)
+        `)
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let currentLimit = 100; // Default free plan
+      if (subscription?.plan) {
+        const planName = subscription.plan.name;
+        if (planName === 'Lite') {
+          currentLimit = 249;
+        } else if (planName === 'Pro') {
+          currentLimit = 500;
+        }
+      }
+
       // Check if we need to reset for new month
       const lastReset = new Date(existing.last_reset_date);
       const resetMonth = lastReset.getMonth();
@@ -39,11 +62,12 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         newSearchCount += 1;
       }
 
-      // Update existing record
+      // Update existing record with current plan limit
       const { error: updateError } = await supabase
         .from('search_usage_tracking')
         .update({
           searches_used: newSearchCount,
+          searches_limit: currentLimit,
           last_reset_date: resetDate,
           updated_at: now.toISOString()
         })
@@ -63,7 +87,7 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         .insert({
           user_id: userId,
           searches_used: 1,
-          searches_limit: 50, // Default free plan limit
+          searches_limit: 100, // Default free plan limit
           last_reset_date: now.toISOString()
         });
 
@@ -100,13 +124,15 @@ export const getSearchUsage = async (userId: string): Promise<{ used: number; li
       .maybeSingle();
 
     // Determine search limit based on plan
-    let limit = 50; // Default free plan
+    let limit = 100; // Default free plan
     if (subscription?.plan) {
       const planName = subscription.plan.name;
       if (planName === 'Lite') {
         limit = 249;
       } else if (planName === 'Pro') {
         limit = 500;
+      } else {
+        limit = 100; // Free plan
       }
     }
 
@@ -147,9 +173,67 @@ export const getSearchUsage = async (userId: string): Promise<{ used: number; li
 
 /**
  * Check if user has reached their search limit
+ * Always checks against the current plan's limit, not stored limit
  */
 export const hasReachedSearchLimit = async (userId: string): Promise<boolean> => {
-  const usage = await getSearchUsage(userId);
-  if (!usage) return false;
-  return usage.used >= usage.limit;
+  try {
+    // Get user's current plan to determine limit
+    const { data: subscription } = await supabase
+      .from('user_subscriptions')
+      .select(`
+        *,
+        plan:subscription_plans(*)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // Determine search limit based on current plan
+    let currentLimit = 100; // Default free plan
+    if (subscription?.plan) {
+      const planName = subscription.plan.name;
+      if (planName === 'Lite') {
+        currentLimit = 249;
+      } else if (planName === 'Pro') {
+        currentLimit = 500;
+      }
+    }
+
+    // Get current usage
+    const { data: usage, error } = await supabase
+      .from('search_usage_tracking')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching search usage:', error);
+      return false;
+    }
+
+    if (!usage) {
+      return false; // No usage record means no searches yet
+    }
+
+    // Check if we need to reset for new month
+    const lastReset = new Date(usage.last_reset_date as string);
+    const currentMonth = new Date().getMonth();
+    const resetMonth = lastReset.getMonth();
+
+    if (currentMonth !== resetMonth) {
+      return false; // New month, reset usage
+    }
+
+    const usedSearches = (usage.searches_used as number) || 0;
+    const limitReached = usedSearches >= currentLimit;
+    
+    console.log(`Search limit check: ${usedSearches}/${currentLimit} - Limit reached: ${limitReached}`);
+    
+    return limitReached;
+  } catch (error) {
+    console.error('Error in hasReachedSearchLimit:', error);
+    return false; // On error, allow search to continue
+  }
 };

@@ -483,7 +483,7 @@ const SubscriptionManager: React.FC = () => {
               const displayFeatures: string[] = (() => {
                 if (plan.name === 'Free Plan' || plan.name === 'Free') {
                   return [
-                    'Advanced search (50 results limit)',
+                    'Advanced search (100 results limit)',
                     '100 drugs database access',
                     'Basic drug information',
                     'Drug interaction checker',
