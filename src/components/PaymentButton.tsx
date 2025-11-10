@@ -10,6 +10,7 @@ import { SubscriptionService } from '@/services/subscriptionService';
 import { usePaymentStatus } from '@/hooks/usePaymentStatus';
 import ErrorHandler, { PaymentError } from '@/components/ErrorHandler';
 import { transactionLogger } from '@/utils/transactionLogger';
+import PaymentSummary from '@/components/PaymentSummary';
 
 interface PaymentButtonProps {
   plan?: SubscriptionPlan;
@@ -35,6 +36,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<PaymentError | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
+  const [showSummary, setShowSummary] = useState(false);
   
   const { startPolling, reset, isPolling, error: pollingError } = usePaymentStatus();
   const currentPlan = plan;
@@ -84,7 +86,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     });
   };
 
-  const handlePayment = async () => {
+  const showPaymentSummary = () => {
     if (planId && !plan) {
       toast.error('Plan details not available. Please try again.');
       return;
@@ -103,6 +105,23 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
     if (currentPlan.id === 'free-plan') {
       toast.success('You are already on the Free Plan!');
+      return;
+    }
+
+    setShowSummary(true);
+  };
+
+  const handlePayment = async () => {
+    setShowSummary(false);
+    
+    if (planId && !plan) {
+      toast.error('Plan details not available. Please try again.');
+      return;
+    }
+
+    const currentPlan = plan;
+    if (!currentPlan) {
+      toast.error('Plan information is missing');
       return;
     }
 
@@ -384,7 +403,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )}
 
       <Button
-        onClick={handlePayment}
+        onClick={showPaymentSummary}
         disabled={isCurrentPlan || isProcessing || isPolling}
         className={`w-full h-12 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500 inline-flex items-center justify-center gap-2 ${
           plan?.id === 'monthly-premium-plan' && !isCurrentPlan
@@ -451,6 +470,58 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment Summary Dialog */}
+      {plan && (
+        <PaymentSummary
+          isOpen={showSummary}
+          onClose={() => setShowSummary(false)}
+          onConfirm={handlePayment}
+          planName={plan.name || 'Subscription Plan'}
+          planPrice={(plan as any).discounted_price || plan.price || 0}
+          originalPrice={(plan as any).original_price}
+          features={(() => {
+            const planName = plan.name || '';
+            if (planName === 'Free Plan' || planName === 'Free') {
+              return [
+                'Advanced search (50 results limit)',
+                '100 drugs database access',
+                'Basic drug information',
+                'Drug interaction checker',
+                'Symptom checker'
+              ];
+            } else if (planName === 'Lite') {
+              return [
+                'All Free Plan features',
+                'Priority support',
+                'Advanced search (249 results limit)',
+                'Layman explanations',
+                '1200+ medicines database',
+                'Drug interaction checker',
+                'Symptom checker',
+                'PWA offline access'
+              ];
+            } else if (planName === 'Pro') {
+              return [
+                'All Free Plan features',
+                'Priority support',
+                'Advanced search (500 results limit)',
+                'Layman explanations',
+                '1200+ medicines database',
+                'Drug interaction checker',
+                'Symptom checker',
+                'PWA offline access',
+                'History feature (unlimited)'
+              ];
+            }
+            return ['Basic features'];
+          })()}
+          identificationsLimit={(plan as any).identifications_limit || 5}
+          searchLimit={(plan as any).advanced_search_limit}
+          billingCycle={billingCycle}
+          isProcessing={isProcessing}
+        />
       )}
     </div>
   );

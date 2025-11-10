@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings } from 'lucide-react';
+import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -101,6 +101,107 @@ const Header = () => {
               >
                 {(resolvedTheme || theme) === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </button>
+              
+              {/* Profile Icon */}
+              {!isLoading && isAuthenticated && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <UserCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="text-xs leading-snug break-all whitespace-normal max-w-[220px]">
+                      {user?.email}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex items-center w-full cursor-pointer">
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/symptom-checker" className="flex items-center w-full cursor-pointer">
+                        <Activity className="mr-2 h-4 w-4" />
+                        <span>Symptom Checker</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/drug-interactions" className="flex items-center w-full cursor-pointer">
+                        <FlaskConical className="mr-2 h-4 w-4" />
+                        <span>Drug Interaction</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/payment-history" className="flex items-center w-full cursor-pointer">
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        <span>Payment History</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/subscription" className="flex items-center w-full cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Manage Subscription</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={handleDonation} className="flex items-center cursor-pointer">
+                      <Coffee className="mr-2 h-4 w-4 text-amber-600" />
+                      <span>Buy Me a Coffee</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/help" className="flex items-center w-full cursor-pointer">
+                        <HelpCircle className="mr-2 h-4 w-4" />
+                        <span>Help Center</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/contact" className="flex items-center w-full cursor-pointer">
+                        <Phone className="mr-2 h-4 w-4" />
+                        <span>Contact Us</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/faq" className="flex items-center w-full cursor-pointer">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        <span>FAQ</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <Link to="/privacy" className="flex items-center w-full cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Privacy Policy</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/terms" className="flex items-center w-full cursor-pointer">
+                        <Scale className="mr-2 h-4 w-4" />
+                        <span>Terms and Conditions</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/disclaimer" className="flex items-center w-full cursor-pointer">
+                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        <span>Disclaimer</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
@@ -193,6 +294,12 @@ const Header = () => {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                          <Link to="/drug-interactions" className="flex items-center w-full cursor-pointer">
+                            <FlaskConical className="mr-2 h-4 w-4" />
+                            <span>Drug Interaction</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link to="/payment-history" className="flex items-center w-full cursor-pointer">
                             <CreditCard className="mr-2 h-4 w-4" />
                             <span>Payment History</span>
@@ -235,15 +342,10 @@ const Header = () => {
                         
                         {/* Legal Section */}
                         <DropdownMenuItem asChild>
-                          <a 
-                            href="https://pharmalens.tech/privacy" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center w-full cursor-pointer"
-                          >
+                          <Link to="/privacy" className="flex items-center w-full cursor-pointer">
                             <Shield className="mr-2 h-4 w-4" />
                             <span>Privacy Policy</span>
-                          </a>
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/terms" className="flex items-center w-full cursor-pointer">
@@ -276,14 +378,6 @@ const Header = () => {
                 </>
               )}
 
-              {/* Mobile Menu Toggle */}
-              <button
-                className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-              >
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
             </div>
           </div>
         </div>

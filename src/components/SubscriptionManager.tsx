@@ -372,6 +372,86 @@ const SubscriptionManager: React.FC = () => {
               </>
             )}
           </div>
+
+          {/* Comprehensive Usage Warnings & Info */}
+          <div className="space-y-2 mt-4">
+            {/* Critical: Out of identifications */}
+            {usageStats.identificationsUsed >= (usageStats.monthlyLimit + (profile?.extra_identifications || 0)) && usageStats.monthlyLimit !== -1 && (
+              <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-red-700 dark:text-red-200">
+                  <p className="font-semibold">Identification Limit Reached</p>
+                  <p className="mt-1">You've used all {usageStats.monthlyLimit + (profile?.extra_identifications || 0)} identifications this month. Upgrade your plan or purchase a top-up pack to continue.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Warning: Approaching limit (80-94%) */}
+            {usagePercentage >= 80 && usagePercentage < 95 && usageStats.monthlyLimit !== -1 && usageStats.identificationsUsed < (usageStats.monthlyLimit + (profile?.extra_identifications || 0)) && (
+              <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-amber-700 dark:text-amber-200">
+                  <p className="font-semibold">You're Approaching Your Identification Limit</p>
+                  <p className="mt-1">{(usageStats.monthlyLimit + (profile?.extra_identifications || 0)) - usageStats.identificationsUsed} identifications remaining. Consider upgrading to avoid interruptions.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Warning: Critical limit (95-99%) */}
+            {usagePercentage >= 95 && usageStats.monthlyLimit !== -1 && usageStats.identificationsUsed < (usageStats.monthlyLimit + (profile?.extra_identifications || 0)) && (
+              <div className="flex items-start gap-2 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-orange-700 dark:text-orange-200">
+                  <p className="font-semibold">Critical: Almost Out of Identifications!</p>
+                  <p className="mt-1">Only {(usageStats.monthlyLimit + (profile?.extra_identifications || 0)) - usageStats.identificationsUsed} identifications left. Upgrade now to continue using PharmaLens.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Info: Subscription expiring soon */}
+            {subscriptionStatus.status === 'expiring' && subscriptionStatus.daysLeft > 0 && subscriptionStatus.daysLeft <= 7 && (
+              <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-yellow-700 dark:text-yellow-200">
+                  <p className="font-semibold">Subscription Expiring Soon</p>
+                  <p className="mt-1">Your {currentPlan?.name || 'subscription'} expires in {subscriptionStatus.daysLeft} day{subscriptionStatus.daysLeft > 1 ? 's' : ''}. Renew to maintain access to premium features.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Info: Subscription expired */}
+            {subscriptionStatus.status === 'expired' && (
+              <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-red-700 dark:text-red-200">
+                  <p className="font-semibold">Subscription Expired</p>
+                  <p className="mt-1">Your subscription has expired. Renew now to restore full access to PharmaLens features and identifications.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Info: Good usage status */}
+            {usagePercentage < 50 && usageStats.monthlyLimit !== -1 && subscriptionStatus.status === 'active' && (
+              <div className="flex items-start gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-green-700 dark:text-green-200">
+                  <p className="font-semibold">You're On Track!</p>
+                  <p className="mt-1">You've used {usageStats.identificationsUsed} of {usageStats.monthlyLimit + (profile?.extra_identifications || 0)} identifications. You're managing your usage efficiently.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Info: Free plan reminder */}
+            {subscriptionStatus.status === 'free' && usageStats.identificationsUsed >= 3 && (
+              <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <Zap className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-blue-700 dark:text-blue-200">
+                  <p className="font-semibold">Unlock More with Premium Plans</p>
+                  <p className="mt-1">Upgrade to Lite (39/month) or Pro (101/month) for more identifications, advanced search, and priority support.</p>
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 

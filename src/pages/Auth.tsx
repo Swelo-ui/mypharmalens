@@ -5,6 +5,7 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AuthForm from '@/components/AuthForm';
+import AccountBenefits from '@/components/AccountBenefits';
 
 const Auth = () => {
   const { isAuthenticated, isLoading } = useAuthStatus();
@@ -27,23 +28,8 @@ const Auth = () => {
         
         <AuthForm />
         
-        <div className="mt-8 sm:mt-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 max-w-2xl mx-auto">
-          <h3 className="text-base sm:text-lg font-medium mb-3">Benefits of creating an account:</h3>
-          <ul className="space-y-2">
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5 flex-shrink-0">✓</span>
-              <span className="text-sm sm:text-base">Save your medication identification history</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5 flex-shrink-0">✓</span>
-              <span className="text-sm sm:text-base">Access your history from any device</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-pharma-100 dark:bg-pharma-900/30 text-pharma-600 text-sm mr-3 mt-0.5 flex-shrink-0">✓</span>
-              <span className="text-sm sm:text-base">Track medications you've identified previously</span>
-            </li>
-          </ul>
-        </div>
+        {/* Comprehensive Benefits Section */}
+        <AccountBenefits />
       </main>
       <Footer />
     </div>
