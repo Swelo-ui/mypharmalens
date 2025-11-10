@@ -77,28 +77,28 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
-                    How It Works
+                  <Link to="/subscription" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                    Pricing Plans
                   </Link>
                 </li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-sm font-semibold mb-4">Support</h3>
-              <ul className="space-y-3">
+              <h3 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4">Support</h3>
+              <ul className="space-y-2 sm:space-y-3">
                 <li>
-                  <Link to="/help" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                  <Link to="/help" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                  <Link to="/faq" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     FAQs
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                  <Link to="/contact" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     Contact Us
                   </Link>
                 </li>
@@ -106,25 +106,25 @@ const Footer = () => {
             </div>
             
             <div>
-              <h3 className="text-sm font-semibold mb-4">Legal</h3>
-              <ul className="space-y-3">
+              <h3 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4">Legal</h3>
+              <ul className="space-y-2 sm:space-y-3">
                 <li>
                   <a 
                     href="https://pharmalens.tech/privacy" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors flex items-center"
+                    className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors flex items-center"
                   >
                     Privacy Policy <ExternalLink className="h-3 w-3 ml-1" />
                   </a>
                 </li>
                 <li>
-                  <Link to="/terms" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                  <Link to="/terms" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     Terms of Use
                   </Link>
                 </li>
                 <li>
-                  <Link to="/disclaimer" className="text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                  <Link to="/disclaimer" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     Medical Disclaimer
                   </Link>
                 </li>

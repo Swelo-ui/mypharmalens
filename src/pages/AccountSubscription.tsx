@@ -89,14 +89,14 @@ const AccountSubscription: React.FC = () => {
                       })()}` : ' (Unlimited)'}
                       </p>
                       {extraIdentifications > 0 && (
-                        <p className={`text-xs flex items-center gap-1 ${
+                        <p className={`text-xs flex items-center gap-1 font-medium ${
                           extraIdentifications >= 50 ? 'text-violet-600 dark:text-violet-400' :
                           extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
                           extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
                           extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
                           'text-red-600 dark:text-red-400'
                         }`}>
-                          <span className="inline-block">⚡</span>{extraIdentifications} bonus remaining
+                          +{extraIdentifications} bonus identifications
                         </p>
                       )}
                       {usageStats.monthlyLimit >= 0 && (
@@ -127,15 +127,7 @@ const AccountSubscription: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-0 sm:border shadow-none sm:shadow-sm">
-            <CardHeader>
-              <CardTitle>Purchase History</CardTitle>
-              <CardDescription>Your recent transactions and billing cycles</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PaymentHistory />
-            </CardContent>
-          </Card>
+          <PaymentHistory />
         </div>
       </main>
       <Footer />

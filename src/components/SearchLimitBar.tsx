@@ -174,34 +174,34 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
   const remaining = getRemainingSearches();
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 dark:border-blue-800">
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <span className="font-semibold text-blue-900 dark:text-blue-100">
-                Database Search Limit
+    <Card className="border bg-card">
+      <CardContent className="p-3 sm:p-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium truncate">
+                Search Limit
               </span>
             </div>
-            <span className={`text-sm font-bold ${getWarningColor()} dark:text-green-400`}>
-              {remaining} / {searchesLimit} remaining
+            <span className={`text-xs sm:text-sm font-semibold ${getWarningColor()} whitespace-nowrap`}>
+              {remaining} / {searchesLimit}
             </span>
           </div>
 
           <Progress 
             value={percentage} 
-            className="h-2" 
+            className="h-1.5 sm:h-2" 
           />
 
           {percentage >= 80 && percentage < 100 && (
-            <div className="flex items-center justify-between text-sm">
-              <p className="text-amber-700 dark:text-amber-300">
-                You're approaching your search limit
+            <div className="flex items-center justify-between text-xs gap-2">
+              <p className="text-amber-700 dark:text-amber-300 truncate">
+                Approaching limit
               </p>
               <Link to="/subscription-manager">
-                <Button variant="link" size="sm" className="h-auto p-0 text-blue-600">
-                  Upgrade →
+                <Button variant="link" size="sm" className="h-auto p-0 text-xs text-primary">
+                  Upgrade
                 </Button>
               </Link>
             </div>

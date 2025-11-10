@@ -276,16 +276,14 @@ const Header = () => {
                 </>
               )}
 
-              {/* Mobile Menu Toggle - Only visible on non-bottom nav screens */}
-              {!isMobile && (
-                <button
-                  className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
-                  onClick={() => setIsOpen(!isOpen)}
-                  aria-label="Toggle menu"
-                >
-                  {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                </button>
-              )}
+              {/* Mobile Menu Toggle */}
+              <button
+                className="p-2 text-gray-600 dark:text-gray-300 md:hidden"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
+              >
+                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </div>

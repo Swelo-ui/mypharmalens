@@ -278,8 +278,8 @@ const PaymentHistory: React.FC = () => {
                           <h3 className="font-semibold text-sm sm:text-base truncate">
                             {transactionTitle}
                           </h3>
-                          <Badge variant="outline" className="text-xs">
-                            {isTopUp ? '🎁 Top-Up' : '📦 Subscription'}
+                          <Badge variant="outline" className="text-xs shrink-0">
+                            {isTopUp ? 'Top-Up' : 'Subscription'}
                           </Badge>
                         </div>
                         <p className="text-xs sm:text-sm text-gray-600 truncate">
