@@ -637,9 +637,9 @@ export const useSubscription = () => {
 
   // Get database search limit based on subscription plan
   const getDatabaseSearchLimit = () => {
-    if (!currentSubscription || !currentSubscription.plan) return 10;
-    // Use default limits based on plan type
-    return currentSubscription.plan.id === 'free-plan' ? 10 : 100;
+    if (!currentSubscription || !currentSubscription.plan) return 50; // Default free plan limit
+    // Use advanced_search_limit from the plan
+    return currentSubscription.plan.advanced_search_limit || 50;
   };
 
   // Check if user can access a specific feature

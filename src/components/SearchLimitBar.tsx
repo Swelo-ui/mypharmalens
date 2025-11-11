@@ -52,7 +52,7 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
     try {
       // Try to fetch real usage, fallback to plan-based limits
       let currentUsed = 0;
-      let currentLimit = 100; // Default free plan limit
+      let currentLimit = 50; // Default free plan limit
       
       // First, get user's current plan to determine search limit
       const { data: subscription } = await supabase
@@ -67,18 +67,11 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
         .limit(1)
         .maybeSingle();
 
-      // Determine search limit based on plan
+      // Use advanced_search_limit from subscription plan
       if (subscription?.plan) {
-        const planName = subscription.plan.name;
-        if (planName === 'Lite') {
-          currentLimit = 249;
-        } else if (planName === 'Pro') {
-          currentLimit = 500;
-        } else {
-          currentLimit = 100; // Free plan
-        }
+        currentLimit = subscription.plan.advanced_search_limit || 50;
       } else {
-        currentLimit = 100; // No active subscription = free plan
+        currentLimit = 50; // No active subscription = free plan
       }
 
       // Try to get actual usage from search_usage_tracking table
@@ -118,7 +111,7 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
       console.error('Error checking search limit:', error);
       // Fallback to free plan limits
       setSearchesUsed(0);
-      setSearchesLimit(100);
+      setSearchesLimit(50);
       setIsLocked(false);
     } finally {
       setLoading(false);

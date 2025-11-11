@@ -36,14 +36,9 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         .limit(1)
         .maybeSingle();
 
-      let currentLimit = 100; // Default free plan
+      let currentLimit = 50; // Default free plan (based on database)
       if (subscription?.plan) {
-        const planName = subscription.plan.name;
-        if (planName === 'Lite') {
-          currentLimit = 249;
-        } else if (planName === 'Pro') {
-          currentLimit = 500;
-        }
+        currentLimit = subscription.plan.advanced_search_limit || 50;
       }
 
       // Check if we need to reset for new month
@@ -87,7 +82,7 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         .insert({
           user_id: userId,
           searches_used: 1,
-          searches_limit: 100, // Default free plan limit
+          searches_limit: 50, // Default free plan limit
           last_reset_date: now.toISOString()
         });
 
@@ -123,17 +118,10 @@ export const getSearchUsage = async (userId: string): Promise<{ used: number; li
       .limit(1)
       .maybeSingle();
 
-    // Determine search limit based on plan
-    let limit = 100; // Default free plan
+    // Use advanced_search_limit from subscription plan
+    let limit = 50; // Default free plan (based on database)
     if (subscription?.plan) {
-      const planName = subscription.plan.name;
-      if (planName === 'Lite') {
-        limit = 249;
-      } else if (planName === 'Pro') {
-        limit = 500;
-      } else {
-        limit = 100; // Free plan
-      }
+      limit = subscription.plan.advanced_search_limit || 50;
     }
 
     // Get usage
@@ -190,15 +178,10 @@ export const hasReachedSearchLimit = async (userId: string): Promise<boolean> =>
       .limit(1)
       .maybeSingle();
 
-    // Determine search limit based on current plan
-    let currentLimit = 100; // Default free plan
+    // Use advanced_search_limit from the subscription plan
+    let currentLimit = 50; // Default free plan (based on database)
     if (subscription?.plan) {
-      const planName = subscription.plan.name;
-      if (planName === 'Lite') {
-        currentLimit = 249;
-      } else if (planName === 'Pro') {
-        currentLimit = 500;
-      }
+      currentLimit = subscription.plan.advanced_search_limit || 50;
     }
 
     // Get current usage

@@ -1,4 +1,4 @@
-# 💊 PharmaLens - AI-Powered Medication Identification & Healthcare Platform
+# 💊 PharmaLens - AI-Powered Medication Strip Identification & Healthcare Platform
 
 <div align="center">
 
@@ -9,7 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![PhonePe](https://img.shields.io/badge/PhonePe-Payments-5F259F?style=flat-square)](https://www.phonepe.com/)
+[![Razorpay](https://img.shields.io/badge/Razorpay-Payments-3395FF?style=flat-square)](https://razorpay.com/)
 
 **🌐 Live Demo:** [https://pharmalens.tech](https://pharmalens.tech)  
 **📱 Mobile Optimized:** Progressive Web App (PWA)  
@@ -21,17 +21,17 @@
 
 ## 🚀 Overview
 
-**PharmaLens** is a comprehensive AI-powered healthcare platform that revolutionizes medication management through advanced image recognition, symptom analysis, and drug interaction checking. Built with modern web technologies, it provides healthcare professionals and patients with accurate, real-time pharmaceutical information.
+**PharmaLens** is a specialized AI-powered medication strip identifier that helps users identify pharmaceutical blister packs, sachets, and medication strips through advanced image recognition. Unlike pills that may have visible markings, medication strips often lack clear identifiers, making PharmaLens essential for accurate identification. The platform also includes symptom analysis and drug interaction checking for comprehensive healthcare support.
 
 ### 🎯 Key Features
 
-- **🔍 AI Medication Identification** - 99.5% accuracy rate with advanced image recognition
+- **🔍 AI Medication Strip Identification** - Advanced recognition of blister packs, sachets, and medication strips
 - **🩺 Symptoms Checker** - AI-powered symptom analysis with first-line treatment recommendations
 - **⚠️ Drug Interactions Checker** - Real-time safety analysis with layman/medical terminology toggle
 - **📊 Comprehensive Database** - 1000+ medications with verified pharmaceutical data
-- **📱 Mobile-First Design** - Responsive PWA with offline capabilities
-- **💳 Secure Payments** - PhonePe integration with multiple payment methods
-- **🔐 Privacy-First** - HIPAA compliant with enterprise-grade security
+- **📱 Mobile-First Design** - Responsive PWA optimized for mobile cameras
+- **💳 Secure Payments** - Razorpay integration with UPI and multiple payment methods
+- **🔐 Privacy-First** - Secure image processing without data storage
 
 ---
 
@@ -61,7 +61,7 @@ Row Level Security - Data protection
 
 ### Payment & Integration
 ```
-PhonePe API        - Payment gateway
+Razorpay API       - Payment gateway
 UPI Integration    - Digital payments
 Webhook System     - Real-time notifications
 SSL Encryption     - Secure transactions
@@ -74,22 +74,22 @@ SSL Encryption     - Secure transactions
 ### 1. 🔍 AI Medication Identification
 
 <details>
-<summary><strong>Advanced Image Recognition System</strong></summary>
+<summary><strong>Specialized Strip Recognition System</strong></summary>
 
-- **AI Model**: Custom-trained on 10,000+ medication images
-- **Accuracy**: 99.5% identification rate
-- **Processing**: Real-time image analysis
+- **Target**: Medication strips, blister packs, sachets without visible markings
+- **AI Processing**: Advanced image analysis for packaging identification
 - **Features**:
-  - Shape, color, and imprint recognition
-  - Multi-angle analysis
-  - Blurry image enhancement
+  - Strip packaging recognition
+  - Brand and manufacturer detection
+  - Multi-angle analysis support
   - Confidence scoring
   - Alternative suggestions
+  - Both Standard and Enhanced identification modes
 
 **Usage Limits by Plan:**
-- Free: 5 identifications/month
-- Weekly: 21 identifications/week
-- Premium: Unlimited identifications
+- Free: 100 searches/month
+- Lite: 249 searches/month  
+- Pro: 500 searches/month
 
 </details>
 
@@ -152,22 +152,21 @@ SSL Encryption     - Secure transactions
 - ✅ Symptoms checker access
 - ✅ Drug interaction checker
 
-### ⏰ Weekly Plan - ₹39/week
+### ⏰ Lite Plan - ₹49/week
 - ✅ All Free Plan features
-- ✅ 21 AI identifications per week
-- ✅ 500+ medicines database
+- ✅ 39 AI identifications per month
+- ✅ 249 medication searches per month
+- ✅ Enhanced drug database
 - ✅ Priority support
 - ✅ Ad-free experience
-- ✅ Enhanced search filters
 
-### 👑 Premium Plan - ₹199/month *(Most Popular)*
-- ✅ All Weekly Plan features
-- ✅ **Unlimited AI identifications**
-- ✅ **1000+ database drugs**
-- ✅ **Layman explanations**
-- ✅ **History feature**
+### 👑 Pro Plan - ₹99/month *(Most Popular)*
+- ✅ All Lite Plan features
+- ✅ 101 AI identifications per month
+- ✅ **500 medication searches per month**
 - ✅ **Advanced search filters**
-- ✅ **Priority database updates**
+- ✅ **Layman explanations**
+- ✅ **Enhanced identification modes**
 
 ---
 
@@ -188,7 +187,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Configure your Supabase and PhonePe credentials
+# Configure your Supabase and Razorpay credentials
 
 # Start development server
 npm run dev
@@ -198,8 +197,8 @@ npm run dev
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_PHONEPE_MERCHANT_ID=your_phonepe_merchant_id
-VITE_PHONEPE_SALT_KEY=your_phonepe_salt_key
+VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+VITE_RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 ```
 
 ### Available Scripts
@@ -227,7 +226,7 @@ pharmalens/
 │   ├── hooks/              # Custom React hooks
 │   ├── lib/                # Utility functions
 │   ├── services/           # API services
-│   │   └── payment/        # PhonePe integration
+│   │   └── payment/        # Razorpay integration
 │   ├── types/              # TypeScript definitions
 │   └── utils/              # Helper functions
 ├── public/                 # Static assets
@@ -243,11 +242,11 @@ pharmalens/
 - **HIPAA Compliance** - Healthcare data protection standards
 - **SSL/TLS Encryption** - All data transmission encrypted
 - **Row Level Security** - Database-level access control
-- **No Personal Health Data Storage** - Images processed and discarded
+- **No Personal Health Data Storage** - Images processed and discarded immediately
 - **Secure Authentication** - Supabase Auth with JWT tokens
 
 ### Payment Security
-- **PCI DSS Compliant** - PhonePe payment processing
+- **PCI DSS Compliant** - Razorpay payment processing
 - **256-bit SSL Encryption** - Secure transaction processing
 - **No Card Data Storage** - Tokenized payment processing
 - **Real-time Fraud Detection** - Advanced security monitoring
@@ -285,9 +284,8 @@ medications          # Drug database
 drug_interactions    # Interaction mappings
 symptom_mappings     # Symptom-drug relationships
 
--- User activity
-identification_history  # AI identification logs
-search_history         # Search queries
+-- User activity  
+search_usage_tracking  # Search quota and usage
 user_feedback         # Quality improvement data
 ```
 
