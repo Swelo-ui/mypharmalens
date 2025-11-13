@@ -57,12 +57,12 @@ export async function performLocalOCRFallback(base64Image: string): Promise<Loca
 /**
  * Analyze image using basic pattern recognition
  */
-async function analyzeImageLocally(base64Image: string): Promise<{
+function analyzeImageLocally(base64Image: string): {
   text: string;
   drugName?: string;
   genericName?: string;
   confidence: 'high' | 'medium' | 'low';
-}> {
+} {
   
   // Common drug name patterns to look for
   const commonDrugPatterns = [
@@ -88,7 +88,7 @@ async function analyzeImageLocally(base64Image: string): Promise<{
   ];
   
   // Try to extract text from filename or metadata if available
-  let extractedText = '';
+  const extractedText = '';
   
   // Look for common text patterns in the image data
   // This is a simplified approach - in production, you'd use more sophisticated methods
@@ -114,14 +114,37 @@ async function analyzeImageLocally(base64Image: string): Promise<{
   };
 }
 
+interface LocalDrugInfo {
+  name: string;
+  genericName: string;
+  manufacturer?: string;
+  category: string;
+  description: string;
+  dosageAndAdmin: string;
+  sideEffects: string[];
+  warnings: string[];
+  storage: string;
+  indications: string[];
+  contraindications: string[];
+  prescriptionStatus: string;
+  confidence: string;
+  verified: boolean;
+}
+
+interface LocalDrugResponse {
+  success: boolean;
+  data: LocalDrugInfo;
+  source?: string;
+}
+
 /**
  * Get drug information from local database when AI fails
  */
-export async function getLocalDrugInfo(drugName: string): Promise<any> {
+export function getLocalDrugInfo(drugName: string): LocalDrugResponse {
   console.log(`🔍 Getting local drug info for: ${drugName}`);
   
   // Common drug information database (simplified)
-  const localDrugDB: Record<string, any> = {
+  const localDrugDB: Record<string, LocalDrugInfo> = {
     'limcee': {
       name: 'Limcee',
       genericName: 'Vitamin C (Ascorbic Acid)',
@@ -146,6 +169,7 @@ export async function getLocalDrugInfo(drugName: string): Promise<any> {
       dosageAndAdmin: '500mg-1000mg every 4-6 hours, maximum 4000mg per day',
       sideEffects: ['Rare allergic reactions', 'Liver damage with overdose'],
       warnings: ['Do not exceed maximum daily dose', 'Avoid alcohol consumption'],
+      storage: 'Store in cool, dry place away from direct sunlight',
       indications: ['Pain relief', 'Fever reduction'],
       contraindications: ['Severe liver disease'],
       prescriptionStatus: 'Over-the-counter',
@@ -160,6 +184,7 @@ export async function getLocalDrugInfo(drugName: string): Promise<any> {
       dosageAndAdmin: '65-90mg daily for adults',
       sideEffects: ['Stomach upset', 'Diarrhea with high doses'],
       warnings: ['Consult healthcare provider for high doses'],
+      storage: 'Store in cool, dry place away from direct sunlight',
       indications: ['Scurvy prevention', 'Immune support', 'Antioxidant'],
       contraindications: ['Kidney stones history (high doses)'],
       prescriptionStatus: 'Over-the-counter',
@@ -187,20 +212,64 @@ export async function getLocalDrugInfo(drugName: string): Promise<any> {
     data: {
       name: drugName,
       genericName: 'Not identified',
+      category: 'Unknown',
       description: 'Drug information unavailable - AI services exhausted',
+      dosageAndAdmin: 'Consult healthcare professional',
+      sideEffects: ['Unknown - consult healthcare provider'],
       warnings: ['Consult healthcare professional for proper identification'],
+      storage: 'Follow package instructions',
       indications: ['Please visit a pharmacy or doctor for accurate identification'],
+      contraindications: ['Do not use if unsure of medication identity'],
+      prescriptionStatus: 'Unknown',
       confidence: 'low',
-      verified: false,
-      source: 'local-fallback'
-    }
+      verified: false
+    },
+    source: 'local-fallback'
   };
+}
+
+interface OfflineResponse {
+  success: boolean;
+  data: {
+    id: string;
+    name: string;
+    genericName: string;
+    manufacturer: string;
+    category: string;
+    description: string;
+    dosageAndAdmin: string;
+    sideEffects: string[];
+    warnings: string[];
+    interactions: string[];
+    storage: string;
+    mechanism: string;
+    indications: string[];
+    contraindications: string[];
+    prescriptionStatus: string;
+    pregnancy: string;
+    imprint: string;
+    verified: boolean;
+    drugClass: string;
+    confidence: string;
+    color: string;
+    shape: string;
+    brandNames: string[];
+    possibleNames: string[];
+    processingStages: string[];
+    fallbackUsed: boolean;
+    offlineMode: boolean;
+    recommendations: string[];
+  };
+  processingStages: string[];
+  confidence: string;
+  fallbackUsed: boolean;
+  processingTime: number;
 }
 
 /**
  * Create a comprehensive response when all AI services fail
  */
-export function createOfflineResponse(drugName?: string): any {
+export function createOfflineResponse(drugName?: string): OfflineResponse {
   return {
     success: true,
     data: {
