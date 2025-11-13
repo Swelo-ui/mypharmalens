@@ -1,8 +1,9 @@
 import "xhr";
-import { checkDrugCache as checkCacheIntegration } from './cache-integration.ts';
+import { checkDrugCache as checkCacheIntegration, checkDrugCacheWithValidation } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
 import { cleanText, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
+import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 // AI fallback imports (will be used when adding intelligent fallbacks)
 // import {
 //   extractDrugFromImage,
@@ -105,6 +106,10 @@ interface DrugData {
   possibleNames?: string[];
   verified?: boolean;
   completeness?: number;
+  // Cache-specific properties
+  fromCache?: boolean;
+  cacheCompleteness?: number;
+  qualityScore?: number;
   [key: string]: unknown; // Allow additional properties
 }
 
@@ -503,8 +508,22 @@ async function checkLocalDatabase(drugName: string, threshold: number = 0.75): P
   return null;
 }
 
-async function checkDrugCache(drugName: string): Promise<unknown> {
+// Enhanced cache check with validation
+async function checkDrugCache(
+  drugName: string,
+  extractedInfo?: {
+    genericNames?: string[];
+    imprint?: string;
+    color?: string;
+    shape?: string;
+  }
+): Promise<unknown> {
   try {
+    // Use validated cache check if we have extracted info
+    if (extractedInfo) {
+      return await checkDrugCacheWithValidation(drugName, extractedInfo);
+    }
+    // Fall back to basic cache check
     return await checkCacheIntegration(drugName);
   } catch (error) {
     console.error('Cache check error:', error);
@@ -1233,14 +1252,33 @@ Deno.serve(async (req: Request) => {
     // ⚡ OPTIMIZATION 1: PARALLEL CACHE + LOCAL DB SEARCH (30-40% faster!)
     console.log('⚡ Stage 2+3: PARALLEL Cache + Local DB Search (OPTIMIZED)...');
     
-    // Helper: Early exit for high-confidence results (5-10x faster!)
+    // Helper: Optimized early exit for fast cache hits and quality data
     const shouldEarlyExit = (data: DrugData): boolean => {
-      const completeness = data.completeness || 0;
+      // Safe number extraction with fallbacks
+      const completeness = typeof data.completeness === 'number' ? data.completeness : 
+                          (typeof data.cacheCompleteness === 'number' ? data.cacheCompleteness : 0);
       const confidence = data.confidence || 'low';
-      if (completeness >= 95 && confidence === 'high') {
-        console.log(`\n⚡ EARLY EXIT: ${completeness}% complete + high confidence!`);
+      const fromCache = Boolean(data.fromCache);
+      const qualityScore = typeof data.qualityScore === 'number' ? data.qualityScore : 0;
+      
+      // Immediate exit for cache hits with reasonable completeness
+      if (fromCache && completeness >= 60) {
+        console.log(`\n🚀 IMMEDIATE CACHE EXIT: ${completeness}% complete cache hit!`);
         return true;
       }
+      
+      // Early exit for high-quality non-cache data  
+      if (!fromCache && completeness >= 85 && (confidence === 'high' || qualityScore >= 85)) {
+        console.log(`\n⚡ EARLY EXIT: ${completeness}% complete + ${confidence} confidence!`);
+        return true;
+      }
+      
+      // Quick exit for any very complete data
+      if (completeness >= 95) {
+        console.log(`\n⚡ QUICK EXIT: ${completeness}% completion achieved!`);
+        return true;
+      }
+      
       return false;
     };
     
@@ -1280,10 +1318,17 @@ Deno.serve(async (req: Request) => {
       const thresholds = [0.90, 0.80, 0.70]; // Extended AI validation range
       const allPromises: Promise<{ type: 'cache'|'db', data: unknown, key?: string, thresh?: number }>[] = [];
       
-      // Cache promises
+      // Cache promises with validation data from vision analysis
+      const extractedValidationInfo = {
+        genericNames: genericName ? [genericName] : [],
+        imprint: visionResult?.imprint,
+        color: visionResult?.color,
+        shape: visionResult?.shape
+      };
+      
       uniqueVariations.forEach(v => {
         allPromises.push(
-          checkDrugCache(v).then(d => ({ type: 'cache' as const, data: d, key: v }))
+          checkDrugCache(v, extractedValidationInfo).then(d => ({ type: 'cache' as const, data: d, key: v }))
         );
       });
       
@@ -1308,33 +1353,27 @@ Deno.serve(async (req: Request) => {
       
       if (cacheHits.length > 0) {
         const hit = cacheHits[0];
-        console.log(`✅ CACHE HIT: "${hit.key}"!`);
+        const hitData = hit.data as DrugData;
+        console.log(`✅ CACHE HIT: "${hit.key}"! (${hitData.completeness || hitData.cacheCompleteness || 'Unknown'}% complete)`);
         
         stages.push({
           name: 'cache-search',
           success: true,
-          data: hit.data,
+          data: hitData,
           processingTime: Date.now() - overallStartTime
         });
 
+        // For cache hits, immediately enrich and return - no need for further processing
         const enrichedCacheData = enrichResponseMetadata(
-          hit.data as DrugData,
+          hitData,
           stages,
           preProcessingResult,
           overallStartTime
         );
         
-        // ⚡ EARLY EXIT CHECK
-        if (shouldEarlyExit(hit.data as DrugData)) {
-          return createResponse({
-            success: true,
-            data: enrichedCacheData,
-            processingStages: stages.map(s => s.name),
-            confidence: 'high',
-            fallbackUsed: false,
-            processingTime: Date.now() - overallStartTime
-          });
-        }
+        console.log(`🚀 IMMEDIATE CACHE RETURN - No further processing needed`);
+        console.log(`   Cache completeness: ${hitData.completeness || hitData.cacheCompleteness || 'Unknown'}%`);
+        console.log(`   Processing time: ${Date.now() - overallStartTime}ms`);
         
         return createResponse({
           success: true,
@@ -1390,8 +1429,10 @@ Deno.serve(async (req: Request) => {
           overallStartTime
         );
         
-        // ⚡ EARLY EXIT CHECK
-        if (shouldEarlyExit(dbHit.data as DrugData)) {
+        // ⚡ OPTIMIZED EXIT CHECK - More lenient for database hits
+        const dbData = dbHit.data as DrugData;
+        if (shouldEarlyExit(dbData) || (dbHit.thresh! >= 0.85 && dbData.name && dbData.genericName)) {
+          console.log(`🎯 FAST DB RETURN: ${dbHit.thresh! >= 0.85 ? 'High' : 'Good'} confidence match`);
           return createResponse({
             success: true,
             data: enrichedLocalData,
@@ -1453,8 +1494,9 @@ Deno.serve(async (req: Request) => {
         const limitedData = limitDataForStandardMode(oneMgResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
         
-        // ⚡ EARLY EXIT CHECK
-        if (shouldEarlyExit(limitedData)) {
+        // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
+        if (shouldEarlyExit(limitedData) || (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 70)) {
+          console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${oneMgResult.data.dataQuality || 'Unknown'}%`);
           return createResponse({
             success: true,
             data: enrichedData,
@@ -1492,8 +1534,9 @@ Deno.serve(async (req: Request) => {
         const limitedData = limitDataForStandardMode(medlinePlusResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
         
-        // ⚡ EARLY EXIT CHECK
-        if (shouldEarlyExit(limitedData)) {
+        // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
+        if (shouldEarlyExit(limitedData) || (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 70)) {
+          console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${medlinePlusResult.data.dataQuality || 'Unknown'}%`);
           return createResponse({
             success: true,
             data: enrichedData,
@@ -1651,6 +1694,89 @@ Deno.serve(async (req: Request) => {
     }
     
     console.log(`🤖 === AI ENHANCEMENT COMPLETE ===\n`);
+    
+    // Stage 6.2: Intelligent Web Search (NEW!) - for torn/damaged strips
+    // Automatically triggered when strip is damaged or information is incomplete
+    console.log('🌐 Stage 6.2: Intelligent AI Web Search...');
+    
+    const stripCondition = visionResult?.tornOrCut ? 'torn' : 
+                          (visionResult?.partialView ? 'partial' : 
+                          (visionResult?.blurry ? 'blurry' : 'good'));
+    
+    const qualityResult = calculateQualityScore({
+      name: drugName,
+      genericName: genericName,
+      description: '',
+      sideEffects: [],
+      warnings: []
+    } as DrugData, stages.map(s => s.name));
+    
+    const currentCompleteness = qualityResult.overall;
+    
+    if (shouldUseIntelligentWebSearch(visionResult, currentCompleteness)) {
+      console.log('🧠 === INTELLIGENT WEB SEARCH ACTIVATED ===');
+      console.log(`   Trigger: ${stripCondition} strip or low completeness (${currentCompleteness}%)`);
+      console.log(`   Strategy: AI thinks + searches web for complete information`);
+      
+      try {
+        const webSearchResult = await performIntelligentWebSearch({
+          drugName: drugName || undefined,
+          genericName: genericName || undefined,
+          imprint: visionResult?.imprint,
+          color: visionResult?.color,
+          shape: visionResult?.shape,
+          stripCondition: stripCondition as 'torn' | 'damaged' | 'cut' | 'partial' | 'blurry' | 'good',
+          visibleText: undefined,
+          completeness: currentCompleteness
+        });
+        
+        if (webSearchResult.success && webSearchResult.drugInfo) {
+          console.log(`✅ INTELLIGENT WEB SEARCH SUCCESSFUL!`);
+          console.log(`   Drug: ${webSearchResult.drugInfo.name}`);
+          console.log(`   Strategy: ${webSearchResult.searchStrategy}`);
+          console.log(`   Sources: ${webSearchResult.sourcesSearched?.length || 0} sources`);
+          console.log(`   Confidence: ${(webSearchResult.confidence || 0) * 100}%`);
+          
+          stages.push({
+            name: 'intelligent-web-search',
+            success: true,
+            data: webSearchResult.drugInfo,
+            processingTime: Date.now() - overallStartTime
+          });
+          
+          // Enrich web search data with metadata
+          const enrichedWebSearchData = enrichResponseMetadata(
+            webSearchResult.drugInfo as DrugData,
+            stages,
+            preProcessingResult,
+            overallStartTime
+          );
+          
+          return createResponse({
+            success: true,
+            data: {
+              ...enrichedWebSearchData,
+              searchStrategy: webSearchResult.searchStrategy,
+              reasoning: webSearchResult.reasoning,
+              sourcesUsed: webSearchResult.sourcesSearched,
+              webSearchUsed: true
+            },
+            processingStages: stages.map(s => s.name),
+            confidence: (webSearchResult.confidence || 0) >= 0.8 ? 'high' : 'medium',
+            fallbackUsed: true,
+            processingTime: Date.now() - overallStartTime
+          });
+        } else {
+          console.log(`⚠️ Intelligent web search failed: ${webSearchResult.error || 'Unknown error'}`);
+        }
+      } catch (webSearchError) {
+        console.error(`❌ Intelligent web search error:`, webSearchError);
+      }
+    } else {
+      console.log(`ℹ️ Intelligent web search not needed (good strip condition, sufficient info)`);
+    }
+    
+    console.log(`🌐 === INTELLIGENT WEB SEARCH COMPLETE ===\n`);
     
     // Stage 6.5: Critical Vision Analysis (Qwen) for challenging images
     console.log('🔬 Stage 6.5: Critical Vision Analysis...');

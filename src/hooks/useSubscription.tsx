@@ -140,11 +140,22 @@ export const useSubscription = () => {
       setAvailablePlans((data || []) as SubscriptionPlan[]);
     } catch (error: any) {
       console.error('Error fetching subscription plans:', error);
-      const msg = error?.message || 'Unknown error';
-      const details = error?.hint || error?.details || error?.code || '';
-      toast.error('Failed to load subscription plans', {
-        description: `${msg}${details ? ` (code: ${details})` : ''}`
-      });
+      
+      // Don't show error toasts when offline - user already gets offline notification
+      const isOfflineError = !navigator.onLine || 
+                            error?.message?.includes('fetch') ||
+                            error?.message?.includes('Failed to fetch') ||
+                            error?.code === 'PGRST301';
+      
+      if (!isOfflineError) {
+        const msg = error?.message || 'Unknown error';
+        toast.error('Failed to load subscription plans', {
+          description: msg,
+          duration: 4000
+        });
+      } else {
+        console.log('📴 Offline - subscription data will load when online');
+      }
     }
   };
 

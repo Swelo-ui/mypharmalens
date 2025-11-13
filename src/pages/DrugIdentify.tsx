@@ -14,6 +14,7 @@ import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useOfflineDetection } from '@/hooks/useOfflineDetection';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -76,6 +77,7 @@ const calculateSimilarity = (hash1: string, hash2: string): number => {
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
+  const { checkOnlineStatus } = useOfflineDetection();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
   const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');
   const [isIdentifying, setIsIdentifying] = useState(false);
@@ -622,6 +624,11 @@ const DrugIdentify = () => {
 
   const handleImageCapture = async (file: File) => {
     try {
+      // Check if online before attempting identification
+      if (!checkOnlineStatus('Drug identification')) {
+        return; // User gets toast notification from checkOnlineStatus
+      }
+
       // Force refresh bonus identifications before checking limits
       if (user) {
         console.log('🔄 Force refreshing bonus identifications before limit check...');

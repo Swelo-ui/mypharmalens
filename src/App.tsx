@@ -8,6 +8,9 @@ import { playAppAccessSound } from '@/utils/audioService';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BottomNavigation from "./components/BottomNavigation";
+import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { useOfflineDetection } from "./hooks/useOfflineDetection";
 
 // Lazy load heavy components
 const SearchResults = lazy(() => import("./pages/SearchResults"));
@@ -42,6 +45,9 @@ const LoadingSpinner = () => (
 );
 
 const App = () => {
+  // Initialize offline detection
+  useOfflineDetection();
+
   useEffect(() => {
     // Play access alert sound when PharmaLens is accessed
     playAppAccessSound();
@@ -51,6 +57,10 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          {/* PWA Update & Install Prompts */}
+          <PWAUpdatePrompt />
+          <PWAInstallPrompt />
+          
           <div className="flex flex-col min-h-screen">
             <div className="flex-1">
               <Suspense fallback={<LoadingSpinner />}>
