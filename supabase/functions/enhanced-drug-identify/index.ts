@@ -4,6 +4,7 @@ import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
 import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
+import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 import {
   extractDrugFromImage,
   extractTextFromImage,
@@ -3970,9 +3971,19 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error('Enhanced drug identification error:', error);
     
+    // Check if this is a rate limit error
+    if (isRateLimitError(error as Error)) {
+      logRateLimit('Enhanced Mode', (error as Error).message);
+      
+      const rateLimitResponse = createRateLimitResponse(Date.now() - overallStartTime);
+      return createResponse(rateLimitResponse, 200);
+    }
+    
     const result: DrugIdentificationResult = {
       success: false,
-      error: (error as Error).message || "Unknown error occurred",
+      error: isRateLimitError(error as Error) ? 
+        getRateLimitErrorMessage() :
+        (error as Error).message || "Unknown error occurred",
       processingStages: stages.map(s => s.name),
       confidence: 'low',
       fallbackUsed: false,

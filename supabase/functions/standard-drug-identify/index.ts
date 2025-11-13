@@ -4,6 +4,7 @@ import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
 import { cleanText, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
+import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 // AI fallback imports (will be used when adding intelligent fallbacks)
 // import {
 //   extractDrugFromImage,
@@ -1915,13 +1916,23 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error('Standard drug identification error:', error);
     
+    // Check if this is a rate limit error
+    if (isRateLimitError(error as Error)) {
+      logRateLimit('Standard Mode', (error as Error).message);
+      
+      const rateLimitResponse = createRateLimitResponse(Date.now() - overallStartTime);
+      return createResponse(rateLimitResponse, 200);
+    }
+    
     return createResponse({
       success: false,
-      error: (error as Error).message || "An unexpected error occurred",
+      error: isRateLimitError(error as Error) ? 
+        getRateLimitErrorMessage() :
+        (error as Error).message || "An unexpected error occurred",
       processingStages: stages.map(s => s.name),
       confidence: 'low',
       fallbackUsed: false,
       processingTime: Date.now() - overallStartTime
-    }, 500);
+    }, isRateLimitError(error as Error) ? 200 : 500);
   }
 });
