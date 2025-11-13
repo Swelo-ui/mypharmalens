@@ -13,6 +13,7 @@ import { loadAllDrugs } from '@/data/drugDataLoader';
 import { fetchDrugs, supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { useOfflineDetection } from '@/hooks/useOfflineDetection';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';

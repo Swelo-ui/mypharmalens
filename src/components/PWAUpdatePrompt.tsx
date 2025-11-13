@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
 
 /**
  * PWA Update Prompt Component
@@ -11,74 +8,96 @@ import { RefreshCw } from 'lucide-react';
  */
 export const PWAUpdatePrompt = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({
-    onRegistered(r) {
-      console.log('✅ Service Worker registered:', r);
-      
-      // Check for updates every 60 seconds
-      if (r) {
-        setInterval(() => {
-          console.log('🔍 Checking for app updates...');
-          r.update();
-        }, 60000); // Check every 1 minute
-      }
-    },
-    onRegisterError(error) {
-      console.error('❌ Service Worker registration error:', error);
-    },
-    onNeedRefresh() {
-      console.log('🆕 New version available!');
-      setUpdateAvailable(true);
-      setNeedRefresh(true);
-      
-      // Show persistent toast notification
-      toast.info('🎉 Update Available!', {
-        description: 'A new version of PharmaLens is ready',
-        duration: Infinity, // Don't auto-dismiss
-        action: {
-          label: 'Update Now',
-          onClick: () => handleUpdate()
-        },
-        cancel: {
-          label: 'Later',
-          onClick: () => {
-            setUpdateAvailable(false);
-            setNeedRefresh(false);
-          }
-        }
+  useEffect(() => {
+    // Register service worker and handle updates
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('✅ Service Worker registered:', reg);
+          setRegistration(reg);
+          
+          // Check for updates every 60 seconds
+          setInterval(() => {
+            console.log('🔍 Checking for app updates...');
+            reg.update();
+          }, 60000); // Check every 1 minute
+          
+          // Listen for updates
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('🆕 New version available!');
+                  setUpdateAvailable(true);
+                  
+                  // Show persistent toast notification
+                  toast.info('🎉 Update Available!', {
+                    description: 'A new version of PharmaLens is ready',
+                    duration: Infinity, // Don't auto-dismiss
+                    action: {
+                      label: 'Update Now',
+                      onClick: () => handleUpdate()
+                    },
+                    cancel: {
+                      label: 'Later',
+                      onClick: () => {
+                        setUpdateAvailable(false);
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('❌ Service Worker registration error:', error);
+        });
+
+      // Listen for controller change (new SW activated)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('✅ New service worker activated!');
+        window.location.reload();
       });
-    },
-    onOfflineReady() {
-      console.log('✅ App ready to work offline!');
-      toast.success('📴 Offline Mode Ready', {
-        description: 'You can now use medications, symptom checker, and drug interactions offline',
-        duration: 5000
+
+      // Check if app is ready to work offline
+      navigator.serviceWorker.ready.then(() => {
+        console.log('✅ App ready to work offline!');
+        toast.success('📴 Offline Mode Ready', {
+          description: 'You can now use medications, symptom checker, and drug interactions offline',
+          duration: 5000
+        });
       });
-    },
-  });
+    }
+  }, []);
 
   const handleUpdate = async () => {
     console.log('🔄 Updating to new version...');
     toast.loading('Updating app...', { id: 'app-update' });
     
     try {
-      await updateServiceWorker(true);
-      
-      // Show success and reload
-      toast.success('✅ Updated!', {
-        id: 'app-update',
-        description: 'Reloading app with latest version...',
-        duration: 2000
-      });
-      
-      // Reload after short delay to show success message
-      setTimeout(() => {
+      if (registration && registration.waiting) {
+        // Tell the waiting service worker to skip waiting and become active
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        
+        // Show success message
+        toast.success('✅ Updated!', {
+          id: 'app-update',
+          description: 'Reloading app with latest version...',
+          duration: 2000
+        });
+        
+        // Reload after short delay to show success message
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        // Fallback: just reload
         window.location.reload();
-      }, 1500);
+      }
     } catch (error) {
       console.error('❌ Update error:', error);
       toast.error('Update failed', {
@@ -91,7 +110,7 @@ export const PWAUpdatePrompt = () => {
 
   // Auto-update in 30 seconds if user doesn't respond
   useEffect(() => {
-    if (needRefresh && updateAvailable) {
+    if (updateAvailable) {
       const autoUpdateTimer = setTimeout(() => {
         console.log('⏰ Auto-updating after 30 seconds...');
         toast.info('Auto-updating...', { duration: 2000 });
@@ -100,7 +119,7 @@ export const PWAUpdatePrompt = () => {
 
       return () => clearTimeout(autoUpdateTimer);
     }
-  }, [needRefresh, updateAvailable]);
+  }, [updateAvailable]);
 
   return null; // This component doesn't render anything visually
 };
