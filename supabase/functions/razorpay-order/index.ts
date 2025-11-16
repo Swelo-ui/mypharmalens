@@ -175,10 +175,10 @@ Deno.serve(async (req: Request) => {
       // Just return the order details
 
       return new Response(JSON.stringify({
+        key: Deno.env.get('RAZORPAY_KEY_ID'),
         order_id: order.id,
         amount: amountPaise,
-        currency: 'INR',
-        key_id: Deno.env.get('RAZORPAY_KEY_ID')
+        currency: 'INR'
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     } else {
       // Handle subscription order
@@ -242,12 +242,12 @@ Deno.serve(async (req: Request) => {
       const callbackUrl = `${appUrl}/payment-result`;
 
       return new Response(JSON.stringify({
-        keyId: Deno.env.get('RAZORPAY_KEY_ID'),
+        key: Deno.env.get('RAZORPAY_KEY_ID'),
+        order_id: order.id,
         amount: amountPaise,
         currency: 'INR',
-        orderId: order.id,
-        callbackUrl,
-        transactionId: txnid
+        callback_url: callbackUrl,
+        transaction_id: txnid
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
   } catch (error) {

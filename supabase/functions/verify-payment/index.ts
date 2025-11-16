@@ -166,8 +166,50 @@ Deno.serve(async (req: Request) => {
         throw new Error(`Failed to update subscription: ${updateErr.message}`);
       }
 
-      // Handle subscription activation logic here if needed
-      console.log('Subscription transaction updated to success');
+      const startsAt = new Date().toISOString();
+      const endsAt = (() => {
+        const d = new Date();
+        const cycle = String(subTx.billing_cycle || 'monthly');
+        if (cycle === 'yearly') d.setFullYear(d.getFullYear() + 1);
+        else if (cycle === 'weekly') d.setDate(d.getDate() + 7);
+        else d.setMonth(d.getMonth() + 1);
+        return d.toISOString();
+      })();
+      const { error: deactivateErr } = await supabase
+        .from('user_subscriptions')
+        .update({ status: 'inactive' })
+        .eq('user_id', String(subTx.user_id))
+        .eq('status', 'active');
+      if (deactivateErr) {
+        console.error('Error deactivating old subscriptions:', deactivateErr);
+      }
+      const { data: newSub, error: insertSubErr } = await supabase
+        .from('user_subscriptions')
+        .insert({
+          user_id: String(subTx.user_id),
+          plan_id: String(subTx.plan_id),
+          status: 'active',
+          starts_at: startsAt,
+          ends_at: endsAt
+        })
+        .select('*')
+        .single();
+      if (insertSubErr) {
+        console.error('Subscription activation failed:', insertSubErr);
+      } else {
+        await supabase
+          .from('subscription_history')
+          .insert({
+            user_id: String(subTx.user_id),
+            subscription_id: newSub.id,
+            plan_id: String(subTx.plan_id),
+            action: 'activated',
+            transaction_id: String(subTx.transaction_id),
+            billing_cycle: String(subTx.billing_cycle),
+            amount: Number(subTx.amount)
+          });
+        console.log('Subscription activated:', { subscription_id: newSub.id });
+      }
 
       return new Response(JSON.stringify({
         success: true,
