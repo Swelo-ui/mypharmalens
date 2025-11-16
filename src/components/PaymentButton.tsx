@@ -217,13 +217,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
 
       const returnPath = window.location.pathname || '/subscription-manager';
+      let rzp: any;
       const options: any = {
-        key: data?.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: data?.amount, // in paise
+        key: data?.key,
+        amount: data?.amount,
         currency: data?.currency || 'INR',
         name: 'Pharmalens',
         description: `${currentPlan.name} - ${currentBillingCycle} subscription`,
-        order_id: data?.orderId,
+        order_id: data?.order_id,
         prefill: {
           name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
           email: user.email || '',
@@ -233,7 +234,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           billingCycle: currentBillingCycle,
         },
         theme: { color: '#3399cc' },
-        callback_url: `${data?.callbackUrl}?return=${encodeURIComponent(returnPath)}`,
+        callback_url: `${data?.callback_url}?return=${encodeURIComponent(returnPath)}`,
         handler: function (response: any) {
           // Log payment success
           transactionLogger.logPaymentSuccess(user.id, {
@@ -282,6 +283,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           })();
           
           onPaymentSuccess?.(currentPlan.id);
+
+          if (rzp && typeof rzp.close === 'function') {
+            rzp.close();
+          }
+          document.body.style.overflow = '';
         },
         modal: {
           ondismiss: function() {
@@ -294,6 +300,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               message: 'Payment window dismissed',
               code: 'user_cancelled'
             });
+            document.body.style.overflow = '';
           }
         }
       };
@@ -305,7 +312,22 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         return;
       }
 
-      const rzp = new (window as any).Razorpay(options);
+      rzp = new (window as any).Razorpay(options);
+
+      rzp.on('payment.failed', (response: any) => {
+        const errorMsg = response?.error?.description || 'Payment failed. Please try again.';
+        toast.error(errorMsg);
+        transactionLogger.logPaymentFailed(user.id, {
+          planId: currentPlan.id,
+          amount,
+          reason: errorMsg
+        }, {
+          message: errorMsg,
+          code: response?.error?.code,
+        });
+        document.body.style.overflow = '';
+      });
+
       rzp.open();
       
     } catch (error: any) {

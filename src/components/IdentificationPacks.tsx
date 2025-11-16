@@ -185,11 +185,12 @@ const IdentificationPacks: React.FC = () => {
       
       console.log('Transaction updated with order_id:', orderData.order_id);
 
-      // Initialize Razorpay
+      // Initialize Razorpay using server-provided fields
+      let razorpay: any;
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: pack.price_inr * 100,
-        currency: 'INR',
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
         name: 'PharmaLens',
         description: pack.name,
         order_id: orderData.order_id,
@@ -242,7 +243,16 @@ const IdentificationPacks: React.FC = () => {
 
               if (verifyError) {
                 console.error('❌ Verification error:', verifyError);
-                throw new Error(verifyError.message || 'Payment verification failed');
+                const message = (verifyError as any)?.message || 'Payment verification failed';
+                // Gracefully handle non-captured payments (HTTP 400 from verify-payment)
+                if (message.toLowerCase().includes('payment not captured')) {
+                  toast.error('Payment not captured — please retry.', {
+                    description: 'No money should be captured for this attempt. You can safely try again.'
+                  });
+                  setPurchasing(null);
+                  return;
+                }
+                throw new Error(message);
               }
 
               if (verifyResult?.success) {
@@ -322,6 +332,7 @@ const IdentificationPacks: React.FC = () => {
         modal: {
           ondismiss: () => {
             setPurchasing(null);
+            document.body.style.overflow = '';
           }
         }
       };
@@ -333,7 +344,16 @@ const IdentificationPacks: React.FC = () => {
         return;
       }
 
-      const razorpay = new (window as any).Razorpay(options);
+      razorpay = new (window as any).Razorpay(options);
+
+      razorpay.on('payment.failed', (response: any) => {
+        console.error('Razorpay payment failed:', response);
+        const errorMsg = response?.error?.description || 'Payment failed. Please try again.';
+        toast.error(errorMsg);
+        setPurchasing(null);
+        document.body.style.overflow = '';
+      });
+
       razorpay.open();
     } catch (error: any) {
       console.error('Error creating order:', error);
