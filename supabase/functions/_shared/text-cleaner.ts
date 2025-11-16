@@ -152,3 +152,26 @@ export function generateNameAliases(name: string): string[] {
   push(base.replace(/\b(cream|ointment|gel|lotion|syrup|tablet|capsule|drops|injection)\b/gi, ''));
   return [...variants];
 }
+
+export function normalizeManufacturer(manu: string): string {
+  if (!manu || typeof manu !== 'string') return manu as unknown as string;
+  let s = manu.trim();
+  s = s.replace(/limited|ltd\.|ltd|industries|inc\.|inc|private|pvt\.|pvt|pharmaceuticals?/gi, '').trim();
+  s = s.replace(/\s{2,}/g, ' ');
+  const map: Record<string, string> = {
+    'cipla': 'Cipla',
+    'sun pharma': 'Sun Pharma',
+    'sun pharmaceutical': 'Sun Pharma',
+    'dr reddy': "Dr. Reddy's",
+    'dr reddys': "Dr. Reddy's",
+    'gsk': 'GSK',
+    'glaxosmithkline': 'GSK',
+    'novartis': 'Novartis',
+    'pfizer': 'Pfizer'
+  };
+  const key = s.toLowerCase();
+  for (const k in map) {
+    if (key.includes(k)) return map[k];
+  }
+  return s;
+}

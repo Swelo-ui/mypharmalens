@@ -2,7 +2,7 @@ import "xhr";
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases } from '../_shared/text-cleaner.ts';
+import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases, normalizeManufacturer } from '../_shared/text-cleaner.ts';
 import { geminiExtractName, geminiValidateData } from '../_shared/ai-helpers.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
@@ -2529,7 +2529,7 @@ function combineStageResults(stages: ProcessingStage[]): CombinedResult | null {
   // Clean string fields
   combinedResult.name = cleanText(combinedResult.name);
   combinedResult.genericName = cleanText(combinedResult.genericName);
-  combinedResult.manufacturer = cleanText(combinedResult.manufacturer);
+  combinedResult.manufacturer = normalizeManufacturer(cleanText(combinedResult.manufacturer || ''));
   combinedResult.category = cleanText(combinedResult.category);
   combinedResult.drugClass = cleanText(combinedResult.drugClass);
   combinedResult.description = cleanText(combinedResult.description);
@@ -2610,7 +2610,9 @@ Deno.serve(async (req: Request) => {
               try {
                 const parsed = JSON.parse(g.text || '{}');
                 if (parsed?.name) quickData = { name: parsed.name };
-              } catch {}
+              } catch {
+                quickData = quickData ?? null;
+              }
             }
           }
         }
@@ -4001,13 +4003,3 @@ Deno.serve(async (req: Request) => {
     return createResponse(result, 200);
   }
 });
-    if (!OPENROUTER_API_KEY) {
-      return createResponse({
-        success: false,
-        error: 'Service unavailable: vision API key missing',
-        processingStages: ['preflight-failed'],
-        confidence: 'low',
-        fallbackUsed: false,
-        processingTime: Date.now() - overallStartTime
-      }, 200);
-    }

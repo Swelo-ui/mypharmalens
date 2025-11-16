@@ -2,8 +2,8 @@ import "xhr";
 import { checkDrugCache as checkCacheIntegration, checkDrugCacheWithValidation } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases } from '../_shared/text-cleaner.ts';
-import { geminiExtractName, geminiValidateData } from '../_shared/ai-helpers.ts';
+import { cleanText, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases, normalizeManufacturer } from '../_shared/text-cleaner.ts';
+import { geminiExtractName, geminiValidateData as _geminiValidateData } from '../_shared/ai-helpers.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 // AI fallback imports (will be used when adding intelligent fallbacks)
@@ -436,6 +436,9 @@ function enrichResponseMetadata(
   preProcessing: PreProcessingResult,
   overallStartTime: number
 ): EnrichedResponse {
+  if (data.manufacturer) {
+    data.manufacturer = normalizeManufacturer(cleanText(data.manufacturer));
+  }
   const successfulStages = stages.filter(s => s.success).map(s => s.name);
   const failedStages = stages.filter(s => !s.success).map(s => s.name);
   
@@ -1287,7 +1290,9 @@ Deno.serve(async (req: Request) => {
     if ((!drugName || drugName.toLowerCase().includes('unknown')) && imageBase64) {
       const g = await geminiExtractName(imageBase64);
       if (g.success) {
-        try { const p = JSON.parse(g.text || '{}'); if (p?.name) drugName = p.name; } catch {}
+        let parsedName: string | undefined = undefined;
+        try { const p = JSON.parse(g.text || '{}'); parsedName = p?.name; } catch { parsedName = undefined; }
+        if (parsedName) drugName = parsedName;
       }
     }
 
