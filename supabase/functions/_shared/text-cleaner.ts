@@ -125,3 +125,30 @@ export function cleanSideEffectText(effect: string): string {
     // Ensure proper capitalization
     .replace(/^[a-z]/, match => match.toUpperCase());
 }
+
+export function normalizeDrugName(name: string): string {
+  if (!name || typeof name !== 'string') return name as unknown as string;
+  const lower = name.toLowerCase().trim();
+  const noStrength = lower
+    .replace(/\b\d+\s*(mg|mcg|g|ml|l|iu|%)\b/gi, '')
+    .replace(/\b\d+\.?\d*\s*(w\/w|v\/v)\b/gi, '')
+    .replace(/\b\d+\s*(tablet|capsule|syrup|drops|injection)\b/gi, '');
+  const noForms = noStrength
+    .replace(/\b(tablet|capsule|syrup|ointment|gel|lotion|drops|injection|cream)\b/gi, '')
+    .replace(/\b(hcl|hydrochloride)\b/gi, ' hydrochloride ');
+  const noPunct = noForms.replace(/[&/+\-]/g, ' ');
+  return noPunct.replace(/\s+/g, ' ').trim();
+}
+
+export function generateNameAliases(name: string): string[] {
+  const base = normalizeDrugName(name);
+  const variants = new Set<string>();
+  const push = (v: string) => { if (v && v.trim().length > 1) variants.add(v.trim()); };
+  push(name);
+  push(base);
+  push(base.replace(/\s+/g, ''));
+  push(base.split(' ')[0]);
+  push(base.replace(/\b(hydrochloride)\b/gi, ''));
+  push(base.replace(/\b(cream|ointment|gel|lotion|syrup|tablet|capsule|drops|injection)\b/gi, ''));
+  return [...variants];
+}

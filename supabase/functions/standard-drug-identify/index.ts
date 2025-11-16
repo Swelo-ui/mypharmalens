@@ -2,7 +2,8 @@ import "xhr";
 import { checkDrugCache as checkCacheIntegration, checkDrugCacheWithValidation } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
+import { cleanText, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases } from '../_shared/text-cleaner.ts';
+import { geminiExtractName, geminiValidateData } from '../_shared/ai-helpers.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 // AI fallback imports (will be used when adding intelligent fallbacks)
@@ -1283,33 +1284,32 @@ Deno.serve(async (req: Request) => {
       return false;
     };
     
+    if ((!drugName || drugName.toLowerCase().includes('unknown')) && imageBase64) {
+      const g = await geminiExtractName(imageBase64);
+      if (g.success) {
+        try { const p = JSON.parse(g.text || '{}'); if (p?.name) drugName = p.name; } catch {}
+      }
+    }
+
     if ((drugName && !drugName.toLowerCase().includes('unknown')) || (genericName && !genericName.toLowerCase().includes('unknown'))) {
-      // Build candidates for cache
       const candidates = new Set<string>();
-      const addVariations = (base: string) => {
-        if (!base) return;
-        candidates.add(base);
-        candidates.add(`${base} Syrup`);
-        candidates.add(`${base} Tablet`);
-        candidates.add(`${base} Capsule`);
-        candidates.add(base.replace(/\s+(Syrup|Tablet|Capsule|Drops|Injection)$/i, ''));
-      };
-      addVariations(drugName);
+      generateNameAliases(drugName || '').forEach(v => candidates.add(v));
       if (genericName && !genericName.toLowerCase().includes('unknown')) {
-        addVariations(genericName);
+        generateNameAliases(genericName).forEach(v => candidates.add(v));
       }
       const uniqueVariations = [...candidates].filter(v => v && v.trim().length > 1);
       
       // Build queries for local DB
       const searchQueries: string[] = [];
       if (drugName && drugName !== 'Unknown' && !drugName.toLowerCase().includes('unknown')) {
-        searchQueries.push(drugName);
-        searchQueries.push(drugName.replace(/[-\s]/g, ''));
-        searchQueries.push(drugName.replace(/[0-9]+/g, '').trim());
+        const dn = normalizeDrugName(drugName);
+        searchQueries.push(dn);
+        searchQueries.push(dn.replace(/[-\s]/g, ''));
       }
       if (genericName && genericName !== 'Unknown' && !genericName.toLowerCase().includes('unknown')) {
-        searchQueries.push(genericName);
-        searchQueries.push(genericName.replace(/[-\s]/g, ''));
+        const gn = normalizeDrugName(genericName);
+        searchQueries.push(gn);
+        searchQueries.push(gn.replace(/[-\s]/g, ''));
       }
       const uniqueQueries = [...new Set(searchQueries)].filter(q => q && q.length > 2);
       
@@ -1614,8 +1614,8 @@ Deno.serve(async (req: Request) => {
               });
             } else {
               console.log(`⚠️ Multi-source quality low (${completeness}%), trying AI enhancement...`);
-            }
-          }
+        }
+      }
         }
       } catch (error) {
         console.error(`❌ Multi-source API error:`, error);

@@ -2,7 +2,8 @@ import "xhr";
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
+import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases } from '../_shared/text-cleaner.ts';
+import { geminiExtractName, geminiValidateData } from '../_shared/ai-helpers.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 import {
@@ -2567,7 +2568,7 @@ Deno.serve(async (req: Request) => {
   try {
     // Parse request
     const { imageBase64, options = {} } = await req.json();
-    const optAdvanced = options?.enhancedMode || options?.advancedAnalysis;
+    const optAdvanced = options?.enhanced === true || options?.enhancedMode === true || options?.advancedAnalysis === true;
     const optBlurry = options?.blurryMode === true;
     const optBypassCache = options?.bypassCache === true;
     const optUseCache = options?.useCache !== false; // STAGE 0: Smart caching (enabled by default)
@@ -2601,9 +2602,17 @@ Deno.serve(async (req: Request) => {
         try {
           quickData = JSON.parse(quickResult);
         } catch {
-          // If not JSON, try to extract name from text
           const nameMatch = quickResult.match(/"name":\s*"([^"]+)"/);
           quickData = nameMatch ? { name: nameMatch[1] } : null;
+          if (!quickData?.name) {
+            const g = await geminiExtractName(imageBase64);
+            if (g.success) {
+              try {
+                const parsed = JSON.parse(g.text || '{}');
+                if (parsed?.name) quickData = { name: parsed.name };
+              } catch {}
+            }
+          }
         }
         
         const drugName = quickData?.name;
@@ -2611,22 +2620,19 @@ Deno.serve(async (req: Request) => {
         if (drugName && !drugName.toLowerCase().includes('unknown')) {
           console.log(`💾 Quick extraction found: "${drugName}" - checking cache...`);
           
-          // Try multiple variations for better cache matching
-          const drugVariations = [
-            drugName,
-            drugName.replace(/\s+/g, ' ').trim(),
-            drugName.replace(/\d+\.\d+%?\s*w\/w/gi, '').trim(), // Remove w/w percentages
-            drugName.replace(/cream|ointment|gel|lotion/gi, '').trim(), // Remove dosage forms
-            drugName.split(' ')[0] // Just the first word
-          ].filter(v => v.length > 2);
+          const drugVariations = generateNameAliases(drugName).filter(v => v.length > 2);
           
           let cacheResult = null;
           for (const variation of drugVariations) {
             console.log(`   Trying cache variation: "${variation}"`);
             cacheResult = await checkDrugCache(variation);
-            if (cacheResult && (cacheResult as CachedDrugData).completeness && (cacheResult as CachedDrugData).completeness! > 90) {
-              console.log(`   ✅ Cache hit with variation: "${variation}"`);
-              break;
+            if (cacheResult) {
+              const cand = cacheResult as CachedDrugData;
+              const cmp = await aiCompareDrugNames(drugName, undefined, cand.name as string, cand.genericName as string | undefined);
+              if (cmp.isSame && (cand.completeness || 0) > 80) {
+                console.log(`   ✅ AI-validated cache hit: "${variation}" (confidence ${cmp.confidence})`);
+                break;
+              }
             }
           }
           
@@ -3483,7 +3489,7 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify({ 
               imageBase64: imageBase64,
               options: {
-                enhancedMode: true,
+                enhanced: true,
                 blurryMode: options?.blurryMode || false
               }
             }),
@@ -3995,3 +4001,13 @@ Deno.serve(async (req: Request) => {
     return createResponse(result, 200);
   }
 });
+    if (!OPENROUTER_API_KEY) {
+      return createResponse({
+        success: false,
+        error: 'Service unavailable: vision API key missing',
+        processingStages: ['preflight-failed'],
+        confidence: 'low',
+        fallbackUsed: false,
+        processingTime: Date.now() - overallStartTime
+      }, 200);
+    }

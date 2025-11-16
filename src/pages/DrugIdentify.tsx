@@ -468,8 +468,11 @@ const DrugIdentify = () => {
           body: { 
             imageBase64: base64Image,
             options: {
+              mode: analysisMode,
+              enhanced: analysisMode === 'enhanced',
               blurryMode: blurryMode || isImageLowRes,
-              advancedAnalysis: analysisMode === 'enhanced'
+              bypassCache: analysisMode === 'enhanced' && (blurryMode || isImageLowRes),
+              useCache: true
             }
           }
         });

@@ -417,6 +417,100 @@ Be thorough but fair in your assessment.`;
   );
 }
 
+export async function geminiExtractName(
+  imageBase64: string
+): Promise<AIResponse> {
+  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
+  const start = Date.now();
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'GEMINI_API_KEY missing', modelUsed: 'gemini', latency: 0, attemptedModels: [] };
+  }
+  const prompt = 'Extract ONLY the drug/medication name from this image. Return JSON: {"name":"drug name"}';
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: prompt },
+          { inline_data: { mime_type: 'image/jpeg', data: imageBase64 } }
+        ]
+      }
+    ]
+  };
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    const latency = Date.now() - start;
+    if (!res.ok) {
+      return { success: false, error: `Gemini HTTP ${res.status}`, modelUsed: 'gemini', latency, attemptedModels: [] };
+    }
+    const json = await res.json();
+    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return {
+      success: true,
+      text,
+      data: text,
+      modelUsed: 'gemini-1.5-flash',
+      latency,
+      attemptedModels: []
+    };
+  } catch (e) {
+    clearTimeout(timeoutId);
+    return { success: false, error: e instanceof Error ? e.message : 'Gemini error', modelUsed: 'gemini', latency: 0, attemptedModels: [] };
+  }
+}
+
+export async function geminiValidateData(
+  drugData: Record<string, unknown>
+): Promise<AIResponse> {
+  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
+  const start = Date.now();
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'GEMINI_API_KEY missing', modelUsed: 'gemini', latency: 0, attemptedModels: [] };
+  }
+  const prompt = `Validate and correct this drug information. Ensure brand/generic consistency and active ingredients. Return JSON only.`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: `${prompt}\n\n${JSON.stringify(drugData).substring(0, 8000)}` }
+        ]
+      }
+    ]
+  };
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    const latency = Date.now() - start;
+    if (!res.ok) {
+      return { success: false, error: `Gemini HTTP ${res.status}`, modelUsed: 'gemini', latency, attemptedModels: [] };
+    }
+    const json = await res.json();
+    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let data: unknown = text;
+    try { data = JSON.parse(text); } catch {}
+    return { success: true, text, data, modelUsed: 'gemini-1.5-flash', latency, attemptedModels: [] };
+  } catch (e) {
+    clearTimeout(timeoutId);
+    return { success: false, error: e instanceof Error ? e.message : 'Gemini error', modelUsed: 'gemini', latency: 0, attemptedModels: [] };
+  }
+}
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
