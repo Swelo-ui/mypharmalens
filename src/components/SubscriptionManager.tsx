@@ -478,7 +478,7 @@ const SubscriptionManager: React.FC = () => {
               // Build features based on plan name with proper search limits
               const planExtended = plan as any;
               const identificationLimit = planExtended.identifications_limit || 5;
-              const searchLimit = planExtended.advanced_search_limit || 50;
+              const searchLimit = planExtended.advanced_search_limit || (plan.name === 'Free Plan' || plan.id === 'free-plan' ? 100 : 50);
               
               const displayFeatures: string[] = (() => {
                 if (plan.name === 'Free Plan' || plan.name === 'Free') {

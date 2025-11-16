@@ -21,7 +21,7 @@ import DrugCard from '@/components/DrugCard';
 import SearchLimitBar from '@/components/SearchLimitBar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
-import { trackSearchUsage, hasReachedSearchLimit } from '@/utils/searchUsageTracker';
+import { hasReachedSearchLimit } from '@/utils/searchUsageTracker';
 
 // Inline Levenshtein distance implementation to avoid missing module error
 function calculateLevenshteinDistance(a: string, b: string): number {
@@ -112,9 +112,8 @@ const SearchResults = () => {
         console.log("Searching for:", searchQuery);
         console.log("Active filters:", activeFilters);
         
-        // Track search usage if user is authenticated and actually searching
+        // Check limit only; decrement handled by RPC in handleSearch
         if (user && searchQuery) {
-          // Check if user has reached limit before tracking
           const limitReached = await hasReachedSearchLimit(user.id);
           if (limitReached) {
             toast.error('Search limit reached', {
@@ -124,9 +123,6 @@ const SearchResults = () => {
             setIsLoading(false);
             return;
           }
-          
-          // Track this search
-          await trackSearchUsage(user.id);
         }
         
         let useLocalData = true;

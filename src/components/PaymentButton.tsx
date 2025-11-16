@@ -209,7 +209,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         throw new Error(`${errorMsg}${errorDetails ? ` (${errorDetails})` : ''}`);
       };
 
-      const data = await invokeWithRetry(2);
+      let data = await invokeWithRetry(2);
+      // Backward compatibility mapping for legacy fields
+      if (!data?.key && data?.keyId) data.key = data.keyId;
+      if (!data?.order_id && (data?.orderId || data?.order_id)) data.order_id = data.orderId || data.order_id;
+      if (!data?.callback_url && data?.callbackUrl) data.callback_url = data.callbackUrl;
+      if (!data?.transaction_id && data?.transactionId) data.transaction_id = data.transactionId;
+      if (!data?.key || !data?.order_id) {
+        throw new Error('No key/order returned from server');
+      }
 
       const loaded = await loadRazorpayScript();
       if (!loaded) {
@@ -234,7 +242,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           billingCycle: currentBillingCycle,
         },
         theme: { color: '#3399cc' },
-        callback_url: `${data?.callback_url}?return=${encodeURIComponent(returnPath)}`,
+        callback_url: `${data?.callback_url || ''}?return=${encodeURIComponent(returnPath)}`,
         handler: function (response: any) {
           // Log payment success
           transactionLogger.logPaymentSuccess(user.id, {
@@ -258,7 +266,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
                   userId: user.id,
                   planId: currentPlan.id,
                   billingCycle: currentBillingCycle,
-                  transactionId: data?.transactionId
+                  transactionId: data?.transaction_id || data?.transactionId
                 }
               });
             } catch (err) {
@@ -269,7 +277,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               const result = await SubscriptionService.getInstance().updateSubscriptionStatus(
                 user.id,
                 currentPlan.id,
-                data?.transactionId
+                data?.transaction_id || data?.transactionId
               );
               
               if (result.success) {
@@ -361,6 +369,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       toast.error(errorMessage);
       onPaymentError?.(errorMessage);
+      document.body.style.overflow = '';
     } finally {
       setIsProcessing(false);
     }

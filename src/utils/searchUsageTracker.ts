@@ -36,9 +36,9 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         .limit(1)
         .maybeSingle();
 
-      let currentLimit = 50; // Default free plan (based on database)
+      let currentLimit = 100; // Default free plan (based on database)
       if (subscription?.plan) {
-        currentLimit = subscription.plan.advanced_search_limit || 50;
+        currentLimit = subscription.plan.advanced_search_limit || 100;
       }
 
       // Check if we need to reset for new month
@@ -82,7 +82,7 @@ export const trackSearchUsage = async (userId: string): Promise<boolean> => {
         .insert({
           user_id: userId,
           searches_used: 1,
-          searches_limit: 50, // Default free plan limit
+          searches_limit: 100, // Default free plan limit
           last_reset_date: now.toISOString()
         });
 
@@ -119,9 +119,9 @@ export const getSearchUsage = async (userId: string): Promise<{ used: number; li
       .maybeSingle();
 
     // Use advanced_search_limit from subscription plan
-    let limit = 50; // Default free plan (based on database)
+    let limit = 100; // Default free plan (based on database)
     if (subscription?.plan) {
-      limit = subscription.plan.advanced_search_limit || 50;
+      limit = subscription.plan.advanced_search_limit || 100;
     }
 
     // Get usage
@@ -179,9 +179,9 @@ export const hasReachedSearchLimit = async (userId: string): Promise<boolean> =>
       .maybeSingle();
 
     // Use advanced_search_limit from the subscription plan
-    let currentLimit = 50; // Default free plan (based on database)
+    let currentLimit = 100; // Default free plan (based on database)
     if (subscription?.plan) {
-      currentLimit = subscription.plan.advanced_search_limit || 50;
+      currentLimit = subscription.plan.advanced_search_limit || 100;
     }
 
     // Get current usage
