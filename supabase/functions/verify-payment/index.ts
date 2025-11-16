@@ -15,6 +15,31 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
+async function isPaymentCaptured(orderId?: string, paymentId?: string): Promise<{ captured: boolean; paymentId?: string }> {
+  const keyId = Deno.env.get('RAZORPAY_KEY_ID');
+  const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
+  if (!keyId || !keySecret) return { captured: false };
+  const auth = 'Basic ' + btoa(`${keyId}:${keySecret}`);
+  try {
+    if (paymentId) {
+      const res = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, { headers: { Authorization: auth } });
+      if (!res.ok) return { captured: false };
+      const p = await res.json();
+      return { captured: String(p.status) === 'captured', paymentId };
+    }
+    if (orderId) {
+      const res = await fetch(`https://api.razorpay.com/v1/orders/${orderId}/payments`, { headers: { Authorization: auth } });
+      if (!res.ok) return { captured: false };
+      const list = await res.json();
+      const capturedItem = Array.isArray(list.items) ? list.items.find((it: Record<string, unknown>) => String(it.status) === 'captured') : undefined;
+      return { captured: !!capturedItem, paymentId: capturedItem ? String(capturedItem.id) : undefined };
+    }
+    return { captured: false };
+  } catch {
+    return { captured: false };
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -69,12 +94,15 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      // Update to success
+      const capture = await isPaymentCaptured(String(topupTx.razorpay_order_id), razorpay_payment_id || topupTx.razorpay_payment_id);
+      if (!capture.captured) {
+        return new Response(JSON.stringify({ error: 'Payment not captured' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
       const { error: updateErr } = await supabase
         .from('topup_transactions')
         .update({
           status: 'success',
-          razorpay_payment_id: razorpay_payment_id || topupTx.razorpay_payment_id,
+          razorpay_payment_id: capture.paymentId || razorpay_payment_id || topupTx.razorpay_payment_id,
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -151,12 +179,15 @@ Deno.serve(async (req: Request) => {
     if (subTx) {
       console.log('Found subscription transaction:', subTx);
 
-      // Update to success
+      const capture = await isPaymentCaptured(String(subTx.razorpay_order_id), razorpay_payment_id || subTx.razorpay_payment_id);
+      if (!capture.captured) {
+        return new Response(JSON.stringify({ error: 'Payment not captured' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
       const { error: updateErr } = await supabase
         .from('payment_transactions')
         .update({
           status: 'success',
-          razorpay_payment_id: razorpay_payment_id || subTx.razorpay_payment_id,
+          razorpay_payment_id: capture.paymentId || razorpay_payment_id || subTx.razorpay_payment_id,
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
