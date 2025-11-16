@@ -1,9 +1,7 @@
-// @ts-ignore
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-// @ts-ignore
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "std/http/server";
+import "xhr";
 
-declare const Deno: any;
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,7 +19,7 @@ interface TextExtractionResult {
 }
 
 // Helper function to create consistent response
-function createResponse(data: any, status: number = 200): Response {
+function createResponse(data: unknown, status: number = 200): Response {
   return new Response(
     JSON.stringify(data),
     { 
@@ -34,6 +32,7 @@ function createResponse(data: any, status: number = 200): Response {
 // Enhanced image preprocessing for better OCR results
 async function preprocessImage(imageBase64: string): Promise<string> {
   try {
+    await Promise.resolve();
     // For now, return the original image
     // In a production environment, you would implement:
     // - Noise reduction
@@ -42,7 +41,8 @@ async function preprocessImage(imageBase64: string): Promise<string> {
     // - Sharpening filters
     return imageBase64;
   } catch (error) {
-    console.error('Error preprocessing image:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Error preprocessing image:', msg);
     return imageBase64;
   }
 }
@@ -123,8 +123,9 @@ async function extractTextWithGemini(imageBase64: string): Promise<{ text: strin
       confidence
     };
   } catch (error) {
-    console.error('Gemini OCR error:', error);
-    throw error;
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Gemini OCR error:', msg);
+    throw new Error(msg);
   }
 }
 
@@ -148,8 +149,9 @@ async function extractTextFallback(imageBase64: string): Promise<{ text: string;
       confidence: 0.3
     };
   } catch (error) {
-    console.error('Fallback OCR error:', error);
-    throw error;
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Fallback OCR error:', msg);
+    throw new Error(msg);
   }
 }
 
@@ -302,8 +304,8 @@ serve(async (req) => {
     return createResponse(result);
 
   } catch (error) {
-    console.error('Text extraction service error:', error);
-    
+    const msg = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Text extraction service error:', msg);
     return createResponse({
       success: false,
       extractedText: "",
@@ -311,7 +313,7 @@ serve(async (req) => {
       method: "error",
       processingTime: Date.now() - startTime,
       imageQuality: "unknown",
-      error: error.message || "Unknown error occurred"
+      error: msg
     }, 500);
   }
 });

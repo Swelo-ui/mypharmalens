@@ -2,8 +2,7 @@ import "xhr";
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
-import { cleanText, cleanDrugData, cleanMechanismText, cleanTextArray, normalizeDrugName, generateNameAliases, normalizeManufacturer } from '../_shared/text-cleaner.ts';
-import { geminiExtractName, geminiValidateData } from '../_shared/ai-helpers.ts';
+import * as TextCleanerModule from '../_shared/text-cleaner.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
 import {
@@ -14,8 +13,30 @@ import {
   correctScrapedData,
   generateDrugData,
   performQualityCheck,
-  logAIUsage
+  logAIUsage,
+  geminiExtractName,
+  geminiValidateData
 } from '../_shared/ai-helpers.ts';
+
+type TextCleanerExports = {
+  cleanText: (text: string) => string;
+  cleanDrugData: (data: Record<string, unknown>) => Record<string, unknown>;
+  cleanMechanismText: (text: string) => string;
+  cleanTextArray: (arr: string[]) => string[];
+  normalizeDrugName: (name: string) => string;
+  generateNameAliases: (name: string) => string[];
+  normalizeManufacturer: (manu: string) => string;
+};
+
+const {
+  cleanText,
+  cleanDrugData,
+  cleanMechanismText,
+  cleanTextArray,
+  normalizeDrugName,
+  generateNameAliases,
+  normalizeManufacturer
+} = TextCleanerModule as unknown as TextCleanerExports;
 
 // Use edge runtime types via deno.json; no manual Deno declaration
 
@@ -2622,7 +2643,7 @@ Deno.serve(async (req: Request) => {
         if (drugName && !drugName.toLowerCase().includes('unknown')) {
           console.log(`💾 Quick extraction found: "${drugName}" - checking cache...`);
           
-          const drugVariations = generateNameAliases(drugName).filter(v => v.length > 2);
+          const drugVariations: string[] = generateNameAliases(drugName).filter((v: string) => v.length > 2);
           
           let cacheResult = null;
           for (const variation of drugVariations) {
