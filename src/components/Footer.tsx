@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, Heart, ExternalLink, Mail, Linkedin, Github } from 'lucide-react';
+import { Pill, Heart, ExternalLink, Mail, Linkedin, Youtube } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 
 const Footer = () => {
@@ -38,13 +38,13 @@ const Footer = () => {
               </a>
               
               <a 
-                href="https://github.com" 
+                href="https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-pharma-600 transition-colors"
-                aria-label="GitHub"
+                aria-label="YouTube"
               >
-                <Github className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Youtube className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
               
               <a 

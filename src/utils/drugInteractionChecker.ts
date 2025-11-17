@@ -169,6 +169,35 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
     sources.push(`rule:class-combo ${hasCombo.classes.join('+')}`);
   }
 
+  // Fallback rule: carry over key single-ingredient interactions to
+  // combination products that clearly contain paracetamol in their name.
+  // This fixes cases where "Paracetamol" vs "Rifampin" shows a mild
+  // interaction, but a combo like "Paracetamol/Phenylephrine/Caffeine"
+  // was previously treated as fully safe.
+  const name1 = (drug1.name || '').toLowerCase();
+  const name2 = (drug2.name || '').toLowerCase();
+  const generic1 = (drug1.genericName || '').toLowerCase();
+  const generic2 = (drug2.genericName || '').toLowerCase();
+
+  const hasParacetamolToken = (s: string) =>
+    s.includes('paracetamol') || s.includes('acetaminophen');
+  const isRifampinLike = (s: string) =>
+    s.includes('rifampin') || s.includes('rifampicin') || s.includes('rifamycin');
+
+  if (!interactionFound) {
+    const drug1HasParacetamol = hasParacetamolToken(name1) || hasParacetamolToken(generic1);
+    const drug2HasParacetamol = hasParacetamolToken(name2) || hasParacetamolToken(generic2);
+    const drug1IsRifampin = isRifampinLike(name1) || isRifampinLike(generic1) || isRifampinLike(drug1Class);
+    const drug2IsRifampin = isRifampinLike(name2) || isRifampinLike(generic2) || isRifampinLike(drug2Class);
+
+    if ((drug1HasParacetamol && drug2IsRifampin) || (drug2HasParacetamol && drug1IsRifampin)) {
+      interactionFound = true;
+      severity = 'mild';
+      interactionText = 'Rifampin can increase the breakdown of paracetamol, which may reduce its effect and add liver stress at high doses.';
+      sources.push('rule:name-paracetamol+rifampin');
+    }
+  }
+
   // Infer severity from interaction text keywords
   if (interactionText) {
     const t = interactionText.toLowerCase();

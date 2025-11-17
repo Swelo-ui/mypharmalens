@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, AlertTriangle, X, Plus, Shield, Info, ArrowRight, ExternalLink, ChevronDown } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
@@ -153,6 +153,20 @@ const DrugInteractionChecker = () => {
       : (showAll ? allDrugs.slice().sort((a,b) => a.name.localeCompare(b.name)) : []);
     return list.slice(0, page * pageSize);
   })();
+
+  const severityCounts = useMemo(() => {
+    const base = { mild: 0, moderate: 0, severe: 0, contraindicated: 0 } as const;
+    if (!interactionResult) {
+      return { ...base };
+    }
+    return interactionResult.interactions.reduce(
+      (acc, interaction) => {
+        acc[interaction.severity] += 1;
+        return acc;
+      },
+      { mild: 0, moderate: 0, severe: 0, contraindicated: 0 }
+    );
+  }, [interactionResult]);
 
   const getSeverityLabel = (severity: string) => {
     switch (severity) {
@@ -504,6 +518,20 @@ const DrugInteractionChecker = () => {
                                 </div>
                               </div>
                             )}
+
+                            {interaction.sources && interaction.sources.length > 0 && (
+                              <div className="pt-3 border-t text-xs text-gray-500 dark:text-gray-400 flex flex-wrap gap-2">
+                                <span className="font-semibold">Sources:</span>
+                                {interaction.sources.map((src, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800"
+                                  >
+                                    {src}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </AlertDescription>
                         </Alert>
                       ))}
@@ -554,6 +582,30 @@ const DrugInteractionChecker = () => {
                         <Badge className="bg-red-500 text-white">Requires Attention</Badge>
                       )}
                     </div>
+
+                    {interactionResult.interactions.length > 0 && (
+                      <div className="border-t pt-4 space-y-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Interaction severity</p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-500 dark:text-gray-400">Mild</span>
+                            <span className="font-semibold">{severityCounts.mild}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-500 dark:text-gray-400">Moderate</span>
+                            <span className="font-semibold">{severityCounts.moderate}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-500 dark:text-gray-400">Severe</span>
+                            <span className="font-semibold">{severityCounts.severe}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-500 dark:text-gray-400">Contraindicated</span>
+                            <span className="font-semibold">{severityCounts.contraindicated}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 

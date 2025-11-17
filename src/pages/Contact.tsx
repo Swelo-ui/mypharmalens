@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Mail, MessageCircle, Linkedin, Send, Loader2, CheckCircle, MapPin } from 'lucide-react';
+import { Mail, MessageCircle, Linkedin, Send, Loader2, CheckCircle, MapPin, Youtube } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -279,6 +280,15 @@ const Contact = () => {
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5 text-pharma-600" />
+                  </a>
+                  <a
+                    href="https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-full bg-white dark:bg-gray-800 shadow-sm hover:shadow transition-shadow"
+                    aria-label="YouTube"
+                  >
+                    <Youtube className="h-5 w-5 text-pharma-600" />
                   </a>
                 </div>
               </div>
