@@ -66,10 +66,29 @@ export const PWAUpdatePrompt = () => {
       // Check if app is ready to work offline
       navigator.serviceWorker.ready.then(() => {
         console.log('✅ App ready to work offline!');
-        toast.success('📴 Offline Mode Ready', {
-          description: 'You can now use medications, symptom checker, and drug interactions offline',
-          duration: 5000
-        });
+
+        let offlineToastShown = false;
+
+        const showOfflineToast = () => {
+          if (offlineToastShown) return;
+          offlineToastShown = true;
+
+          toast.success('📴 Offline Mode Ready', {
+            description:
+              'You can now use medications, symptom checker, and drug interactions offline',
+            duration: 5000,
+          });
+        };
+
+        // If the app is already offline when ready
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          showOfflineToast();
+        }
+
+        // Show toast whenever the user goes offline
+        if (typeof window !== 'undefined') {
+          window.addEventListener('offline', showOfflineToast);
+        }
       });
     }
   }, []);
