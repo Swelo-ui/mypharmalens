@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import SearchBar from '@/components/SearchBar';
 import Footer from '@/components/Footer';
+import SponsorCarousel from '@/components/SponsorCarousel';
 import BottomNavigation from '@/components/BottomNavigation';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -660,6 +661,8 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        <SponsorCarousel />
 
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-pharma-600 to-pharma-700 border-t border-gray-200 dark:border-gray-800">
