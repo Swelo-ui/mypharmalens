@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertCircle, Pill, ChevronDown, ChevronRight, ArrowRight, Filter, Eye, X } from 'lucide-react';
+import { Search, AlertCircle, Pill, ChevronDown, ChevronRight, ArrowRight, Filter, Eye, X, Stethoscope } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import Header from '@/components/Header';
 import DrugCard from '@/components/DrugCard';
@@ -625,21 +625,31 @@ const SymptomChecker = () => {
       <div className="container max-w-7xl mx-auto px-4 pt-24 pb-12">
         {/* Header Section */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">Symptom-Based Drug Search</h1>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
                 Find medications based on your symptoms
               </p>
             </div>
-            {allDrugs.length > 0 && (
-              <div className="flex items-center gap-2 bg-pharma-50 dark:bg-pharma-900/20 px-3 py-2 rounded-lg">
-                <Pill className="h-4 w-4 text-pharma-600" />
-                <span className="text-sm font-medium text-pharma-700 dark:text-pharma-300">
-                  {allDrugs.length.toLocaleString()} medications available
-                </span>
-              </div>
-            )}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto flex items-center gap-2 justify-center"
+                onClick={() => navigate('/identify')}
+              >
+                <Stethoscope className="h-4 w-4" />
+                <span>Identify Medication</span>
+              </Button>
+              {allDrugs.length > 0 && (
+                <div className="flex items-center gap-2 bg-pharma-50 dark:bg-pharma-900/20 px-3 py-2 rounded-lg">
+                  <Pill className="h-4 w-4 text-pharma-600" />
+                  <span className="text-sm font-medium text-pharma-700 dark:text-pharma-300">
+                    {allDrugs.length.toLocaleString()} medications available
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           
         </div>

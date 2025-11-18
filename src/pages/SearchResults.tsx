@@ -321,16 +321,25 @@ const SearchResults = () => {
       <Header />
       
       <main className="flex-1 pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-6">
-              {searchQuery ? `Search Results for "${searchQuery}"` : 'All Medications'}
-            </h1>
-            
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold">
+                  {searchQuery ? 'Search Medications' : 'All Medications'}
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
+                  {searchQuery
+                    ? `Showing results for "${searchQuery}".`
+                    : 'Browse and search the complete PharmaLens medication database.'}
+                </p>
+              </div>
+            </div>
+
             <SearchBar 
               fullWidth 
               onSearch={handleSearch} 
-              placeholder="Refine your search..." 
+              placeholder="Search medications..." 
             />
           </div>
           

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus } from 'lucide-react';
+import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -1040,31 +1040,40 @@ const DrugIdentify = () => {
   return (
     <>
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 pt-24 pb-24">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h1 className="text-3xl font-bold">Identify Medication</h1>
-          
-          {!isAuthenticated && !authLoading && (
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => navigate('/auth')}
-            >
-              <LogIn className="h-4 w-4" />
-              <span>Sign in to save history</span>
-            </Button>
-          )}
-          
-          {isAuthenticated && (
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/symptom-checker')}
-            >
-              Check Symptoms
-            </Button>
-          )}
+      <div className="container max-w-7xl mx-auto px-4 pt-24 pb-24">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold">Identify Medication</h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
+                Upload or capture a clear photo to identify tablets, capsules, or strips.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 w-full sm:w-auto">
+              {isAuthenticated && (
+                <Button 
+                  variant="outline"
+                  className="w-full sm:w-auto flex items-center gap-2 justify-center"
+                  onClick={() => navigate('/symptom-checker')}
+                >
+                  <Stethoscope className="h-4 w-4" />
+                  <span>Check Symptoms</span>
+                </Button>
+              )}
+              {!isAuthenticated && !authLoading && (
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto flex items-center gap-2 justify-center"
+                  onClick={() => navigate('/auth')}
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign in to save history</span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-        
+
         {!identifiedDrug ? (
           <>
             <div className="flex justify-center mb-6">
