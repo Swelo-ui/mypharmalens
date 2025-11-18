@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertTriangle, X, Plus, Shield, Info, ArrowRight, ExternalLink, ChevronDown } from 'lucide-react';
+import { Search, AlertTriangle, X, Plus, Shield, Info, ArrowRight, ExternalLink, ChevronDown, Mic } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import Header from '@/components/Header';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,34 @@ import {
 import { toast } from 'sonner';
 // Removed popover/command UI to use inline, mobile-friendly list
 
+function calculateLevenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 const DrugInteractionChecker = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -34,6 +62,29 @@ const DrugInteractionChecker = () => {
   const [showAll, setShowAll] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 50;
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setIsSpeechSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN';
+
+    recognitionRef.current = recognition;
+    setIsSpeechSupported(true);
+  }, []);
   // Load all drugs and restore selections on component mount
   useEffect(() => {
     const loadDrugs = async () => {
@@ -95,6 +146,64 @@ const DrugInteractionChecker = () => {
 
   const handleRemoveDrug = (drugId: string) => {
     setSelectedDrugs(selectedDrugs.filter(d => d.id !== drugId));
+  };
+
+  const handleDrugVoiceSearch = () => {
+    if (!recognitionRef.current) return;
+
+    try {
+      const recognition = recognitionRef.current;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const cleaned = transcript.trim();
+        if (!cleaned) return;
+
+        const lower = cleaned.toLowerCase();
+        let bestMatch = cleaned;
+        let bestScore = Number.MAX_SAFE_INTEGER;
+
+        allDrugs.forEach(drug => {
+          const candidates: string[] = [];
+          if (drug.name) candidates.push(drug.name);
+          if (drug.genericName) candidates.push(drug.genericName);
+          (drug.brandNames || []).forEach(b => candidates.push(b));
+
+          candidates.forEach(name => {
+            const n = name.toLowerCase();
+            const distance = calculateLevenshteinDistance(lower, n);
+            if (distance < bestScore) {
+              bestScore = distance;
+              bestMatch = name;
+            }
+          });
+        });
+
+        const threshold = Math.min(4, Math.max(1, Math.floor(lower.length / 3)));
+        const finalTerm = bestScore <= threshold ? bestMatch : cleaned;
+        setSearchTerm(finalTerm);
+        setPage(1);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      // Animate waves only when sound is detected
+      (recognition as any).onsoundstart = () => {
+        setIsListening(true);
+      };
+      (recognition as any).onsoundend = () => {
+        setIsListening(false);
+      };
+      recognition.start();
+    } catch (error) {
+      setIsListening(false);
+    }
   };
 
   // Search helper: require minimal characters and dedupe by display key (name+generic)
@@ -232,10 +341,20 @@ const DrugInteractionChecker = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       placeholder="Search medications..."
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       value={searchTerm}
                       onChange={(e) => { setPage(1); setSearchTerm(e.target.value); }}
                     />
+                    {isSpeechSupported && (
+                      <button
+                        type="button"
+                        onClick={handleDrugVoiceSearch}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 ${isListening ? 'text-pharma-600 mic-listening' : ''}`}
+                        aria-label="Voice search medications"
+                      >
+                        <Mic className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
 
                   {/* Browse all toggle */}

@@ -1,5 +1,33 @@
 import { DrugData } from "@/components/DrugCard";
 
+function calculateLevenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 // Lazy loading functions for drug data
 const drugDataLoaders = {
   cardiovascular: () => import("./cardiovascularDrugs").then(m => m.cardiovascularDrugs),
@@ -96,21 +124,70 @@ export const loadAllDrugs = async (): Promise<DrugData[]> => {
 // Search drugs with lazy loading
 export const searchDrugs = async (query: string): Promise<DrugData[]> => {
   const allDrugs = await loadAllDrugs();
-  const searchTerm = query.toLowerCase().trim();
-  
-  if (!searchTerm) return [];
+  const raw = query.toLowerCase().trim();
 
-  return allDrugs.filter(drug => {
-    const nameMatch = drug.name.toLowerCase().includes(searchTerm);
-    const genericMatch = drug.genericName?.toLowerCase().includes(searchTerm);
-    const categoryMatch = drug.category.toLowerCase().includes(searchTerm);
-    const classMatch = drug.drugClass?.toLowerCase().includes(searchTerm);
-    const brandMatch = drug.brandNames?.some(brand => 
-      brand.toLowerCase().includes(searchTerm)
-    );
+  if (!raw) return [];
 
-    return nameMatch || genericMatch || categoryMatch || classMatch || brandMatch;
-  });
+  const searchTerm = raw.replace(/\s+/g, " ");
+
+  const scored = allDrugs
+    .map((drug) => {
+      const name = (drug.name || "").toLowerCase();
+      const generic = (drug.genericName || "").toLowerCase();
+      const category = (drug.category || "").toLowerCase();
+      const drugClass = (drug.drugClass || "").toLowerCase();
+      const brands = (drug.brandNames || []).map((b) => b.toLowerCase());
+
+      let score = 0;
+
+      // Exact matches get highest weight
+      if (name === searchTerm) score += 140;
+      if (generic && generic === searchTerm) score += 135;
+      if (brands.some((b) => b === searchTerm)) score += 130;
+
+      // Starts-with matches (very strong signal for typed search)
+      if (name.startsWith(searchTerm)) score += 70;
+      if (generic && generic.startsWith(searchTerm)) score += 60;
+      if (brands.some((b) => b.startsWith(searchTerm))) score += 60;
+
+      // Substring matches (keep existing behavior but ranked)
+      if (name.includes(searchTerm)) score += 35;
+      if (generic && generic.includes(searchTerm)) score += 30;
+      if (brands.some((b) => b.includes(searchTerm))) score += 30;
+      if (category.includes(searchTerm)) score += 18;
+      if (drugClass.includes(searchTerm)) score += 18;
+
+      // Fuzzy distance across primary identifiers to help voice/spelling errors
+      const candidates: string[] = [];
+      if (name) candidates.push(name);
+      if (generic) candidates.push(generic);
+      candidates.push(...brands);
+
+      if (candidates.length > 0) {
+        let bestDistance = Number.MAX_SAFE_INTEGER;
+        for (const text of candidates) {
+          const distance = calculateLevenshteinDistance(searchTerm, text);
+          if (distance < bestDistance) bestDistance = distance;
+        }
+
+        const maxLen = Math.max(searchTerm.length, 1);
+        const normalized = bestDistance / maxLen; // 0 = perfect, >1 = very different
+
+        // Only reward reasonably close fuzzy matches
+        if (normalized <= 0.5) {
+          // Closer terms get up to +60 extra
+          const fuzzyScore = Math.max(0, 60 - normalized * 60);
+          score += fuzzyScore;
+        }
+      }
+
+      return { drug, score };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((entry) => entry.drug);
+
+  return scored;
 };
 
 // Get drug by ID with lazy loading

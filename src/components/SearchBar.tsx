@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
-import { Search, X, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, X, Loader2, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { searchDrugs } from '@/data/drugDataLoader';
@@ -24,25 +23,48 @@ const SearchBar = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  
+  const recognitionRef = useRef<any | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setIsSpeechSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN';
+
+    recognitionRef.current = recognition;
+    setIsSpeechSupported(true);
+  }, []);
+
   // Generate suggestions based on query using the optimized searchDrugs function
   useEffect(() => {
     if (!query.trim()) {
       setSuggestions([]);
       return;
     }
-    
+
     console.log("Searching for:", query);
-    
+
     // Find matching drugs using the optimized search function
     const searchForDrugs = async () => {
       try {
         const matchingDrugs = await searchDrugs(query);
-        
+
         console.log("Found matching drugs:", matchingDrugs.length);
-        
+
         // Extract drug names from the matched drugs
         const drugNames = matchingDrugs.map(drug => drug.name);
         setSuggestions(Array.from(new Set(drugNames))); // Remove duplicates
@@ -51,49 +73,93 @@ const SearchBar = ({
         setSuggestions([]);
       }
     };
-    
+
     searchForDrugs();
   }, [query]);
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!query.trim()) return;
-    
+
+  const executeSearch = (value: string) => {
+    const trimmed = value.trim();
+
+    if (!trimmed) return;
+
     if (onSearch) {
       setIsLoading(true);
-      // Simulate search delay
       setTimeout(() => {
-        onSearch(query);
+        onSearch(trimmed);
         setIsLoading(false);
         setSuggestions([]);
       }, 300);
     } else {
-      console.log("Navigating to search with query:", query);
-      navigate(`/search?q=${encodeURIComponent(query)}`);
+      console.log("Navigating to search with query:", trimmed);
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
       setSuggestions([]);
     }
   };
-  
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    executeSearch(query);
+  };
+
   const selectSuggestion = (suggestion: string) => {
     setQuery(suggestion);
     setSuggestions([]);
-    
-    if (onSearch) {
-      setIsLoading(true);
-      setTimeout(() => {
-        onSearch(suggestion);
-        setIsLoading(false);
-      }, 300);
-    } else {
-      console.log("Selected suggestion:", suggestion);
-      navigate(`/search?q=${encodeURIComponent(suggestion)}`);
-    }
+    executeSearch(suggestion);
   };
-  
+
   const clearSearch = () => {
     setQuery('');
     setSuggestions([]);
+  };
+
+  const handleVoiceInput = () => {
+    if (!recognitionRef.current) return;
+
+    try {
+      const recognition = recognitionRef.current;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const cleaned = transcript.trim();
+
+        if (!cleaned) return;
+
+        (async () => {
+          try {
+            const matches = await searchDrugs(cleaned);
+            const bestMatch = matches && matches.length > 0 ? matches[0].name : cleaned;
+
+            setQuery(bestMatch);
+            executeSearch(bestMatch);
+          } catch (error) {
+            console.error("Voice search suggestion error:", error);
+            setQuery(cleaned);
+            executeSearch(cleaned);
+          }
+        })();
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      // Animate waves only when sound is detected
+      (recognition as any).onsoundstart = () => {
+        setIsListening(true);
+      };
+      (recognition as any).onsoundend = () => {
+        setIsListening(false);
+      };
+      recognition.start();
+    } catch (error) {
+      console.error("Voice search error:", error);
+      setIsListening(false);
+    }
   };
 
   return (
@@ -137,6 +203,22 @@ const SearchBar = ({
               className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 flex-shrink-0"
             >
               <X className="h-4 w-4" />
+            </button>
+          )}
+          
+          {isSpeechSupported && (
+            <button
+              type="button"
+              onClick={handleVoiceInput}
+              className={cn(
+                "p-1.5 rounded-full flex-shrink-0 transition-colors flex items-center justify-center w-8 h-8",
+                isListening
+                  ? "bg-pharma-100 text-pharma-700 dark:bg-pharma-900/40 mic-listening"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              )}
+              aria-label="Voice search"
+            >
+              <Mic className="h-4 w-4" />
             </button>
           )}
           

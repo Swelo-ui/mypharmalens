@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertCircle, Pill, ChevronDown, ChevronRight, ArrowRight, Filter, Eye, X, Stethoscope } from 'lucide-react';
+import { Search, AlertCircle, Pill, ChevronDown, ChevronRight, ArrowRight, Filter, Eye, X, Stethoscope, Mic } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import Header from '@/components/Header';
 import DrugCard from '@/components/DrugCard';
@@ -15,6 +15,34 @@ import { loadAllDrugs } from '@/data/drugDataLoader';
 import { DrugData } from '@/components/DrugCard';
 import { toast } from 'sonner';
 
+function calculateLevenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 const SymptomChecker = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -26,6 +54,29 @@ const SymptomChecker = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [viewingSymptom, setViewingSymptom] = useState<Symptom | null>(null);
   const [symptomDrugs, setSymptomDrugs] = useState<DrugData[]>([]);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setIsSpeechSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN';
+
+    recognitionRef.current = recognition;
+    setIsSpeechSupported(true);
+  }, []);
 
   // Compute per-symptom priority weights for first-line classes and key generics
   const getSymptomPriorityWeights = (syms: Symptom[]) => {
@@ -610,6 +661,60 @@ const SymptomChecker = () => {
     setExpandedCategories(newExpanded);
   };
 
+  const handleSymptomVoiceSearch = () => {
+    if (!recognitionRef.current) return;
+
+    try {
+      const recognition = recognitionRef.current;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const cleaned = transcript.trim();
+        if (!cleaned) return;
+
+        const lower = cleaned.toLowerCase();
+        let bestMatch = cleaned;
+        let bestScore = Number.MAX_SAFE_INTEGER;
+
+        symptoms.forEach(symptom => {
+          const candidates = [symptom.nameEn, symptom.nameHi].filter(Boolean) as string[];
+          candidates.forEach(name => {
+            const n = name.toLowerCase();
+            const distance = calculateLevenshteinDistance(lower, n);
+            if (distance < bestScore) {
+              bestScore = distance;
+              bestMatch = symptom.nameEn;
+            }
+          });
+        });
+
+        const threshold = Math.min(4, Math.max(1, Math.floor(lower.length / 3)));
+        const finalTerm = bestScore <= threshold ? bestMatch : cleaned;
+        setSearchTerm(finalTerm);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      // Animate waves only when sound is detected
+      (recognition as any).onsoundstart = () => {
+        setIsListening(true);
+      };
+      (recognition as any).onsoundend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (error) {
+      setIsListening(false);
+    }
+  };
+
   // Filter symptoms based on search
   const filteredCategories = symptomCategories.map(category => ({
     ...category,
@@ -733,10 +838,20 @@ const SymptomChecker = () => {
                   <Input
                     type="search"
                     placeholder="Search symptoms..."
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
+                  {isSpeechSupported && (
+                    <button
+                      type="button"
+                      onClick={handleSymptomVoiceSearch}
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 ${isListening ? 'text-pharma-600 mic-listening' : ''}`}
+                      aria-label="Voice search symptoms"
+                    >
+                      <Mic className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </CardHeader>
               
