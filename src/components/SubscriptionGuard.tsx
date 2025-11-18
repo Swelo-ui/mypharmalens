@@ -132,12 +132,12 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
     
     if (currentPlanId === 'free-plan') {
       if (feature === 'ai_identification') {
-        return 'Weekly Plan'; // For more identifications
+        return 'Lite Plan'; // For more identifications
       }
       return 'Monthly Premium Plan'; // For premium features
     }
     
-    if (currentPlanId === 'weekly-plan') {
+    if (currentPlanId === 'lite-plan') {
       return 'Monthly Premium Plan'; // For premium features
     }
     

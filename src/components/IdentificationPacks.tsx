@@ -6,6 +6,7 @@ import { Zap, Check, Loader2, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
+import CongratulationsMessage from '@/components/CongratulationsMessage';
 
 interface IdentificationPack {
   id: string;
@@ -22,6 +23,8 @@ const IdentificationPacks: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [extraIdentifications, setExtraIdentifications] = useState(0);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [congratsPack, setCongratsPack] = useState<IdentificationPack | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -262,6 +265,8 @@ const IdentificationPacks: React.FC = () => {
                 await fetchExtraIdentifications();
                 
                 // Show instant success message
+                setCongratsPack(pack);
+                setShowCongratulations(true);
                 toast.success('🎉 Purchase Successful!', {
                   description: `Congratulations! ${pack.identifications_count} AI identifications have been added instantly to your account!`,
                   duration: 6000
@@ -292,6 +297,8 @@ const IdentificationPacks: React.FC = () => {
                 if (transaction?.status === 'success') {
                   toast.dismiss(processingToast);
                   await fetchExtraIdentifications();
+                  setCongratsPack(pack);
+                  setShowCongratulations(true);
                   toast.success('🎉 Purchase Successful!', {
                     description: `${pack.identifications_count} identifications added!`,
                     duration: 5000
@@ -368,9 +375,19 @@ const IdentificationPacks: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Identification Packs */}
-      <Card>
+    <>
+      <CongratulationsMessage
+        isVisible={showCongratulations}
+        onDismiss={() => setShowCongratulations(false)}
+        type="topup"
+        planName={congratsPack?.name || 'Top-Up Pack'}
+        identificationsCount={congratsPack?.identifications_count || 0}
+        amount={congratsPack?.price_inr || 0}
+      />
+
+      <div className="space-y-4">
+        {/* Identification Packs */}
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
@@ -452,7 +469,8 @@ const IdentificationPacks: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -78,6 +78,11 @@ const PaymentResult: React.FC = () => {
             console.error('Client update error (PaymentResult):', e);
           }
 
+          toast.success('🎉 Subscription Activated!', {
+            description: `Congratulations! Your ${getPlanDisplayName(tx?.plan_id || '')} plan is now active.`,
+            duration: 6000
+          });
+
           // Show congratulations modal
           setShowCongratulations(true);
         } else if (status === 'failed') {
@@ -130,6 +135,11 @@ const PaymentResult: React.FC = () => {
                 } catch (e) {
                   console.error('Client update error (Polling):', e);
                 }
+
+                toast.success('🎉 Subscription Activated!', {
+                  description: `Congratulations! Your ${getPlanDisplayName(latest?.plan_id || '')} plan is now active.`,
+                  duration: 6000
+                });
 
                 // Show congratulations modal
                 setShowCongratulations(true);
@@ -215,49 +225,68 @@ const PaymentResult: React.FC = () => {
     window.location.reload();
   };
 
+  const getPlanDisplayName = (planId: string): string => {
+    const normalized = planId.toLowerCase();
+    if (planId === 'lite-plan' || normalized.includes('lite')) return 'Lite';
+    if (planId === 'monthly-premium-plan' || normalized.includes('premium')) return 'Pro';
+    if (planId === 'free-plan' || normalized.includes('free')) return 'Free Plan';
+    if (normalized.includes('yearly')) return 'Yearly Premium';
+    return 'Premium Plan';
+  };
+
+  const getPlanFeatures = (planId: string, cycle: string): string[] => {
+    const normalized = planId.toLowerCase();
+    if (planId === 'lite-plan' || normalized.includes('lite')) {
+      return [
+        '39 AI identifications per month',
+        'Advanced search (249 results limit)',
+        'Priority support',
+        '1200+ medicines database',
+        'Layman explanations'
+      ];
+    }
+    if (planId === 'monthly-premium-plan' || normalized.includes('premium')) {
+      return [
+        '101 AI identifications per month',
+        'Advanced search (500 results limit)',
+        'Priority support',
+        '1200+ medicines database',
+        'Layman explanations',
+        'History feature (unlimited)',
+        'Advanced search filters'
+      ];
+    }
+    if (cycle === 'yearly') {
+      return [
+        '1200 AI identifications per year',
+        '1000+ medicines database',
+        'Advanced search & filters',
+        'Layman explanations',
+        'History feature',
+        'Unlimited database searches'
+      ];
+    }
+    return [
+      '100 AI identifications per month',
+      '1000+ medicines database',
+      'Advanced search & filters',
+      'Layman explanations',
+      'History feature',
+      'Unlimited database searches'
+    ];
+  };
+
   return (
     <>
       <CongratulationsModal
         isOpen={showCongratulations}
         onClose={handleCloseCongratulations}
-        planName={(() => {
-          const planId = transactionDetails?.plan_id || '';
-          if (planId.includes('weekly')) return 'Weekly Plan';
-          if (planId.includes('monthly') || planId.includes('premium')) return 'Monthly Premium';
-          if (planId.includes('yearly')) return 'Yearly Premium';
-          return 'Premium Plan';
-        })()}
+        planName={getPlanDisplayName(transactionDetails?.plan_id || '')}
         billingCycle={transactionDetails?.billing_cycle || 'monthly'}
-        planFeatures={(() => {
-          const cycle = transactionDetails?.billing_cycle || 'monthly';
-          if (cycle === 'weekly') {
-            return [
-              '21 AI identifications per week',
-              '500+ medicines database',
-              'Priority support',
-              'No ads',
-              'History feature'
-            ];
-          } else if (cycle === 'yearly') {
-            return [
-              '1200 AI identifications per year',
-              '1000+ medicines database',
-              'Advanced search & filters',
-              'Layman explanations',
-              'History feature',
-              'Unlimited database searches'
-            ];
-          } else {
-            return [
-              '100 AI identifications per month',
-              '1000+ medicines database',
-              'Advanced search & filters',
-              'Layman explanations',
-              'History feature',
-              'Unlimited database searches'
-            ];
-          }
-        })()}
+        planFeatures={getPlanFeatures(
+          transactionDetails?.plan_id || '',
+          transactionDetails?.billing_cycle || 'monthly'
+        )}
       />
       
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
