@@ -728,9 +728,9 @@ const SymptomChecker = () => {
   return (
     <>
       <SEOHead
-        title="Symptom Checker - Find Medications by Symptoms | PharmaLens"
-        description="Identify potential medications based on your symptoms. Our AI-powered symptom checker helps you find the right treatment options safely."
-        keywords="symptom checker, find medication by symptom, drug symptom search, medicine finder, health symptom analysis"
+        title="Free AI Symptom Checker - Identify Medications & Conditions | PharmaLens"
+        description="Use our free AI-powered Symptom Checker to find medications and understand potential conditions. Instant, accurate health analysis and drug recommendations based on your symptoms."
+        keywords="AI symptom checker, free symptom checker, medication finder by symptom, check symptoms online, drug symptom search, medicine finder, health symptom analysis, indian medicine finder, symptom based medicine"
         canonicalUrl="/symptom-checker"
       />
       <Header />

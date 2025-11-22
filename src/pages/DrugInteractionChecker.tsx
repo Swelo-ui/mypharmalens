@@ -296,9 +296,9 @@ const DrugInteractionChecker = () => {
   return (
     <>
       <SEOHead
-        title="Drug Interaction Checker - Check Medication Safety | PharmaLens"
-        description="Check for potential interactions between your medications. Ensure safety with our comprehensive drug interaction checker tool."
-        keywords="drug interaction checker, medication interactions, pill checker, drug safety, medicine combination safety"
+        title="Free Drug Interaction Checker - Instant Safety Analysis | PharmaLens"
+        description="Check for harmful interactions between prescription drugs, OTC medicines, and supplements. Free, instant, and comprehensive medication safety analysis tool."
+        keywords="drug interaction checker, free medication interaction check, pill checker, drug safety analysis, medicine combination safety, contraindications checker, multi-drug interaction"
         canonicalUrl="/drug-interactions"
       />
       <Header />
