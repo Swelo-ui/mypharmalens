@@ -3,6 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from './useAuthStatus';
 import { toast } from 'sonner';
 import { Tables } from '@/types/database.types';
+import {
+  PLAN_IDS,
+  IDENTIFICATION_LIMITS,
+  GUEST_LIMITS,
+  DATABASE_SEARCH_LIMITS,
+  hasSpecialAccess,
+  getMonthlyLimit
+} from '@/config/subscription.config';
 
 export type SubscriptionPlan = Tables<"subscription_plans">;
 export type UserSubscription = Tables<"user_subscriptions"> & {
@@ -30,10 +38,10 @@ export const useSubscription = () => {
   // Fetch profile usage data - ensures profile exists and is initialized
   const fetchProfileUsage = async () => {
     if (!user?.id) return;
-    
+
     try {
       const now = new Date();
-      
+
       // First, ensure profile exists with proper defaults
       const { error: upsertError } = await supabase
         .from('profiles')
@@ -44,16 +52,16 @@ export const useSubscription = () => {
             last_reset_date: now.toISOString(),
             monthly_identifications: 5
           },
-          { 
+          {
             onConflict: 'id',
             ignoreDuplicates: true // Don't overwrite existing data
           }
         );
-      
+
       if (upsertError) {
         console.error('Error ensuring profile exists:', upsertError);
       }
-      
+
       // Now fetch the actual data
       const { data, error } = await supabase
         .from('profiles')
@@ -140,13 +148,13 @@ export const useSubscription = () => {
       setAvailablePlans((data || []) as SubscriptionPlan[]);
     } catch (error: any) {
       console.error('Error fetching subscription plans:', error);
-      
+
       // Don't show error toasts when offline - user already gets offline notification
-      const isOfflineError = !navigator.onLine || 
-                            error?.message?.includes('fetch') ||
-                            error?.message?.includes('Failed to fetch') ||
-                            error?.code === 'PGRST301';
-      
+      const isOfflineError = !navigator.onLine ||
+        error?.message?.includes('fetch') ||
+        error?.message?.includes('Failed to fetch') ||
+        error?.code === 'PGRST301';
+
       if (!isOfflineError) {
         const msg = error?.message || 'Unknown error';
         toast.error('Failed to load subscription plans', {
@@ -264,18 +272,18 @@ export const useSubscription = () => {
     if (!user?.id) return;
 
     // Special handling for specific user - set special access directly
-    if (user?.email === 'imgamer.ms@gmail.com') {
+    if (hasSpecialAccess(user?.email)) {
       const specialSubscription: UserSubscription = {
         id: 'special-access',
         user_id: user.id,
-        plan_id: 'special-plan',
+        plan_id: PLAN_IDS.SPECIAL,
         status: 'active',
         starts_at: new Date().toISOString(),
         ends_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         plan: {
-          id: 'special-plan',
+          id: PLAN_IDS.SPECIAL,
           name: 'Special Access',
           description: 'Unlimited access for special users',
           price: 0,
@@ -287,7 +295,7 @@ export const useSubscription = () => {
           updated_at: new Date().toISOString()
         }
       } as unknown as UserSubscription;
-      
+
       setCurrentSubscription(specialSubscription);
       await calculateUsageStats(specialSubscription, true);
       await reconcileBonusIdentifications();
@@ -316,14 +324,14 @@ export const useSubscription = () => {
       // If we have multiple active subscriptions, keep only the latest (non-free) one
       if (allActiveSubscriptions && allActiveSubscriptions.length > 1) {
         console.log(`Found ${allActiveSubscriptions.length} active subscriptions, cleaning up...`);
-        
+
         // Find the latest non-free subscription, or latest overall
         const latestPaidSubscription = allActiveSubscriptions.find(sub => sub.plan_id !== 'free-plan');
         const activeSubscription = latestPaidSubscription || allActiveSubscriptions[0];
-        
+
         // Deactivate all other subscriptions
         const subscriptionsToDeactivate = allActiveSubscriptions.filter(sub => sub.id !== activeSubscription.id);
-        
+
         for (const sub of subscriptionsToDeactivate) {
           await supabase
             .from('user_subscriptions')
@@ -331,7 +339,7 @@ export const useSubscription = () => {
             .eq('id', sub.id);
           console.log(`Deactivated subscription: ${sub.plan_id} (${sub.id})`);
         }
-        
+
         setCurrentSubscription(activeSubscription as UserSubscription);
         await calculateUsageStats(activeSubscription as UserSubscription, true);
         await reconcileBonusIdentifications();
@@ -358,7 +366,7 @@ export const useSubscription = () => {
     if (!user?.id) return;
 
     try {
-      const freePlan = availablePlans.find(plan => plan.id === 'free-plan');
+      const freePlan = availablePlans.find(plan => plan.id === PLAN_IDS.FREE);
       if (!freePlan) return;
 
       const endDate = new Date();
@@ -368,7 +376,7 @@ export const useSubscription = () => {
         .from('user_subscriptions')
         .insert({
           user_id: user.id,
-          plan_id: 'free-plan',
+          plan_id: PLAN_IDS.FREE,
           status: 'active',
           starts_at: new Date().toISOString(),
           ends_at: endDate.toISOString()
@@ -394,42 +402,33 @@ export const useSubscription = () => {
   // Reconcile bonus identifications based on actual usage
   const reconcileBonusIdentifications = async () => {
     if (!user?.id || !currentSubscription) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('identifications_used, extra_identifications')
         .eq('id', user.id)
         .single();
-      
+
       if (error || !data) return;
-      
+
       const currentUsed = data.identifications_used ?? 0;
       const currentExtra = data.extra_identifications ?? 0;
-      
+
       if (currentExtra === 0) return; // No bonus to reconcile
-      
+
       // Get monthly limit
       const plan = currentSubscription.plan;
       const planId = plan?.id || currentSubscription.plan_id || '';
       const planName = plan?.name || '';
-      
-      let monthlyLimit = 5;
-      if (planId === 'special-plan') {
-        monthlyLimit = -1;
-      } else if (planId === 'free-plan') {
-        monthlyLimit = 5;
-      } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
-        monthlyLimit = 39;
-      } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
-        monthlyLimit = 101;
-      }
-      
+
+      const monthlyLimit = getMonthlyLimit(planId, planName);
+
       // Check if usage or bonus needs reconciliation
       if (monthlyLimit !== -1 && currentUsed >= monthlyLimit) {
         let needsUpdate = false;
         let updates: any = {};
-        
+
         // CRITICAL: identifications_used should NEVER exceed monthlyLimit
         // If it does, cap it at monthlyLimit
         if (currentUsed > monthlyLimit) {
@@ -441,10 +440,10 @@ export const useSubscription = () => {
           updates.identifications_used = monthlyLimit;
           needsUpdate = true;
         }
-        
+
         // Check if bonus needs reconciliation
         const bonusAlreadyUsed = Math.max(0, currentUsed - monthlyLimit);
-        
+
         if (bonusAlreadyUsed > currentExtra) {
           // Bonus was fully consumed, should be 0
           if (currentExtra > 0) {
@@ -461,7 +460,7 @@ export const useSubscription = () => {
         } else if (bonusAlreadyUsed > 0) {
           // Some bonus was used
           const bonusShouldRemain = currentExtra - bonusAlreadyUsed;
-          
+
           if (bonusShouldRemain !== currentExtra && bonusShouldRemain >= 0) {
             console.log('🔧 AUTO-RECONCILING partial bonus usage:', {
               currentUsed,
@@ -474,14 +473,14 @@ export const useSubscription = () => {
             needsUpdate = true;
           }
         }
-        
+
         // Apply updates if needed
         if (needsUpdate) {
           const { error: updateError } = await supabase
             .from('profiles')
             .update(updates)
             .eq('id', user.id);
-          
+
           if (!updateError) {
             if (updates.identifications_used !== undefined) {
               setProfileIdentificationsUsed(updates.identifications_used);
@@ -489,7 +488,7 @@ export const useSubscription = () => {
             if (updates.extra_identifications !== undefined) {
               setExtraIdentifications(updates.extra_identifications);
             }
-            
+
             if (updates.identifications_used !== undefined) {
               toast.info(`Usage corrected to monthly limit`, {
                 description: `Usage was ${currentUsed}, capped at ${monthlyLimit}`,
@@ -507,41 +506,31 @@ export const useSubscription = () => {
   // Calculate usage statistics
   const calculateUsageStats = async (subscription: UserSubscription, forceRefresh: boolean = true) => {
     const plan = subscription.plan;
-    
+
     // Check if paid subscription is expired
     const now = new Date();
     const endsAt = subscription.ends_at ? new Date(subscription.ends_at) : null;
     const isExpired = endsAt && now > endsAt && subscription.plan_id !== 'free-plan';
-    
+
     // Determine limits based on plan features, billing period, and plan id
     const hasUnlimited = Array.isArray(plan?.features) && plan!.features!.includes('unlimited_identifications');
     const billingPeriod = plan?.billing_period || subscription.plan?.billing_period || 'monthly';
     const planId = plan?.id || subscription.plan_id || '';
     const planName = plan?.name || '';
-    
+
     console.log('📊 Plan detection:', { planId, planName, billingPeriod, subscriptionPlanId: subscription.plan_id });
-    
-    // If expired, force free tier limits (5), otherwise use plan limits
+
+    // If expired, force free tier limits, otherwise use plan limits
     let monthlyLimit: number;
     if (isExpired) {
-      monthlyLimit = 5; // Expired subscriptions get free tier limits
+      monthlyLimit = IDENTIFICATION_LIMITS.FREE; // Expired subscriptions get free tier limits
       console.log('⚠️ Subscription expired - applying free tier limits');
-    } else if (hasUnlimited || planId === 'special-plan') {
-      monthlyLimit = -1; // Unlimited
-    } else if (planId === 'free-plan') {
-      monthlyLimit = 5; // Free tier
-    } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
-      monthlyLimit = 39; // Lite plan: 39 identifications per month
-      console.log('✅ Lite plan detected - 39 identifications');
-    } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
-      monthlyLimit = 101; // Pro plan: 101 identifications per month
-      console.log('✅ Pro plan detected - 101 identifications');
+    } else if (hasUnlimited || planId === PLAN_IDS.SPECIAL) {
+      monthlyLimit = IDENTIFICATION_LIMITS.UNLIMITED; // Unlimited
     } else {
-      // Fallback to 5 for unknown plans to be safe
-      monthlyLimit = 5;
-      console.warn('⚠️ Unknown plan, defaulting to free tier limits:', { planId, planName });
+      monthlyLimit = getMonthlyLimit(planId, planName);
     }
-    
+
     // Always get fresh usage data from profiles to ensure sync across devices
     let used = profileIdentificationsUsed || 0;
     if (user?.id) {
@@ -551,7 +540,7 @@ export const useSubscription = () => {
           .select('identifications_used')
           .eq('id', user.id)
           .single();
-        
+
         if (!error && data) {
           used = data.identifications_used ?? 0;
           setProfileIdentificationsUsed(used);
@@ -563,7 +552,7 @@ export const useSubscription = () => {
         console.error('Error fetching fresh usage data:', err);
       }
     }
-    
+
     const remaining = monthlyLimit < 0 ? -1 : Math.max(monthlyLimit - used, 0);
 
     setUsageStats({
@@ -579,66 +568,52 @@ export const useSubscription = () => {
   // Check if user can perform an identification
   const canPerformIdentification = (): boolean => {
     // Special access for specific user
-    if (user?.email === 'imgamer.ms@gmail.com') {
+    if (hasSpecialAccess(user?.email)) {
       return true;
     }
-    
+
     // For unauthenticated users, allow limited usage based on localStorage
     if (!isAuthenticated || !user?.id) {
       const guestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
-      return guestUsage < 3; // Allow 3 free identifications for guests
+      return guestUsage < GUEST_LIMITS.IDENTIFICATIONS;
     }
-    
+
     // Get current usage count
     const currentUsage = profileIdentificationsUsed || 0;
-    
+
     // Check if subscription is expired (paid subscriptions only)
-    if (currentSubscription && currentSubscription.plan_id !== 'free-plan') {
+    if (currentSubscription && currentSubscription.plan_id !== PLAN_IDS.FREE) {
       const now = new Date();
       const endsAt = currentSubscription.ends_at ? new Date(currentSubscription.ends_at) : null;
       if (endsAt && now > endsAt) {
         console.warn('⚠️ Subscription expired - limiting to free tier (no bonus allowed)');
-        // Expired paid subscription = free tier limits (5 identifications, NO BONUS)
-        const canProceed = currentUsage < 5;
-        console.log('🔒 Free tier check (expired):', { currentUsage, limit: 5, canProceed, bonusIgnored: true });
+        // Expired paid subscription = free tier limits (no bonus)
+        const canProceed = currentUsage < IDENTIFICATION_LIMITS.FREE;
+        console.log('🔒 Free tier check (expired):', { currentUsage, limit: IDENTIFICATION_LIMITS.FREE, canProceed, bonusIgnored: true });
         return canProceed;
       }
     }
-    
+
     // While subscription info is loading or unavailable, default to Free plan limits
     if (!currentSubscription?.plan) {
       // No subscription = free tier with bonus allowed
-      const totalLimit = 5 + extraIdentifications;
+      const totalLimit = IDENTIFICATION_LIMITS.FREE + extraIdentifications;
       const canProceed = currentUsage < totalLimit;
-      console.log('🔒 Free tier check (no subscription):', { currentUsage, monthlyLimit: 5, bonusIds: extraIdentifications, totalLimit, canProceed });
+      console.log('🔒 Free tier check (no subscription):', { currentUsage, monthlyLimit: IDENTIFICATION_LIMITS.FREE, bonusIds: extraIdentifications, totalLimit, canProceed });
       return canProceed;
     }
-    
+
     const plan = currentSubscription.plan;
     const planId = plan?.id || currentSubscription.plan_id || '';
     const planName = plan?.name || '';
-    
+
     console.log('🔍 canPerformIdentification - Plan check:', { planId, planName });
-    
+
     // Use default limits based on plan type
-    let limit: number;
-    if (planId === 'special-plan') {
-      limit = -1; // Unlimited
-    } else if (planId === 'free-plan') {
-      limit = 5; // Free plan: 5 identifications
-    } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
-      limit = 39; // Lite plan: 39 identifications  
-      console.log('✅ Lite plan detected in canPerform - limit: 39');
-    } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
-      limit = 101; // Pro plan: 101 identifications
-      console.log('✅ Pro plan detected in canPerform - limit: 101');
-    } else {
-      limit = 5; // Default to free tier for unknown plans
-      console.warn('⚠️ Unknown plan in canPerform, defaulting to free:', { planId, planName });
-    }
-    
-    if (limit === -1) return true; // Unlimited
-    
+    const limit = getMonthlyLimit(planId, planName);
+
+    if (limit === IDENTIFICATION_LIMITS.UNLIMITED) return true; // Unlimited
+
     // Include bonus identifications in the total limit
     const totalLimit = limit + extraIdentifications;
     const canProceed = currentUsage < totalLimit;
@@ -648,16 +623,16 @@ export const useSubscription = () => {
 
   // Get database search limit based on subscription plan
   const getDatabaseSearchLimit = () => {
-    if (!currentSubscription || !currentSubscription.plan) return 100; // Default free plan limit
+    if (!currentSubscription || !currentSubscription.plan) return DATABASE_SEARCH_LIMITS.DEFAULT;
     // Use advanced_search_limit from the plan
-    return currentSubscription.plan.advanced_search_limit || 100;
+    return currentSubscription.plan.advanced_search_limit || DATABASE_SEARCH_LIMITS.DEFAULT;
   };
 
   // Check if user can access a specific feature
   const hasFeatureAccess = (feature: 'history_feature' | 'layman_explanations' | 'advanced_filters'): boolean => {
     if (!currentSubscription?.plan) return false;
     const plan = currentSubscription.plan;
-    
+
     // Check if the feature is in the features array
     if (plan.features && Array.isArray(plan.features)) {
       switch (feature) {
@@ -671,30 +646,30 @@ export const useSubscription = () => {
           return false;
       }
     }
-    
+
     // Default access for free plan (limited features)
-    return plan.id !== 'free-plan';
+    return plan.id !== PLAN_IDS.FREE;
   };
 
   // Increment identification usage (stored in profiles)
   const incrementIdentificationUsage = async (): Promise<boolean> => {
-    if (user?.email === 'imgamer.ms@gmail.com') {
+    if (hasSpecialAccess(user?.email)) {
       return true;
     }
-    
+
     // For unauthenticated users, increment localStorage counter
     if (!isAuthenticated || !user?.id) {
       const currentGuestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
       localStorage.setItem('guest_identifications_used', (currentGuestUsage + 1).toString());
       return true;
     }
-    
+
     if (!user?.id) return false;
 
     try {
       const now = new Date();
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      
+
       // Ensure profile exists first
       await supabase
         .from('profiles')
@@ -705,12 +680,12 @@ export const useSubscription = () => {
             last_reset_date: now.toISOString(),
             monthly_identifications: 5
           },
-          { 
+          {
             onConflict: 'id',
             ignoreDuplicates: true
           }
         );
-      
+
       // Fetch current usage, extra_identifications, and last reset
       const { data: existing, error: fetchErr } = await supabase
         .from('profiles')
@@ -732,29 +707,19 @@ export const useSubscription = () => {
       let payload: Partial<Tables<'profiles'>> & { id: string } = { id: user.id } as any;
 
       // Get monthly limit based on plan
-      let monthlyLimit = 5; // Default free tier
+      let monthlyLimit = IDENTIFICATION_LIMITS.FREE; // Default free tier
       if (currentSubscription?.plan) {
         const plan = currentSubscription.plan;
         const planId = plan?.id || currentSubscription.plan_id || '';
         const planName = plan?.name || '';
-        
-        if (planId === 'special-plan') {
-          monthlyLimit = -1; // Unlimited
-        } else if (planId === 'free-plan') {
-          monthlyLimit = 5; // Free plan: 5 identifications
-        } else if (planId.toLowerCase().includes('lite') || planName.toLowerCase().includes('lite')) {
-          monthlyLimit = 39; // Lite plan: 39 identifications  
-        } else if (planId.toLowerCase().includes('pro') || planName.toLowerCase().includes('pro')) {
-          monthlyLimit = 101; // Pro plan: 101 identifications
-        } else {
-          monthlyLimit = 5; // Default to free tier for safety
-        }
+
+        monthlyLimit = getMonthlyLimit(planId, planName);
       }
 
       // RECONCILIATION: Fix usage and bonus if they don't match
       if (monthlyLimit !== -1 && currentUsed > monthlyLimit) {
         const bonusAlreadyUsed = currentUsed - monthlyLimit;
-        
+
         // If bonusAlreadyUsed > currentExtra, bonus was fully consumed, reset usage
         if (bonusAlreadyUsed > currentExtra) {
           console.log('🔧 RECONCILING: Bonus fully consumed, resetting to monthly limit:', {
@@ -764,26 +729,26 @@ export const useSubscription = () => {
             currentExtra,
             resetting: `${currentUsed} → ${monthlyLimit}`
           });
-          
+
           // Reset usage to monthly limit and clear bonus
           await supabase
             .from('profiles')
-            .update({ 
+            .update({
               identifications_used: monthlyLimit,
-              extra_identifications: 0 
+              extra_identifications: 0
             })
             .eq('id', user.id);
-          
+
           setProfileIdentificationsUsed(monthlyLimit);
           setExtraIdentifications(0);
-          
+
           // Update local variables for the current increment
           newUsed = monthlyLimit + 1; // Will be the new usage after this identification
           newExtra = 0;
         } else if (bonusAlreadyUsed > 0 && currentExtra > 0) {
           // Partial bonus usage
           const bonusShouldRemain = currentExtra - bonusAlreadyUsed;
-          
+
           if (bonusShouldRemain !== currentExtra && bonusShouldRemain >= 0) {
             console.log('🔧 RECONCILING partial bonus usage:', {
               currentUsed,
@@ -791,7 +756,7 @@ export const useSubscription = () => {
               bonusWas: currentExtra,
               bonusShouldBe: bonusShouldRemain
             });
-            
+
             newExtra = bonusShouldRemain;
             await supabase
               .from('profiles')
@@ -821,13 +786,13 @@ export const useSubscription = () => {
             // Keep identifications_used AT monthlyLimit, don't increment it
             newUsed = monthlyLimit; // Stay at monthly limit (39 for Lite, 101 for Pro)
             newExtra = Math.max(0, currentExtra - 1);
-            
+
             payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra } as any;
-            console.log('🎁 Using bonus identification:', { 
+            console.log('🎁 Using bonus identification:', {
               monthlyLimit,
               identifications_used: newUsed, // Stays at monthly limit
-              bonusUsed: currentExtra - newExtra, 
-              bonusRemaining: newExtra 
+              bonusUsed: currentExtra - newExtra,
+              bonusRemaining: newExtra
             });
           } else {
             // No bonus available - cannot proceed, keep at monthly limit
@@ -852,7 +817,7 @@ export const useSubscription = () => {
       console.log('✅ Usage incremented:', { newUsed, newExtra, monthlyLimit });
       setProfileIdentificationsUsed(newUsed);
       setExtraIdentifications(newExtra);
-      
+
       // Always update usage stats, even for free tier users without subscription
       if (currentSubscription) {
         await calculateUsageStats(currentSubscription, true);
@@ -868,7 +833,7 @@ export const useSubscription = () => {
         });
         console.log('✅ Free tier usage stats updated:', { used: newUsed, remaining: Math.max(5 - newUsed, 0) });
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error incrementing identification usage:', error);
@@ -986,7 +951,7 @@ export const useSubscription = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
@@ -1094,18 +1059,18 @@ export const useSubscription = () => {
   }, [isAuthenticated]);
 
   return {
-      currentSubscription,
-      availablePlans,
-      loading,
-      usageStats,
-      canPerformIdentification,
-      getDatabaseSearchLimit,
-      hasFeatureAccess,
-      getPlanById,
-      isSubscriptionExpired,
-      getSubscriptionStatusDisplay,
-      incrementIdentificationUsage
-    };
+    currentSubscription,
+    availablePlans,
+    loading,
+    usageStats,
+    canPerformIdentification,
+    getDatabaseSearchLimit,
+    hasFeatureAccess,
+    getPlanById,
+    isSubscriptionExpired,
+    getSubscriptionStatusDisplay,
+    incrementIdentificationUsage
+  };
 };
 
 
