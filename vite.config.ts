@@ -72,8 +72,8 @@ export default defineConfig(({ mode }) => ({
             // Cache Supabase medication data for offline access
             urlPattern: ({ url }) => {
               return url.pathname.includes('drug_identification_cache') ||
-                     url.pathname.includes('medications') ||
-                     url.pathname.includes('drug_interactions');
+                url.pathname.includes('medications') ||
+                url.pathname.includes('drug_interactions');
             },
             handler: 'CacheFirst',
             options: {
@@ -91,7 +91,7 @@ export default defineConfig(({ mode }) => ({
             // Cache symptom checker data
             urlPattern: ({ url }) => {
               return url.pathname.includes('symptom_checker') ||
-                     url.pathname.includes('symptoms');
+                url.pathname.includes('symptoms');
             },
             handler: 'CacheFirst',
             options: {
@@ -142,32 +142,60 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: 'dist',        // Output to 'dist' folder
-    emptyOutDir: true,     // Clean the 'dist' folder before each build
-    sourcemap: true,
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false, // Disable sourcemaps in production for smaller bundle
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'],
       },
     },
+    cssCodeSplit: true, // Split CSS for better caching
+    chunkSizeWarningLimit: 1000, // Warn for chunks > 1MB
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: [
+          // Core React dependencies
+          'vendor-react': [
             'react',
             'react-dom',
             'react-router-dom',
+          ],
+          // Data fetching
+          'vendor-query': [
             '@tanstack/react-query'
           ],
-          ui: [
+          // UI framework components
+          'ui-radix': [
             '@radix-ui/react-avatar',
             '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
             '@radix-ui/react-toast',
-            'lucide-react'
           ],
-        }
-      }
-    }
-  }
+          // Icons and utilities
+          'ui-utils': [
+            'lucide-react',
+            'class-variance-authority',
+            'clsx',
+            'tailwind-merge',
+          ],
+          // Supabase
+          'vendor-supabase': [
+            '@supabase/supabase-js',
+            '@supabase/auth-helpers-react',
+          ],
+        },
+        // Optimize chunk naming for better caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
+  },
 }));

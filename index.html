@@ -70,7 +70,12 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://pharmalens.tech/" />
 
-  <!-- DNS Prefetch for Performance -->
+  <!-- Preconnect for Performance - establishes early connections -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin>
+
+  <!-- DNS Prefetch as fallback -->
   <link rel="dns-prefetch" href="//fonts.googleapis.com" />
   <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
 
@@ -139,10 +144,10 @@
 
 <body>
   <div id="root"></div>
-  <!-- Razorpay SDK - Required for payment processing -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Razorpay SDK - Async load (only needed on payment pages) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
   <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module" defer></script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
