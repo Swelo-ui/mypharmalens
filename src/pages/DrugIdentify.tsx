@@ -20,7 +20,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 import { playDrugIdentificationSound } from '@/utils/audioService';
+import SEOHead from '@/components/SEOHead';
 
 // Helper function to extract image features for similarity comparison
 const extractImageFeatures = (base64Image: string): Promise<string> => {
@@ -35,13 +37,13 @@ const extractImageFeatures = (base64Image: string): Promise<string> => {
       canvas.width = size;
       canvas.height = size;
       const ctx = canvas.getContext('2d');
-      
+
       if (ctx) {
         ctx.drawImage(img, 0, 0, size, size);
         // Get grayscale pixel data as a simple feature vector
         const imageData = ctx.getImageData(0, 0, size, size);
         const data = imageData.data;
-        
+
         // Create a feature hash from the downsampled image
         let featureHash = '';
         for (let i = 0; i < data.length; i += 4) {
@@ -49,13 +51,13 @@ const extractImageFeatures = (base64Image: string): Promise<string> => {
           const gray = Math.floor((data[i] + data[i + 1] + data[i + 2]) / 3);
           featureHash += gray > 128 ? '1' : '0';
         }
-        
+
         resolve(featureHash);
       } else {
         resolve('');
       }
     };
-    
+
     img.src = base64Image;
   });
 };
@@ -63,14 +65,14 @@ const extractImageFeatures = (base64Image: string): Promise<string> => {
 // Function to calculate similarity between two feature hashes
 const calculateSimilarity = (hash1: string, hash2: string): number => {
   if (!hash1 || !hash2 || hash1.length !== hash2.length) return 0;
-  
+
   let matchingBits = 0;
   for (let i = 0; i < hash1.length; i++) {
     if (hash1[i] === hash2[i]) {
       matchingBits++;
     }
   }
-  
+
   return matchingBits / hash1.length;
 };
 
@@ -79,6 +81,7 @@ const DrugIdentify = () => {
   const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
   const { checkOnlineStatus } = useOfflineDetection();
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
+
   const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [extraIdentifications, setExtraIdentifications] = useState(0);
@@ -150,18 +153,18 @@ const DrugIdentify = () => {
     if (stageInfo) {
       setProcessingPhase(stageInfo.message);
       setTargetProgress(stageInfo.progress);
-      
+
       // Clear any existing interval
       if (progressInterval) {
         clearInterval(progressInterval);
       }
-      
+
       // Smoothly interpolate to target progress over the stage duration
       const startProgress = currentProgress;
       const progressDiff = stageInfo.progress - startProgress;
       const steps = stageInfo.duration / 50; // Update every 50ms
       const progressPerStep = progressDiff / steps;
-      
+
       let stepCount = 0;
       const interval = setInterval(() => {
         stepCount++;
@@ -169,29 +172,29 @@ const DrugIdentify = () => {
           stageInfo.progress,
           startProgress + (progressPerStep * stepCount)
         );
-        
+
         setCurrentProgress(newProgress);
         setProcessingProgress(Math.floor(newProgress));
-        
+
         // Calculate time remaining
         if (processingStartTime > 0) {
           const elapsed = Date.now() - processingStartTime;
           const remainingProgress = 100 - newProgress;
-          
+
           if (newProgress > 0) {
             const avgTimePerPercent = elapsed / newProgress;
             const estimatedRemaining = Math.ceil((avgTimePerPercent * remainingProgress) / 1000);
             setEstimatedTimeRemaining(Math.max(1, estimatedRemaining));
           }
         }
-        
+
         // Stop when target reached
         if (stepCount >= steps || newProgress >= stageInfo.progress) {
           clearInterval(interval);
           setProgressInterval(null);
         }
       }, 50);
-      
+
       setProgressInterval(interval);
     }
   };
@@ -227,7 +230,7 @@ const DrugIdentify = () => {
           .select('extra_identifications')
           .eq('id', user.id)
           .single();
-        
+
         if (!error && data) {
           console.log('✅ Extra identifications fetched:', data.extra_identifications);
           setExtraIdentifications(data.extra_identifications || 0);
@@ -236,7 +239,7 @@ const DrugIdentify = () => {
         }
       }
     };
-    
+
     if (user) {
       fetchExtraIdentifications();
     }
@@ -253,14 +256,14 @@ const DrugIdentify = () => {
   const fetchPreviousIdentifications = async () => {
     try {
       if (!user) return;
-      
+
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
         throw new Error("No active session");
       }
 
       const response = await supabase.functions.invoke('manage-drug-history', {
-        body: { 
+        body: {
           action: 'getIdentificationHistory',
           data: { userId: user.id }
         },
@@ -283,22 +286,22 @@ const DrugIdentify = () => {
   // Function to check if the current image matches any previously identified medications
   const findMatchInHistory = async (base64Image: string): Promise<any | null> => {
     if (!previousIdentifications.length) return null;
-    
+
     try {
       // Extract features from current image
       const features = await extractImageFeatures(base64Image);
       setImageFeatures(features);
-      
+
       // Set minimum similarity threshold
       const SIMILARITY_THRESHOLD = 0.85;
-      
+
       // Check each previous identification for a match
       for (const prevIdentification of previousIdentifications) {
         // Skip if no image features stored
         if (!prevIdentification.image_features) continue;
-        
+
         const similarity = calculateSimilarity(features, prevIdentification.image_features);
-        
+
         // If similarity is above threshold, we have a match
         if (similarity >= SIMILARITY_THRESHOLD) {
           console.log(`Found match in history with similarity: ${similarity}`, prevIdentification);
@@ -310,7 +313,7 @@ const DrugIdentify = () => {
           };
         }
       }
-      
+
       return null;
     } catch (err) {
       console.error('Error in findMatchInHistory:', err);
@@ -333,12 +336,12 @@ const DrugIdentify = () => {
       }
 
       setIsSaving(true);
-      
+
       console.log('🔄 Attempting manual cache save for:', identifiedDrug.name);
-      
+
       // Call the manual cache save function
       const { data: cacheResult, error: cacheError } = await supabase.functions.invoke('manual-cache-save', {
-        body: { 
+        body: {
           drugData: identifiedDrug
         }
       });
@@ -362,7 +365,7 @@ const DrugIdentify = () => {
       } else {
         const errorMessage = cacheResult?.message || "Unknown error occurred";
         const completenessScore = cacheResult?.details?.completenessScore;
-        
+
         if (cacheResult?.error === 'already_cached') {
           console.log('ℹ️ Drug already in cache:', cacheResult?.details);
           toast.info("Already cached!", {
@@ -396,19 +399,19 @@ const DrugIdentify = () => {
       // Start tracking time
       const startTime = Date.now();
       setProcessingStartTime(startTime);
-      
+
       // Track progress for better UX
       setProcessingPhase("Preparing image for analysis");
       setProcessingProgress(3);
       setEstimatedTimeRemaining(35); // Initial estimate: 35 seconds
-      
+
       // First check if this medication was previously identified
       setProcessingPhase("Checking your previous scans");
       setProcessingProgress(8);
       setEstimatedTimeRemaining(30);
-      
+
       const historicalMatch = await findMatchInHistory(base64Image);
-      
+
       if (historicalMatch) {
         setProcessingPhase("✓ Match found in your history!");
         setProcessingProgress(100);
@@ -418,17 +421,17 @@ const DrugIdentify = () => {
           fromHistory: true
         };
       }
-      
+
       // No match found, proceed with enhanced multi-stage identification
       setProcessingPhase("Starting advanced AI analysis");
       setProcessingProgress(12);
       setEstimatedTimeRemaining(28);
-      
+
       // Try enhanced drug identification first
       let result = null;
       let fallbackUsed = false;
       let progressSimulator: NodeJS.Timeout | null = null;
-      
+
       try {
         // Log which mode we're using
         console.log(`🚀 Identifying drug using ${analysisMode.toUpperCase()} mode`);
@@ -438,7 +441,7 @@ const DrugIdentify = () => {
           blurryMode: blurryMode || isImageLowRes,
           bypassCache: analysisMode === 'enhanced'
         });
-        
+
         // Start simulated progress updates during API call
         let simulatedProgress = 10;
         progressSimulator = setInterval(() => {
@@ -446,7 +449,7 @@ const DrugIdentify = () => {
           if (simulatedProgress <= 85) {
             setProcessingProgress(simulatedProgress);
             setCurrentProgress(simulatedProgress);
-            
+
             // Update phase based on progress
             if (simulatedProgress <= 30) {
               setProcessingPhase("Analyzing medication image");
@@ -459,13 +462,13 @@ const DrugIdentify = () => {
             }
           }
         }, 1000); // Update every 1 second
-        
+
         // Use the appropriate function based on analysis mode
         const functionName = analysisMode === 'enhanced' ? 'enhanced-drug-identify' : 'standard-drug-identify';
         console.log(`🚀 Calling function: ${functionName} for ${analysisMode} mode`);
-        
+
         const { data: drugData, error: drugError } = await supabase.functions.invoke(functionName, {
-          body: { 
+          body: {
             imageBase64: base64Image,
             options: {
               mode: analysisMode,
@@ -485,7 +488,7 @@ const DrugIdentify = () => {
 
         // Clear the progress simulator
         clearInterval(progressSimulator);
-        
+
         // Handle successful identification
         if (drugData?.success) {
           // Clear any existing progress intervals
@@ -493,31 +496,31 @@ const DrugIdentify = () => {
             clearInterval(progressInterval);
             setProgressInterval(null);
           }
-          
+
           // Immediately jump to 100% when result is received
           setProcessingPhase("Identification complete");
           setProcessingProgress(100);
           setCurrentProgress(100);
           setTargetProgress(100);
-          
+
           result = drugData.data;
           result.enhancedProcessing = analysisMode === 'enhanced';
           result.processingStages = drugData.processingStages || [];
           result.confidence = drugData.confidence || 'medium';
           result.fallbackUsed = drugData.fallbackUsed || false;
-          
+
           // If there's an error message, log it but don't fail
           if (drugData.error) {
             console.warn(`${analysisMode} identification completed with issues:`, drugData.error);
           }
-          
+
           setProcessingMeta({
             confidence: result.confidence,
             fallbackUsed: result.fallbackUsed,
             processingStages: drugData.processingStages || [],
             enhancedProcessing: analysisMode === 'enhanced'
           });
-          
+
           console.log(`${analysisMode} identification completed:`, result.name);
         } else if (drugData?.success === false) {
           // Function executed but couldn't identify the drug
@@ -548,7 +551,7 @@ const DrugIdentify = () => {
             setProcessingPhase("Searching additional databases");
             setProcessingProgress(96);
             setEstimatedTimeRemaining(2);
-            
+
             const searchTerm = result.imprint || result.description.substring(0, 50);
             const { data: directSearchData } = await supabase.functions.invoke('drugs-com-api', {
               body: { drugName: searchTerm }
@@ -573,16 +576,16 @@ const DrugIdentify = () => {
       result.processingTime = Date.now();
       result.enhancedMode = enhancedMode;
       result.blurryMode = blurryMode || isImageLowRes;
-      
+
       // Mark as complete
       setProcessingPhase("✓ Analysis complete!");
       setProcessingProgress(100);
       setEstimatedTimeRemaining(0);
-      
+
       return result;
     } catch (error: any) {
       console.error('Error in enhanced drug identification:', error);
-      
+
       // Provide more specific error messages
       if (error.message.includes('All identification systems failed')) {
         throw new Error('Unable to identify this medication. Please ensure the image is clear and try again.');
@@ -606,7 +609,7 @@ const DrugIdentify = () => {
       // Create an Image object to check dimensions
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
-      
+
       img.onload = () => {
         URL.revokeObjectURL(objectUrl);
         // If image dimensions are small, consider it low quality
@@ -614,13 +617,13 @@ const DrugIdentify = () => {
         setIsImageLowRes(isLowRes);
         resolve(isLowRes);
       };
-      
+
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
         setIsImageLowRes(false);
         resolve(false);
       };
-      
+
       img.src = objectUrl;
     });
   };
@@ -640,7 +643,7 @@ const DrugIdentify = () => {
           .select('extra_identifications')
           .eq('id', user.id)
           .single();
-        
+
         if (freshProfile) {
           const freshBonus = freshProfile.extra_identifications || 0;
           setExtraIdentifications(freshBonus);
@@ -672,10 +675,10 @@ const DrugIdentify = () => {
         const monthlyLimit = usageStats?.monthlyLimit ?? 5;
         const planName = usageStats?.planName || 'Free';
         const isUnlimited = monthlyLimit === -1;
-        
+
         // Determine total limit based on plan type using fresh bonus
         let totalLimit = monthlyLimit;
-        
+
         // Free plan and paid plans can use bonus identifications
         if (planName === 'Free' || planName.toLowerCase().includes('free')) {
           // Free plan: 5 monthly + bonus allowed
@@ -690,21 +693,21 @@ const DrugIdentify = () => {
           // Default: use monthly limit + bonus
           totalLimit = monthlyLimit + currentBonus;
         }
-        
-        console.log('🔍 Comprehensive identification check:', { 
-          used, 
-          monthlyLimit, 
+
+        console.log('🔍 Comprehensive identification check:', {
+          used,
+          monthlyLimit,
           staleBonus: extraIdentifications,
-          freshBonus: currentBonus, 
-          totalLimit, 
-          isUnlimited, 
+          freshBonus: currentBonus,
+          totalLimit,
+          isUnlimited,
           planName,
           canProceed: used < totalLimit,
           calculation: `${monthlyLimit} + ${currentBonus} = ${totalLimit}`,
           usageStatsLimit: usageStats?.monthlyLimit,
           displayWillShow: `${used}/${totalLimit}`
         });
-        
+
         // FIRST CHECK: Strict enforcement based on calculated total limit
         if (!isUnlimited && used >= totalLimit) {
           const bonusText = currentBonus > 0 ? ` (includes ${currentBonus} bonus)` : '';
@@ -758,7 +761,7 @@ const DrugIdentify = () => {
 
             // Always check if we have usable data, even if success is false
             const hasUsableData = drugData && drugData.name && (
-              drugData.name === "Unknown Medication" || 
+              drugData.name === "Unknown Medication" ||
               drugData.name === "Unidentified Medication" ||
               drugData.name === "Partially Identified Medication" ||
               drugData.name !== "Unknown Medication"
@@ -766,12 +769,12 @@ const DrugIdentify = () => {
 
             if (hasUsableData) {
               setProcessingProgress(95);
-              
+
               // Check if this is an unidentified medication with recommendations
-              const isUnidentified = drugData.name === "Unidentified Medication" || 
-                                     drugData.name === "Unknown Medication" ||
-                                     drugData.name === "Partially Identified Medication";
-              
+              const isUnidentified = drugData.name === "Unidentified Medication" ||
+                drugData.name === "Unknown Medication" ||
+                drugData.name === "Partially Identified Medication";
+
               // Format the drug data to match our DetailedDrugData interface
               const formattedDrugData: DetailedDrugData = {
                 id: drugData.id || crypto.randomUUID(),
@@ -799,14 +802,14 @@ const DrugIdentify = () => {
                 shape: drugData.shape,
                 possibleNames: drugData.possibleNames
               };
-              
+
               setIdentifiedDrug(formattedDrugData);
               setIsSaved(false);
               setProcessingProgress(100);
-              
+
               // Increment usage count for successful identification
               const usageIncremented = await incrementIdentificationUsage();
-              
+
               // Refresh bonus identifications from profile after usage
               if (usageIncremented && user) {
                 const { data: profileData } = await supabase
@@ -814,24 +817,24 @@ const DrugIdentify = () => {
                   .select('extra_identifications')
                   .eq('id', user.id)
                   .single();
-                
+
                 if (profileData) {
                   setExtraIdentifications(profileData.extra_identifications || 0);
                   console.log('🔄 Refreshed bonus identifications:', profileData.extra_identifications);
                 }
               }
-              
+
               // Play drug identification completion sound
               playDrugIdentificationSound();
-              
+
               // Enhanced messaging based on identification result
               if (isUnidentified) {
                 // Show helpful message for unidentified medications
-                toast.warning(`Unable to identify medication`, { 
+                toast.warning(`Unable to identify medication`, {
                   description: "We've provided recommendations to help you. Please see the details below.",
                   duration: 6000
                 });
-                
+
                 // Show tips for better identification
                 if (drugData.possibleNames && drugData.possibleNames.length > 0) {
                   setTimeout(() => {
@@ -842,11 +845,11 @@ const DrugIdentify = () => {
                   }, 1000);
                 }
               } else if (drugData.fromHistory) {
-                toast.success(`Matched with previously identified ${drugData.name}!`, { 
+                toast.success(`Matched with previously identified ${drugData.name}!`, {
                   description: "Using your history helped identify this medication faster."
                 });
               } else if (drugData.prescriptionStatus === 'Non-pharmaceutical product') {
-                toast.info(`Non-pharmaceutical product identified: ${drugData.name}`, { 
+                toast.info(`Non-pharmaceutical product identified: ${drugData.name}`, {
                   description: "This appears to be a cosmetic, lotion, or other non-medication product.",
                   duration: 5000
                 });
@@ -856,29 +859,29 @@ const DrugIdentify = () => {
                   'medium': "Enhanced analysis completed. Data from AI backup system.",
                   'low': "Enhanced analysis completed with low confidence. Verify with a healthcare professional."
                 };
-                
+
                 const isBackupData = Array.isArray(drugData.processingStages) && drugData.processingStages.includes('gemini-backup');
-                
-                toast.success(`Medication identified: ${drugData.name}!`, { 
+
+                toast.success(`Medication identified: ${drugData.name}!`, {
                   description: isBackupData ? "Data generated by AI backup system. Verify accuracy." : (confidenceMessage[drugData.confidence] || "Enhanced analysis completed."),
                   duration: drugData.confidence === 'low' || isBackupData ? 6000 : 4000
                 });
               } else if (drugData.fallbackUsed) {
-                toast.success(`Medication identified using backup system: ${drugData.name}`, { 
+                toast.success(`Medication identified using backup system: ${drugData.name}`, {
                   description: "Backup identification system was used. Results may have lower confidence.",
                   duration: 5000
                 });
               } else if (drugData.multiModelAnalysisUsed || drugData.blurryModeUsed) {
                 if (drugData.confidence === 'high') {
-                  toast.success(`Medication successfully identified as ${drugData.name}!`, { 
+                  toast.success(`Medication successfully identified as ${drugData.name}!`, {
                     description: "Enhanced analysis provided high confidence results."
                   });
                 } else if (drugData.confidence === 'medium') {
-                  toast.success(`Medication identified as ${drugData.name}`, { 
+                  toast.success(`Medication identified as ${drugData.name}`, {
                     description: "The identification has medium confidence. Consider the alternatives listed."
                   });
                 } else {
-                  toast.info(`Medication possibly identified as ${drugData.name}`, { 
+                  toast.info(`Medication possibly identified as ${drugData.name}`, {
                     description: "Low confidence identification. Consider consulting a healthcare professional.",
                     duration: 5000
                   });
@@ -886,22 +889,22 @@ const DrugIdentify = () => {
               } else {
                 toast.success(`Medication successfully identified as ${drugData.name}!`);
               }
-              
+
               // Show processing stages if available
               if (Array.isArray(drugData.processingStages) && drugData.processingStages.length > 0) {
                 console.log('Processing stages used:', drugData.processingStages);
               }
-              
+
               // Additional information about image quality if relevant
               if (isImageLowRes || drugData.blurryModeUsed) {
-                toast.info("For better accuracy, consider uploading a higher quality image.", { 
-                  duration: 5000 
+                toast.info("For better accuracy, consider uploading a higher quality image.", {
+                  duration: 5000
                 });
               }
             } else {
               // Complete failure - no usable data at all
               console.error('No usable data returned from identification');
-              
+
               // Create minimal error result to prevent blank screen
               const errorData: DetailedDrugData = {
                 id: crypto.randomUUID(),
@@ -939,7 +942,7 @@ const DrugIdentify = () => {
                 drugClass: "",
                 brandNames: []
               };
-              
+
               setIdentifiedDrug(errorData);
               setErrorDetails("Could not identify medication from the image. Please see recommendations below.");
               toast.error("Could not identify the medication", {
@@ -949,7 +952,7 @@ const DrugIdentify = () => {
             }
           } catch (error: any) {
             console.error('Error processing image:', error);
-            
+
             // Even on error, provide helpful information instead of blank screen
             const errorData: DetailedDrugData = {
               id: crypto.randomUUID(),
@@ -981,7 +984,7 @@ const DrugIdentify = () => {
               drugClass: "",
               brandNames: []
             };
-            
+
             setIdentifiedDrug(errorData);
             setErrorDetails(`Error: ${error.message || "Unknown error"}`);
             toast.error("Failed to process the image", {
@@ -994,14 +997,14 @@ const DrugIdentify = () => {
           }
         }
       };
-      
+
       reader.onerror = () => {
         toast.error("Failed to read the image file. Please try another image.");
         setIsIdentifying(false);
       };
-      
+
       reader.readAsDataURL(file);
-      
+
     } catch (error: any) {
       console.error("Error identifying medication:", error);
       setErrorDetails(`Unexpected Error: ${error.message || "Unknown error"}`);
@@ -1016,7 +1019,7 @@ const DrugIdentify = () => {
       clearInterval(progressInterval);
       setProgressInterval(null);
     }
-    
+
     setIdentifiedDrug(null);
     setErrorDetails(null);
     setCapturedImage(null);
@@ -1039,6 +1042,12 @@ const DrugIdentify = () => {
 
   return (
     <>
+      <SEOHead
+        title="Identify Pills & Medications - AI Drug Identifier | PharmaLens"
+        description="Upload a photo to instantly identify pills and medications using advanced AI. Get detailed drug information, dosage, and safety warnings."
+        keywords="pill identifier, identify pill by image, medication scanner, drug identifier app, ai pill recognition"
+        canonicalUrl="/identify"
+      />
       <Header />
       <div className="container max-w-7xl mx-auto px-4 pt-24 pb-24">
         <div className="mb-8">
@@ -1051,7 +1060,7 @@ const DrugIdentify = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 w-full sm:w-auto">
               {isAuthenticated && (
-                <Button 
+                <Button
                   variant="outline"
                   className="w-full sm:w-auto flex items-center gap-2 justify-center"
                   onClick={() => navigate('/symptom-checker')}
@@ -1061,8 +1070,8 @@ const DrugIdentify = () => {
                 </Button>
               )}
               {!isAuthenticated && !authLoading && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full sm:w-auto flex items-center gap-2 justify-center"
                   onClick={() => navigate('/auth')}
                 >
@@ -1094,7 +1103,7 @@ const DrugIdentify = () => {
                 </Button>
               </div>
             </div>
-            
+
             {errorDetails && capturedImage && (
               <Alert variant="destructive" className="mb-6">
                 <AlertTriangle className="h-4 w-4" />
@@ -1110,7 +1119,7 @@ const DrugIdentify = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 sm:p-8 lg:p-10 mb-8 max-w-4xl mx-auto">
               {/* Subscription Usage Display */}
 
@@ -1123,9 +1132,9 @@ const DrugIdentify = () => {
                   <div className="mb-6 p-4 bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg border">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-sm">AI Identifications Usage</h4>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => navigate('/subscription-manager')}
                         className="text-xs"
                       >
@@ -1160,37 +1169,34 @@ const DrugIdentify = () => {
                         </span>
                       </div>
                       {extraIdentifications > 0 && (
-                        <div className={`flex items-center gap-2 px-2 py-1 rounded border ${
-                          extraIdentifications >= 50 
-                            ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800' 
-                            : extraIdentifications >= 30 
+                        <div className={`flex items-center gap-2 px-2 py-1 rounded border ${extraIdentifications >= 50
+                          ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800'
+                          : extraIdentifications >= 30
                             ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                            : extraIdentifications >= 10 
-                            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                            : extraIdentifications >= 5
-                            ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
-                            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                        }`}>
-                          <Zap className={`w-3 h-3 flex-shrink-0 ${
-                            extraIdentifications >= 50 ? 'text-violet-600' :
-                            extraIdentifications >= 30 ? 'text-green-600' :
-                            extraIdentifications >= 10 ? 'text-blue-600' :
-                            extraIdentifications >= 5 ? 'text-amber-600' :
-                            'text-red-600'
-                          }`} />
-                          <p className={`text-xs font-medium ${
-                            extraIdentifications >= 50 ? 'text-violet-700 dark:text-violet-300' :
-                            extraIdentifications >= 30 ? 'text-green-700 dark:text-green-300' :
-                            extraIdentifications >= 10 ? 'text-blue-700 dark:text-blue-300' :
-                            extraIdentifications >= 5 ? 'text-amber-700 dark:text-amber-300' :
-                            'text-red-700 dark:text-red-300'
+                            : extraIdentifications >= 10
+                              ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                              : extraIdentifications >= 5
+                                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                           }`}>
+                          <Zap className={`w-3 h-3 flex-shrink-0 ${extraIdentifications >= 50 ? 'text-violet-600' :
+                            extraIdentifications >= 30 ? 'text-green-600' :
+                              extraIdentifications >= 10 ? 'text-blue-600' :
+                                extraIdentifications >= 5 ? 'text-amber-600' :
+                                  'text-red-600'
+                            }`} />
+                          <p className={`text-xs font-medium ${extraIdentifications >= 50 ? 'text-violet-700 dark:text-violet-300' :
+                            extraIdentifications >= 30 ? 'text-green-700 dark:text-green-300' :
+                              extraIdentifications >= 10 ? 'text-blue-700 dark:text-blue-300' :
+                                extraIdentifications >= 5 ? 'text-amber-700 dark:text-amber-300' :
+                                  'text-red-700 dark:text-red-300'
+                            }`}>
                             {extraIdentifications} bonus remaining
                           </p>
                         </div>
                       )}
                       {usageStats?.monthlyLimit !== -1 && (
-                        <Progress 
+                        <Progress
                           value={(() => {
                             const planName = usageStats?.planName || 'Free';
                             let monthlyLimit = 5;
@@ -1203,7 +1209,7 @@ const DrugIdentify = () => {
                             }
                             const totalLimit = monthlyLimit + extraIdentifications;
                             return ((usageStats?.identificationsUsed || 0) / totalLimit) * 100;
-                          })()} 
+                          })()}
                           className="h-2"
                         />
                       )}
@@ -1216,27 +1222,27 @@ const DrugIdentify = () => {
                   </div>
                 )
               )}
-              
+
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6 text-base sm:text-lg">
-                {identificationMode === 'upload' 
-                  ? "Upload a clear image of the medication for identification" 
+                {identificationMode === 'upload'
+                  ? "Upload a clear image of the medication for identification"
                   : "Take a clear photo of the medication for identification"}
               </p>
-              
+
               <Tabs value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'standard' | 'enhanced')} className="mb-6">
                 <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-4">
                   <TabsTrigger value="standard">Standard Mode</TabsTrigger>
                   <TabsTrigger value="enhanced">Enhanced Mode</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="standard" className="space-y-4">
                   <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
                         <span className="text-sm font-medium">Quick Search</span>
                       </div>
-                      <Switch 
-                        id="blur-mode" 
+                      <Switch
+                        id="blur-mode"
                         checked={true}
                         disabled={false}
                       />
@@ -1251,7 +1257,7 @@ const DrugIdentify = () => {
                     )}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="enhanced" className="space-y-4">
                   <div className="rounded-lg border p-4 bg-pharma-50 dark:bg-pharma-900/20">
                     <div className="flex items-center justify-between mb-2">
@@ -1259,8 +1265,8 @@ const DrugIdentify = () => {
                         <Zap className="h-4 w-4 text-pharma-600" />
                         <span className="text-sm font-medium">Deep Analysis</span>
                       </div>
-                      <Switch 
-                        id="enhanced-mode" 
+                      <Switch
+                        id="enhanced-mode"
                         checked={enhancedMode}
                         onCheckedChange={setEnhancedMode}
                       />
@@ -1271,13 +1277,13 @@ const DrugIdentify = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-              
+
               {identificationMode === 'upload' ? (
                 <ImageUpload onImageCapture={handleImageCapture} />
               ) : (
                 <CameraCapture onImageCapture={handleImageCapture} />
               )}
-              
+
               {isIdentifying && (
                 <div className="mt-6 space-y-3">
                   <div className="flex items-center justify-between text-sm font-medium">
@@ -1291,8 +1297,8 @@ const DrugIdentify = () => {
                   <Progress value={processingProgress} className="h-2.5" />
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-700 dark:text-white/90">
-                      {enhancedMode 
-                        ? "PharmaLens Deep Analysis" 
+                      {enhancedMode
+                        ? "PharmaLens Deep Analysis"
                         : "PharmaLens Quick Search"}
                     </span>
                     {estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
@@ -1309,7 +1315,7 @@ const DrugIdentify = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="bg-pharma-50 dark:bg-pharma-900/20 rounded-2xl p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto">
               <h3 className="font-medium text-lg sm:text-xl mb-4 sm:mb-6">Tips for better identification:</h3>
               <ul className="list-disc list-inside space-y-3 sm:space-y-4 text-gray-700 dark:text-gray-300">
@@ -1339,7 +1345,7 @@ const DrugIdentify = () => {
                 </li>
               </ul>
             </div>
-            
+
             {/* Medical Disclaimer & Important Warnings - Matching Tips Section Style */}
             <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto">
               <h3 className="font-medium text-lg sm:text-xl mb-4 sm:mb-6 text-amber-900 dark:text-amber-100">Important Medical Disclaimer:</h3>
@@ -1384,7 +1390,7 @@ const DrugIdentify = () => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
+                        <Button
                           variant="outline"
                           className="flex items-center gap-2"
                           onClick={handleSaveToCache}
@@ -1424,7 +1430,7 @@ const DrugIdentify = () => {
                 </div>
               </Alert>
             )}
-          <DrugDetails drug={identifiedDrug} />
+            <DrugDetails drug={identifiedDrug} />
           </div>
         )}
       </div>

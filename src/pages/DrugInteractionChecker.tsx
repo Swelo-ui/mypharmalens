@@ -11,13 +11,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { loadAllDrugs } from '@/data/drugDataLoader';
 import { DrugData } from '@/components/DrugCard';
-import { 
-  checkDrugInteractions, 
-  getSeverityColor, 
+import {
+  checkDrugInteractions,
+  getSeverityColor,
   getSeverityBadgeColor,
-  InteractionCheckResult 
+  InteractionCheckResult
 } from '@/utils/drugInteractionChecker';
 import { toast } from 'sonner';
+import SEOHead from '@/components/SEOHead';
 // Removed popover/command UI to use inline, mobile-friendly list
 
 function calculateLevenshteinDistance(a: string, b: string): number {
@@ -92,7 +93,7 @@ const DrugInteractionChecker = () => {
       try {
         const drugs = await loadAllDrugs();
         setAllDrugs(drugs);
-        
+
         // Restore selected drugs from sessionStorage
         const savedSelections = sessionStorage.getItem('selectedDrugs');
         if (savedSelections) {
@@ -125,7 +126,7 @@ const DrugInteractionChecker = () => {
     } else {
       sessionStorage.removeItem('selectedDrugs');
     }
-    
+
     if (selectedDrugs.length >= 2) {
       const result = checkDrugInteractions(selectedDrugs, allDrugs);
       setInteractionResult(result);
@@ -259,7 +260,7 @@ const DrugInteractionChecker = () => {
   const visibleDrugs = (() => {
     const list = filteredDrugs.length > 0
       ? filteredDrugs
-      : (showAll ? allDrugs.slice().sort((a,b) => a.name.localeCompare(b.name)) : []);
+      : (showAll ? allDrugs.slice().sort((a, b) => a.name.localeCompare(b.name)) : []);
     return list.slice(0, page * pageSize);
   })();
 
@@ -294,6 +295,12 @@ const DrugInteractionChecker = () => {
 
   return (
     <>
+      <SEOHead
+        title="Drug Interaction Checker - Check Medication Safety | PharmaLens"
+        description="Check for potential interactions between your medications. Ensure safety with our comprehensive drug interaction checker tool."
+        keywords="drug interaction checker, medication interactions, pill checker, drug safety, medicine combination safety"
+        canonicalUrl="/drug-interactions"
+      />
       <Header />
       <div className="container max-w-7xl mx-auto px-4 pt-24 pb-12">
         {/* Header Section */}
@@ -503,15 +510,14 @@ const DrugInteractionChecker = () => {
                         >
                           <AlertTitle className="mb-3">
                             <div
-                              className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-2 border-l-4 pl-4 ${
-                                interaction.severity === 'contraindicated'
-                                  ? 'border-red-500'
-                                  : interaction.severity === 'severe'
+                              className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-2 border-l-4 pl-4 ${interaction.severity === 'contraindicated'
+                                ? 'border-red-500'
+                                : interaction.severity === 'severe'
                                   ? 'border-orange-500'
                                   : interaction.severity === 'moderate'
-                                  ? 'border-yellow-500'
-                                  : 'border-blue-500'
-                              }`}
+                                    ? 'border-yellow-500'
+                                    : 'border-blue-500'
+                                }`}
                             >
                               <span className="font-semibold text-sm sm:text-base break-words leading-tight">
                                 {interaction.drug1.name} ↔ {interaction.drug2.name}
@@ -524,7 +530,7 @@ const DrugInteractionChecker = () => {
                               <span className="flex items-center gap-1">
                                 <span className="font-semibold">Type:</span>
                                 <span className="break-words">
-                                  {useLaymanTerms 
+                                  {useLaymanTerms
                                     ? `${interaction.drug1.drugClass?.replace(/[A-Z]/g, ' $&').trim() || 'Medicine'} + ${interaction.drug2.drugClass?.replace(/[A-Z]/g, ' $&').trim() || 'Medicine'}`
                                     : `${interaction.drug1.drugClass || 'N/A'} + ${interaction.drug2.drugClass || 'N/A'}`
                                   }
@@ -536,17 +542,17 @@ const DrugInteractionChecker = () => {
                             <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                               <p className="font-semibold mb-1 text-xs uppercase tracking-wide">What Happens:</p>
                               <p className="text-sm leading-relaxed break-words">
-                                {useLaymanTerms && interaction.laymanDescription 
-                                  ? interaction.laymanDescription 
+                                {useLaymanTerms && interaction.laymanDescription
+                                  ? interaction.laymanDescription
                                   : interaction.description}
                               </p>
                             </div>
-                            
+
                             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                               <p className="font-semibold mb-1 text-xs uppercase tracking-wide text-blue-700 dark:text-blue-400">What To Do:</p>
                               <p className="text-sm leading-relaxed break-words">
-                                {useLaymanTerms && interaction.laymanRecommendation 
-                                  ? interaction.laymanRecommendation 
+                                {useLaymanTerms && interaction.laymanRecommendation
+                                  ? interaction.laymanRecommendation
                                   : interaction.recommendation}
                               </p>
                             </div>
@@ -556,7 +562,7 @@ const DrugInteractionChecker = () => {
                               <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded">
                                 <p className="font-semibold mb-1">When it starts:</p>
                                 <p className="text-gray-600 dark:text-gray-400 break-words">
-                                  {interaction.onset || (interaction.severity === 'contraindicated' || interaction.severity === 'severe' 
+                                  {interaction.onset || (interaction.severity === 'contraindicated' || interaction.severity === 'severe'
                                     ? (useLaymanTerms ? 'Quickly (hours to days)' : 'Rapid (hours to days)')
                                     : (useLaymanTerms ? 'Varies (days to weeks)' : 'Variable (days to weeks)'))}
                                 </p>
@@ -564,21 +570,21 @@ const DrugInteractionChecker = () => {
                               <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded">
                                 <p className="font-semibold mb-1">What to watch:</p>
                                 <p className="text-gray-600 dark:text-gray-400 break-words">
-                                  {useLaymanTerms && interaction.laymanMonitoring 
+                                  {useLaymanTerms && interaction.laymanMonitoring
                                     ? interaction.laymanMonitoring
                                     : interaction.monitoring || (interaction.severity === 'contraindicated'
                                       ? (useLaymanTerms ? 'Do not use together' : 'Avoid combination')
                                       : interaction.severity === 'severe'
-                                      ? (useLaymanTerms ? 'Watch closely with doctor' : 'Frequent monitoring required')
-                                      : (useLaymanTerms ? 'Check with doctor regularly' : 'Periodic monitoring advised'))}
+                                        ? (useLaymanTerms ? 'Watch closely with doctor' : 'Frequent monitoring required')
+                                        : (useLaymanTerms ? 'Check with doctor regularly' : 'Periodic monitoring advised'))}
                                 </p>
                               </div>
                               <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 lg:col-span-1">
                                 <p className="font-semibold mb-1">How it works:</p>
                                 <p className="text-gray-600 dark:text-gray-400 break-words">
-                                  {useLaymanTerms && interaction.laymanMechanism 
+                                  {useLaymanTerms && interaction.laymanMechanism
                                     ? interaction.laymanMechanism
-                                    : interaction.mechanism || (useLaymanTerms 
+                                    : interaction.mechanism || (useLaymanTerms
                                       ? 'The medicines affect each other'
                                       : 'Pharmacodynamic or pharmacokinetic interaction')}
                                 </p>
@@ -589,11 +595,11 @@ const DrugInteractionChecker = () => {
                               <div className="border-t pt-3">
                                 <p className="font-semibold mb-2 text-sm">Safer Alternatives:</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
-                                  {useLaymanTerms 
+                                  {useLaymanTerms
                                     ? `Consider replacing `
                                     : 'Consider replacing '}
                                   <strong className="text-orange-600 dark:text-orange-400">{interaction.drug2.name}</strong>
-                                  {useLaymanTerms 
+                                  {useLaymanTerms
                                     ? ' with one of these safer options:'
                                     : ' with one of these pharmacologically appropriate alternatives:'}
                                 </p>
@@ -620,12 +626,12 @@ const DrugInteractionChecker = () => {
                                           )}
                                           <div className="mt-2 p-2 bg-white/60 dark:bg-gray-800/60 rounded text-xs">
                                             <p className="text-green-700 dark:text-green-400 leading-relaxed break-words">
-                                              ✓ {useLaymanTerms 
-                                                ? alt.reason.replace(/pharmacologically|mechanism|therapeutic/gi, match => 
-                                                    match.toLowerCase() === 'pharmacologically' ? 'medically' :
+                                              ✓ {useLaymanTerms
+                                                ? alt.reason.replace(/pharmacologically|mechanism|therapeutic/gi, match =>
+                                                  match.toLowerCase() === 'pharmacologically' ? 'medically' :
                                                     match.toLowerCase() === 'mechanism' ? 'way it works' :
-                                                    match.toLowerCase() === 'therapeutic' ? 'treatment' : match
-                                                  )
+                                                      match.toLowerCase() === 'therapeutic' ? 'treatment' : match
+                                                )
                                                 : alt.reason}
                                             </p>
                                           </div>
@@ -674,7 +680,7 @@ const DrugInteractionChecker = () => {
                 <ChevronDown className={`h-4 w-4 transition-transform ${showSummary ? 'rotate-180' : ''}`} />
               </Button>
             )}
-            
+
             {/* Summary Card */}
             <Card className={isMobile && !showSummary ? 'hidden' : ''}>
               <CardHeader>
@@ -685,14 +691,14 @@ const DrugInteractionChecker = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Medications Added</p>
                   <p className="text-2xl font-bold">{selectedDrugs.length}</p>
                 </div>
-                
+
                 {selectedDrugs.length >= 2 && interactionResult && (
                   <>
                     <div className="border-t pt-4">
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Interactions Found</p>
                       <p className="text-2xl font-bold">{interactionResult.interactions.length}</p>
                     </div>
-                    
+
                     <div className="border-t pt-4">
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Safety Status</p>
                       {interactionResult.safeToUse ? (
@@ -766,7 +772,7 @@ const DrugInteractionChecker = () => {
                 <CardDescription>Find medications by symptoms</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   variant="outline"
                   className="w-full"
                   onClick={() => navigate('/symptom-checker')}

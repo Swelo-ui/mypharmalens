@@ -14,6 +14,7 @@ import { symptoms, symptomCategories, Symptom } from '@/utils/symptomMapping';
 import { loadAllDrugs } from '@/data/drugDataLoader';
 import { DrugData } from '@/components/DrugCard';
 import { toast } from 'sonner';
+import SEOHead from '@/components/SEOHead';
 
 function calculateLevenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
@@ -104,203 +105,203 @@ const SymptomChecker = () => {
 
     syms.forEach(s => {
       const name = s.nameEn.toLowerCase();
-      
+
       // HEAD & MIND
       if (name.includes('headache')) {
         addClass('nsaid', 60); addClass('anti-inflammatory', 30); addClass('analgesic', 20); addClass('triptan', 50);
-        ['ibuprofen','naproxen','diclofenac','paracetamol','acetaminophen','sumatriptan','rizatriptan'].forEach(n => addName(n, 40));
+        ['ibuprofen', 'naproxen', 'diclofenac', 'paracetamol', 'acetaminophen', 'sumatriptan', 'rizatriptan'].forEach(n => addName(n, 40));
         addNegClass('opioid', 60); addNegName('tramadol', 60); addNegClass('topical', 30);
       }
       if (name.includes('anxiety') || name.includes('nervous')) {
         addClass('benzodiazepine', 60); addClass('ssri', 25); addClass('anxiolytic', 60);
-        ['alprazolam','lorazepam','clonazepam','diazepam'].forEach(n => addName(n, 40));
-        ['sertraline','paroxetine','fluoxetine','escitalopram'].forEach(n => addName(n, 25));
+        ['alprazolam', 'lorazepam', 'clonazepam', 'diazepam'].forEach(n => addName(n, 40));
+        ['sertraline', 'paroxetine', 'fluoxetine', 'escitalopram'].forEach(n => addName(n, 25));
         addNegClass('antihistamine', 20);
       }
       if (name.includes('insomnia') || name.includes('sleep')) {
         addClass('sedative', 50); addClass('hypnotic', 50); addClass('benzodiazepine', 30);
-        ['zolpidem','eszopiclone','melatonin','doxepin'].forEach(n => addName(n, 35));
+        ['zolpidem', 'eszopiclone', 'melatonin', 'doxepin'].forEach(n => addName(n, 35));
       }
       if (name.includes('dizz')) {
         addClass('antihistamine', 40); addClass('antivertigo', 50);
-        ['meclizine','betahistine','dimenhydrinate'].forEach(n => addName(n, 35));
+        ['meclizine', 'betahistine', 'dimenhydrinate'].forEach(n => addName(n, 35));
       }
-      
+
       // FEVER & GENERAL
       if (name.includes('fever')) {
         addClass('antipyretic', 60); addClass('analgesic', 30);
-        ['paracetamol','acetaminophen','ibuprofen'].forEach(n => addName(n, 40));
+        ['paracetamol', 'acetaminophen', 'ibuprofen'].forEach(n => addName(n, 40));
       }
       if (name.includes('body ache') || name.includes('myalgia')) {
         addClass('analgesic', 50); addClass('nsaid', 50); addClass('muscle relaxant', 30);
-        ['ibuprofen','paracetamol','diclofenac','cyclobenzaprine'].forEach(n => addName(n, 35));
+        ['ibuprofen', 'paracetamol', 'diclofenac', 'cyclobenzaprine'].forEach(n => addName(n, 35));
       }
       if (name.includes('tired') || name.includes('fatigue') || name.includes('weak')) {
         addClass('multivitamin', 40); addClass('iron supplement', 40); addClass('vitamin b', 30);
-        ['ferrous','folic','vitamin b12','multivitamin'].forEach(n => addName(n, 30));
+        ['ferrous', 'folic', 'vitamin b12', 'multivitamin'].forEach(n => addName(n, 30));
       }
-      
+
       // DIGESTIVE
       if (name.includes('stomach pain') || name.includes('abdominal')) {
         addClass('antacid', 40); addClass('antispasmodic', 50); addClass('ppi', 35);
-        ['omeprazole','pantoprazole','dicyclomine','hyoscine'].forEach(n => addName(n, 35));
+        ['omeprazole', 'pantoprazole', 'dicyclomine', 'hyoscine'].forEach(n => addName(n, 35));
       }
       if (name.includes('acid') || name.includes('heartburn') || name.includes('gerd')) {
         addClass('ppi', 60); addClass('h2 blocker', 40); addClass('antacid', 30);
-        ['omeprazole','pantoprazole','esomeprazole','ranitidine','famotidine'].forEach(n => addName(n, 40));
+        ['omeprazole', 'pantoprazole', 'esomeprazole', 'ranitidine', 'famotidine'].forEach(n => addName(n, 40));
       }
       if (name.includes('nausea') || name.includes('vomit')) {
         addClass('antiemetic', 60); addClass('prokinetic', 40);
-        ['ondansetron','metoclopramide','domperidone'].forEach(n => addName(n, 40));
+        ['ondansetron', 'metoclopramide', 'domperidone'].forEach(n => addName(n, 40));
       }
       if (name.includes('diarrhea') || name.includes('loose')) {
         addClass('antidiarrheal', 60); addClass('probiotic', 35);
-        ['loperamide','racecadotril','saccharomyces'].forEach(n => addName(n, 40));
+        ['loperamide', 'racecadotril', 'saccharomyces'].forEach(n => addName(n, 40));
         addNegClass('laxative', 50);
       }
       if (name.includes('constipation')) {
         addClass('laxative', 60); addClass('stool softener', 40);
-        ['lactulose','bisacodyl','docusate','psyllium'].forEach(n => addName(n, 40));
+        ['lactulose', 'bisacodyl', 'docusate', 'psyllium'].forEach(n => addName(n, 40));
         addNegClass('antidiarrheal', 50);
       }
       if (name.includes('gas') || name.includes('bloat')) {
         addClass('antiflatulent', 60); addClass('carminative', 40);
-        ['simethicone','activated charcoal'].forEach(n => addName(n, 40));
+        ['simethicone', 'activated charcoal'].forEach(n => addName(n, 40));
       }
-      
+
       // RESPIRATORY
       if (name.includes('cough')) {
         addClass('antitussive', 50); addClass('expectorant', 40); addClass('mucolytic', 35);
-        ['dextromethorphan','guaifenesin','ambroxol','bromhexine'].forEach(n => addName(n, 35));
+        ['dextromethorphan', 'guaifenesin', 'ambroxol', 'bromhexine'].forEach(n => addName(n, 35));
       }
       if (name.includes('cold') || name.includes('nasal')) {
         addClass('decongestant', 50); addClass('antihistamine', 40);
-        ['pseudoephedrine','cetirizine','loratadine','phenylephrine'].forEach(n => addName(n, 35));
+        ['pseudoephedrine', 'cetirizine', 'loratadine', 'phenylephrine'].forEach(n => addName(n, 35));
       }
       if (name.includes('breathless') || name.includes('asthma')) {
         addClass('bronchodilator', 60); addClass('corticosteroid', 40);
-        ['salbutamol','albuterol','budesonide','fluticasone'].forEach(n => addName(n, 40));
+        ['salbutamol', 'albuterol', 'budesonide', 'fluticasone'].forEach(n => addName(n, 40));
       }
-      
+
       // SKIN & INFECTIONS
       if (name.includes('itch') || name.includes('allergy')) {
         addClass('antihistamine', 60); addClass('corticosteroid', 35);
-        ['cetirizine','loratadine','fexofenadine','hydrocortisone'].forEach(n => addName(n, 40));
+        ['cetirizine', 'loratadine', 'fexofenadine', 'hydrocortisone'].forEach(n => addName(n, 40));
       }
       if (name.includes('rash') || name.includes('acne') || name.includes('pimple')) {
         addClass('antibiotic', 40); addClass('retinoid', 35); addClass('corticosteroid', 30);
-        ['clindamycin','benzoyl peroxide','tretinoin','adapalene'].forEach(n => addName(n, 30));
+        ['clindamycin', 'benzoyl peroxide', 'tretinoin', 'adapalene'].forEach(n => addName(n, 30));
       }
       if (name.includes('swell') || name.includes('inflam')) {
         addClass('anti-inflammatory', 50); addClass('nsaid', 50); addClass('corticosteroid', 35);
-        ['ibuprofen','diclofenac','prednisolone'].forEach(n => addName(n, 35));
+        ['ibuprofen', 'diclofenac', 'prednisolone'].forEach(n => addName(n, 35));
       }
-      
+
       // JOINTS & MUSCLES
       if (name.includes('joint') || name.includes('arthritis') || name.includes('knee') || name.includes('back pain')) {
         addClass('nsaid', 60); addClass('analgesic', 40); addClass('muscle relaxant', 30);
-        ['ibuprofen','diclofenac','naproxen','etoricoxib','cyclobenzaprine'].forEach(n => addName(n, 40));
+        ['ibuprofen', 'diclofenac', 'naproxen', 'etoricoxib', 'cyclobenzaprine'].forEach(n => addName(n, 40));
         addNegClass('opioid', 30);
       }
       if (name.includes('muscle cramp') || name.includes('spasm')) {
         addClass('muscle relaxant', 60); addClass('magnesium', 40);
-        ['cyclobenzaprine','methocarbamol','magnesium'].forEach(n => addName(n, 40));
+        ['cyclobenzaprine', 'methocarbamol', 'magnesium'].forEach(n => addName(n, 40));
       }
-      
+
       // ENT
       if (name.includes('sore throat') || name.includes('throat')) {
         addClass('analgesic', 50); addClass('antiseptic', 40); addClass('antibiotic', 30);
-        ['benzocaine','chlorhexidine','amoxicillin','azithromycin'].forEach(n => addName(n, 30));
+        ['benzocaine', 'chlorhexidine', 'amoxicillin', 'azithromycin'].forEach(n => addName(n, 30));
       }
       if (name.includes('ear pain') || name.includes('ear')) {
         addClass('analgesic', 50); addClass('antibiotic', 40);
-        ['ibuprofen','paracetamol','ciprofloxacin'].forEach(n => addName(n, 35));
+        ['ibuprofen', 'paracetamol', 'ciprofloxacin'].forEach(n => addName(n, 35));
       }
-      
+
       // DENTAL & ORAL
       if (name.includes('tooth') || name.includes('dental')) {
         addClass('analgesic', 50); addClass('antibiotic', 40); addClass('local anesthetic', 30);
-        ['ibuprofen','paracetamol','amoxicillin','clindamycin'].forEach(n => addName(n, 35));
+        ['ibuprofen', 'paracetamol', 'amoxicillin', 'clindamycin'].forEach(n => addName(n, 35));
       }
       if (name.includes('gum') || name.includes('mouth ulcer')) {
         addClass('antiseptic', 50); addClass('vitamin b12', 40);
-        ['chlorhexidine','benzydamine'].forEach(n => addName(n, 35));
+        ['chlorhexidine', 'benzydamine'].forEach(n => addName(n, 35));
       }
       if (name.includes('dry mouth') || name.includes('bad breath')) {
         addClass('saliva substitute', 40); addClass('antiseptic mouthwash', 40);
       }
-      
+
       // WOMEN'S HEALTH (GYNECOLOGICAL - TOP PRIORITY)
       if (name.includes('menstrual') || name.includes('period') || name.includes('cramp')) {
         // Gynecologist's first-line drugs for menstrual cramps
         addClass('nsaid', 70); addClass('analgesic', 60); addClass('antispasmodic', 55);
         // TOP PRIORITY: Specific gynecological drugs
-        ['mefenamic acid','tranexamic acid','norethisterone'].forEach(n => addName(n, 70)); // Gynecologist favorites
-        ['naproxen','ibuprofen','drotaverine','hyoscine'].forEach(n => addName(n, 50));
-        ['paracetamol','dicyclomine'].forEach(n => addName(n, 35));
+        ['mefenamic acid', 'tranexamic acid', 'norethisterone'].forEach(n => addName(n, 70)); // Gynecologist favorites
+        ['naproxen', 'ibuprofen', 'drotaverine', 'hyoscine'].forEach(n => addName(n, 50));
+        ['paracetamol', 'dicyclomine'].forEach(n => addName(n, 35));
       }
       if (name.includes('heavy') && name.includes('bleeding')) {
         // Gynecologist's drugs for heavy menstrual bleeding (menorrhagia)
         addClass('tranexamic acid', 80); addClass('progestin', 70); addClass('iron supplement', 50);
         // TOP PRIORITY: Specific gynecological drugs
-        ['tranexamic acid','norethisterone','medroxyprogesterone'].forEach(n => addName(n, 75)); // Stop heavy bleeding
-        ['ethamsylate','ferrous sulfate','ferrous fumarate'].forEach(n => addName(n, 45));
-        ['folic acid','vitamin c'].forEach(n => addName(n, 30)); // For anemia support
+        ['tranexamic acid', 'norethisterone', 'medroxyprogesterone'].forEach(n => addName(n, 75)); // Stop heavy bleeding
+        ['ethamsylate', 'ferrous sulfate', 'ferrous fumarate'].forEach(n => addName(n, 45));
+        ['folic acid', 'vitamin c'].forEach(n => addName(n, 30)); // For anemia support
       }
       if (name.includes('irregular period') || name.includes('pcos')) {
         // Gynecologist's drugs for irregular periods / PCOS
         addClass('oral contraceptive', 80); addClass('progestin', 70); addClass('hormone', 60);
         // TOP PRIORITY: Specific gynecological hormonal drugs
-        ['norethisterone','medroxyprogesterone','dydrogesterone'].forEach(n => addName(n, 75)); // Cycle regulation
-        ['diane-35','yasmin','meprate'].forEach(n => addName(n, 65)); // PCOS management
-        ['metformin','myo-inositol'].forEach(n => addName(n, 45)); // PCOS support
+        ['norethisterone', 'medroxyprogesterone', 'dydrogesterone'].forEach(n => addName(n, 75)); // Cycle regulation
+        ['diane-35', 'yasmin', 'meprate'].forEach(n => addName(n, 65)); // PCOS management
+        ['metformin', 'myo-inositol'].forEach(n => addName(n, 45)); // PCOS support
       }
       if (name.includes('white discharge') || name.includes('vaginal')) {
         // Gynecologist's drugs for vaginal discharge / infections
         addClass('antifungal', 75); addClass('antibiotic', 65); addClass('antiseptic', 50);
         // TOP PRIORITY: Specific gynecological drugs
-        ['fluconazole','clotrimazole','itraconazole'].forEach(n => addName(n, 70)); // Antifungal first
-        ['metronidazole','secnidazole','tinidazole'].forEach(n => addName(n, 60)); // Bacterial vaginosis
-        ['clindamycin','povidone iodine'].forEach(n => addName(n, 45)); // Topical/oral antibiotics
+        ['fluconazole', 'clotrimazole', 'itraconazole'].forEach(n => addName(n, 70)); // Antifungal first
+        ['metronidazole', 'secnidazole', 'tinidazole'].forEach(n => addName(n, 60)); // Bacterial vaginosis
+        ['clindamycin', 'povidone iodine'].forEach(n => addName(n, 45)); // Topical/oral antibiotics
       }
       if (name.includes('hot flash') || name.includes('menopause')) {
         // Gynecologist's drugs for menopausal symptoms
         addClass('hormone replacement', 75); addClass('ssri', 50); addClass('snri', 45);
         // TOP PRIORITY: Specific gynecological HRT drugs
-        ['conjugated estrogen','estradiol','tibolone'].forEach(n => addName(n, 70)); // HRT first-line
-        ['paroxetine','venlafaxine','desvenlafaxine'].forEach(n => addName(n, 50)); // Non-hormonal option
-        ['clonidine','gabapentin'].forEach(n => addName(n, 35)); // Alternative
+        ['conjugated estrogen', 'estradiol', 'tibolone'].forEach(n => addName(n, 70)); // HRT first-line
+        ['paroxetine', 'venlafaxine', 'desvenlafaxine'].forEach(n => addName(n, 50)); // Non-hormonal option
+        ['clonidine', 'gabapentin'].forEach(n => addName(n, 35)); // Alternative
       }
       if (name.includes('breast') || name.includes('mastalgia')) {
         // Gynecologist's drugs for breast tenderness / pain
         addClass('vitamin e', 65); addClass('evening primrose oil', 60); addClass('nsaid', 50);
         // TOP PRIORITY: Specific gynecological drugs for breast pain
-        ['vitamin e','evening primrose oil','danazol'].forEach(n => addName(n, 65)); // First-line for mastalgia
-        ['bromocriptine','tamoxifen'].forEach(n => addName(n, 55)); // Severe cases
-        ['ibuprofen','naproxen'].forEach(n => addName(n, 40)); // Pain relief
+        ['vitamin e', 'evening primrose oil', 'danazol'].forEach(n => addName(n, 65)); // First-line for mastalgia
+        ['bromocriptine', 'tamoxifen'].forEach(n => addName(n, 55)); // Severe cases
+        ['ibuprofen', 'naproxen'].forEach(n => addName(n, 40)); // Pain relief
       }
-      
+
       // MENTAL HEALTH & SLEEP
       if (name.includes('depression') || name.includes('low mood')) {
         addClass('antidepressant', 60); addClass('ssri', 60); addClass('snri', 40);
-        ['sertraline','fluoxetine','escitalopram','venlafaxine'].forEach(n => addName(n, 40));
+        ['sertraline', 'fluoxetine', 'escitalopram', 'venlafaxine'].forEach(n => addName(n, 40));
         addNegClass('benzodiazepine', 30);
       }
       if (name.includes('panic') || name.includes('severe anxiety')) {
         addClass('benzodiazepine', 60); addClass('ssri', 40);
-        ['alprazolam','clonazepam','lorazepam'].forEach(n => addName(n, 40));
+        ['alprazolam', 'clonazepam', 'lorazepam'].forEach(n => addName(n, 40));
       }
       if (name.includes('mood swing') || name.includes('bipolar')) {
         addClass('mood stabilizer', 60); addClass('antipsychotic', 40);
-        ['lithium','valproate','quetiapine'].forEach(n => addName(n, 35));
+        ['lithium', 'valproate', 'quetiapine'].forEach(n => addName(n, 35));
       }
       if (name.includes('memory') || name.includes('concentration') || name.includes('brain fog')) {
         addClass('nootropic', 50); addClass('multivitamin', 40);
-        ['piracetam','ginkgo','vitamin b12'].forEach(n => addName(n, 30));
+        ['piracetam', 'ginkgo', 'vitamin b12'].forEach(n => addName(n, 30));
       }
       if (name.includes('stress') || name.includes('tension headache')) {
         addClass('anxiolytic', 50); addClass('magnesium', 40); addClass('adaptogen', 30);
-        ['magnesium','ashwagandha'].forEach(n => addName(n, 30));
+        ['magnesium', 'ashwagandha'].forEach(n => addName(n, 30));
       }
       if (name.includes('excessive sleep') || name.includes('drowsiness')) {
         addClass('stimulant', 50); addClass('modafinil', 40);
@@ -308,43 +309,43 @@ const SymptomChecker = () => {
       }
       if (name.includes('nightmare') || name.includes('disturbed sleep')) {
         addClass('sedative', 40); addClass('anxiolytic', 40);
-        ['zolpidem','eszopiclone'].forEach(n => addName(n, 30));
+        ['zolpidem', 'eszopiclone'].forEach(n => addName(n, 30));
       }
-      
+
       // ALLERGY & IMMUNE
       if (name.includes('sneez') || name.includes('rhinitis') || name.includes('hay fever')) {
         addClass('antihistamine', 60); addClass('nasal corticosteroid', 40);
-        ['cetirizine','loratadine','fexofenadine','fluticasone'].forEach(n => addName(n, 40));
+        ['cetirizine', 'loratadine', 'fexofenadine', 'fluticasone'].forEach(n => addName(n, 40));
       }
       if (name.includes('hives') || name.includes('urticaria')) {
         addClass('antihistamine', 60); addClass('corticosteroid', 40);
-        ['cetirizine','loratadine','prednisolone'].forEach(n => addName(n, 40));
+        ['cetirizine', 'loratadine', 'prednisolone'].forEach(n => addName(n, 40));
       }
       if (name.includes('wheez') || name.includes('asthma')) {
         addClass('bronchodilator', 60); addClass('corticosteroid', 50);
-        ['salbutamol','albuterol','budesonide','montelukast'].forEach(n => addName(n, 40));
+        ['salbutamol', 'albuterol', 'budesonide', 'montelukast'].forEach(n => addName(n, 40));
       }
       if (name.includes('food allergy') || name.includes('anaphyla')) {
         addClass('antihistamine', 60); addClass('epinephrine', 50); addClass('corticosteroid', 40);
-        ['epinephrine','prednisolone'].forEach(n => addName(n, 50));
+        ['epinephrine', 'prednisolone'].forEach(n => addName(n, 50));
       }
       if (name.includes('seasonal allergy') || name.includes('pollen')) {
         addClass('antihistamine', 60); addClass('nasal spray', 40);
-        ['cetirizine','loratadine','mometasone'].forEach(n => addName(n, 35));
+        ['cetirizine', 'loratadine', 'mometasone'].forEach(n => addName(n, 35));
       }
-      
+
       // CHRONIC CONDITIONS
       if (name.includes('diabetes') || name.includes('high blood sugar') || name.includes('hyperglyce')) {
         addClass('antidiabetic', 60); addClass('insulin', 50);
-        ['metformin','glimepiride','insulin','sitagliptin'].forEach(n => addName(n, 40));
+        ['metformin', 'glimepiride', 'insulin', 'sitagliptin'].forEach(n => addName(n, 40));
       }
       if (name.includes('low blood sugar') || name.includes('hypoglyce')) {
         addClass('glucose', 60);
-        ['glucose','glucagon'].forEach(n => addName(n, 50));
+        ['glucose', 'glucagon'].forEach(n => addName(n, 50));
       }
       if (name.includes('high blood pressure') || name.includes('hypertension')) {
         addClass('antihypertensive', 60); addClass('ace inhibitor', 50); addClass('beta blocker', 40);
-        ['amlodipine','enalapril','losartan','metoprolol'].forEach(n => addName(n, 40));
+        ['amlodipine', 'enalapril', 'losartan', 'metoprolol'].forEach(n => addName(n, 40));
       }
       if (name.includes('low blood pressure') || name.includes('hypotension')) {
         addClass('vasopressor', 50);
@@ -352,43 +353,43 @@ const SymptomChecker = () => {
       }
       if (name.includes('thyroid') || name.includes('goiter')) {
         addClass('thyroid hormone', 60); addClass('antithyroid', 40);
-        ['levothyroxine','carbimazole'].forEach(n => addName(n, 40));
+        ['levothyroxine', 'carbimazole'].forEach(n => addName(n, 40));
       }
       if (name.includes('anemia') || name.includes('pallor') || name.includes('pale')) {
         addClass('iron supplement', 60); addClass('vitamin b12', 50); addClass('folic acid', 40);
-        ['ferrous','folic','vitamin b12'].forEach(n => addName(n, 40));
+        ['ferrous', 'folic', 'vitamin b12'].forEach(n => addName(n, 40));
       }
-      
+
       // NEUROLOGICAL
       if (name.includes('tremor') || name.includes('shak') || name.includes('parkinson')) {
         addClass('antiparkinson', 60); addClass('beta blocker', 40);
-        ['levodopa','carbidopa','propranolol'].forEach(n => addName(n, 40));
+        ['levodopa', 'carbidopa', 'propranolol'].forEach(n => addName(n, 40));
       }
       if (name.includes('numbness') || name.includes('tingling') || name.includes('neuropathy')) {
         addClass('vitamin b12', 60); addClass('neuropathic pain agent', 50);
-        ['vitamin b12','gabapentin','pregabalin'].forEach(n => addName(n, 40));
+        ['vitamin b12', 'gabapentin', 'pregabalin'].forEach(n => addName(n, 40));
       }
       if (name.includes('confusion') || name.includes('alzheimer') || name.includes('dementia')) {
         addClass('dementia medication', 60); addClass('nootropic', 40);
-        ['donepezil','rivastigmine','memantine'].forEach(n => addName(n, 40));
+        ['donepezil', 'rivastigmine', 'memantine'].forEach(n => addName(n, 40));
       }
       if (name.includes('seizure') || name.includes('epilepsy') || name.includes('fit')) {
         addClass('anticonvulsant', 60); addClass('antiepileptic', 60);
-        ['phenytoin','carbamazepine','valproate','levetiracetam'].forEach(n => addName(n, 40));
+        ['phenytoin', 'carbamazepine', 'valproate', 'levetiracetam'].forEach(n => addName(n, 40));
       }
       if (name.includes('vertigo') || name.includes('balance')) {
         addClass('antivertigo', 60); addClass('antihistamine', 40);
-        ['betahistine','meclizine'].forEach(n => addName(n, 40));
+        ['betahistine', 'meclizine'].forEach(n => addName(n, 40));
       }
       if (name.includes('speech') || name.includes('stroke')) {
         addClass('stroke medication', 60); addClass('neuroprotective', 40);
-        ['aspirin','clopidogrel'].forEach(n => addName(n, 40));
+        ['aspirin', 'clopidogrel'].forEach(n => addName(n, 40));
       }
-      
+
       // OTHER
       if (name.includes('burn') && name.includes('urinat')) {
         addClass('antibiotic', 60); addClass('urinary alkalizer', 40);
-        ['nitrofurantoin','ciprofloxacin','trimethoprim'].forEach(n => addName(n, 40));
+        ['nitrofurantoin', 'ciprofloxacin', 'trimethoprim'].forEach(n => addName(n, 40));
       }
     });
 
@@ -417,11 +418,11 @@ const SymptomChecker = () => {
     }
 
     setIsLoading(true);
-    
+
     // Combine all related drug classes and categories from selected symptoms
     const relatedClasses = new Set<string>();
     const relatedCategories = new Set<string>();
-    
+
     selectedSymptoms.forEach(symptom => {
       symptom.relatedDrugClasses.forEach(dc => relatedClasses.add(dc.toLowerCase()));
       symptom.relatedCategories.forEach(cat => relatedCategories.add(cat.toLowerCase()));
@@ -496,7 +497,7 @@ const SymptomChecker = () => {
         const hit = name.includes(token) || generic.includes(token) || brands.some(b => b.includes(token));
         return acc + (hit ? negativeNameWeights[token] : 0);
       }, 0);
-      const score = 
+      const score =
         (primaryIndicationScore * 3)           // Strong indication matches (highest weight)
         + (secondaryIndicationScore * 0.5)     // Partial matches (lower weight)
         + (classHit ? 8 : 0)                   // Drug class match (high weight)
@@ -509,35 +510,35 @@ const SymptomChecker = () => {
         + (drug.indications && drug.indications.length > 3 ? 1 : 0)  // Versatile drugs
         + negClassPenalty + negNamePenalty;     // Deprioritize non-first-line options
 
-      return { 
-        drug, 
-        score, 
+      return {
+        drug,
+        score,
         primaryIndicationScore,
         secondaryIndicationScore,
         keywordMatchCount,
-        classHit, 
+        classHit,
         classBoost,
-        categoryHit 
+        categoryHit
       };
     })
-    .filter(x => 
-      x.classHit || 
-      x.categoryHit || 
-      x.primaryIndicationScore > 0 || 
-      x.keywordMatchCount > 0
-    )
-    .sort((a, b) => {
-      // Primary sort by score
-      if (b.score !== a.score) return b.score - a.score;
-      // Tiebreaker: prefer drugs with more primary matches
-      if (b.primaryIndicationScore !== a.primaryIndicationScore) {
-        return b.primaryIndicationScore - a.primaryIndicationScore;
-      }
-      // Next tiebreaker: higher classBoost
-      if (b.classBoost !== a.classBoost) return b.classBoost - a.classBoost;
-      // Final tiebreaker: verified status
-      return (b.drug.verified ? 1 : 0) - (a.drug.verified ? 1 : 0);
-    });
+      .filter(x =>
+        x.classHit ||
+        x.categoryHit ||
+        x.primaryIndicationScore > 0 ||
+        x.keywordMatchCount > 0
+      )
+      .sort((a, b) => {
+        // Primary sort by score
+        if (b.score !== a.score) return b.score - a.score;
+        // Tiebreaker: prefer drugs with more primary matches
+        if (b.primaryIndicationScore !== a.primaryIndicationScore) {
+          return b.primaryIndicationScore - a.primaryIndicationScore;
+        }
+        // Next tiebreaker: higher classBoost
+        if (b.classBoost !== a.classBoost) return b.classBoost - a.classBoost;
+        // Final tiebreaker: verified status
+        return (b.drug.verified ? 1 : 0) - (a.drug.verified ? 1 : 0);
+      });
 
     // Show top highly relevant medications (reduced from 50 to avoid confusion)
     setMatchedDrugs(scored.slice(0, 12).map(x => x.drug));
@@ -554,11 +555,11 @@ const SymptomChecker = () => {
 
   const handleViewSymptomDrugs = (symptom: Symptom) => {
     setViewingSymptom(symptom);
-    
+
     // Get drugs specific to this symptom with advanced matching
     const relatedClasses = new Set<string>();
     const relatedCategories = new Set<string>();
-    
+
     symptom.relatedDrugClasses.forEach(dc => relatedClasses.add(dc.toLowerCase()));
     symptom.relatedCategories.forEach(cat => relatedCategories.add(cat.toLowerCase()));
 
@@ -624,7 +625,7 @@ const SymptomChecker = () => {
         return acc + (hit ? negativeNameWeights[token] : 0);
       }, 0);
 
-      const score = 
+      const score =
         (primaryIndicationScore * 3)
         + (secondaryIndicationScore * 0.5)
         + (classHit ? 8 : 0)
@@ -638,15 +639,15 @@ const SymptomChecker = () => {
 
       return { drug, score, primaryIndicationScore, classHit, classBoost, categoryHit };
     })
-    .filter(x => x.classHit || x.categoryHit || x.primaryIndicationScore > 0)
-    .sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      if (b.primaryIndicationScore !== a.primaryIndicationScore) {
-        return b.primaryIndicationScore - a.primaryIndicationScore;
-      }
-      if (b.classBoost !== a.classBoost) return b.classBoost - a.classBoost;
-      return (b.drug.verified ? 1 : 0) - (a.drug.verified ? 1 : 0);
-    });
+      .filter(x => x.classHit || x.categoryHit || x.primaryIndicationScore > 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        if (b.primaryIndicationScore !== a.primaryIndicationScore) {
+          return b.primaryIndicationScore - a.primaryIndicationScore;
+        }
+        if (b.classBoost !== a.classBoost) return b.classBoost - a.classBoost;
+        return (b.drug.verified ? 1 : 0) - (a.drug.verified ? 1 : 0);
+      });
 
     setSymptomDrugs(scored.slice(0, 15).map(x => x.drug)); // Limit to 15 most relevant
   };
@@ -726,6 +727,12 @@ const SymptomChecker = () => {
 
   return (
     <>
+      <SEOHead
+        title="Symptom Checker - Find Medications by Symptoms | PharmaLens"
+        description="Identify potential medications based on your symptoms. Our AI-powered symptom checker helps you find the right treatment options safely."
+        keywords="symptom checker, find medication by symptom, drug symptom search, medicine finder, health symptom analysis"
+        canonicalUrl="/symptom-checker"
+      />
       <Header />
       <div className="container max-w-7xl mx-auto px-4 pt-24 pb-12">
         {/* Header Section */}
@@ -756,7 +763,7 @@ const SymptomChecker = () => {
               )}
             </div>
           </div>
-          
+
         </div>
 
         {/* Warning Alert */}
@@ -764,7 +771,7 @@ const SymptomChecker = () => {
           <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           <AlertTitle className="text-amber-800 dark:text-amber-300">Medical Disclaimer</AlertTitle>
           <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
-            This tool is for informational purposes only and does not replace professional medical advice. 
+            This tool is for informational purposes only and does not replace professional medical advice.
             Always consult a qualified healthcare provider for diagnosis and treatment.
           </AlertDescription>
         </Alert>
@@ -831,7 +838,7 @@ const SymptomChecker = () => {
               <CardHeader>
                 <CardTitle>Select Your Symptoms</CardTitle>
                 <CardDescription>Choose one or more symptoms you're experiencing</CardDescription>
-                
+
                 {/* Search Bar */}
                 <div className="relative mt-4">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -854,7 +861,7 @@ const SymptomChecker = () => {
                   )}
                 </div>
               </CardHeader>
-              
+
               <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
                 {filteredCategories.map((category) => (
                   <div key={category.title} className="border rounded-lg overflow-hidden">
@@ -875,7 +882,7 @@ const SymptomChecker = () => {
                         <ChevronRight className="h-4 w-4" />
                       )}
                     </button>
-                    
+
                     {expandedCategories.has(category.title) && (
                       <div className="p-4 space-y-2">
                         {category.symptoms.map((symptom) => {
@@ -883,11 +890,10 @@ const SymptomChecker = () => {
                           return (
                             <div
                               key={symptom.id}
-                              className={`p-3 rounded-lg border transition-all ${
-                                isSelected
-                                  ? 'bg-pharma-500 text-white shadow-md border-pharma-500'
-                                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-pharma-300'
-                              }`}
+                              className={`p-3 rounded-lg border transition-all ${isSelected
+                                ? 'bg-pharma-500 text-white shadow-md border-pharma-500'
+                                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-pharma-300'
+                                }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex-1 min-w-0">
@@ -950,7 +956,7 @@ const SymptomChecker = () => {
                     ))}
                   </div>
                 )}
-                
+
                 {selectedSymptoms.length > 0 && (
                   <Button
                     variant="outline"
@@ -976,7 +982,7 @@ const SymptomChecker = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   onClick={() => navigate('/drug-interactions')}
                 >
