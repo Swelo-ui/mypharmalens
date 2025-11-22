@@ -5,6 +5,21 @@
 [build.environment]
   NODE_VERSION = "20.19.2"
 
+# Redirect all traffic to HTTPS
+[[redirects]]
+  from = "http://pharmalens.tech/*"
+  to = "https://pharmalens.tech/:splat"
+  status = 301
+  force = true
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.pharmalens.tech/*"
+  to = "https://pharmalens.tech/:splat"
+  status = 301
+  force = true
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
