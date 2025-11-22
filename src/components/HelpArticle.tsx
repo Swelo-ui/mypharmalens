@@ -342,35 +342,38 @@ export const helpArticles: HelpArticle[] = [
         <li><strong>Mobile web app access:</strong> Use on any device with internet</li>
       </ul>
       
-      <h3>Weekly Plan Benefits (₹39/week):</h3>
+      <h3>Lite Plan Benefits (₹49/month - Save ₹30):</h3>
       
       <ul>
         <li><strong>All Free Plan features</strong></li>
-        <li><strong>21 AI identifications per week:</strong> More frequent use of camera identification</li>
-        <li><strong>500+ medicines database:</strong> Expanded medication coverage</li>
+        <li><strong>39 AI identifications per month:</strong> More frequent use of camera identification</li>
+        <li><strong>1200+ medicines database:</strong> Expanded medication coverage with advanced search (249 results)</li>
         <li><strong>Priority support:</strong> Faster response to queries and issues</li>
         <li><strong>No ads:</strong> Uninterrupted, clean user experience</li>
+        <li><strong>PWA offline access:</strong> Use even with limited connectivity</li>
       </ul>
       
-      <h3>Premium Plan Benefits (₹199/month):</h3>
+      <h3>Pro Plan Benefits (₹99/month - Save ₹100):</h3>
       
       <ul>
-        <li><strong>All Weekly Plan features</strong></li>
-        <li><strong>Unlimited AI identifications:</strong> No restrictions on camera use</li>
-        <li><strong>1000+ database drugs:</strong> Comprehensive medication coverage</li>
+        <li><strong>All Lite Plan features</strong></li>
+        <li><strong>101 AI identifications per month:</strong> Extensive camera use capabilities</li>
+        <li><strong>1200+ database drugs:</strong> Comprehensive medication coverage with advanced search (500 results)</li>
         <li><strong>Layman explanations:</strong> Simplified medical terminology</li>
         <li><strong>History feature:</strong> Track all your searches and identifications</li>
         <li><strong>Advanced search filters:</strong> More precise medication searches</li>
       </ul>
       
+
+      
       <h3>Tips to Maximize Value:</h3>
       
       <ul>
-        <li><strong>Use the history feature</strong> (Premium) to track medications for family members</li>
-        <li><strong>Take advantage of unlimited identifications</strong> (Premium) for medicine cabinet audits</li>
-        <li><strong>Utilize advanced search filters</strong> (Premium) to find specific formulations</li>
-        <li><strong>Enable layman explanations</strong> (Premium) for better understanding</li>
-        <li><strong>Use priority support</strong> (Weekly/Premium) for quick assistance</li>
+        <li><strong>Use the history feature</strong> (Pro) to track medications for family members</li>
+        <li><strong>Take advantage of extensive identifications</strong> (Pro - 101/month) for medicine cabinet audits</li>
+        <li><strong>Utilize advanced search filters</strong> (Pro) to find specific formulations</li>
+        <li><strong>Enable layman explanations</strong> (Pro) for better understanding</li>
+        <li><strong>Use priority support</strong> (Lite/Pro) for quick assistance</li>
       </ul>
       
       <h3>Payment and Billing:</h3>
@@ -378,7 +381,7 @@ export const helpArticles: HelpArticle[] = [
       <ul>
         <li><strong>Secure PhonePe integration:</strong> Pay with UPI, cards, or digital wallets</li>
         <li><strong>Instant activation:</strong> Features unlock immediately after payment</li>
-        <li><strong>Flexible billing:</strong> Choose weekly or monthly based on usage patterns</li>
+        <li><strong>Flexible billing:</strong> Choose the plan that fits your usage patterns</li>
         <li><strong>Easy cancellation:</strong> Cancel anytime through your account settings</li>
       </ul>
       
@@ -386,8 +389,8 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>Free Plan:</strong> Occasional users, basic medication lookups</li>
-        <li><strong>Weekly Plan:</strong> Regular users, short-term needs, trying premium features</li>
-        <li><strong>Premium Plan:</strong> Power users, families, healthcare professionals, comprehensive needs</li>
+        <li><strong>Lite Plan:</strong> Regular users, need up to 39 identifications monthly</li>
+        <li><strong>Pro Plan:</strong> Power users, families, healthcare professionals, comprehensive needs</li>
       </ul>
       
       <p>Consider upgrading if you find yourself hitting usage limits or needing more detailed information regularly.</p>
@@ -492,7 +495,7 @@ const HelpArticle = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-2xl font-bold mb-6">Article Not Found</h1>
             <p className="mb-6">The help article you're looking for doesn't exist or has been moved.</p>
-            <Link 
+            <Link
               to="/help"
               className="inline-flex items-center text-pharma-600 hover:text-pharma-700"
             >
@@ -510,7 +513,7 @@ const HelpArticle = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
-            <Link 
+            <Link
               to="/help"
               className="inline-flex items-center text-pharma-600 hover:text-pharma-700"
             >
@@ -518,11 +521,11 @@ const HelpArticle = () => {
               Back to Help Center
             </Link>
           </div>
-          
+
           <article className="prose dark:prose-invert prose-a:text-pharma-600 max-w-none">
             <div dangerouslySetInnerHTML={{ __html: article.content }} />
           </article>
-          
+
           <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Last updated: {new Date(article.createdAt).toLocaleDateString()}

@@ -31,7 +31,7 @@ INSERT INTO subscription_plans (
     NOW()
 );
 
--- Insert Weekly Plan
+-- Insert Lite Plan
 INSERT INTO subscription_plans (
     id,
     name,
@@ -41,30 +41,32 @@ INSERT INTO subscription_plans (
     features,
     created_at
 ) VALUES (
-    'weekly-plan',
-    'Weekly Plan',
+    'lite',
+    'Lite Plan',
     'Regular users who need frequent identification',
+    49,
     39,
-    21,
     '{
-        "database_searches": 500,
-        "ai_identifications": 21,
+        "database_searches": 249,
+        "ai_identifications": 39,
         "drug_information": true,
         "prescription_status": true,
         "mobile_access": true,
         "support": "priority",
-        "history_feature": true,
+        "history_feature": false,
         "layman_explanations": false,
         "ads": false,
         "enhanced_info": true,
-        "billing_cycle": "weekly",
-        "billing_period": "weekly",
-        "duration_days": 7
+        "billing_cycle": "monthly",
+        "billing_period": "monthly",
+        "duration_days": 30,
+        "original_price": 79,
+        "savings": 30
     }',
     NOW()
 );
 
--- Insert Monthly Premium Plan
+-- Insert Pro Plan
 INSERT INTO subscription_plans (
     id,
     name,
@@ -74,14 +76,14 @@ INSERT INTO subscription_plans (
     features,
     created_at
 ) VALUES (
-    'monthly-premium',
-    'Monthly Premium Plan',
+    'pro',
+    'Pro Plan',
     'Power users, families, healthcare enthusiasts',
-    199,
-    -1,
+    99,
+    101,
     '{
-        "database_searches": 1000,
-        "ai_identifications": -1,
+        "database_searches": 500,
+        "ai_identifications": 101,
         "drug_information": true,
         "prescription_status": true,
         "mobile_access": true,
@@ -94,8 +96,8 @@ INSERT INTO subscription_plans (
         "advanced_filters": true,
         "offline_access": true,
         "billing_cycle": "monthly",
-        "yearly_price": 1999,
-        "yearly_savings": 16
+        "original_price": 199,
+        "savings": 100
     }',
     NOW()
 );

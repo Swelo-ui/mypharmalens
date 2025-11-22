@@ -55,7 +55,7 @@ const FAQ = () => {
         "name": "What subscription plans are available?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "PharmaLens offers three plans: Free (₹0/month), Weekly (₹39/week), and Premium (₹199/month) with varying features including AI identifications, database access, and advanced tools."
+          "text": "PharmaLens offers three plans: Free (₹0/month, 5 AI identifications), Lite (₹49/month, 39 AI identifications), and Pro (₹99/month, 101 AI identifications) with varying features including advanced search, database access, and premium tools."
         }
       }
     ]
@@ -144,7 +144,7 @@ const FAQ = () => {
             <AccordionItem value="item-10">
               <AccordionTrigger>What subscription plans are available?</AccordionTrigger>
               <AccordionContent>
-                PharmaLens offers three plans: Free (₹0/month) with 100 drugs database search and 5 AI identifications; Weekly (₹39/week) with 21 AI identifications and 500+ medicines database; Premium (₹199/month) with unlimited AI identifications, 1000+ database drugs, layman explanations, history feature, and advanced search filters. All plans include mobile web app access and basic drug information.
+                PharmaLens offers three plans: Free (₹0/month) with 100 drugs database search and 5 AI identifications; Lite (₹49/month, save ₹30) with 39 AI identifications and 1200+ medicines database with advanced search (249 results); Pro (₹99/month, save ₹100) with 101 AI identifications, 1200+ medicines database, advanced search (500 results), layman explanations, history feature, and advanced search filters. All plans include mobile web app access, PWA offline access, and basic drug information.
               </AccordionContent>
             </AccordionItem>
             
@@ -172,7 +172,7 @@ const FAQ = () => {
             <AccordionItem value="item-14">
               <AccordionTrigger>How do I access my identification history?</AccordionTrigger>
               <AccordionContent>
-                The identification history feature is available for Premium subscribers (₹199/month). Once subscribed, all your medication identifications and searches are automatically saved in your account. You can access your history from the main menu, view past results, and quickly re-access previously identified medications. This feature helps track your medication queries over time.
+                The identification history feature is available for Pro subscribers (₹99/month). Once subscribed, all your medication identifications and searches are automatically saved in your account. You can access your history from the main menu, view past results, and quickly re-access previously identified medications. This feature helps track your medication queries over time.
               </AccordionContent>
             </AccordionItem>
             
@@ -186,7 +186,7 @@ const FAQ = () => {
             <AccordionItem value="item-16">
               <AccordionTrigger>How often is the medication database updated?</AccordionTrigger>
               <AccordionContent>
-                Our medication database is updated continuously with new medications, safety information, and drug interactions. We source data from trusted pharmaceutical databases including Drugs.com and national drug formularies. Updates include new drug approvals, safety alerts, recall information, and revised dosing guidelines. Premium users get priority access to the latest database updates.
+                Our medication database is updated continuously with new medications, safety information, and drug interactions. We source data from trusted pharmaceutical databases including Drugs.com and national drug formularies. Updates include new drug approvals, safety alerts, recall information, and revised dosing guidelines. Pro plan users get priority access to the latest database updates.
               </AccordionContent>
             </AccordionItem>
             

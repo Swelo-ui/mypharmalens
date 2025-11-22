@@ -151,7 +151,7 @@ const PaymentResult: React.FC = () => {
                 clearInterval(interval);
                 toast.info('Still processing. You will see updates in Subscription Manager.');
               }
-            } catch {}
+            } catch { }
           }, 2000);
         }
 
@@ -227,25 +227,24 @@ const PaymentResult: React.FC = () => {
 
   const getPlanDisplayName = (planId: string): string => {
     const normalized = planId.toLowerCase();
-    if (planId === 'lite-plan' || normalized.includes('lite')) return 'Lite';
-    if (planId === 'monthly-premium-plan' || normalized.includes('premium')) return 'Pro';
+    if (planId === 'lite' || normalized.includes('lite')) return 'Lite';
+    if (planId === 'pro' || normalized.includes('pro')) return 'Pro';
     if (planId === 'free-plan' || normalized.includes('free')) return 'Free Plan';
-    if (normalized.includes('yearly')) return 'Yearly Premium';
-    return 'Premium Plan';
+    return 'Subscription Plan';
   };
 
   const getPlanFeatures = (planId: string, cycle: string): string[] => {
     const normalized = planId.toLowerCase();
-    if (planId === 'lite-plan' || normalized.includes('lite')) {
+    if (planId === 'lite' || normalized.includes('lite')) {
       return [
         '39 AI identifications per month',
         'Advanced search (249 results limit)',
         'Priority support',
         '1200+ medicines database',
-        'Layman explanations'
+        'PWA offline access'
       ];
     }
-    if (planId === 'monthly-premium-plan' || normalized.includes('premium')) {
+    if (planId === 'pro' || normalized.includes('pro')) {
       return [
         '101 AI identifications per month',
         'Advanced search (500 results limit)',
@@ -288,7 +287,7 @@ const PaymentResult: React.FC = () => {
           transactionDetails?.billing_cycle || 'monthly'
         )}
       />
-      
+
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center pb-4">
@@ -299,83 +298,82 @@ const PaymentResult: React.FC = () => {
               {getStatusTitle()}
             </CardTitle>
           </CardHeader>
-        
-        <CardContent className="text-center space-y-4">
-          <p className="text-gray-600">
-            {getStatusMessage()}
-          </p>
 
-          {transactionDetails && (
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <h4 className="font-semibold text-sm text-gray-700 mb-2">Transaction Details</h4>
-              <div className="space-y-1 text-xs text-gray-600">
-                <div className="flex justify-between">
-                  <span>Transaction ID:</span>
-                  <span className="font-mono">{transactionDetails.transaction_id}</span>
-                </div>
-                {transactionDetails.amount && (
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              {getStatusMessage()}
+            </p>
+
+            {transactionDetails && (
+              <div className="bg-gray-50 rounded-lg p-4 text-left">
+                <h4 className="font-semibold text-sm text-gray-700 mb-2">Transaction Details</h4>
+                <div className="space-y-1 text-xs text-gray-600">
                   <div className="flex justify-between">
-                    <span>Amount:</span>
-                    <span>₹{transactionDetails.amount}</span>
+                    <span>Transaction ID:</span>
+                    <span className="font-mono">{transactionDetails.transaction_id}</span>
                   </div>
-                )}
-                {transactionDetails.plan_id && (
+                  {transactionDetails.amount && (
+                    <div className="flex justify-between">
+                      <span>Amount:</span>
+                      <span>₹{transactionDetails.amount}</span>
+                    </div>
+                  )}
+                  {transactionDetails.plan_id && (
+                    <div className="flex justify-between">
+                      <span>Plan:</span>
+                      <span className="capitalize">{transactionDetails.plan_id.replace('-', ' ')}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
-                    <span>Plan:</span>
-                    <span className="capitalize">{transactionDetails.plan_id.replace('-', ' ')}</span>
+                    <span>Status:</span>
+                    <span className={`capitalize ${paymentStatus === 'success' ? 'text-green-600' :
+                        paymentStatus === 'failed' ? 'text-red-600' :
+                          'text-yellow-600'
+                      }`}>
+                      {paymentStatus}
+                    </span>
                   </div>
-                )}
-                <div className="flex justify-between">
-                  <span>Status:</span>
-                  <span className={`capitalize ${
-                    paymentStatus === 'success' ? 'text-green-600' :
-                    paymentStatus === 'failed' ? 'text-red-600' :
-                    'text-yellow-600'
-                  }`}>
-                    {paymentStatus}
-                  </span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="pt-4">
-            <Button 
-              onClick={handleContinue}
-              disabled={isVerifying}
-              className="w-full"
-              variant={paymentStatus === 'success' ? 'default' : 'outline'}
-            >
-              {isVerifying ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Verifying...
-                </>
-              ) : paymentStatus === 'success' ? (
-                'Continue to Dashboard'
-              ) : paymentStatus === 'failed' ? (
-                'Try Again'
-              ) : (
-                'Go to Dashboard'
-              )}
-            </Button>
-          </div>
-
-          {paymentStatus === 'failed' && (
-            <div className="pt-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/help')}
-                className="text-xs"
+            <div className="pt-4">
+              <Button
+                onClick={handleContinue}
+                disabled={isVerifying}
+                className="w-full"
+                variant={paymentStatus === 'success' ? 'default' : 'outline'}
               >
-                Need help? Contact Support
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Verifying...
+                  </>
+                ) : paymentStatus === 'success' ? (
+                  'Continue to Dashboard'
+                ) : paymentStatus === 'failed' ? (
+                  'Try Again'
+                ) : (
+                  'Go to Dashboard'
+                )}
               </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+
+            {paymentStatus === 'failed' && (
+              <div className="pt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/help')}
+                  className="text-xs"
+                >
+                  Need help? Contact Support
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 };
