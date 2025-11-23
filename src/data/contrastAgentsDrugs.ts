@@ -1,0 +1,70 @@
+import { DrugData } from "../components/DrugCard";
+
+export const contrastAgentsDrugs: DrugData[] = [
+    {
+        id: "CAD001",
+        name: "Gadopentetate",
+        genericName: "Gadopentetate Dimeglumine",
+        manufacturer: "Various",
+        category: "Contrast Agents",
+        description: "Gadolinium-based contrast agent used for MRI imaging to enhance visualization of internal structures",
+        drugClass: "MRI Contrast Agent",
+        verified: true,
+        brandNames: ["Magnevist", "Gadovist", "Gado-MRI", "Magnegita", "Gadolite"],
+        prescriptionStatus: "Hospital Use Only",
+        dosageAndAdmin: "IV injection: 0.1-0.2 mmol/kg body weight (0.2-0.4 mL/kg). Administered as rapid bolus followed by saline flush. Imaging done immediately after injection.",
+        mechanism: "Gadopentetate is a paramagnetic contrast agent. The gadolinium ion alters the magnetic properties of nearby water molecules, shortening T1 relaxation time and increasing signal intensity on T1-weighted MRI sequences, enhancing contrast between normal and abnormal tissues.",
+        indications: ["MRI of CNS (brain and spine)", "MRI angiography", "body MRI imaging", "detection of tumors", "vascular abnormalities", "inflammatory lesions"],
+        contraindications: ["Severe renal impairment (eGFR <30 mL/min)", "previous severe allergic reaction to gadolinium", "pregnancy (first trimester)"],
+        warnings: ["Nephrogenic systemic fibrosis (NSF) risk in renal impairment", "gadolinium retention in brain and tissues", "acute kidney injury risk", "hypersensitivity reactions"],
+        sideEffects: ["Nausea", "headache", "injection site reactions", "coldness at injection site", "allergic reactions", "rarely: anaphylaxis"],
+        interactions: ["Medications affecting renal function", "other contrast agents"],
+        pregnancy: "Category C - Use only if clearly needed, especially avoid in first trimester",
+        storage: "Store at 15-30°C, do not freeze, protect from light",
+        laymanExplanations: {
+            description: "Gadopentetate is a contrast dye injected into your vein before an MRI scan. It makes certain body parts show up more clearly on the MRI images, helping doctors see problems better.",
+            mechanism: "Contains gadolinium, a metal that changes how water appears on MRI scans. This creates brighter images of blood vessels, tumors, and inflammation.",
+            indications: ["Used during MRI scans of the brain, spine, blood vessels, or other body parts to make abnormalities easier to see."],
+            contraindications: ["Cannot be used in people with severe kidney problems or previous severe allergic reactions to gadolinium contrast."],
+            sideEffects: ["Common: nausea, headache, cold feeling at injection site. Rare: allergic reactions or severe reaction (anaphylaxis)."],
+            interactions: ["May be affected by medications that impact kidney function."],
+            dosageAndAdmin: "Given as an injection into your vein just before the MRI scan. The dose depends on your body weight.",
+            warnings: ["Can cause a rare serious condition called nephrogenic systemic fibrosis in people with severe kidney disease. Gadolinium may stay in the body long-term."],
+            pregnancy: "Avoid during first trimester. Use later in pregnancy only if absolutely necessary.",
+            storage: "Stored at room temperature by healthcare facilities."
+        }
+    },
+    {
+        id: "CAD002",
+        name: "Iopromide",
+        genericName: "Iopromide",
+        manufacturer: "Various",
+        category: "Contrast Agents",
+        description: "Non-ionic iodinated contrast medium used for CT scans and angiography",
+        drugClass: "Iodinated Contrast Agent",
+        verified: true,
+        brandNames: ["Ultravist", "Iopamiro", "Iopamiron", "Scanlux", "Iopro-CT"],
+        prescriptionStatus: "Hospital Use Only",
+        dosageAndAdmin: "IV/IA injection: Dose varies by procedure - CT: 50-150 mL, Angiography: 30-250 mL. Concentration: 240-370 mg iodine/mL. Rate depends on imaging protocol.",
+        mechanism: "Iopromide is a non-ionic, low-osmolar iodinated contrast medium. Iodine atoms absorb X-rays, creating radiodensity (whiteness) on CT images. This enhances differentiation between tissues, blood vessels, and organs based on their vascularity and perfusion patterns.",
+        indications: ["CT imaging (brain, chest, abdomen, pelvis)", "CT angiography", "conventional angiography", "urography", "cardiac catheterization"],
+        contraindications: ["Hyperthyroidism (relative)", "severe renal impairment", "previous severe reaction to iodinated contrast", "dehydration"],
+        warnings: ["Contrast-induced nephropathy risk", "thyroid dysfunction", "allergic/anaphylactoid reactions", "adequate hydration essential", "metformin interaction"],
+        sideEffects: ["Warmth sensation", "metallic taste", "nausea", "headache", "injection site pain", "allergic reactions", "rarely: severe anaphylaxis", "acute kidney injury"],
+        interactions: ["Metformin (discontinue 48 hours before in renal impairment)", "interleukin-2", "NSAIDs", "nephrotoxic drugs"],
+        pregnancy: "Category B - Use only if clearly needed. May affect fetal thyroid",
+        storage: "Store at room temperature 15-30°C, protect from light and X-rays",
+        laymanExplanations: {
+            description: "Iopromide is a contrast dye containing iodine that is injected before CT scans. It makes blood vessels and organs show up clearly on the images, helping doctors see problems like blockages, tumors, or injuries.",
+            mechanism: "The iodine in the dye blocks X-rays, making injected areas appear white/bright on CT scans. This highlights blood vessels, organs, and abnormalities.",
+            indications: ["Used for CT scans of any body part, heart catheterization, and studies of blood vessels to detect diseases."],
+            contraindications: ["Extra caution needed with overactive thyroid, severe kidney problems, dehydration, or previous severe allergic reactions."],
+            sideEffects: ["Common: warm/hot feeling throughout body, metallic taste, nausea. Rare: allergic reactions or kidney damage."],
+            interactions: ["Important interaction with metformin (diabetes drug) - may need to stop temporarily. Can worsen kidney function with certain medications."],
+            dosageAndAdmin: "Injected into your vein or artery during the CT scan. Amount varies based on what body part is being scanned.",
+            warnings: ["Can damage kidneys, especially in people with existing kidney problems. Must stay well-hydrated before and after. May affect thyroid function."],
+            pregnancy: "Generally avoided during pregnancy unless absolutely necessary. May affect baby's thyroid.",
+            storage: "Stored at room temperature by healthcare facilities."
+        }
+    }
+];

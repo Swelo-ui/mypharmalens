@@ -1,7 +1,7 @@
 
 import { DrugData } from "@/components/DrugCard";
-import { 
-  DetailedDrugData, 
+import {
+  DetailedDrugData,
   getDetailedDrugData,
   validateDrugDataset,
   detectAllDuplicates,
@@ -54,6 +54,12 @@ import { permethrinScabiesDrugs } from "./permethrinScabiesDrugs";
 import { additionalMiscellaneousDrugs } from "./additionalMiscellaneousDrugs";
 import { finalExpansionDrugs } from "./finalExpansionDrugs";
 import { miscellaneousExpansionDrugs } from "./miscellaneousExpansionDrugs";
+import { addictionTreatmentDrugs } from './addictionTreatmentDrugs';
+import { enzymeDigestiveDrugs } from './enzymeDigestiveDrugs';
+import { contrastAgentsDrugs } from './contrastAgentsDrugs';
+import { fertilityDrugs } from './fertilityDrugs';
+import { painInflammationCombinationDrugs } from './painInflammationCombinationDrugs';
+import { dermatologyDrugs } from './dermatologyDrugs';
 
 // Create a map to track drug sources for validation reporting
 const drugSources = new Map<string, string>();
@@ -73,7 +79,7 @@ const allDrugsData: DrugData[] = [
   ...addDrugsWithSource(gastrointestinalDrugs, 'gastrointestinalDrugs.ts'),
   ...addDrugsWithSource(endocrineDrugs, 'endocrineDrugs.ts'),
   ...addDrugsWithSource(centralNervousDrugs, 'centralNervousDrugs.ts'),
-  ...addDrugsWithSource(antibioticDrugs, 'antibioticDrugs.ts'), 
+  ...addDrugsWithSource(antibioticDrugs, 'antibioticDrugs.ts'),
   ...addDrugsWithSource(antiviralDrugs, 'antiviralDrugs.ts'),
   ...addDrugsWithSource(antimalarialDrugs, 'antimalarialDrugs.ts'),
   ...addDrugsWithSource(supplementDrugs, 'supplementDrugs.ts'),
@@ -113,82 +119,88 @@ const allDrugsData: DrugData[] = [
   ...addDrugsWithSource(permethrinScabiesDrugs, 'permethrinScabiesDrugs.ts'),
   ...addDrugsWithSource(additionalMiscellaneousDrugs, 'additionalMiscellaneousDrugs.ts'),
   ...addDrugsWithSource(finalExpansionDrugs, 'finalExpansionDrugs.ts'),
-  ...addDrugsWithSource(miscellaneousExpansionDrugs, 'miscellaneousExpansionDrugs.ts')
+  ...addDrugsWithSource(miscellaneousExpansionDrugs, 'miscellaneousExpansionDrugs.ts'),
+  ...addDrugsWithSource(addictionTreatmentDrugs, 'addictionTreatmentDrugs.ts'),
+  ...addDrugsWithSource(enzymeDigestiveDrugs, 'enzymeDigestiveDrugs.ts'),
+  ...addDrugsWithSource(contrastAgentsDrugs, 'contrastAgentsDrugs.ts'),
+  ...addDrugsWithSource(fertilityDrugs, 'fertilityDrugs.ts'),
+  ...addDrugsWithSource(painInflammationCombinationDrugs, 'painInflammationCombinationDrugs.ts'),
+  ...addDrugsWithSource(dermatologyDrugs, 'dermatologyDrugs.ts'),
 ];
 
 // Enhanced deduplication with validation logging for both ID and name duplicates
 let duplicatesFound = 0;
-const duplicateLog: Array<{id: string, kept: string, replaced: string[]}> = [];
+const duplicateLog: Array<{ id: string, kept: string, replaced: string[] }> = [];
 
 export const combinedDrugsData: DrugData[] = allDrugsData
   .filter(drug => drug && drug.id && drug.name) // Filter out undefined/null entries
   .reduce((unique: DrugData[], drug: DrugData) => {
-  // Check for ID duplicates first
-  const existingIdIndex = unique.findIndex(existingDrug => existingDrug && existingDrug.id === drug.id);
-  if (existingIdIndex !== -1) {
-    // Log duplicate found
-    duplicatesFound++;
-    const existingDrug = unique[existingIdIndex];
-    const existingSource = drugSources.get(existingDrug.id) || 'unknown';
-    const currentSource = drugSources.get(drug.id) || 'unknown';
-    
-    // Find existing log entry or create new one
-    let logEntry = duplicateLog.find(entry => entry.id === drug.id);
-    if (!logEntry) {
-      logEntry = {
-        id: drug.id,
+    // Check for ID duplicates first
+    const existingIdIndex = unique.findIndex(existingDrug => existingDrug && existingDrug.id === drug.id);
+    if (existingIdIndex !== -1) {
+      // Log duplicate found
+      duplicatesFound++;
+      const existingDrug = unique[existingIdIndex];
+      const existingSource = drugSources.get(existingDrug.id) || 'unknown';
+      const currentSource = drugSources.get(drug.id) || 'unknown';
+
+      // Find existing log entry or create new one
+      let logEntry = duplicateLog.find(entry => entry.id === drug.id);
+      if (!logEntry) {
+        logEntry = {
+          id: drug.id,
+          kept: currentSource, // additionalDrugsData takes precedence (last in array)
+          replaced: [existingSource]
+        };
+        duplicateLog.push(logEntry);
+      } else {
+        logEntry.replaced.push(existingSource);
+      }
+
+      // Merge drugs, preserving laymanExplanations if it exists in either entry
+      const mergedDrug = {
+        ...drug, // Start with current drug (additionalDrugsData takes precedence)
+        laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
+      };
+
+      // Replace with merged drug
+      unique[existingIdIndex] = mergedDrug;
+      return unique;
+    }
+
+    // Check for name duplicates (case-insensitive)
+    const existingNameIndex = unique.findIndex(existingDrug =>
+      existingDrug.name.toLowerCase().trim() === drug.name.toLowerCase().trim()
+    );
+    if (existingNameIndex !== -1) {
+      // Log name duplicate found
+      duplicatesFound++;
+      const existingDrug = unique[existingNameIndex];
+      const existingSource = drugSources.get(existingDrug.id) || 'unknown';
+      const currentSource = drugSources.get(drug.id) || 'unknown';
+
+      // Create log entry for name duplicate
+      const logEntry = {
+        id: `${drug.name} (ID: ${drug.id} vs ${existingDrug.id})`,
         kept: currentSource, // additionalDrugsData takes precedence (last in array)
         replaced: [existingSource]
       };
       duplicateLog.push(logEntry);
-    } else {
-      logEntry.replaced.push(existingSource);
+
+      // Merge drugs, preserving laymanExplanations if it exists in either entry
+      const mergedDrug = {
+        ...drug, // Start with current drug (additionalDrugsData takes precedence)
+        laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
+      };
+
+      // Replace with merged drug
+      unique[existingNameIndex] = mergedDrug;
+      return unique;
     }
-    
-    // Merge drugs, preserving laymanExplanations if it exists in either entry
-    const mergedDrug = {
-      ...drug, // Start with current drug (additionalDrugsData takes precedence)
-      laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
-    };
-    
-    // Replace with merged drug
-    unique[existingIdIndex] = mergedDrug;
+
+    unique.push(drug);
     return unique;
-  }
-  
-  // Check for name duplicates (case-insensitive)
-  const existingNameIndex = unique.findIndex(existingDrug => 
-    existingDrug.name.toLowerCase().trim() === drug.name.toLowerCase().trim()
-  );
-  if (existingNameIndex !== -1) {
-    // Log name duplicate found
-    duplicatesFound++;
-    const existingDrug = unique[existingNameIndex];
-    const existingSource = drugSources.get(existingDrug.id) || 'unknown';
-    const currentSource = drugSources.get(drug.id) || 'unknown';
-    
-    // Create log entry for name duplicate
-    const logEntry = {
-      id: `${drug.name} (ID: ${drug.id} vs ${existingDrug.id})`,
-      kept: currentSource, // additionalDrugsData takes precedence (last in array)
-      replaced: [existingSource]
-    };
-    duplicateLog.push(logEntry);
-    
-    // Merge drugs, preserving laymanExplanations if it exists in either entry
-    const mergedDrug = {
-      ...drug, // Start with current drug (additionalDrugsData takes precedence)
-      laymanExplanations: drug.laymanExplanations || existingDrug.laymanExplanations // Preserve laymanExplanations from either source
-    };
-    
-    // Replace with merged drug
-    unique[existingNameIndex] = mergedDrug;
-    return unique;
-  }
-  
-  unique.push(drug);
-  return unique;
-}, []);
+  }, []);
 
 // Log deduplication results in development
 if (process.env.NODE_ENV === 'development' && duplicatesFound > 0) {
@@ -199,7 +211,7 @@ if (process.env.NODE_ENV === 'development' && duplicatesFound > 0) {
 }
 
 // Export validation functions for external use
-export { 
+export {
   getDetailedDrugData,
   validateDrugDataset,
   detectAllDuplicates,
@@ -225,7 +237,7 @@ export const detectCombinedDrugDuplicates = (): DuplicateDetectionResult => {
 export const getValidationReport = (): {
   totalDrugs: number;
   duplicatesResolved: number;
-  duplicateLog: Array<{id: string, kept: string, replaced: string[]}>;
+  duplicateLog: Array<{ id: string, kept: string, replaced: string[] }>;
   validation: ValidationResult;
   duplicateDetection: DuplicateDetectionResult;
 } => {
@@ -274,57 +286,57 @@ export const searchDrugs = (query: string): DrugData[] => {
   if (!query || query.trim().length < 2) {
     return [];
   }
-  
+
   const searchTerm = query.toLowerCase().trim();
-  
+
   return combinedDrugsData.filter(drug => {
     // Direct name match
     if (drug.name.toLowerCase().includes(searchTerm)) return true;
-    
+
     // Generic name match
     if (drug.genericName && drug.genericName.toLowerCase().includes(searchTerm)) return true;
-    
+
     // Brand name match
     if (drug.brandNames && drug.brandNames.some(brand => brand.toLowerCase().includes(searchTerm))) return true;
-    
+
     // Manufacturer match
     if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(searchTerm)) return true;
-    
+
     // Category match
     if (drug.category && drug.category.toLowerCase().includes(searchTerm)) return true;
-    
+
     // Drug class match
     if (drug.drugClass && drug.drugClass.toLowerCase().includes(searchTerm)) return true;
-    
+
     // Advanced Levenshtein distance for fuzzy matching with improved threshold
     const nameLower = drug.name.toLowerCase();
     // Adjust threshold based on search term length for more accurate fuzzy matching
     const threshold = Math.min(2, Math.max(1, Math.floor(searchTerm.length / 4)));
-    
+
     // Calculate Levenshtein distance
     const matrix = [];
-    
+
     // Initialize matrix
     for (let i = 0; i <= nameLower.length; i++) {
       matrix[i] = [i];
     }
-    
+
     for (let j = 0; j <= searchTerm.length; j++) {
       matrix[0][j] = j;
     }
-    
+
     // Fill matrix
     for (let i = 1; i <= nameLower.length; i++) {
       for (let j = 1; j <= searchTerm.length; j++) {
         const cost = nameLower.charAt(i - 1) === searchTerm.charAt(j - 1) ? 0 : 1;
         matrix[i][j] = Math.min(
-          matrix[i-1][j] + 1,      // deletion
-          matrix[i][j-1] + 1,      // insertion
-          matrix[i-1][j-1] + cost  // substitution
+          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1,      // insertion
+          matrix[i - 1][j - 1] + cost  // substitution
         );
       }
     }
-    
+
     return matrix[nameLower.length][searchTerm.length] <= threshold;
   }); // Removed slice limit - pagination will handle performance
 };

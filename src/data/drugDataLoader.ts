@@ -79,6 +79,13 @@ const drugDataLoaders = {
   additionalMiscellaneous: () => import("./additionalMiscellaneousDrugs").then(m => m.additionalMiscellaneousDrugs),
   finalExpansion: () => import("./finalExpansionDrugs").then(m => m.finalExpansionDrugs),
   miscellaneousExpansion: () => import("./miscellaneousExpansionDrugs").then(m => m.miscellaneousExpansionDrugs),
+  // New specialized categories
+  addictionTreatment: () => import("./addictionTreatmentDrugs").then(m => m.addictionTreatmentDrugs),
+  enzymeDigestive: () => import("./enzymeDigestiveDrugs").then(m => m.enzymeDigestiveDrugs),
+  contrastAgents: () => import("./contrastAgentsDrugs").then(m => m.contrastAgentsDrugs),
+  fertility: () => import("./fertilityDrugs").then(m => m.fertilityDrugs),
+  painInflammationCombination: () => import("./painInflammationCombinationDrugs").then(m => m.painInflammationCombinationDrugs),
+  dermatology: () => import("./dermatologyDrugs").then(m => m.dermatologyDrugs),
 };
 
 // Cache for loaded drug data
@@ -108,7 +115,7 @@ export const loadAllDrugs = async (): Promise<DrugData[]> => {
   );
 
   const allDrugs = allDrugsArrays.flat();
-  
+
   // Remove duplicates by ID
   const uniqueDrugs = allDrugs.reduce((unique: DrugData[], drug: DrugData) => {
     if (!unique.find(existingDrug => existingDrug.id === drug.id)) {
