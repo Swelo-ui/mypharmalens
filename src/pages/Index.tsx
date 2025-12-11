@@ -42,29 +42,35 @@ const Index = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "PharmaLens",
-    "description": "AI-powered medication identification and comprehensive drug information platform",
+    "@type": "SoftwareApplication",
+    "name": "PharmaLens - AI Medication Identification App",
+    "alternateName": ["PharmaLens", "PharmaLens AI", "PharmaLens Tech"],
+    "description": "PharmaLens is an AI-powered medication identification application. Take a photo of any pill or medication and instantly identify it using artificial intelligence. Access comprehensive drug information including side effects, dosages, interactions, and safety warnings.",
+    "disambiguatingDescription": "PharmaLens is a healthcare AI application for identifying medications and pills at pharmalens.tech. NOT related to contact lenses or optical products. Uses artificial intelligence to recognize medications from photos.",
     "url": "https://pharmalens.tech",
     "applicationCategory": "HealthApplication",
-    "operatingSystem": "Web",
+    "applicationSubCategory": "Medical",
+    "operatingSystem": "Web Browser",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "INR"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
-      "ratingCount": "150"
+      "ratingCount": "150",
+      "bestRating": "5"
     },
     "featureList": [
-      "AI-powered medication identification",
-      "Comprehensive drug database",
-      "Side effects and interactions information",
-      "Dosage guidelines",
+      "AI-powered medication identification from photos",
+      "Comprehensive drug database with 1000+ medications",
+      "Drug interaction checker",
+      "Symptom-based medicine recommendations",
+      "Side effects and dosage information",
       "Visual pill identification"
-    ]
+    ],
+    "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner"
   };
 
   return (

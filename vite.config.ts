@@ -10,6 +10,15 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      // Proxy MedlinePlus API requests to bypass CORS in development
+      '/medlineplus-api': {
+        target: 'https://wsearch.nlm.nih.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/medlineplus-api/, '/ws/query'),
+        secure: true,
+      }
+    }
   },
   plugins: [
     react(),

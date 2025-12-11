@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
-import { 
-  Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown, 
+import {
+  Pill, Shield, AlertCircle, History, ThumbsUp, ThumbsDown,
   Calendar, FileText, Clock, Search,
   AlertTriangle, Package, Tag, BookOpen, GraduationCap,
   Info,
@@ -61,10 +60,12 @@ interface DrugDetailsProps {
   className?: string;
 }
 
+import { HealthTopicsSection } from '@/components/health-topics/HealthTopicsSection';
+
 const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives' | 'resources'>('general');
   const [showLaymanTerms, setShowLaymanTerms] = useState(false);
-  
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'general':
@@ -73,128 +74,128 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Description</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                {showLaymanTerms && drug.laymanExplanations?.description 
-                  ? drug.laymanExplanations.description 
+                {showLaymanTerms && drug.laymanExplanations?.description
+                  ? drug.laymanExplanations.description
                   : drug.description}
               </p>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Dosage & Administration</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin 
-                  ? drug.laymanExplanations.dosageAndAdmin 
+                {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin
+                  ? drug.laymanExplanations.dosageAndAdmin
                   : drug.dosageAndAdmin}
               </p>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Mechanism of Action</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                {showLaymanTerms && drug.laymanExplanations?.mechanism 
-                  ? drug.laymanExplanations.mechanism 
+                {showLaymanTerms && drug.laymanExplanations?.mechanism
+                  ? drug.laymanExplanations.mechanism
                   : drug.mechanism}
               </p>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Side Effects</h3>
               <ul className="space-y-2">
-                {((showLaymanTerms && drug.laymanExplanations?.sideEffects 
-                  ? drug.laymanExplanations.sideEffects 
+                {((showLaymanTerms && drug.laymanExplanations?.sideEffects
+                  ? drug.laymanExplanations.sideEffects
                   : drug.sideEffects) ?? []).map((effect, i) => (
-                  <li key={i} className="flex items-start">
-                    <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
-                  </li>
-                ))}
+                    <li key={i} className="flex items-start">
+                      <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Warnings & Precautions</h3>
               <ul className="space-y-2">
-                {((showLaymanTerms && drug.laymanExplanations?.warnings 
-                  ? drug.laymanExplanations.warnings 
+                {((showLaymanTerms && drug.laymanExplanations?.warnings
+                  ? drug.laymanExplanations.warnings
                   : drug.warnings) ?? []).map((warning, i) => (
-                  <li key={i} className="flex items-start">
-                    <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
-                  </li>
-                ))}
+                    <li key={i} className="flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Drug Interactions</h3>
               <ul className="space-y-2">
-                {((showLaymanTerms && drug.laymanExplanations?.interactions 
-                  ? drug.laymanExplanations.interactions 
+                {((showLaymanTerms && drug.laymanExplanations?.interactions
+                  ? drug.laymanExplanations.interactions
                   : drug.interactions) ?? []).map((interaction, i) => (
-                  <li key={i} className="flex items-start">
-                    <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
-                  </li>
-                ))}
+                    <li key={i} className="flex items-start">
+                      <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
           </div>
         );
-        
+
       case 'usage':
         return (
           <div className="space-y-6">
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Indications</h3>
               <ul className="space-y-2">
-                {((showLaymanTerms && drug.laymanExplanations?.indications 
-                  ? drug.laymanExplanations.indications 
+                {((showLaymanTerms && drug.laymanExplanations?.indications
+                  ? drug.laymanExplanations.indications
                   : drug.indications) ?? []).map((indication, i) => (
-                  <li key={i} className="flex items-start">
-                    <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
-                  </li>
-                ))}
+                    <li key={i} className="flex items-start">
+                      <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Contraindications</h3>
               <ul className="space-y-2">
-                {((showLaymanTerms && drug.laymanExplanations?.contraindications 
-                  ? drug.laymanExplanations.contraindications 
+                {((showLaymanTerms && drug.laymanExplanations?.contraindications
+                  ? drug.laymanExplanations.contraindications
                   : drug.contraindications) ?? []).map((contraindication, i) => (
-                  <li key={i} className="flex items-start">
-                    <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
-                  </li>
-                ))}
+                    <li key={i} className="flex items-start">
+                      <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Pregnancy & Lactation</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm">
-                {showLaymanTerms && drug.laymanExplanations?.pregnancy 
-                  ? drug.laymanExplanations.pregnancy 
+                {showLaymanTerms && drug.laymanExplanations?.pregnancy
+                  ? drug.laymanExplanations.pregnancy
                   : drug.pregnancy}
               </p>
             </div>
-            
+
             <div className="glass-card p-4">
               <h3 className="text-sm font-medium mb-3">Storage Information</h3>
               <div className="flex items-start">
                 <History className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 text-sm">
-                  {showLaymanTerms && drug.laymanExplanations?.storage 
-                    ? drug.laymanExplanations.storage 
+                  {showLaymanTerms && drug.laymanExplanations?.storage
+                    ? drug.laymanExplanations.storage
                     : drug.storage}
                 </span>
               </div>
             </div>
           </div>
         );
-        
+
       case 'alternatives':
         return (
           <div className="space-y-4">
@@ -211,11 +212,11 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                 </div>
               </div>
             )}
-            
+
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Similar medications or alternatives to {drug.name}.
             </p>
-            
+
             {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(drug.similarDrugs ?? []).map((similar) => (
@@ -226,8 +227,8 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">{similar.name}</h4>
-                        <a 
-                          href={`/drug/${similar.id}`} 
+                        <a
+                          href={`/drug/${similar.id}`}
                           className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
                         >
                           View details
@@ -245,7 +246,17 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             )}
           </div>
         );
-        
+
+      case 'resources':
+        return (
+          <HealthTopicsSection
+            drugName={drug.name}
+            genericName={drug.genericName}
+            category={drug.category}
+            indications={drug.indications}
+          />
+        );
+
       default:
         return null;
     }
@@ -262,48 +273,48 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                 <span className="text-xs font-medium text-green-600">Verified</span>
               </div>
             )}
-            
+
             <div className="flex items-center bg-pharma-50 dark:bg-pharma-900/20 px-2 py-0.5 rounded-full">
               <Clock className="h-3 w-3 text-pharma-600 mr-1" />
               <span className={cn(
                 "text-xs font-medium",
-                drug.prescriptionStatus === 'Non-pharmaceutical product' 
-                  ? "text-orange-600" 
+                drug.prescriptionStatus === 'Non-pharmaceutical product'
+                  ? "text-orange-600"
                   : "text-pharma-600"
               )}>
                 {drug.prescriptionStatus}
               </span>
             </div>
           </div>
-          
+
           <h2 className="text-2xl font-bold mb-1 break-words overflow-wrap-anywhere leading-tight">{drug.name}</h2>
-          
+
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
             <span className="font-medium">Generic Name:</span> {drug.genericName}
           </p>
-          
+
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
               {drug.category}
             </span>
-            
+
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pharma-50 dark:bg-pharma-900/20 text-pharma-700 dark:text-pharma-300">
               {drug.manufacturer}
             </span>
           </div>
         </div>
-        
+
         {drug.image && (
           <div className="md:w-1/3 h-48 md:h-56 rounded-xl overflow-hidden shadow-lg">
-            <img 
-              src={drug.image} 
-              alt={drug.name} 
+            <img
+              src={drug.image}
+              alt={drug.name}
               className="w-full h-full object-cover"
             />
           </div>
         )}
       </div>
-      
+
       {/* Package image section */}
       {drug.packageImage && (
         <div className="mb-6">
@@ -312,15 +323,15 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             <h3 className="text-sm font-medium">Package Appearance</h3>
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg">
-            <img 
-              src={drug.packageImage} 
-              alt={`${drug.name} package`} 
+            <img
+              src={drug.packageImage}
+              alt={`${drug.name} package`}
               className="w-full object-cover"
             />
           </div>
         </div>
       )}
-      
+
       {/* Language Toggle and Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
@@ -354,12 +365,12 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             </div>
           )}
         </div>
-        
-        <div className="flex space-x-8">
+
+        <div className="flex space-x-8 overflow-x-auto pb-1">
           <button
             onClick={() => setActiveTab('general')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
               activeTab === 'general'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -367,11 +378,11 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           >
             General Information
           </button>
-          
+
           <button
             onClick={() => setActiveTab('usage')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
               activeTab === 'usage'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -379,11 +390,11 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           >
             Usage & Precautions
           </button>
-          
+
           <button
             onClick={() => setActiveTab('alternatives')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
               activeTab === 'alternatives'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -391,9 +402,22 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           >
             Alternatives & Brands
           </button>
+
+          <button
+            onClick={() => setActiveTab('resources')}
+            className={cn(
+              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap flex items-center gap-1",
+              activeTab === 'resources'
+                ? "border-pharma-600 text-pharma-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            )}
+          >
+            <BookOpen className="h-3 w-3" />
+            Health Resources
+          </button>
         </div>
       </div>
-      
+
       {/* Tab Content */}
       <div className="animate-fade-in">
         {renderTabContent()}

@@ -82,8 +82,7 @@
   <!-- Preload Critical Resources -->
 
 
-  <!-- Structured Data for Rich Snippets -->
-  <!-- Structured Data for Rich Snippets -->
+  <!-- Structured Data for Rich Snippets - Enhanced for Google AI Overview -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -92,6 +91,7 @@
           "@type": "Organization",
           "@id": "https://pharmalens.tech/#organization",
           "name": "PharmaLens",
+          "alternateName": ["PharmaLens Tech", "PharmaLens AI", "PharmaLens App"],
           "url": "https://pharmalens.tech",
           "logo": {
             "@type": "ImageObject",
@@ -99,47 +99,100 @@
             "width": 512,
             "height": 512
           },
-          "sameAs": [
-            "https://twitter.com/pharmalens",
-            "https://www.linkedin.com/company/pharmalens"
+          "description": "PharmaLens is an AI-powered healthcare technology company specializing in medication identification, drug information, and pharmaceutical safety. We use artificial intelligence to help users identify pills, check drug interactions, and access comprehensive medicine databases.",
+          "disambiguatingDescription": "PharmaLens is a healthcare technology company and AI medication identification platform at pharmalens.tech. NOT related to contact lenses, optical products, or eyewear. PharmaLens provides AI-powered pill identification, drug interaction checking, and pharmaceutical information services.",
+          "foundingDate": "2024",
+          "knowsAbout": [
+            "Medication Identification",
+            "Drug Information",
+            "Pharmaceutical Database",
+            "AI Healthcare Technology",
+            "Drug Interactions",
+            "Pill Identification",
+            "Medicine Safety"
           ],
-          "description": "PharmaLens is an AI-powered healthcare technology platform specializing in medication identification and drug safety information."
+          "slogan": "Your Personal AI Pharmacist",
+          "areaServed": "Worldwide",
+          "serviceType": ["AI Medication Identification", "Drug Information Service", "Drug Interaction Checker", "Symptom Checker"]
         },
         {
-          "@type": "WebApplication",
-          "@id": "https://pharmalens.tech/#webapp",
-          "name": "PharmaLens AI Pill Identifier",
+          "@type": "SoftwareApplication",
+          "@id": "https://pharmalens.tech/#app",
+          "name": "PharmaLens - AI Medication Identification App",
+          "alternateName": "PharmaLens AI Pill Identifier",
           "url": "https://pharmalens.tech",
           "applicationCategory": "HealthApplication",
-          "operatingSystem": "Any",
-          "description": "Identify pills and medications instantly using advanced AI. Check drug interactions, side effects, and safety information.",
+          "applicationSubCategory": "Medical",
+          "operatingSystem": "Web Browser, Android, iOS",
+          "description": "PharmaLens is an AI-powered medication identification application. Take a photo of any pill or medication and instantly identify it using advanced artificial intelligence. Access comprehensive drug information including side effects, dosages, interactions, and safety warnings.",
+          "disambiguatingDescription": "PharmaLens is a healthcare AI application for identifying medications and pills. This is NOT a contact lens product or optical brand. PharmaLens uses artificial intelligence to recognize medications from photos and provide drug information.",
           "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD"
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock"
           },
-          "publisher": {
+          "provider": {
             "@id": "https://pharmalens.tech/#organization"
           },
           "featureList": [
-            "Visual Pill Identification",
+            "AI-Powered Pill Identification from Photos",
+            "Comprehensive Drug Database with 1000+ Medications",
             "Drug Interaction Checker",
-            "Symptom Checker",
-            "Medication Reminders",
-            "Detailed Drug Information"
+            "Symptom-Based Medicine Recommendations",
+            "Detailed Side Effects Information",
+            "Dosage Guidelines",
+            "Generic and Brand Name Cross-Reference",
+            "Medication Safety Warnings"
           ],
-          "screenshot": "https://pharmalens.tech/og-image.png"
+          "screenshot": "https://pharmalens.tech/og-image.png",
+          "softwareVersion": "2.0",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "150",
+            "bestRating": "5"
+          },
+          "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner, medicine lookup, drug interactions checker"
         },
         {
-          "@type": "Brand",
-          "@id": "https://pharmalens.tech/#brand",
+          "@type": "WebSite",
+          "@id": "https://pharmalens.tech/#website",
           "name": "PharmaLens",
-          "slogan": "Your Personal AI Pharmacist",
-          "description": "PharmaLens is a digital health brand focused on medication safety and AI-driven pharmaceutical intelligence, distinct from contact lens manufacturers."
+          "url": "https://pharmalens.tech",
+          "description": "PharmaLens - AI-Powered Medication Identification and Drug Information Platform",
+          "publisher": {
+            "@id": "https://pharmalens.tech/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://pharmalens.tech/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "MedicalWebPage",
+          "@id": "https://pharmalens.tech/#medicalpage",
+          "name": "PharmaLens - AI Medication Identification",
+          "url": "https://pharmalens.tech",
+          "about": {
+            "@type": "MedicalEntity",
+            "name": "Medication Identification and Drug Information"
+          },
+          "audience": {
+            "@type": "MedicalAudience",
+            "audienceType": "Patient"
+          },
+          "medicalAudience": "Patients, Healthcare Consumers, Caregivers",
+          "specialty": "Pharmacy",
+          "isAccessibleForFree": true,
+          "publisher": {
+            "@id": "https://pharmalens.tech/#organization"
+          }
         }
       ]
     }
-    </script>
+  </script>
 </head>
 
 <body>
