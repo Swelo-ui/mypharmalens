@@ -1,22 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://pharmalens.tech/</loc>
     <lastmod>2025-12-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-ai-pharmacist-homepage-hero.jpg</image:loc>
+      <image:title>PharmaLens AI Pharmacist Homepage</image:title>
+      <image:caption>PharmaLens - Your Personal AI Pharmacist for medication identification and drug information</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-logo-ai-medication-app.jpg</image:loc>
+      <image:title>PharmaLens Logo</image:title>
+      <image:caption>PharmaLens official logo - AI-powered medication identification platform</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-app-icon.jpg</image:loc>
+      <image:title>PharmaLens App Icon</image:title>
+      <image:caption>PharmaLens mobile app icon for AI medication identification</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-dark-light-mode-theme-comparison.jpg</image:loc>
+      <image:title>PharmaLens Dark and Light Mode Theme</image:title>
+      <image:caption>PharmaLens app supports both dark mode and light mode themes for comfortable viewing</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://pharmalens.tech/identify</loc>
     <lastmod>2025-12-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-ai-pill-identification-result.jpg</image:loc>
+      <image:title>PharmaLens AI Pill Identification Result</image:title>
+      <image:caption>AI-powered pill identification result showing matched medication details in PharmaLens</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-drug-information-details-screen.jpg</image:loc>
+      <image:title>PharmaLens Drug Information Details</image:title>
+      <image:caption>Comprehensive drug information and medication details screen in PharmaLens app</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://pharmalens.tech/drug-interactions</loc>
     <lastmod>2025-12-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://pharmalens.tech/images/pharmalens-drug-interaction-checker-screen.jpg</image:loc>
+      <image:title>PharmaLens Drug Interaction Checker</image:title>
+      <image:caption>Check drug interactions and medication safety with PharmaLens drug interaction checker</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://pharmalens.tech/symptom-checker</loc>
