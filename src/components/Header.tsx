@@ -29,7 +29,7 @@ const Header = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
-  
+
   // Handle scroll lock when mobile menu is open
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +37,7 @@ const Header = () => {
     } else {
       document.body.classList.remove('overflow-hidden');
     }
-    
+
     return () => {
       document.body.classList.remove('overflow-hidden');
     };
@@ -101,7 +101,7 @@ const Header = () => {
               >
                 {(resolvedTheme || theme) === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </button>
-              
+
               {/* Profile Icon */}
               {!isLoading && isAuthenticated && (
                 <DropdownMenu>
@@ -115,7 +115,7 @@ const Header = () => {
                       {user?.email}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem asChild>
                       <Link to="/profile" className="flex items-center w-full cursor-pointer">
                         <UserCircle className="mr-2 h-4 w-4" />
@@ -146,9 +146,9 @@ const Header = () => {
                         <span>Manage Subscription</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem onClick={handleDonation} className="flex items-center cursor-pointer">
                       <Coffee className="mr-2 h-4 w-4 text-amber-600" />
                       <span>Buy Me a Coffee</span>
@@ -171,9 +171,9 @@ const Header = () => {
                         <span>FAQ</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem asChild>
                       <Link to="/privacy" className="flex items-center w-full cursor-pointer">
                         <Shield className="mr-2 h-4 w-4" />
@@ -192,9 +192,9 @@ const Header = () => {
                         <span>Disclaimer</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
@@ -228,26 +228,35 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                    location.pathname === link.path
+                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === link.path
                       ? 'text-pharma-600 dark:text-pharma-400'
                       : 'text-gray-600 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </Link>
               ))}
               {isAuthenticated && (
-                <Link
-                  to="/symptom-checker"
-                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${
-                    location.pathname === '/symptom-checker'
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                  }`}
-                >
-                  Symptoms
-                </Link>
+                <>
+                  <Link
+                    to="/symptom-checker"
+                    className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/symptom-checker'
+                        ? 'text-pharma-600 dark:text-pharma-400'
+                        : 'text-gray-600 dark:text-gray-300'
+                      }`}
+                  >
+                    Symptoms
+                  </Link>
+                  <Link
+                    to="/drug-interactions"
+                    className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/drug-interactions'
+                        ? 'text-pharma-600 dark:text-pharma-400'
+                        : 'text-gray-600 dark:text-gray-300'
+                      }`}
+                  >
+                    Interactions
+                  </Link>
+                </>
               )}
             </nav>
 
@@ -279,7 +288,7 @@ const Header = () => {
                           {user?.email}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        
+
                         {/* Account Section */}
                         <DropdownMenuItem asChild>
                           <Link to="/profile" className="flex items-center w-full cursor-pointer">
@@ -311,9 +320,9 @@ const Header = () => {
                             <span>Manage Subscription</span>
                           </Link>
                         </DropdownMenuItem>
-                        
+
                         <DropdownMenuSeparator />
-                        
+
                         {/* Support Section */}
                         <DropdownMenuItem onClick={handleDonation} className="flex items-center cursor-pointer">
                           <Coffee className="mr-2 h-4 w-4 text-amber-600" />
@@ -337,9 +346,9 @@ const Header = () => {
                             <span>FAQ</span>
                           </Link>
                         </DropdownMenuItem>
-                        
+
                         <DropdownMenuSeparator />
-                        
+
                         {/* Legal Section */}
                         <DropdownMenuItem asChild>
                           <Link to="/privacy" className="flex items-center w-full cursor-pointer">
@@ -359,9 +368,9 @@ const Header = () => {
                             <span>Disclaimer</span>
                           </Link>
                         </DropdownMenuItem>
-                        
+
                         <DropdownMenuSeparator />
-                        
+
                         {/* Sign Out */}
                         <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500">
                           <LogOut className="mr-2 h-4 w-4" />
@@ -390,43 +399,51 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-lg font-medium transition-colors ${
-                    location.pathname === link.path
+                  className={`text-lg font-medium transition-colors ${location.pathname === link.path
                       ? 'text-pharma-600 dark:text-pharma-400'
                       : 'text-gray-800 dark:text-gray-200'
-                  }`}
+                    }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
                 </Link>
               ))}
-              
+
               {isAuthenticated && (
                 <>
                   <Link
                     to="/symptom-checker"
-                    className={`text-lg font-medium transition-colors ${
-                      location.pathname === '/symptom-checker'
+                    className={`text-lg font-medium transition-colors ${location.pathname === '/symptom-checker'
                         ? 'text-pharma-600 dark:text-pharma-400'
                         : 'text-gray-800 dark:text-gray-200'
-                    }`}
+                      }`}
                     onClick={() => setIsOpen(false)}
                   >
                     Symptom Checker
                   </Link>
-                  
+
                   <Link
-                    to="/profile"
-                    className={`text-lg font-medium transition-colors ${
-                      location.pathname === '/profile'
+                    to="/drug-interactions"
+                    className={`text-lg font-medium transition-colors ${location.pathname === '/drug-interactions'
                         ? 'text-pharma-600 dark:text-pharma-400'
                         : 'text-gray-800 dark:text-gray-200'
-                    }`}
+                      }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Interactions
+                  </Link>
+
+                  <Link
+                    to="/profile"
+                    className={`text-lg font-medium transition-colors ${location.pathname === '/profile'
+                        ? 'text-pharma-600 dark:text-pharma-400'
+                        : 'text-gray-800 dark:text-gray-200'
+                      }`}
                     onClick={() => setIsOpen(false)}
                   >
                     Profile
                   </Link>
-                  
+
                   <button
                     onClick={() => {
                       handleDonation();
@@ -437,7 +454,7 @@ const Header = () => {
                     <Coffee className="mr-2 h-5 w-5" />
                     Buy Me a Coffee
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       handleSignOut();
@@ -450,7 +467,7 @@ const Header = () => {
                   </button>
                 </>
               )}
-              
+
               {!isAuthenticated && !isLoading && (
                 <Link
                   to="/auth"
@@ -461,7 +478,7 @@ const Header = () => {
                   Sign In
                 </Link>
               )}
-              
+
               <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6">
                 <div className="flex flex-col space-y-4">
                   <p className="text-sm text-gray-500 dark:text-gray-400">

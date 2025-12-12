@@ -114,15 +114,49 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   // Specific high-risk combinations by class/name
   type Combo = { classes: string[]; severity: 'moderate' | 'severe' | 'contraindicated'; note: string };
   const combos: Combo[] = [
-    { classes: ['anticoagulant', 'nsaid'], severity: 'severe', note: 'Bleeding risk increases.' },
-    { classes: ['anticoagulant', 'antiplatelet'], severity: 'severe', note: 'Additive bleeding risk.' },
-    { classes: ['benzodiazepine', 'opioid'], severity: 'severe', note: 'Respiratory depression risk.' },
-    { classes: ['ssri', 'maoi'], severity: 'contraindicated', note: 'Serotonin syndrome risk.' },
-    { classes: ['pde5 inhibitor', 'nitrate'], severity: 'contraindicated', note: 'Severe hypotension risk.' },
-    { classes: ['statin', 'macrolide'], severity: 'severe', note: 'Rhabdomyolysis risk increases.' },
-    { classes: ['warfarin', 'antibiotic'], severity: 'severe', note: 'INR changes/bleeding risk.' },
-    { classes: ['ace inhibitor', 'potassium-sparing diuretic'], severity: 'severe', note: 'Hyperkalemia risk.' },
-    
+    // Cardiovascular combinations
+    { classes: ['anticoagulant', 'nsaid'], severity: 'severe', note: 'Bleeding risk increases significantly.' },
+    { classes: ['anticoagulant', 'antiplatelet'], severity: 'severe', note: 'Additive bleeding risk - use with caution.' },
+    { classes: ['beta-blocker', 'calcium channel blocker'], severity: 'moderate', note: 'Bradycardia and hypotension risk.' },
+    { classes: ['beta-blocker', 'verapamil'], severity: 'severe', note: 'Severe bradycardia and heart block risk.' },
+    { classes: ['beta-blocker', 'diltiazem'], severity: 'severe', note: 'Severe bradycardia and AV block risk.' },
+    { classes: ['digoxin', 'amiodarone'], severity: 'severe', note: 'Digoxin toxicity - reduce digoxin dose by 50%.' },
+    { classes: ['digoxin', 'verapamil'], severity: 'moderate', note: 'Increased digoxin levels.' },
+    { classes: ['ace inhibitor', 'potassium-sparing diuretic'], severity: 'severe', note: 'Hyperkalemia risk - monitor potassium.' },
+    { classes: ['ace inhibitor', 'arb'], severity: 'moderate', note: 'Dual RAAS blockade - renal impairment risk.' },
+    { classes: ['pde5 inhibitor', 'nitrate'], severity: 'contraindicated', note: 'Severe life-threatening hypotension.' },
+    { classes: ['statin', 'macrolide'], severity: 'severe', note: 'Rhabdomyolysis risk - consider statin holiday.' },
+    { classes: ['statin', 'fibrate'], severity: 'severe', note: 'Myopathy and rhabdomyolysis risk.' },
+    { classes: ['warfarin', 'antibiotic'], severity: 'severe', note: 'INR changes - monitor closely.' },
+
+    // CNS/Psychiatric combinations
+    { classes: ['benzodiazepine', 'opioid'], severity: 'severe', note: 'Respiratory depression risk - avoid combination.' },
+    { classes: ['ssri', 'maoi'], severity: 'contraindicated', note: 'Serotonin syndrome - life threatening.' },
+    { classes: ['ssri', 'tramadol'], severity: 'severe', note: 'Serotonin syndrome and seizure risk.' },
+    { classes: ['ssri', 'triptans'], severity: 'moderate', note: 'Serotonin syndrome risk.' },
+    { classes: ['ssri', 'nsaid'], severity: 'moderate', note: 'Increased bleeding risk especially GI.' },
+    { classes: ['lithium', 'nsaid'], severity: 'severe', note: 'Lithium toxicity - reduced excretion.' },
+    { classes: ['lithium', 'ace inhibitor'], severity: 'severe', note: 'Lithium toxicity risk.' },
+    { classes: ['lithium', 'diuretic'], severity: 'moderate', note: 'Lithium toxicity from dehydration.' },
+    { classes: ['maoi', 'tyramine'], severity: 'severe', note: 'Hypertensive crisis risk.' },
+    { classes: ['antipsychotic', 'anticholinergic'], severity: 'moderate', note: 'Additive anticholinergic effects.' },
+
+    // Diabetes-related interactions
+    { classes: ['sulfonylurea', 'alcohol'], severity: 'moderate', note: 'Hypoglycemia and disulfiram-like reaction.' },
+    { classes: ['sulfonylurea', 'beta-blocker'], severity: 'moderate', note: 'Masked hypoglycemia symptoms.' },
+    { classes: ['metformin', 'contrast agent'], severity: 'severe', note: 'Lactic acidosis risk - hold metformin.' },
+    { classes: ['metformin', 'alcohol'], severity: 'moderate', note: 'Lactic acidosis risk increases.' },
+    { classes: ['insulin', 'beta-blocker'], severity: 'moderate', note: 'Masked hypoglycemia symptoms.' },
+    { classes: ['insulin', 'alcohol'], severity: 'moderate', note: 'Prolonged hypoglycemia risk.' },
+
+    // Pain/Anti-inflammatory
+    { classes: ['nsaid', 'corticosteroid'], severity: 'moderate', note: 'GI bleeding and ulcer risk.' },
+    { classes: ['nsaid', 'antiplatelet'], severity: 'moderate', note: 'Increased bleeding risk.' },
+    { classes: ['nsaid', 'ace inhibitor'], severity: 'moderate', note: 'Reduced antihypertensive effect and nephrotoxicity.' },
+    { classes: ['nsaid', 'diuretic'], severity: 'moderate', note: 'Reduced diuretic effect and nephrotoxicity.' },
+    { classes: ['tramadol', 'carbamazepine'], severity: 'moderate', note: 'Reduced tramadol effect.' },
+    { classes: ['opioid', 'sedative'], severity: 'severe', note: 'CNS and respiratory depression.' },
+
     // Antibiotic-specific interactions
     { classes: ['fluoroquinolone', 'nsaid'], severity: 'severe', note: 'CNS stimulation and seizure risk.' },
     { classes: ['fluoroquinolone', 'corticosteroid'], severity: 'severe', note: 'Tendon rupture risk increases.' },
@@ -131,6 +165,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
     { classes: ['tetracycline', 'antacid'], severity: 'moderate', note: 'Chelation reduces antibiotic absorption.' },
     { classes: ['tetracycline', 'iron'], severity: 'moderate', note: 'Chelation reduces absorption.' },
     { classes: ['tetracycline', 'calcium'], severity: 'moderate', note: 'Chelation reduces absorption.' },
+    { classes: ['tetracycline', 'dairy'], severity: 'moderate', note: 'Dairy products reduce absorption.' },
     { classes: ['macrolide', 'digoxin'], severity: 'severe', note: 'Digoxin toxicity risk.' },
     { classes: ['macrolide', 'colchicine'], severity: 'contraindicated', note: 'Fatal colchicine toxicity.' },
     { classes: ['macrolide', 'ergot'], severity: 'contraindicated', note: 'Ergot toxicity risk.' },
@@ -156,6 +191,13 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
     { classes: ['isoniazid', 'phenytoin'], severity: 'moderate', note: 'Phenytoin toxicity risk.' },
     { classes: ['trimethoprim', 'ace inhibitor'], severity: 'moderate', note: 'Hyperkalemia risk.' },
     { classes: ['trimethoprim', 'potassium-sparing diuretic'], severity: 'moderate', note: 'Hyperkalemia risk.' },
+
+    // Food interactions
+    { classes: ['statin', 'grapefruit'], severity: 'moderate', note: 'Increased statin levels - myopathy risk.' },
+    { classes: ['calcium channel blocker', 'grapefruit'], severity: 'moderate', note: 'Increased drug levels.' },
+    { classes: ['warfarin', 'vitamin k'], severity: 'moderate', note: 'Reduced anticoagulation effect.' },
+    { classes: ['thyroid', 'calcium'], severity: 'moderate', note: 'Reduced thyroid absorption.' },
+    { classes: ['thyroid', 'iron'], severity: 'moderate', note: 'Reduced thyroid absorption.' },
   ];
 
   const hasCombo = combos.find(c =>
@@ -230,78 +272,78 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
 
   // Mechanism patterns with layman explanations
   const mechMap: { test: (t: string) => boolean; mech: string; layman: string }[] = [
-    { 
-      test: t => /(bleed|hemorrhage|inr|antiplatelet|anticoagulant)/.test(t) || (drug1Class+drug2Class).includes('anticoagulant') || (drug1Class+drug2Class).includes('antiplatelet'), 
+    {
+      test: t => /(bleed|hemorrhage|inr|antiplatelet|anticoagulant)/.test(t) || (drug1Class + drug2Class).includes('anticoagulant') || (drug1Class + drug2Class).includes('antiplatelet'),
       mech: 'Additive antiplatelet/anticoagulant effect increases bleeding risk',
       layman: 'Both medicines thin your blood, which increases bleeding risk'
     },
-    { 
-      test: t => /(serotonin|5-ht)/.test(t) || (drug1Class+drug2Class).includes('ssri') && (drug1Class+drug2Class).includes('maoi') || (drug1Class+drug2Class).includes('linezolid') && (drug1Class+drug2Class).includes('ssri'), 
+    {
+      test: t => /(serotonin|5-ht)/.test(t) || (drug1Class + drug2Class).includes('ssri') && (drug1Class + drug2Class).includes('maoi') || (drug1Class + drug2Class).includes('linezolid') && (drug1Class + drug2Class).includes('ssri'),
       mech: 'Excess serotonergic activity (serotonin syndrome risk)',
       layman: 'Too much serotonin in your brain can cause dangerous symptoms'
     },
-    { 
-      test: t => /(cyp3a4|cyp2c9|inhibitor|inducer|macrolide|grapefruit)/.test(t) || (drug1Class+drug2Class).includes('macrolide') && (drug1Class+drug2Class).includes('statin'), 
+    {
+      test: t => /(cyp3a4|cyp2c9|inhibitor|inducer|macrolide|grapefruit)/.test(t) || (drug1Class + drug2Class).includes('macrolide') && (drug1Class + drug2Class).includes('statin'),
       mech: 'Metabolic interaction (CYP-mediated) increases serum drug levels',
       layman: 'One medicine affects how your liver processes the other, making it stronger'
     },
-    { 
-      test: t => /(qt prolong|torsade)/.test(t), 
+    {
+      test: t => /(qt prolong|torsade)/.test(t),
       mech: 'Additive QT prolongation increases arrhythmia risk',
       layman: 'Both medicines can affect your heart rhythm when used together'
     },
-    { 
-      test: t => /(respiratory|cns depression|sedation)/.test(t) || (drug1Class+drug2Class).includes('benzodiazepine') && (drug1Class+drug2Class).includes('opioid'), 
+    {
+      test: t => /(respiratory|cns depression|sedation)/.test(t) || (drug1Class + drug2Class).includes('benzodiazepine') && (drug1Class + drug2Class).includes('opioid'),
       mech: 'Additive CNS depression/respiratory depression',
       layman: 'Both medicines can make you very drowsy and slow your breathing'
     },
-    { 
-      test: t => /(hypotension|blood pressure|nitrate)/.test(t) || (drug1Class+drug2Class).includes('pde5 inhibitor') && (drug1Class+drug2Class).includes('nitrate'), 
+    {
+      test: t => /(hypotension|blood pressure|nitrate)/.test(t) || (drug1Class + drug2Class).includes('pde5 inhibitor') && (drug1Class + drug2Class).includes('nitrate'),
       mech: 'Excess vasodilation causing severe hypotension',
       layman: 'Both medicines lower blood pressure and together can cause dangerous drops'
     },
-    { 
-      test: t => /(potassium|hyperkalemia)/.test(t) || (drug1Class+drug2Class).includes('potassium-sparing') && (drug1Class+drug2Class).includes('ace') || (drug1Class+drug2Class).includes('trimethoprim'), 
+    {
+      test: t => /(potassium|hyperkalemia)/.test(t) || (drug1Class + drug2Class).includes('potassium-sparing') && (drug1Class + drug2Class).includes('ace') || (drug1Class + drug2Class).includes('trimethoprim'),
       mech: 'Hyperkalemia due to combined effects on potassium homeostasis',
       layman: 'Both medicines can increase potassium levels in your blood to dangerous levels'
     },
     {
-      test: t => /(chelation|absorption|antacid|iron|calcium)/.test(t) || ((drug1Class+drug2Class).includes('tetracycline') || (drug1Class+drug2Class).includes('fluoroquinolone')) && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium')),
+      test: t => /(chelation|absorption|antacid|iron|calcium)/.test(t) || ((drug1Class + drug2Class).includes('tetracycline') || (drug1Class + drug2Class).includes('fluoroquinolone')) && ((drug1Class + drug2Class).includes('antacid') || (drug1Class + drug2Class).includes('iron') || (drug1Class + drug2Class).includes('calcium')),
       mech: 'Chelation formation reduces antibiotic absorption and effectiveness',
       layman: 'These medicines bind together in your stomach, preventing the antibiotic from working'
     },
     {
-      test: t => /(tendon|rupture)/.test(t) || (drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('corticosteroid'),
+      test: t => /(tendon|rupture)/.test(t) || (drug1Class + drug2Class).includes('fluoroquinolone') && (drug1Class + drug2Class).includes('corticosteroid'),
       mech: 'Additive collagen degradation increases tendon rupture risk',
       layman: 'Both medicines weaken tendons and together greatly increase rupture risk'
     },
     {
-      test: t => /(seizure|cns stimulation)/.test(t) || (drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('nsaid'),
+      test: t => /(seizure|cns stimulation)/.test(t) || (drug1Class + drug2Class).includes('fluoroquinolone') && (drug1Class + drug2Class).includes('nsaid'),
       mech: 'GABA antagonism and CNS stimulation increases seizure risk',
       layman: 'Both medicines can overstimulate the brain and cause seizures'
     },
     {
-      test: t => /(ototoxicity|hearing|nephrotoxicity|kidney)/.test(t) || (drug1Class+drug2Class).includes('aminoglycoside') && ((drug1Class+drug2Class).includes('vancomycin') || (drug1Class+drug2Class).includes('loop diuretic')),
+      test: t => /(ototoxicity|hearing|nephrotoxicity|kidney)/.test(t) || (drug1Class + drug2Class).includes('aminoglycoside') && ((drug1Class + drug2Class).includes('vancomycin') || (drug1Class + drug2Class).includes('loop diuretic')),
       mech: 'Additive ototoxicity and nephrotoxicity damage inner ear and kidneys',
       layman: 'Both medicines can damage your hearing and kidneys when used together'
     },
     {
-      test: t => /(disulfiram|alcohol)/.test(t) || (drug1Class+drug2Class).includes('nitroimidazole') && (drug1Class+drug2Class).includes('alcohol'),
+      test: t => /(disulfiram|alcohol)/.test(t) || (drug1Class + drug2Class).includes('nitroimidazole') && (drug1Class + drug2Class).includes('alcohol'),
       mech: 'Inhibition of aldehyde dehydrogenase causing disulfiram-like reaction',
       layman: 'Taking alcohol with this antibiotic causes severe nausea, vomiting, and flushing'
     },
     {
-      test: t => /(valproic acid|valproate|seizure)/.test(t) || (drug1Class+drug2Class).includes('carbapenem') && (drug1Class+drug2Class).includes('valproic'),
+      test: t => /(valproic acid|valproate|seizure)/.test(t) || (drug1Class + drug2Class).includes('carbapenem') && (drug1Class + drug2Class).includes('valproic'),
       mech: 'Reduced valproic acid levels decrease seizure threshold',
       layman: 'This antibiotic lowers seizure medicine levels, increasing seizure risk'
     },
     {
-      test: t => /(contraceptive|birth control|pill)/.test(t) || (drug1Class+drug2Class).includes('rifampin') && (drug1Class+drug2Class).includes('contraceptive'),
+      test: t => /(contraceptive|birth control|pill)/.test(t) || (drug1Class + drug2Class).includes('rifampin') && (drug1Class + drug2Class).includes('contraceptive'),
       mech: 'CYP enzyme induction reduces contraceptive steroid levels',
       layman: 'This antibiotic makes birth control pills less effective, increasing pregnancy risk'
     },
     {
-      test: t => /(hepatotoxicity|liver)/.test(t) || (drug1Class+drug2Class).includes('isoniazid') && (drug1Class+drug2Class).includes('paracetamol'),
+      test: t => /(hepatotoxicity|liver)/.test(t) || (drug1Class + drug2Class).includes('isoniazid') && (drug1Class + drug2Class).includes('paracetamol'),
       mech: 'Additive hepatotoxic effects increase liver damage risk',
       layman: 'Both medicines can damage your liver, especially when used together'
     }
@@ -312,7 +354,7 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
 
   // Onset patterns
   let onset: string | undefined;
-  if (/(immediate|sudden|rapid|hours)/.test(textForMeta) || severity === 'contraindicated' || (classes.includes('benzodiazepine') && classes.includes('opioid')) || (classes.includes('nitrate') && classes.includes('pde5')) ) {
+  if (/(immediate|sudden|rapid|hours)/.test(textForMeta) || severity === 'contraindicated' || (classes.includes('benzodiazepine') && classes.includes('opioid')) || (classes.includes('nitrate') && classes.includes('pde5'))) {
     onset = 'Rapid (hours to days)';
   } else if (/(days|weeks|accumulate|build up|elevated levels)/.test(textForMeta) || (classes.includes('macrolide') && classes.includes('statin')) || classes.includes('warfarin')) {
     onset = 'Typically within days to weeks';
@@ -364,96 +406,96 @@ const checkPairInteraction = (drug1: DrugData, drug2: DrugData): DrugInteraction
   // Tailor recommendation by mechanism/classes with layman versions
   const recHints: string[] = [];
   const laymanRecHints: string[] = [];
-  if ((drug1Class+drug2Class).includes('anticoagulant')) {
-    if ((drug1Class+drug2Class).includes('nsaid')) {
+  if ((drug1Class + drug2Class).includes('anticoagulant')) {
+    if ((drug1Class + drug2Class).includes('nsaid')) {
       recHints.push('Prefer paracetamol (acetaminophen) for pain instead of NSAIDs.');
       laymanRecHints.push('Use paracetamol for pain instead of ibuprofen or similar medicines.');
     }
-    if ((drug1Class+drug2Class).includes('antiplatelet')) {
+    if ((drug1Class + drug2Class).includes('antiplatelet')) {
       recHints.push('Use the lowest effective antiplatelet regimen; assess bleeding risk and gastroprotection (e.g., PPI).');
       laymanRecHints.push('Use the lowest dose that works; may need stomach protection medicine.');
     }
-    if ((drug1.name+drug2.name).toLowerCase().includes('warfarin')) {
+    if ((drug1.name + drug2.name).toLowerCase().includes('warfarin')) {
       recHints.push('If suitable, discuss DOAC alternatives (e.g., apixaban, rivaroxaban) with your doctor.');
       laymanRecHints.push('Ask your doctor about newer blood thinners that may be safer.');
     }
   }
-  if ((drug1Class+drug2Class).includes('benzodiazepine') && (drug1Class+drug2Class).includes('opioid')) {
+  if ((drug1Class + drug2Class).includes('benzodiazepine') && (drug1Class + drug2Class).includes('opioid')) {
     recHints.push('Avoid alcohol and other sedatives; do not drive; ask about take‑home naloxone.');
     laymanRecHints.push('Avoid alcohol; do not drive; ask about emergency overdose medicine (naloxone).');
   }
-  if ((drug1Class+drug2Class).includes('statin') && (drug1Class+drug2Class).includes('macrolide')) {
+  if ((drug1Class + drug2Class).includes('statin') && (drug1Class + drug2Class).includes('macrolide')) {
     recHints.push('Temporarily hold or switch statin (e.g., to pravastatin/rosuvastatin) while on macrolide antibiotic.');
     laymanRecHints.push('May need to temporarily stop cholesterol medicine while taking antibiotic.');
   }
-  if ((drug1Class+drug2Class).includes('pde5') && (drug1Class+drug2Class).includes('nitrate')) {
+  if ((drug1Class + drug2Class).includes('pde5') && (drug1Class + drug2Class).includes('nitrate')) {
     recHints.push('Absolute avoidance: do not take nitrates within 24–48h of PDE5 inhibitors.');
     laymanRecHints.push('Never take these together - wait at least 24-48 hours between doses.');
   }
   // Antibiotic-specific recommendations
-  if ((drug1Class+drug2Class).includes('fluoroquinolone') && (drug1Class+drug2Class).includes('corticosteroid')) {
+  if ((drug1Class + drug2Class).includes('fluoroquinolone') && (drug1Class + drug2Class).includes('corticosteroid')) {
     recHints.push('Consider alternative antibiotic or avoid corticosteroid if possible; stop immediately if tendon pain occurs.');
     laymanRecHints.push('Ask about different antibiotics; stop taking if tendons hurt.');
   }
-  if ((drug1Class+drug2Class).includes('fluoroquinolone') && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium'))) {
+  if ((drug1Class + drug2Class).includes('fluoroquinolone') && ((drug1Class + drug2Class).includes('antacid') || (drug1Class + drug2Class).includes('iron') || (drug1Class + drug2Class).includes('calcium'))) {
     recHints.push('Separate antibiotic by 2–4 hours before or 6 hours after antacids/iron/calcium supplements.');
     laymanRecHints.push('Take antibiotic 2-4 hours before or 6 hours after antacids, iron, or calcium.');
   }
-  if ((drug1Class+drug2Class).includes('tetracycline') && ((drug1Class+drug2Class).includes('antacid') || (drug1Class+drug2Class).includes('iron') || (drug1Class+drug2Class).includes('calcium'))) {
+  if ((drug1Class + drug2Class).includes('tetracycline') && ((drug1Class + drug2Class).includes('antacid') || (drug1Class + drug2Class).includes('iron') || (drug1Class + drug2Class).includes('calcium'))) {
     recHints.push('Separate antibiotic by 2–3 hours before or after antacids/iron/calcium/dairy products.');
     laymanRecHints.push('Take antibiotic 2-3 hours before or after antacids, iron, calcium, or dairy.');
   }
-  if ((drug1Class+drug2Class).includes('nitroimidazole') && (drug1Class+drug2Class).includes('alcohol')) {
+  if ((drug1Class + drug2Class).includes('nitroimidazole') && (drug1Class + drug2Class).includes('alcohol')) {
     recHints.push('Absolute avoidance of alcohol during and for 48-72 hours after completing antibiotic therapy.');
     laymanRecHints.push('Never drink alcohol during treatment and for 48-72 hours after finishing the antibiotic.');
   }
-  if ((drug1Class+drug2Class).includes('macrolide') && (drug1Class+drug2Class).includes('colchicine')) {
+  if ((drug1Class + drug2Class).includes('macrolide') && (drug1Class + drug2Class).includes('colchicine')) {
     recHints.push('Absolute avoidance: choose alternative antibiotic (fluoroquinolone, β-lactam).');
     laymanRecHints.push('Never take these together - get a different antibiotic.');
   }
-  if ((drug1Class+drug2Class).includes('carbapenem') && (drug1Class+drug2Class).includes('valproic')) {
+  if ((drug1Class + drug2Class).includes('carbapenem') && (drug1Class + drug2Class).includes('valproic')) {
     recHints.push('Avoid carbapenem; use alternative antibiotic class (fluoroquinolone, β-lactam); monitor seizures closely if unavoidable.');
     laymanRecHints.push('Should not use together - ask for different antibiotic to prevent seizures.');
   }
-  if ((drug1Class+drug2Class).includes('rifampin') && (drug1Class+drug2Class).includes('contraceptive')) {
+  if ((drug1Class + drug2Class).includes('rifampin') && (drug1Class + drug2Class).includes('contraceptive')) {
     recHints.push('Use additional non-hormonal contraception during and 4–8 weeks after rifampin therapy.');
     laymanRecHints.push('Use backup birth control (condoms) during treatment and for 4-8 weeks after.');
   }
-  if ((drug1Class+drug2Class).includes('aminoglycoside') && ((drug1Class+drug2Class).includes('vancomycin') || (drug1Class+drug2Class).includes('loop diuretic'))) {
+  if ((drug1Class + drug2Class).includes('aminoglycoside') && ((drug1Class + drug2Class).includes('vancomycin') || (drug1Class + drug2Class).includes('loop diuretic'))) {
     recHints.push('Monitor renal function and drug levels closely; ensure adequate hydration; consider alternative if possible.');
     laymanRecHints.push('Get regular kidney tests; drink plenty of water; may need different medicine.');
   }
-  if ((drug1Class+drug2Class).includes('linezolid') && (drug1Class+drug2Class).includes('ssri')) {
+  if ((drug1Class + drug2Class).includes('linezolid') && (drug1Class + drug2Class).includes('ssri')) {
     recHints.push('Avoid combination; if necessary, use lowest SSRI dose and monitor for serotonin syndrome; consider alternative antibiotic.');
     laymanRecHints.push('Should not use together - risk of serious brain reaction. Ask for different antibiotic.');
   }
   if (recHints.length) {
     recommendation = `${recommendation} ${recHints.join(' ')}`.trim();
   }
-  
+
   // Create layman versions
   const laymanDescription = simplifyMedicalTerm(description);
-  const baseLaymanRec = severity === 'contraindicated' 
+  const baseLaymanRec = severity === 'contraindicated'
     ? 'DO NOT use these medicines together. Talk to your doctor right away about other options.'
     : severity === 'severe'
-    ? 'This combination can be dangerous. Only use together with close doctor supervision.'
-    : severity === 'moderate'
-    ? 'Use carefully. Watch for side effects and talk to your doctor before combining.'
-    : 'Generally safe but tell your doctor. May need small timing or dose changes.';
-  const laymanRecommendation = laymanRecHints.length 
+      ? 'This combination can be dangerous. Only use together with close doctor supervision.'
+      : severity === 'moderate'
+        ? 'Use carefully. Watch for side effects and talk to your doctor before combining.'
+        : 'Generally safe but tell your doctor. May need small timing or dose changes.';
+  const laymanRecommendation = laymanRecHints.length
     ? `${baseLaymanRec} ${laymanRecHints.join(' ')}`.trim()
     : baseLaymanRec;
 
-  return { 
-    drug1, 
-    drug2, 
-    severity, 
-    description, 
-    recommendation, 
-    onset, 
-    monitoring, 
-    mechanism: detectedMech, 
-    sources, 
+  return {
+    drug1,
+    drug2,
+    severity,
+    description,
+    recommendation,
+    onset,
+    monitoring,
+    mechanism: detectedMech,
+    sources,
     alternatives: [],
     laymanDescription,
     laymanRecommendation,
@@ -525,7 +567,7 @@ export const checkDrugInteractions = (
   const hasSevereInteractions = interactions.some(
     i => i.severity === 'severe' || i.severity === 'contraindicated'
   );
-  
+
   return {
     hasInteractions: interactions.length > 0,
     interactions,
@@ -542,7 +584,7 @@ const findAlternatives = (
   const alternatives: { drug: DrugData; reason: string }[] = [];
   const drugClass = (drug.drugClass || '').toLowerCase();
   const drugName = drug.name.toLowerCase();
-  
+
   // Define pharmacologically appropriate alternative mappings
   const alternativeMap: Record<string, { classes: string[]; names: string[]; reason: string }> = {
     // Anticoagulants
@@ -556,7 +598,7 @@ const findAlternatives = (
       names: ['rivaroxaban', 'apixaban', 'dabigatran', 'edoxaban', 'warfarin'],
       reason: 'Alternative anticoagulant with different interaction profile'
     },
-    
+
     // Antiplatelets
     'aspirin': {
       classes: ['antiplatelet', 'p2y12 inhibitor'],
@@ -568,42 +610,42 @@ const findAlternatives = (
       names: ['prasugrel', 'ticagrelor', 'aspirin'],
       reason: 'Alternative antiplatelet medication'
     },
-    
+
     // NSAIDs
     'nsaid': {
       classes: ['cox-2 selective inhibitor', 'selective cox-2 inhibitor'],
       names: ['celecoxib', 'etoricoxib'],
       reason: 'COX-2 selective NSAID with lower bleeding risk'
     },
-    
+
     // Statins
     'statin': {
       classes: ['statin', 'hmg-coa reductase inhibitor'],
       names: ['atorvastatin', 'rosuvastatin', 'pravastatin', 'fluvastatin'],
       reason: 'Alternative statin with different interaction profile'
     },
-    
+
     // Antidepressants
     'ssri': {
       classes: ['snri', 'atypical antidepressant', 'tricyclic antidepressant'],
       names: ['venlafaxine', 'duloxetine', 'bupropion', 'mirtazapine'],
       reason: 'Alternative antidepressant with different mechanism'
     },
-    
+
     // Benzodiazepines
     'benzodiazepine': {
       classes: ['non-benzodiazepine hypnotic', 'antihistamine', 'melatonin receptor agonist'],
       names: ['zolpidem', 'eszopiclone', 'diphenhydramine', 'melatonin'],
       reason: 'Non-benzodiazepine alternative with lower interaction risk'
     },
-    
+
     // Opioids
     'opioid': {
       classes: ['nsaid', 'anticonvulsant', 'topical analgesic'],
       names: ['ibuprofen', 'naproxen', 'gabapentin', 'pregabalin', 'lidocaine'],
       reason: 'Non-opioid pain management alternative'
     },
-    
+
     // Antibiotics
     'fluoroquinolone': {
       classes: ['penicillin', 'cephalosporin', 'macrolide', 'beta-lactam'],
@@ -641,10 +683,10 @@ const findAlternatives = (
       reason: 'Alternative for MRSA without serotonergic effects'
     }
   };
-  
+
   // Find appropriate alternatives based on drug class or name
   let targetAlternatives: { classes: string[]; names: string[]; reason: string } | null = null;
-  
+
   // Check by specific drug name first
   for (const [key, alt] of Object.entries(alternativeMap)) {
     if (drugName.includes(key) || alt.names.some(name => drugName.includes(name))) {
@@ -652,7 +694,7 @@ const findAlternatives = (
       break;
     }
   }
-  
+
   // If not found by name, check by class
   if (!targetAlternatives) {
     for (const [key, alt] of Object.entries(alternativeMap)) {
@@ -662,42 +704,42 @@ const findAlternatives = (
       }
     }
   }
-  
+
   if (!targetAlternatives) {
     // Fallback: same category, different class
-    const sameCategoryDrugs = allDrugs.filter(d => 
-      d.category === drug.category && 
+    const sameCategoryDrugs = allDrugs.filter(d =>
+      d.category === drug.category &&
       d.drugClass !== drug.drugClass &&
       !selectedDrugs.some(sd => sd.id === d.id)
     );
-    
+
     sameCategoryDrugs.slice(0, 3).forEach(altDrug => {
       alternatives.push({
         drug: altDrug,
         reason: `Alternative ${drug.category} medication`
       });
     });
-    
+
     return alternatives;
   }
-  
+
   // Find drugs matching the alternative criteria
   const candidateAlternatives = allDrugs.filter(d => {
     if (selectedDrugs.some(sd => sd.id === d.id)) return false;
     if (d.id === drug.id) return false;
-    
+
     const altClass = (d.drugClass || '').toLowerCase();
     const altName = d.name.toLowerCase();
-    
+
     // Check if drug matches alternative classes or names
     return targetAlternatives!.classes.some(cls => altClass.includes(cls)) ||
-           targetAlternatives!.names.some(name => altName.includes(name));
+      targetAlternatives!.names.some(name => altName.includes(name));
   });
-  
+
   // Check if these alternatives interact with other selected drugs
   candidateAlternatives.forEach(altDrug => {
     if (alternatives.length >= 3) return;
-    
+
     let hasInteraction = false;
     for (const selectedDrug of selectedDrugs) {
       if (selectedDrug.id !== drug.id) {
@@ -708,7 +750,7 @@ const findAlternatives = (
         }
       }
     }
-    
+
     if (!hasInteraction) {
       alternatives.push({
         drug: altDrug,
@@ -716,7 +758,7 @@ const findAlternatives = (
       });
     }
   });
-  
+
   return alternatives;
 };
 
