@@ -174,6 +174,17 @@ export default {
 				'marquee-right': {
 					from: { transform: 'translateX(calc(-100% - var(--gap)))' },
 					to: { transform: 'translateX(0)' },
+				},
+				'shine-pulse': {
+					'0%': {
+						'background-position': '0% 0%',
+					},
+					'50%': {
+						'background-position': '100% 100%',
+					},
+					to: {
+						'background-position': '0% 0%',
+					},
 				}
 			},
 			animation: {
