@@ -333,26 +333,26 @@ const SubscriptionManager: React.FC = () => {
                   </div>
                   {profile && profile.extra_identifications > 0 && (
                     <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${profile.extra_identifications >= 50
-                        ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800'
-                        : profile.extra_identifications >= 30
-                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                          : profile.extra_identifications >= 10
-                            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                            : profile.extra_identifications >= 5
-                              ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
-                              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                      ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800'
+                      : profile.extra_identifications >= 30
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                        : profile.extra_identifications >= 10
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                          : profile.extra_identifications >= 5
+                            ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                       }`}>
                       <Zap className={`w-4 h-4 flex-shrink-0 ${profile.extra_identifications >= 50 ? 'text-violet-600' :
-                          profile.extra_identifications >= 30 ? 'text-green-600' :
-                            profile.extra_identifications >= 10 ? 'text-blue-600' :
-                              profile.extra_identifications >= 5 ? 'text-amber-600' :
-                                'text-red-600'
+                        profile.extra_identifications >= 30 ? 'text-green-600' :
+                          profile.extra_identifications >= 10 ? 'text-blue-600' :
+                            profile.extra_identifications >= 5 ? 'text-amber-600' :
+                              'text-red-600'
                         }`} />
                       <p className={`text-xs font-medium ${profile.extra_identifications >= 50 ? 'text-violet-700 dark:text-violet-300' :
-                          profile.extra_identifications >= 30 ? 'text-green-700 dark:text-green-300' :
-                            profile.extra_identifications >= 10 ? 'text-blue-700 dark:text-blue-300' :
-                              profile.extra_identifications >= 5 ? 'text-amber-700 dark:text-amber-300' :
-                                'text-red-700 dark:text-red-300'
+                        profile.extra_identifications >= 30 ? 'text-green-700 dark:text-green-300' :
+                          profile.extra_identifications >= 10 ? 'text-blue-700 dark:text-blue-300' :
+                            profile.extra_identifications >= 5 ? 'text-amber-700 dark:text-amber-300' :
+                              'text-red-700 dark:text-red-300'
                         }`}>
                         {profile.extra_identifications} bonus remaining
                       </p>
@@ -598,7 +598,7 @@ const SubscriptionManager: React.FC = () => {
 
                 if (isCurrentPlan) {
                   return (
-                    <div key={plan.id} className="h-full py-2">
+                    <div key={plan.id} className="h-full">
                       <ShineBorder
                         borderRadius={12}
                         borderWidth={2}
