@@ -2,39 +2,39 @@
 import type { Config } from "tailwindcss";
 
 function addVariablesForColors({ addBase, theme }: { addBase: (styles: Record<string, Record<string, string>>) => void; theme: (path: string) => unknown }) {
-  const allColors = flattenColorPalette(theme("colors") as Record<string, unknown>);
-  const newVars = Object.fromEntries(
-    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-  );
+	const allColors = flattenColorPalette(theme("colors") as Record<string, unknown>);
+	const newVars = Object.fromEntries(
+		Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+	);
 
-  addBase({
-    ":root": {
-      ...newVars,
-      "--transparent": "transparent",
-      "--white": "#ffffff",
-      "--black": "#000000",
-    },
-  });
+	addBase({
+		":root": {
+			...newVars,
+			"--transparent": "transparent",
+			"--white": "#ffffff",
+			"--black": "#000000",
+		},
+	});
 }
 
 // Helper function to flatten color palette - simplified version of the Tailwind utility
 function flattenColorPalette(colors: Record<string, unknown>): Record<string, string> {
-  const result: Record<string, string> = {};
-  
-  const flattenColors = (obj: Record<string, unknown>, prefix = '') => {
-    for (const key in obj) {
-      const value = obj[key as keyof typeof obj];
-      
-      if (typeof value === 'string') {
-        result[prefix + key] = value as string;
-      } else if (typeof value === 'object' && value !== null) {
-        flattenColors(value as Record<string, unknown>, `${prefix}${key}-`);
-      }
-    }
-  };
-  
-  flattenColors(colors);
-  return result;
+	const result: Record<string, string> = {};
+
+	const flattenColors = (obj: Record<string, unknown>, prefix = '') => {
+		for (const key in obj) {
+			const value = obj[key as keyof typeof obj];
+
+			if (typeof value === 'string') {
+				result[prefix + key] = value as string;
+			} else if (typeof value === 'object' && value !== null) {
+				flattenColors(value as Record<string, unknown>, `${prefix}${key}-`);
+			}
+		}
+	};
+
+	flattenColors(colors);
+	return result;
 }
 
 export default {
@@ -132,21 +132,21 @@ export default {
 					to: { opacity: '1' }
 				},
 				'fade-up': {
-					from: { 
+					from: {
 						opacity: '0',
 						transform: 'translateY(10px)'
 					},
-					to: { 
+					to: {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
 				},
 				'scale-in': {
-					from: { 
+					from: {
 						opacity: '0',
 						transform: 'scale(0.98)'
 					},
-					to: { 
+					to: {
 						opacity: '1',
 						transform: 'scale(1)'
 					}
@@ -166,6 +166,14 @@ export default {
 					to: {
 						backgroundPosition: '350% 50%, 350% 50%',
 					},
+				},
+				'marquee-left': {
+					from: { transform: 'translateX(0)' },
+					to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+				},
+				'marquee-right': {
+					from: { transform: 'translateX(calc(-100% - var(--gap)))' },
+					to: { transform: 'translateX(0)' },
 				}
 			},
 			animation: {
@@ -176,7 +184,9 @@ export default {
 				'scale-in': 'scale-in 0.3s ease-out',
 				'float': 'float 3s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
-				'aurora': 'aurora 60s linear infinite'
+				'aurora': 'aurora 60s linear infinite',
+				'marquee-left': 'marquee-left var(--duration, 30s) linear infinite',
+				'marquee-right': 'marquee-right var(--duration, 30s) linear infinite'
 			},
 			boxShadow: {
 				'neo': '5px 5px 15px rgba(0, 0, 0, 0.05), -5px -5px 15px rgba(255, 255, 255, 0.95)',

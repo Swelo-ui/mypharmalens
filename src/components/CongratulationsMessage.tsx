@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, X, Sparkles, Crown, Gift } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
 
 interface CongratulationsMessageProps {
   isVisible: boolean;
@@ -25,6 +27,8 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
   identificationsCount = 0,
   amount = 0
 }) => {
+  const { width, height } = useWindowSize();
+  const isMobile = (width || 0) <= 480;
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
@@ -97,7 +101,7 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
   const generateConfettiItems = () => {
     const items = [];
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-    
+
     for (let i = 0; i < 20; i++) {
       items.push(
         <motion.div
@@ -125,20 +129,17 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Confetti Animation */}
-          <AnimatePresence>
-            {showConfetti && (
-              <motion.div
-                variants={confettiVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="absolute inset-0 pointer-events-none overflow-hidden"
-              >
-                {generateConfettiItems()}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Full-screen Confetti Burst Animation */}
+          {showConfetti && (
+            <Confetti
+              width={width}
+              height={height}
+              recycle={false}
+              numberOfPieces={isMobile ? 150 : 500}
+              gravity={isMobile ? 0.2 : 0.3}
+              colors={['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#22D3EE', '#34D399']}
+            />
+          )}
 
           {/* Main Message Card */}
           <motion.div
@@ -151,7 +152,7 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
             <Card className="relative overflow-hidden border-2 border-blue-500 shadow-2xl shadow-blue-500/20">
               {/* Background Gradient */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-pharma-900 to-blue-900" />
-              
+
               {/* Close Button */}
               <Button
                 variant="ghost"
@@ -167,22 +168,22 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 200, 
+                  transition={{
+                    type: "spring",
+                    stiffness: 200,
                     damping: 15,
-                    delay: 0.2 
+                    delay: 0.2
                   }}
                   className="flex justify-center"
                 >
                   <div className="relative">
                     <CheckCircle className="h-16 w-16 text-green-500 animate-celebration" />
                     <motion.div
-                      animate={{ 
+                      animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.5, 0.8, 0.5]
                       }}
-                      transition={{ 
+                      transition={{
                         duration: 2,
                         repeat: Infinity,
                         ease: "easeInOut"
@@ -206,7 +207,7 @@ const CongratulationsMessage: React.FC<CongratulationsMessageProps> = ({
                     </h2>
                     <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-yellow-500 animate-pulse" />
                   </div>
-                  
+
                   <p className="text-base md:text-lg text-gray-200">
                     {type === 'topup'
                       ? 'Your top-up pack has been successfully added!'

@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* View Transitions API - Theme Toggle Animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 @layer base {
   :root {
     --background: 210 40% 98%;

@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, Heart, ExternalLink, Mail, Linkedin, Youtube } from 'lucide-react';
+import { Pill, ExternalLink, Mail, Linkedin, Youtube } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
+import { LikeButton } from '@/components/ui/like-button';
 
 const Footer = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  
+
   return (
     <footer className={`border-t border-gray-200 dark:border-gray-800 mt-8 sm:mt-12 py-8 sm:py-12 px-3 sm:px-4 ${isMobile ? 'pb-20 sm:pb-24' : ''}`}>
       <div className="container mx-auto max-w-6xl">
@@ -21,14 +22,14 @@ const Footer = () => {
                 <span className="text-pharma-600">.</span>
               </span>
             </Link>
-            
+
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-5 leading-relaxed">
               AI-powered drug identification and comprehensive medication information.
             </p>
-            
+
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <a 
-                href="https://www.linkedin.com/in/himanshu-sharma-374421326" 
+              <a
+                href="https://www.linkedin.com/in/himanshu-sharma-374421326"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-pharma-600 transition-colors"
@@ -36,9 +37,9 @@ const Footer = () => {
               >
                 <Linkedin className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
-              
-              <a 
-                href="https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm" 
+
+              <a
+                href="https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-pharma-600 transition-colors"
@@ -46,9 +47,9 @@ const Footer = () => {
               >
                 <Youtube className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
-              
-              <a 
-                href="mailto:himanshusharma.shriram@gmail.com" 
+
+              <a
+                href="mailto:himanshusharma.shriram@gmail.com"
                 className="text-gray-500 hover:text-pharma-600 transition-colors"
                 aria-label="Email"
               >
@@ -56,7 +57,7 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mt-6 md:mt-0">
             <div>
               <h3 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4">Product</h3>
@@ -83,7 +84,7 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4">Support</h3>
               <ul className="space-y-2 sm:space-y-3">
@@ -104,7 +105,7 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4">Legal</h3>
               <ul className="space-y-2 sm:space-y-3">
@@ -127,22 +128,22 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             © {new Date().getFullYear()} PharmaLens. All rights reserved.
           </p>
-          
+
           <div className="mt-4 md:mt-0 flex items-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-              <span className="mr-2">Made with</span>
-              <Heart className="h-3 w-3 text-red-500" />
-              <span className="mx-2">for healthcare</span>
+              <span className="mr-1">Made with</span>
+              <LikeButton className="mx-1" iconCount={12} />
+              <span className="ml-1">for healthcare</span>
             </p>
-            
-            <a 
-              href="https://www.drugs.com/" 
-              target="_blank" 
+
+            <a
+              href="https://www.drugs.com/"
+              target="_blank"
               rel="noopener noreferrer"
               className="ml-4 text-xs text-pharma-600 hover:text-pharma-700 transition-colors flex items-center"
             >

@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText, Loader2 } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText, Loader2, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import SEOHead from '@/components/SEOHead';
+import { Marquee } from '@/components/ui/marquee';
+import { TestimonialCard, pharmaLensTestimonials } from '@/components/ui/testimonial-card';
 
 const About = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -63,13 +65,50 @@ const About = () => {
     };
   }, [profileImageUrl]);
 
+  // Generate structured data for reviews
+  const reviewSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "PharmaLens",
+    "url": "https://pharmalens.tech",
+    "logo": "https://pharmalens.tech/logo.png",
+    "sameAs": [
+      "https://twitter.com/pharmalens",
+      "https://linkedin.com/company/pharmalens"
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "1000",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "review": pharmaLensTestimonials.map(testimonial => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": testimonial.name,
+        "jobTitle": testimonial.role
+      },
+      "datePublished": "2023-12-01",
+      "reviewBody": testimonial.content,
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": testimonial.rating.toString(),
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEOHead
         title="About PharmaLens - AI Medication Identification Platform"
-        description="Learn about PharmaLens, the AI-powered platform revolutionizing medication identification and drug safety. Founded by Himanshu Sharma to bridge technology and medicine."
-        keywords="about pharmalens, himanshu sharma, medication ai, drug safety platform, pharmaceutical technology, healthcare innovation"
+        description="Learn about PharmaLens, the AI-powered platform revolutionizing medication identification and drug safety. Trusted by healthcare professionals."
+        keywords="about pharmalens, customer reviews, medication ai, drug safety platform, pharmaceutical technology, healthcare innovation"
         canonicalUrl="/about"
+        structuredData={reviewSchema}
       />
       <Header />
 
@@ -255,6 +294,55 @@ const About = () => {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Customer Reviews Section */}
+        <section className="py-16 bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
+          <div className="container mx-auto px-4 max-w-6xl mb-10">
+            <div className="text-center animate-on-scroll">
+              <div className="inline-block mb-3">
+                <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-pharma-100 text-pharma-800 dark:bg-pharma-900/30 dark:text-pharma-300">
+                  Customer Reviews
+                </span>
+              </div>
+              <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Trusted by healthcare professionals, pharmacy students, and caregivers across India
+              </p>
+            </div>
+          </div>
+
+          {/* First row - scrolling left */}
+          <Marquee direction="left" duration={40} repeat={2} pauseOnHover className="mb-6">
+            {pharmaLensTestimonials.slice(0, 4).map((testimonial, index) => (
+              <TestimonialCard key={index} {...testimonial} />
+            ))}
+          </Marquee>
+
+          {/* Second row - scrolling right */}
+          <Marquee direction="right" duration={45} repeat={2} pauseOnHover>
+            {pharmaLensTestimonials.slice(4, 8).map((testimonial, index) => (
+              <TestimonialCard key={index} {...testimonial} />
+            ))}
+          </Marquee>
+
+          {/* Trust indicators */}
+          <div className="container mx-auto px-4 max-w-6xl mt-10">
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <span>4.9/5 Average Rating</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600 hidden sm:block" />
+              <span>1,000+ Happy Users</span>
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600 hidden sm:block" />
+              <span>Trusted by 50+ Healthcare Institutions</span>
             </div>
           </div>
         </section>

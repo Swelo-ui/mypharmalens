@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Sun, Moon, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical } from 'lucide-react';
+import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { playThemeSwitchSound } from '@/utils/audioService';
+import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,12 +43,7 @@ const Header = () => {
     };
   }, [isOpen]);
 
-  // Handle theme toggle with improved reliability
-  const toggleTheme = () => {
-    const currentTheme = resolvedTheme || theme;
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    playThemeSwitchSound();
-  };
+  // toggleTheme is now handled by AnimatedThemeToggler component
 
   const handleSignOut = async () => {
     try {
@@ -94,13 +89,10 @@ const Header = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-1 sm:space-x-2">
-              <button
-                onClick={toggleTheme}
-                className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
-              </button>
+              <AnimatedThemeToggler
+                className="p-1.5 sm:p-2"
+                iconSize="h-4 w-4 sm:h-5 sm:w-5"
+              />
 
               {/* Profile Icon */}
               {!isLoading && isAuthenticated && (
@@ -229,8 +221,8 @@ const Header = () => {
                   key={link.path}
                   to={link.path}
                   className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === link.path
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-600 dark:text-gray-300'
                     }`}
                 >
                   {link.name}
@@ -241,8 +233,8 @@ const Header = () => {
                   <Link
                     to="/symptom-checker"
                     className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/symptom-checker'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-600 dark:text-gray-300'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-600 dark:text-gray-300'
                       }`}
                   >
                     Symptoms
@@ -250,8 +242,8 @@ const Header = () => {
                   <Link
                     to="/drug-interactions"
                     className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/drug-interactions'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-600 dark:text-gray-300'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-600 dark:text-gray-300'
                       }`}
                   >
                     Interactions
@@ -266,13 +258,7 @@ const Header = () => {
                 <Search className="h-5 w-5" />
               </Link>
 
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-pharma-600 dark:hover:text-pharma-400 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {(resolvedTheme || theme) === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
+              <AnimatedThemeToggler />
 
               {!isLoading && (
                 <>
@@ -400,8 +386,8 @@ const Header = () => {
                   key={link.path}
                   to={link.path}
                   className={`text-lg font-medium transition-colors ${location.pathname === link.path
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-800 dark:text-gray-200'
+                    ? 'text-pharma-600 dark:text-pharma-400'
+                    : 'text-gray-800 dark:text-gray-200'
                     }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -414,8 +400,8 @@ const Header = () => {
                   <Link
                     to="/symptom-checker"
                     className={`text-lg font-medium transition-colors ${location.pathname === '/symptom-checker'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-800 dark:text-gray-200'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-800 dark:text-gray-200'
                       }`}
                     onClick={() => setIsOpen(false)}
                   >
@@ -425,8 +411,8 @@ const Header = () => {
                   <Link
                     to="/drug-interactions"
                     className={`text-lg font-medium transition-colors ${location.pathname === '/drug-interactions'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-800 dark:text-gray-200'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-800 dark:text-gray-200'
                       }`}
                     onClick={() => setIsOpen(false)}
                   >
@@ -436,8 +422,8 @@ const Header = () => {
                   <Link
                     to="/profile"
                     className={`text-lg font-medium transition-colors ${location.pathname === '/profile'
-                        ? 'text-pharma-600 dark:text-pharma-400'
-                        : 'text-gray-800 dark:text-gray-200'
+                      ? 'text-pharma-600 dark:text-pharma-400'
+                      : 'text-gray-800 dark:text-gray-200'
                       }`}
                     onClick={() => setIsOpen(false)}
                   >
