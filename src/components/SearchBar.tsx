@@ -13,11 +13,11 @@ interface SearchBarProps {
   className?: string;
 }
 
-const SearchBar = ({ 
-  fullWidth = false, 
+const SearchBar = ({
+  fullWidth = false,
   placeholder = "Search for medications by name, category, or manufacturer...",
   onSearch,
-  className 
+  className
 }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -164,25 +164,25 @@ const SearchBar = ({
 
   return (
     <div className="relative">
-      <form 
-        onSubmit={handleSearch} 
+      <form
+        onSubmit={handleSearch}
         className={cn(
           "relative transition-all duration-300 group",
           fullWidth ? "w-full" : "max-w-xl mx-auto",
-          isFocused 
-            ? "scale-[1.01] shadow-md" 
+          isFocused
+            ? "scale-[1.01] shadow-md"
             : "shadow-sm hover:shadow-md",
           className
         )}
       >
         <div className={cn(
           "flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 rounded-full border",
-          isFocused 
-            ? "border-pharma-400 ring-1 ring-pharma-100" 
+          isFocused
+            ? "border-pharma-400 ring-1 ring-pharma-100"
             : "border-gray-200 dark:border-gray-700"
         )}>
           <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
-          
+
           <input
             type="text"
             value={query}
@@ -195,7 +195,7 @@ const SearchBar = ({
             placeholder={isMobile ? "Search medications..." : placeholder}
             className="flex-1 bg-transparent border-none outline-none placeholder:text-gray-400 text-sm min-w-0"
           />
-          
+
           {query && (
             <button
               type="button"
@@ -205,7 +205,7 @@ const SearchBar = ({
               <X className="h-4 w-4" />
             </button>
           )}
-          
+
           {isSpeechSupported && (
             <button
               type="button"
@@ -221,15 +221,15 @@ const SearchBar = ({
               <Mic className="h-4 w-4" />
             </button>
           )}
-          
-          <button 
-            type="submit" 
-            disabled={isLoading || !query.trim()} 
+
+          <button
+            type="submit"
+            disabled={isLoading || !query.trim()}
             className={cn(
               "px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-all flex-shrink-0",
               "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-pharma-500",
-              query.trim() 
-                ? "bg-pharma-600 text-white hover:bg-pharma-700" 
+              query.trim()
+                ? "bg-pharma-600 text-white hover:bg-pharma-700"
                 : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800"
             )}
           >
@@ -241,7 +241,7 @@ const SearchBar = ({
           </button>
         </div>
       </form>
-      
+
       {/* Suggestions dropdown */}
       {suggestions.length > 0 && isFocused && (
         <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-100 dark:border-gray-800 py-1">
