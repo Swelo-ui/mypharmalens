@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -214,39 +215,63 @@ const Header = () => {
               <span className="font-bold text-lg sm:text-xl text-black dark:text-white">PharmaLens<span className="text-[#0289C8]">.</span></span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-6">
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === link.path
-                    ? 'text-pharma-600 dark:text-pharma-400'
-                    : 'text-gray-600 dark:text-gray-300'
-                    }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+            {/* Desktop Navigation - Animated ChipTabs */}
+            <nav className="hidden md:flex items-center gap-1">
+              {mainLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`${isActive
+                        ? 'text-white'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
+                  >
+                    <span className="relative z-10">{link.name}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="header-pill-tab"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="absolute inset-0 z-0 bg-[#0289C8] rounded-md"
+                      />
+                    )}
+                  </Link>
+                );
+              })}
               {isAuthenticated && (
                 <>
                   <Link
                     to="/symptom-checker"
-                    className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/symptom-checker'
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                      }`}
+                    className={`${location.pathname === '/symptom-checker'
+                        ? 'text-white'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
                   >
-                    Symptoms
+                    <span className="relative z-10">Symptoms</span>
+                    {location.pathname === '/symptom-checker' && (
+                      <motion.span
+                        layoutId="header-pill-tab"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="absolute inset-0 z-0 bg-[#0289C8] rounded-md"
+                      />
+                    )}
                   </Link>
                   <Link
                     to="/drug-interactions"
-                    className={`text-sm font-medium transition-colors hover:text-pharma-600 ${location.pathname === '/drug-interactions'
-                      ? 'text-pharma-600 dark:text-pharma-400'
-                      : 'text-gray-600 dark:text-gray-300'
-                      }`}
+                    className={`${location.pathname === '/drug-interactions'
+                        ? 'text-white'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
                   >
-                    Interactions
+                    <span className="relative z-10">Interactions</span>
+                    {location.pathname === '/drug-interactions' && (
+                      <motion.span
+                        layoutId="header-pill-tab"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="absolute inset-0 z-0 bg-[#0289C8] rounded-md"
+                      />
+                    )}
                   </Link>
                 </>
               )}
