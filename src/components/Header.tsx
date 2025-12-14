@@ -61,7 +61,7 @@ const Header = () => {
     window.open('https://buymeacoffee.com/_himanshusharma', '_blank');
   };
 
-  // Links for navigation
+  // Links for navigation - unified array with authRequired flag
   const mainLinks = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Identify', path: '/identify', icon: Pill },
@@ -69,7 +69,12 @@ const Header = () => {
     { name: 'FAQ', path: '/faq', icon: HelpCircle },
     { name: 'Help', path: '/help', icon: HelpCircle },
     { name: 'Contact', path: '/contact', icon: Mail },
+    { name: 'Symptoms', path: '/symptom-checker', icon: Activity, authRequired: true },
+    { name: 'Interactions', path: '/drug-interactions', icon: FlaskConical, authRequired: true },
   ];
+
+  // Filter links based on auth status for desktop nav
+  const visibleLinks = mainLinks.filter(link => !link.authRequired || isAuthenticated);
 
   // Don't render the full header on specific pages when on mobile
   const isCompactHeader = isMobile && ['/identify', '/search', '/symptom-checker', '/profile'].includes(location.pathname);
@@ -217,7 +222,7 @@ const Header = () => {
 
             {/* Desktop Navigation - Animated ChipTabs */}
             <nav className="hidden md:flex items-center gap-1">
-              {mainLinks.map((link) => {
+              {visibleLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
@@ -239,42 +244,6 @@ const Header = () => {
                   </Link>
                 );
               })}
-              {isAuthenticated && (
-                <>
-                  <Link
-                    to="/symptom-checker"
-                    className={`${location.pathname === '/symptom-checker'
-                        ? 'text-white'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
-                  >
-                    <span className="relative z-10">Symptoms</span>
-                    {location.pathname === '/symptom-checker' && (
-                      <motion.span
-                        layoutId="header-pill-tab"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="absolute inset-0 z-0 bg-[#0289C8] rounded-md"
-                      />
-                    )}
-                  </Link>
-                  <Link
-                    to="/drug-interactions"
-                    className={`${location.pathname === '/drug-interactions'
-                        ? 'text-white'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
-                  >
-                    <span className="relative z-10">Interactions</span>
-                    {location.pathname === '/drug-interactions' && (
-                      <motion.span
-                        layoutId="header-pill-tab"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="absolute inset-0 z-0 bg-[#0289C8] rounded-md"
-                      />
-                    )}
-                  </Link>
-                </>
-              )}
             </nav>
 
             {/* Right Side Actions */}
