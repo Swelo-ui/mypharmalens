@@ -121,7 +121,7 @@ const FlipCard = ({ card }: { card: FeatureCard }) => {
 
     return (
         <div
-            className="h-52 sm:h-56 md:h-60 cursor-pointer perspective-1000 touch-manipulation"
+            className="h-56 sm:h-56 md:h-60 cursor-pointer perspective-1000 touch-manipulation"
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <motion.div
@@ -159,7 +159,7 @@ const FlipCard = ({ card }: { card: FeatureCard }) => {
 
                 <div
                     className={cn(
-                        "absolute inset-0 rounded-xl p-4 shadow-lg",
+                        "absolute inset-0 rounded-xl p-3 shadow-lg",
                         "bg-gradient-to-br from-pharma-500 via-pharma-600 to-pharma-700 dark:from-pharma-600 dark:via-pharma-700 dark:to-pharma-800",
                         "border border-pharma-400/30 dark:border-pharma-500/30",
                         "flex flex-col"
@@ -169,23 +169,23 @@ const FlipCard = ({ card }: { card: FeatureCard }) => {
                         transform: "rotateY(180deg)"
                     }}
                 >
-                    <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white mb-1.5">
                         {card.title}
                     </h3>
 
-                    <div className="space-y-1.5 flex-1">
+                    <div className="space-y-1 flex-1">
                         {card.backFeatures.map((feature, idx) => (
-                            <div key={idx} className="flex items-center gap-2 bg-white/15 dark:bg-white/10 rounded-md p-2">
+                            <div key={idx} className="flex items-center gap-2 bg-white/15 dark:bg-white/10 rounded-md py-1.5 px-2">
                                 <div className="text-pharma-200 dark:text-pharma-300 shrink-0">{feature.icon}</div>
                                 <div>
-                                    <div className="text-white text-sm font-medium">{feature.title}</div>
-                                    <div className="text-pharma-100 dark:text-pharma-200 text-xs">{feature.description}</div>
+                                    <div className="text-white text-xs font-medium leading-tight">{feature.title}</div>
+                                    <div className="text-pharma-100 dark:text-pharma-200 text-xs leading-tight">{feature.description}</div>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="text-xs text-pharma-100 dark:text-pharma-200 mt-2 flex items-center gap-1">
+                    <div className="text-xs text-pharma-100 dark:text-pharma-200 mt-1 flex items-center gap-1">
                         <span className="animate-pulse">←</span>
                         <span>Tap to flip</span>
                     </div>
