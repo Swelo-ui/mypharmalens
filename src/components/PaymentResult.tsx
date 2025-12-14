@@ -78,12 +78,7 @@ const PaymentResult: React.FC = () => {
             console.error('Client update error (PaymentResult):', e);
           }
 
-          toast.success('🎉 Subscription Activated!', {
-            description: `Congratulations! Your ${getPlanDisplayName(tx?.plan_id || '')} plan is now active.`,
-            duration: 6000
-          });
-
-          // Show congratulations modal
+          // Show confetti celebration (toast is shown by the component)
           setShowCongratulations(true);
         } else if (status === 'failed') {
           toast.error('Payment failed. Please try again.');
@@ -136,12 +131,7 @@ const PaymentResult: React.FC = () => {
                   console.error('Client update error (Polling):', e);
                 }
 
-                toast.success('🎉 Subscription Activated!', {
-                  description: `Congratulations! Your ${getPlanDisplayName(latest?.plan_id || '')} plan is now active.`,
-                  duration: 6000
-                });
-
-                // Show congratulations modal
+                // Show confetti celebration (toast is shown by the component)
                 setShowCongratulations(true);
               } else if (newStatus === 'failed') {
                 toast.error('Payment failed during verification.');

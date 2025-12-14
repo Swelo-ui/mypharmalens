@@ -265,8 +265,15 @@ const IdentificationPacks: React.FC = () => {
                 await fetchExtraIdentifications();
 
                 // Show instant success confetti
+                console.log('🎉 Setting showCongratulations to TRUE');
                 setCongratsPack(pack);
                 setShowCongratulations(true);
+
+                // Backup toast in case confetti doesn't show
+                toast.success('🎉 Purchase Successful!', {
+                  description: `${pack.identifications_count} AI identifications added to your account!`,
+                  duration: 5000
+                });
 
                 setPurchasing(null);
               } else {
@@ -293,8 +300,16 @@ const IdentificationPacks: React.FC = () => {
                 if (transaction?.status === 'success') {
                   toast.dismiss(processingToast);
                   await fetchExtraIdentifications();
+                  console.log('🎉 (Fallback) Setting showCongratulations to TRUE');
                   setCongratsPack(pack);
                   setShowCongratulations(true);
+
+                  // Backup toast
+                  toast.success('🎉 Purchase Successful!', {
+                    description: `${pack.identifications_count} identifications added!`,
+                    duration: 5000
+                  });
+
                   setPurchasing(null);
                   return true;
                 }
