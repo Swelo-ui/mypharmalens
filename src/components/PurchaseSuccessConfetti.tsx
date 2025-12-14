@@ -17,67 +17,72 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
     subMessage,
     duration = 5000
 }) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
     const hasTriggeredRef = useRef(false);
-    const animationFrameRef = useRef<number | null>(null);
 
     // Rainbow colors for confetti
     const colors = [
-        '#FF0000', // Red
-        '#FF7F00', // Orange  
-        '#FFFF00', // Yellow
-        '#00FF00', // Green
-        '#0000FF', // Blue
-        '#4B0082', // Indigo
-        '#9400D3', // Violet
-        '#FF1493', // Deep Pink
-        '#00CED1', // Dark Turquoise
-        '#FFD700', // Gold
-        '#FF69B4', // Hot Pink
-        '#00FA9A', // Medium Spring Green
-        '#1E90FF', // Dodger Blue
-        '#FF4500', // Orange Red
-        '#8A2BE2', // Blue Violet
-        '#E91E63', // Pink
-        '#9C27B0', // Purple
-        '#03A9F4', // Light Blue
+        '#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF',
+        '#4B0082', '#9400D3', '#FF1493', '#00CED1', '#FFD700',
+        '#FF69B4', '#00FA9A', '#1E90FF', '#FF4500', '#8A2BE2',
+        '#E91E63', '#9C27B0', '#03A9F4',
     ];
 
-    const fireConfetti = useCallback(() => {
-        const isMobile = window.innerWidth <= 768;
-        const particleCount = isMobile ? 80 : 150;
-        const spread = isMobile ? 60 : 80;
-
-        // Fire confetti from both sides
-        const fireFromSide = (originX: number) => {
-            confetti({
-                particleCount,
-                angle: originX < 0.5 ? 60 : 120,
-                spread,
-                origin: { x: originX, y: 0.6 },
-                colors,
-                ticks: 300,
-                gravity: 1.2,
-                scalar: isMobile ? 0.8 : 1,
-                drift: 0,
-                disableForReducedMotion: true,
+    // Initialize confetti on our canvas
+    useEffect(() => {
+        if (canvasRef.current && !confettiInstanceRef.current) {
+            confettiInstanceRef.current = confetti.create(canvasRef.current, {
+                resize: true,
+                useWorker: true,
             });
-        };
+        }
+    }, []);
 
-        // Fire from left
-        fireFromSide(0.1);
-        // Fire from right
-        fireFromSide(0.9);
+    const fireConfetti = useCallback(() => {
+        if (!confettiInstanceRef.current) return;
+
+        const myConfetti = confettiInstanceRef.current;
+        const isMobile = window.innerWidth <= 768;
+        const particleCount = isMobile ? 60 : 120;
+        const spread = isMobile ? 55 : 70;
+
+        // Fire confetti from left side
+        myConfetti({
+            particleCount,
+            angle: 60,
+            spread,
+            origin: { x: 0, y: 0.65 },
+            colors,
+            ticks: 250,
+            gravity: 1,
+            scalar: isMobile ? 0.7 : 0.9,
+            disableForReducedMotion: true,
+        });
+
+        // Fire confetti from right side
+        myConfetti({
+            particleCount,
+            angle: 120,
+            spread,
+            origin: { x: 1, y: 0.65 },
+            colors,
+            ticks: 250,
+            gravity: 1,
+            scalar: isMobile ? 0.7 : 0.9,
+            disableForReducedMotion: true,
+        });
 
         // Fire from center top
-        confetti({
-            particleCount: isMobile ? 60 : 100,
+        myConfetti({
+            particleCount: isMobile ? 40 : 80,
             angle: 90,
-            spread: isMobile ? 100 : 140,
-            origin: { x: 0.5, y: 0.1 },
+            spread: isMobile ? 80 : 120,
+            origin: { x: 0.5, y: 0 },
             colors,
-            ticks: 350,
-            gravity: 1,
-            scalar: isMobile ? 0.9 : 1.1,
+            ticks: 280,
+            gravity: 0.9,
+            scalar: isMobile ? 0.8 : 1,
             disableForReducedMotion: true,
         });
     }, []);
@@ -91,29 +96,10 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
             duration: duration,
         });
 
-        // Fire confetti bursts
+        // Fire confetti bursts with delays
         fireConfetti();
-
-        // Second burst after delay
-        setTimeout(() => {
-            fireConfetti();
-        }, 500);
-
-        // Third burst
-        setTimeout(() => {
-            const isMobile = window.innerWidth <= 768;
-            confetti({
-                particleCount: isMobile ? 50 : 80,
-                angle: 90,
-                spread: 160,
-                origin: { x: 0.5, y: 0.4 },
-                colors,
-                ticks: 300,
-                gravity: 0.8,
-                scalar: isMobile ? 0.7 : 0.9,
-                disableForReducedMotion: true,
-            });
-        }, 1000);
+        setTimeout(fireConfetti, 400);
+        setTimeout(fireConfetti, 800);
 
         // Cleanup and complete
         setTimeout(() => {
@@ -125,24 +111,41 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
     useEffect(() => {
         if (isOpen && !hasTriggeredRef.current) {
             hasTriggeredRef.current = true;
-            startCelebration();
+            // Small delay to ensure canvas is mounted
+            setTimeout(startCelebration, 50);
         }
 
-        // Reset when closed
         if (!isOpen) {
             hasTriggeredRef.current = false;
         }
-
-        return () => {
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-        };
     }, [isOpen, startCelebration]);
 
-    // This component doesn't render any visible elements
-    // canvas-confetti creates its own canvas on the document body
-    return null;
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (confettiInstanceRef.current) {
+                confettiInstanceRef.current.reset();
+            }
+        };
+    }, []);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                pointerEvents: 'none',
+                zIndex: 2147483647, // Maximum z-index
+                touchAction: 'none',
+                WebkitUserSelect: 'none',
+                userSelect: 'none',
+            }}
+        />
+    );
 };
 
 export default PurchaseSuccessConfetti;
