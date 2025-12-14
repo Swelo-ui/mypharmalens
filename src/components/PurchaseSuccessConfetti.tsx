@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import confetti from 'canvas-confetti';
+import { Confetti, type ConfettiRef } from '@/registry/magicui/confetti';
 import { toast } from 'sonner';
 
 interface PurchaseSuccessConfettiProps {
@@ -17,132 +17,96 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
     subMessage,
     duration = 5000
 }) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
+    const confettiRef = useRef<ConfettiRef>(null);
     const hasTriggeredRef = useRef(false);
 
-    // Rainbow colors for confetti
-    const colors = [
-        '#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF',
-        '#4B0082', '#9400D3', '#FF1493', '#00CED1', '#FFD700',
-        '#FF69B4', '#00FA9A', '#1E90FF', '#FF4500', '#8A2BE2',
-        '#E91E63', '#9C27B0', '#03A9F4',
-    ];
+    const fireCelebration = useCallback(() => {
+        if (!confettiRef.current) return;
 
-    // Initialize confetti on our canvas
-    useEffect(() => {
-        if (canvasRef.current && !confettiInstanceRef.current) {
-            confettiInstanceRef.current = confetti.create(canvasRef.current, {
-                resize: true,
-                useWorker: true,
-            });
-        }
-    }, []);
-
-    const fireConfetti = useCallback(() => {
-        if (!confettiInstanceRef.current) return;
-
-        const myConfetti = confettiInstanceRef.current;
         const isMobile = window.innerWidth <= 768;
-        const particleCount = isMobile ? 60 : 120;
-        const spread = isMobile ? 55 : 70;
+        const particleCount = isMobile ? 80 : 150;
 
         // Fire confetti from left side
-        myConfetti({
+        confettiRef.current.fire({
             particleCount,
             angle: 60,
-            spread,
+            spread: 55,
             origin: { x: 0, y: 0.65 },
-            colors,
-            ticks: 250,
-            gravity: 1,
-            scalar: isMobile ? 0.7 : 0.9,
-            disableForReducedMotion: true,
+            colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'],
         });
 
         // Fire confetti from right side
-        myConfetti({
+        confettiRef.current.fire({
             particleCount,
             angle: 120,
-            spread,
+            spread: 55,
             origin: { x: 1, y: 0.65 },
-            colors,
-            ticks: 250,
-            gravity: 1,
-            scalar: isMobile ? 0.7 : 0.9,
-            disableForReducedMotion: true,
+            colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'],
         });
 
-        // Fire from center top
-        myConfetti({
-            particleCount: isMobile ? 40 : 80,
-            angle: 90,
-            spread: isMobile ? 80 : 120,
-            origin: { x: 0.5, y: 0 },
-            colors,
-            ticks: 280,
-            gravity: 0.9,
-            scalar: isMobile ? 0.8 : 1,
-            disableForReducedMotion: true,
-        });
-    }, []);
-
-    const startCelebration = useCallback(() => {
-        console.log('🎉 PurchaseSuccessConfetti: Starting celebration!');
-
-        // Show toast notification
-        toast.success(`🎉 ${message}`, {
-            description: subMessage,
-            duration: duration,
-        });
-
-        // Fire confetti bursts with delays
-        fireConfetti();
-        setTimeout(fireConfetti, 400);
-        setTimeout(fireConfetti, 800);
-
-        // Cleanup and complete
+        // Second burst from center
         setTimeout(() => {
-            hasTriggeredRef.current = false;
-            onComplete?.();
-        }, duration);
-    }, [message, subMessage, duration, fireConfetti, onComplete]);
+            confettiRef.current?.fire({
+                particleCount: isMobile ? 60 : 100,
+                angle: 90,
+                spread: isMobile ? 100 : 140,
+                origin: { x: 0.5, y: 0.3 },
+                colors: ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#9400D3'],
+            });
+        }, 300);
+
+        // Third burst
+        setTimeout(() => {
+            confettiRef.current?.fire({
+                particleCount: isMobile ? 40 : 80,
+                spread: 160,
+                origin: { x: 0.5, y: 0.5 },
+                colors: ['#FFD700', '#FF69B4', '#00CED1', '#FF4500', '#8A2BE2'],
+            });
+        }, 600);
+    }, []);
 
     useEffect(() => {
         if (isOpen && !hasTriggeredRef.current) {
             hasTriggeredRef.current = true;
-            // Small delay to ensure canvas is mounted
-            setTimeout(startCelebration, 50);
+            console.log('🎉 PurchaseSuccessConfetti: Starting celebration!');
+
+            // Show toast notification
+            toast.success(`🎉 ${message}`, {
+                description: subMessage,
+                duration: duration,
+            });
+
+            // Small delay to ensure canvas is ready
+            setTimeout(() => {
+                fireCelebration();
+            }, 100);
+
+            // Additional bursts
+            setTimeout(fireCelebration, 500);
+            setTimeout(fireCelebration, 900);
+
+            // Cleanup and complete
+            setTimeout(() => {
+                hasTriggeredRef.current = false;
+                onComplete?.();
+            }, duration);
         }
 
         if (!isOpen) {
             hasTriggeredRef.current = false;
         }
-    }, [isOpen, startCelebration]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (confettiInstanceRef.current) {
-                confettiInstanceRef.current.reset();
-            }
-        };
-    }, []);
+    }, [isOpen, message, subMessage, duration, fireCelebration, onComplete]);
 
     return (
-        <canvas
-            ref={canvasRef}
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                pointerEvents: 'none',
-                zIndex: 2147483647, // Maximum z-index
-                touchAction: 'none',
-                WebkitUserSelect: 'none',
-                userSelect: 'none',
+        <Confetti
+            ref={confettiRef}
+            className="absolute top-0 left-0 z-[9999] size-full"
+            manualstart
+            globalOptions={{
+                resize: true,
+                useWorker: true,
+                disableForReducedMotion: true,
             }}
         />
     );
