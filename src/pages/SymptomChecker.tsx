@@ -730,7 +730,7 @@ const SymptomChecker = () => {
       <SEOHead
         title="Free AI Symptom Checker - Identify Medications & Conditions | PharmaLens"
         description="Use our free AI-powered Symptom Checker to find medications and understand potential conditions. Instant, accurate health analysis and drug recommendations based on your symptoms."
-        keywords="AI symptom checker, free symptom checker, medication finder by symptom, check symptoms online, drug symptom search, medicine finder, health symptom analysis, indian medicine finder, symptom based medicine"
+        keywords="AI symptom checker, free symptom checker, medication finder by symptom, check symptoms online, drug symptom search, medicine finder, health symptom analysis, symptom based medicine, what medicine for headache, fever medicine finder, cold medicine checker, stomach pain remedy finder, symptom to drug search, OTC medicine by symptom, find drug by symptoms"
         canonicalUrl="/symptom-checker"
       />
       <Header />

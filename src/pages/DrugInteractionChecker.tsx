@@ -298,7 +298,7 @@ const DrugInteractionChecker = () => {
       <SEOHead
         title="Free Drug Interaction Checker - Instant Safety Analysis | PharmaLens"
         description="Check for harmful interactions between prescription drugs, OTC medicines, and supplements. Free, instant, and comprehensive medication safety analysis tool powered by AI."
-        keywords="drug interaction checker, free medication interaction check, pill checker, drug safety analysis, medicine combination safety, contraindications checker, multi-drug interaction, check drug reactions, medication safety, polypharmacy checker"
+        keywords="drug interaction checker, free medication interaction check, pill checker, drug safety analysis, medicine combination safety, contraindications checker, multi-drug interaction, check drug reactions, medication safety, polypharmacy checker, can I take together, dangerous drug combinations, medicine mixing checker, prescription interaction tool, OTC drug interactions, supplement interaction checker"
         canonicalUrl="/drug-interactions"
       />
       {/* FAQPage Schema for SEO */}

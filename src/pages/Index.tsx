@@ -14,28 +14,28 @@ import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain, Clock,
 const Index = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
-  
+
   // Function to handle animations on scroll
   useEffect(() => {
     const handleScroll = () => {
       const elements = document.querySelectorAll('.animate-on-scroll');
-      
+
       elements.forEach((el) => {
         const rect = el.getBoundingClientRect();
         const isVisible = rect.top < window.innerHeight - 100;
-        
+
         if (isVisible) {
           el.classList.add('visible');
         }
       });
     };
-    
+
     // Initial check
     handleScroll();
-    
+
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll);
-    
+
     // Clean up
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -70,7 +70,7 @@ const Index = () => {
       "Side effects and dosage information",
       "Visual pill identification"
     ],
-    "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner"
+    "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner, free pill finder, camera medication identifier, what pill is this, identify medicine by photo, drug lookup app, medicine database, AI pharmacist, drug interaction checker, symptom checker"
   };
 
   return (
@@ -78,16 +78,16 @@ const Index = () => {
       <SEOHead
         title="PharmaLens - AI-Powered Medication Identification & Drug Information"
         description="Identify medications instantly with AI technology. Access comprehensive drug information, side effects, dosages, and interactions. Free medication identifier and pharmaceutical database."
-        keywords="medication identifier, pill identifier, drug information, AI medication, pharmaceutical database, medicine lookup, drug interactions, side effects, dosage information, prescription drugs, over the counter medications"
+        keywords="medication identifier, pill identifier, drug information, AI medication app, pharmaceutical database, medicine lookup app, drug interactions checker, side effects database, dosage information, prescription drugs database, OTC medications, AI pharmacist, free drug identifier, medicine information app, pill scanner app, camera medicine identification"
         canonicalUrl="/"
         structuredData={structuredData}
       />
-      
+
       <Header />
-      
+
       <main className="flex-1">
         <Hero />
-        
+
         {/* Search Section */}
         <section className="py-16 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
           <div className="container mx-auto px-4 max-w-6xl">
@@ -99,9 +99,9 @@ const Index = () => {
                 Search our comprehensive database for detailed information on medications, including usage, side effects, interactions, and more.
               </p>
             </div>
-            
+
             <SearchBar className="max-w-3xl mx-auto animate-on-scroll" />
-            
+
             <div className="mt-8 text-center animate-on-scroll">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Popular searches: Paracetamol, Ibuprofen, Metformin, Atorvastatin, Amoxicillin
@@ -109,7 +109,7 @@ const Index = () => {
             </div>
           </div>
         </section>
-        
+
         {/* How It Works Section */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800">
           <div className="container mx-auto px-4 max-w-6xl">
@@ -124,7 +124,7 @@ const Index = () => {
                 Our platform combines advanced AI technology with comprehensive drug databases to provide accurate identification and detailed information.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
               <div className="flex flex-col items-center text-center animate-on-scroll">
                 <div className="w-16 h-16 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-5 relative">
@@ -138,7 +138,7 @@ const Index = () => {
                   Use your camera to take a clear photo of the medication, or upload an existing image.
                 </p>
               </div>
-              
+
               <div className="flex flex-col items-center text-center animate-on-scroll delay-150">
                 <div className="w-16 h-16 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-5 relative">
                   <Brain className="h-7 w-7 text-pharma-600" />
@@ -151,7 +151,7 @@ const Index = () => {
                   Our advanced AI algorithms analyze the image to identify the medication with high accuracy.
                 </p>
               </div>
-              
+
               <div className="flex flex-col items-center text-center animate-on-scroll delay-300">
                 <div className="w-16 h-16 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mb-5 relative">
                   <Database className="h-7 w-7 text-pharma-600" />
@@ -165,7 +165,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-16 text-center animate-on-scroll">
               <Link to="/identify" className="inline-flex items-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg hover:shadow-xl hover:shadow-pharma-600/20">
                 Try It Now
@@ -189,7 +189,7 @@ const Index = () => {
                 Beyond medication identification, PharmaLens offers powerful tools to help you understand symptoms and check for dangerous drug interactions.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-stretch">
               {/* Symptoms Checker Feature */}
               <div className="animate-on-scroll h-full">
@@ -203,11 +203,11 @@ const Index = () => {
                       <p className="text-pharma-700 dark:text-pharma-300">AI-powered symptom analysis</p>
                     </div>
                   </div>
-                  
+
                   <p className="text-gray-700 dark:text-gray-300 mb-6 break-words">
                     Get personalized medication recommendations based on your symptoms. Our intelligent system analyzes your symptoms and suggests appropriate first-line treatments from our comprehensive database.
                   </p>
-                  
+
                   <div className="space-y-4 mb-8">
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
@@ -218,7 +218,7 @@ const Index = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Organized by medical specialties: Headache, Fever, Digestive, Respiratory, and more</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
                         <TrendingUp className="h-3 w-3 text-white" />
@@ -228,7 +228,7 @@ const Index = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Evidence-based medication recommendations for common symptoms</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-pharma-600 flex items-center justify-center mr-3 mt-0.5">
                         <Users className="h-3 w-3 text-white" />
@@ -239,7 +239,7 @@ const Index = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <Link to="/symptom-checker" className="mt-auto inline-flex items-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg hover:shadow-xl hover:shadow-pharma-600/20">
                     Try Symptoms Checker
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -259,11 +259,11 @@ const Index = () => {
                       <p className="text-red-700 dark:text-red-300">Safety-first interaction checking</p>
                     </div>
                   </div>
-                  
+
                   <p className="text-gray-700 dark:text-gray-300 mb-6 break-words">
                     Protect yourself from dangerous drug combinations. Our comprehensive interaction checker analyzes potential risks between medications and provides clear safety guidance.
                   </p>
-                  
+
                   <div className="space-y-4 mb-8">
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
@@ -274,7 +274,7 @@ const Index = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Instant detection of potentially harmful drug combinations</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
                         <Activity className="h-3 w-3 text-white" />
@@ -284,7 +284,7 @@ const Index = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Onset timing, monitoring requirements, and severity levels</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center mr-3 mt-0.5">
                         <Users className="h-3 w-3 text-white" />
@@ -295,7 +295,7 @@ const Index = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <Link to="/drug-interactions" className="mt-auto inline-flex items-center px-6 py-3 rounded-full bg-red-600 text-white font-medium hover:bg-red-700 transition-all shadow-lg hover:shadow-xl hover:shadow-red-600/20">
                     Check Interactions
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -303,7 +303,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Feature Statistics */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 animate-on-scroll">
               <div className="text-center">
@@ -340,7 +340,7 @@ const Index = () => {
                 Choose the perfect plan for your medication identification needs. From basic searches to unlimited AI-powered identifications.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Free Plan */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 animate-on-scroll">
@@ -352,7 +352,7 @@ const Index = () => {
                   <div className="text-3xl font-bold text-pharma-600 mb-2">₹0<span className="text-lg font-normal text-gray-500">/month</span></div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Perfect for occasional users</p>
                 </div>
-                
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -371,7 +371,7 @@ const Index = () => {
                     <span className="text-sm">Mobile web app access</span>
                   </li>
                 </ul>
-                
+
                 <Link to="/identify" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full border border-pharma-600 text-pharma-600 font-medium hover:bg-pharma-50 transition-all">
                   Get Started Free
                 </Link>
@@ -391,7 +391,7 @@ const Index = () => {
                   <p className="text-sm text-green-600 font-semibold">Save ₹30/month</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">39 AI identifications/month</p>
                 </div>
-                
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -414,7 +414,7 @@ const Index = () => {
                     <span className="text-sm">PWA offline access</span>
                   </li>
                 </ul>
-                
+
                 <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all">
                   Choose Lite
                 </Link>
@@ -426,7 +426,7 @@ const Index = () => {
                   <Crown className="w-4 h-4 inline mr-1" />
                   Most Popular
                 </div>
-                
+
                 <div className="text-center mb-6 pt-4">
                   <div className="w-12 h-12 rounded-full bg-pharma-600 flex items-center justify-center mx-auto mb-4">
                     <Crown className="h-6 w-6 text-white" />
@@ -439,7 +439,7 @@ const Index = () => {
                   <p className="text-sm text-green-600 font-semibold">Save ₹100/month</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">101 AI identifications/month</p>
                 </div>
-                
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -466,14 +466,14 @@ const Index = () => {
                     <span className="text-sm">Advanced search filters</span>
                   </li>
                 </ul>
-                
+
                 <Link to="/subscription-manager" className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-pharma-600 text-white font-medium hover:bg-pharma-700 transition-all shadow-lg">
                   Choose Pro
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </div>
             </div>
-            
+
             <div className="mt-12 text-center animate-on-scroll">
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Need help choosing the right plan?
@@ -500,7 +500,7 @@ const Index = () => {
                 <p className="text-gray-600 dark:text-gray-300 mb-8">
                   We prioritize accuracy and reliability in our medication database. All information is sourced from trusted pharmaceutical references and verified by healthcare professionals.
                 </p>
-                
+
                 <ul className="space-y-4">
                   {[
                     "Comprehensive database of medications",
@@ -518,7 +518,7 @@ const Index = () => {
                   ))}
                 </ul>
               </div>
-              
+
               <div className="animate-on-scroll delay-150">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
                   <div className="flex items-center mb-6">
@@ -568,9 +568,9 @@ const Index = () => {
                       <Database className="h-10 w-10 text-pharma-600" />
                     </div>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-center mb-6">Our Data Sources</h3>
-                  
+
                   <div className="space-y-6">
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Pharmaceutical Databases</h4>
@@ -578,14 +578,14 @@ const Index = () => {
                         We integrate with trusted sources like Drugs.com and India Drug Index for comprehensive medication data.
                       </p>
                     </div>
-                    
+
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Healthcare Professionals</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         Our information is reviewed by licensed pharmacists and physicians for accuracy and completeness.
                       </p>
                     </div>
-                    
+
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Regulatory Bodies</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -604,9 +604,9 @@ const Index = () => {
                       <Brain className="h-10 w-10 text-pharma-600" />
                     </div>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-center mb-6">AI-Powered Technology</h3>
-                  
+
                   <div className="space-y-6">
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Advanced Image Recognition</h4>
@@ -614,14 +614,14 @@ const Index = () => {
                         Our AI analyzes pill shape, color, imprint, and size to accurately identify medications from photos.
                       </p>
                     </div>
-                    
+
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Smart Search Algorithm</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         Intelligent search that understands partial names, generic/brand variations, and common misspellings.
                       </p>
                     </div>
-                    
+
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
                       <h4 className="font-medium mb-2">Real-time Updates</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -644,7 +644,7 @@ const Index = () => {
                   Your privacy is protected with enterprise-grade security and HIPAA compliance standards.
                 </p>
               </div>
-              
+
               <div className="text-center animate-on-scroll delay-150">
                 <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-purple-600" />
@@ -654,7 +654,7 @@ const Index = () => {
                   Access medication information anytime, anywhere with our reliable cloud infrastructure.
                 </p>
               </div>
-              
+
               <div className="text-center animate-on-scroll delay-300">
                 <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-4">
                   <Database className="h-8 w-8 text-orange-600" />
@@ -690,7 +690,7 @@ const Index = () => {
           </div>
         </section>
       </main>
-      
+
       <Footer />
       <BottomNavigation />
     </div>

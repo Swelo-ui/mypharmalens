@@ -1045,7 +1045,7 @@ const DrugIdentify = () => {
       <SEOHead
         title="Identify Pills & Medications - AI Drug Identifier | PharmaLens"
         description="Upload a photo to instantly identify pills and medications using advanced AI. Get detailed drug information, dosage, and safety warnings."
-        keywords="pill identifier, identify pill by image, medication scanner, drug identifier app, ai pill recognition"
+        keywords="pill identifier, identify pill by image, medication scanner, drug identifier app, AI pill recognition, free pill finder, camera pill identification, what pill is this, identify medicine by photo, pill lookup by imprint, tablet identifier online, drug recognition app, medicine photo scanner, identify drug by picture"
         canonicalUrl="/identify"
       />
       <Header />
