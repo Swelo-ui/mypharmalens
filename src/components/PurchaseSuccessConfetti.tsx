@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Confetti from 'react-confetti';
-import { useWindowSize } from 'react-use';
 import { toast } from 'sonner';
 
 interface PurchaseSuccessConfettiProps {
@@ -18,21 +17,49 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
     subMessage,
     duration = 5000
 }) => {
-    const { width, height } = useWindowSize();
+    // Use state for window dimensions to handle mobile properly
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [confettiPieces, setConfettiPieces] = useState(0);
     const [isActive, setIsActive] = useState(false);
     const hasTriggeredRef = useRef(false);
-    const isMobile = (width || 0) <= 480;
+
+    // Calculate dimensions on mount and resize
+    useEffect(() => {
+        const updateDimensions = () => {
+            // Use document dimensions for better mobile support
+            const width = Math.max(
+                document.documentElement.clientWidth || 0,
+                window.innerWidth || 0
+            );
+            const height = Math.max(
+                document.documentElement.clientHeight || 0,
+                window.innerHeight || 0
+            );
+            setDimensions({ width, height });
+        };
+
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
+        window.addEventListener('orientationchange', updateDimensions);
+
+        return () => {
+            window.removeEventListener('resize', updateDimensions);
+            window.removeEventListener('orientationchange', updateDimensions);
+        };
+    }, []);
+
+    const isMobile = dimensions.width <= 768;
 
     useEffect(() => {
         // Only trigger once when isOpen becomes true
-        if (isOpen && !hasTriggeredRef.current) {
+        if (isOpen && !hasTriggeredRef.current && dimensions.width > 0) {
             hasTriggeredRef.current = true;
-            console.log('🎉 PurchaseSuccessConfetti triggered!');
+            console.log('🎉 PurchaseSuccessConfetti triggered!', { isMobile, dimensions });
 
             // Start confetti immediately
             setIsActive(true);
-            setConfettiPieces(isMobile ? 300 : 600);
+            // Use fewer pieces on mobile for performance
+            setConfettiPieces(isMobile ? 150 : 400);
 
             // Show toast notification
             toast.success(`🎉 ${message}`, {
@@ -42,18 +69,18 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
 
             // Gradually reduce confetti pieces for natural fade-out
             const reduceTimer = setTimeout(() => {
-                setConfettiPieces(isMobile ? 100 : 250);
+                setConfettiPieces(isMobile ? 50 : 150);
             }, 2000);
 
             // Stop generating new confetti
             const stopTimer = setTimeout(() => {
-                setConfettiPieces(50);
-            }, 3500);
+                setConfettiPieces(20);
+            }, 3000);
 
             // Fade out completely
             const fadeTimer = setTimeout(() => {
                 setConfettiPieces(0);
-            }, 4500);
+            }, 4000);
 
             // Complete callback
             const completeTimer = setTimeout(() => {
@@ -74,21 +101,33 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
         if (!isOpen) {
             hasTriggeredRef.current = false;
         }
-    }, [isOpen]);
+    }, [isOpen, dimensions.width]);
 
-    // Always render but with 0 pieces when not active
-    if (!isActive && confettiPieces === 0) return null;
+    // Don't render if not active or no dimensions
+    if (!isActive || dimensions.width === 0) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] pointer-events-none">
+        <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 99999,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+            }}
+        >
             <Confetti
-                width={width}
-                height={height}
+                width={dimensions.width}
+                height={dimensions.height}
                 recycle={confettiPieces > 0}
                 numberOfPieces={confettiPieces}
-                gravity={0.2}
-                wind={0.02}
-                initialVelocityY={15}
+                gravity={isMobile ? 0.3 : 0.2}
+                wind={0.01}
+                initialVelocityY={isMobile ? 10 : 15}
+                friction={0.99}
                 colors={[
                     '#FF0000', // Red
                     '#FF7F00', // Orange  
@@ -109,7 +148,12 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
                     '#9C27B0', // Purple
                     '#03A9F4', // Light Blue
                 ]}
-                tweenDuration={4000}
+                tweenDuration={3000}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                }}
             />
         </div>
     );
