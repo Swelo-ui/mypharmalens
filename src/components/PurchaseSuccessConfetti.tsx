@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Confetti from 'react-confetti';
+import React, { useEffect, useRef, useCallback } from 'react';
+import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 
 interface PurchaseSuccessConfettiProps {
@@ -17,146 +17,132 @@ const PurchaseSuccessConfetti: React.FC<PurchaseSuccessConfettiProps> = ({
     subMessage,
     duration = 5000
 }) => {
-    // Use state for window dimensions to handle mobile properly
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-    const [confettiPieces, setConfettiPieces] = useState(0);
-    const [isActive, setIsActive] = useState(false);
     const hasTriggeredRef = useRef(false);
+    const animationFrameRef = useRef<number | null>(null);
 
-    // Calculate dimensions on mount and resize
-    useEffect(() => {
-        const updateDimensions = () => {
-            // Use document dimensions for better mobile support
-            const width = Math.max(
-                document.documentElement.clientWidth || 0,
-                window.innerWidth || 0
-            );
-            const height = Math.max(
-                document.documentElement.clientHeight || 0,
-                window.innerHeight || 0
-            );
-            setDimensions({ width, height });
+    // Rainbow colors for confetti
+    const colors = [
+        '#FF0000', // Red
+        '#FF7F00', // Orange  
+        '#FFFF00', // Yellow
+        '#00FF00', // Green
+        '#0000FF', // Blue
+        '#4B0082', // Indigo
+        '#9400D3', // Violet
+        '#FF1493', // Deep Pink
+        '#00CED1', // Dark Turquoise
+        '#FFD700', // Gold
+        '#FF69B4', // Hot Pink
+        '#00FA9A', // Medium Spring Green
+        '#1E90FF', // Dodger Blue
+        '#FF4500', // Orange Red
+        '#8A2BE2', // Blue Violet
+        '#E91E63', // Pink
+        '#9C27B0', // Purple
+        '#03A9F4', // Light Blue
+    ];
+
+    const fireConfetti = useCallback(() => {
+        const isMobile = window.innerWidth <= 768;
+        const particleCount = isMobile ? 80 : 150;
+        const spread = isMobile ? 60 : 80;
+
+        // Fire confetti from both sides
+        const fireFromSide = (originX: number) => {
+            confetti({
+                particleCount,
+                angle: originX < 0.5 ? 60 : 120,
+                spread,
+                origin: { x: originX, y: 0.6 },
+                colors,
+                ticks: 300,
+                gravity: 1.2,
+                scalar: isMobile ? 0.8 : 1,
+                drift: 0,
+                disableForReducedMotion: true,
+            });
         };
 
-        updateDimensions();
-        window.addEventListener('resize', updateDimensions);
-        window.addEventListener('orientationchange', updateDimensions);
+        // Fire from left
+        fireFromSide(0.1);
+        // Fire from right
+        fireFromSide(0.9);
 
-        return () => {
-            window.removeEventListener('resize', updateDimensions);
-            window.removeEventListener('orientationchange', updateDimensions);
-        };
+        // Fire from center top
+        confetti({
+            particleCount: isMobile ? 60 : 100,
+            angle: 90,
+            spread: isMobile ? 100 : 140,
+            origin: { x: 0.5, y: 0.1 },
+            colors,
+            ticks: 350,
+            gravity: 1,
+            scalar: isMobile ? 0.9 : 1.1,
+            disableForReducedMotion: true,
+        });
     }, []);
 
-    const isMobile = dimensions.width <= 768;
+    const startCelebration = useCallback(() => {
+        console.log('🎉 PurchaseSuccessConfetti: Starting celebration!');
+
+        // Show toast notification
+        toast.success(`🎉 ${message}`, {
+            description: subMessage,
+            duration: duration,
+        });
+
+        // Fire confetti bursts
+        fireConfetti();
+
+        // Second burst after delay
+        setTimeout(() => {
+            fireConfetti();
+        }, 500);
+
+        // Third burst
+        setTimeout(() => {
+            const isMobile = window.innerWidth <= 768;
+            confetti({
+                particleCount: isMobile ? 50 : 80,
+                angle: 90,
+                spread: 160,
+                origin: { x: 0.5, y: 0.4 },
+                colors,
+                ticks: 300,
+                gravity: 0.8,
+                scalar: isMobile ? 0.7 : 0.9,
+                disableForReducedMotion: true,
+            });
+        }, 1000);
+
+        // Cleanup and complete
+        setTimeout(() => {
+            hasTriggeredRef.current = false;
+            onComplete?.();
+        }, duration);
+    }, [message, subMessage, duration, fireConfetti, onComplete]);
 
     useEffect(() => {
-        // Only trigger once when isOpen becomes true
-        if (isOpen && !hasTriggeredRef.current && dimensions.width > 0) {
+        if (isOpen && !hasTriggeredRef.current) {
             hasTriggeredRef.current = true;
-            console.log('🎉 PurchaseSuccessConfetti triggered!', { isMobile, dimensions });
-
-            // Start confetti immediately
-            setIsActive(true);
-            // Use fewer pieces on mobile for performance
-            setConfettiPieces(isMobile ? 150 : 400);
-
-            // Show toast notification
-            toast.success(`🎉 ${message}`, {
-                description: subMessage,
-                duration: duration,
-            });
-
-            // Gradually reduce confetti pieces for natural fade-out
-            const reduceTimer = setTimeout(() => {
-                setConfettiPieces(isMobile ? 50 : 150);
-            }, 2000);
-
-            // Stop generating new confetti
-            const stopTimer = setTimeout(() => {
-                setConfettiPieces(20);
-            }, 3000);
-
-            // Fade out completely
-            const fadeTimer = setTimeout(() => {
-                setConfettiPieces(0);
-            }, 4000);
-
-            // Complete callback
-            const completeTimer = setTimeout(() => {
-                setIsActive(false);
-                hasTriggeredRef.current = false;
-                onComplete?.();
-            }, duration);
-
-            return () => {
-                clearTimeout(reduceTimer);
-                clearTimeout(stopTimer);
-                clearTimeout(fadeTimer);
-                clearTimeout(completeTimer);
-            };
+            startCelebration();
         }
 
         // Reset when closed
         if (!isOpen) {
             hasTriggeredRef.current = false;
         }
-    }, [isOpen, dimensions.width]);
 
-    // Don't render if not active or no dimensions
-    if (!isActive || dimensions.width === 0) return null;
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [isOpen, startCelebration]);
 
-    return (
-        <div
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 99999,
-                pointerEvents: 'none',
-                overflow: 'hidden',
-            }}
-        >
-            <Confetti
-                width={dimensions.width}
-                height={dimensions.height}
-                recycle={confettiPieces > 0}
-                numberOfPieces={confettiPieces}
-                gravity={isMobile ? 0.3 : 0.2}
-                wind={0.01}
-                initialVelocityY={isMobile ? 10 : 15}
-                friction={0.99}
-                colors={[
-                    '#FF0000', // Red
-                    '#FF7F00', // Orange  
-                    '#FFFF00', // Yellow
-                    '#00FF00', // Green
-                    '#0000FF', // Blue
-                    '#4B0082', // Indigo
-                    '#9400D3', // Violet
-                    '#FF1493', // Deep Pink
-                    '#00CED1', // Dark Turquoise
-                    '#FFD700', // Gold
-                    '#FF69B4', // Hot Pink
-                    '#00FA9A', // Medium Spring Green
-                    '#1E90FF', // Dodger Blue
-                    '#FF4500', // Orange Red
-                    '#8A2BE2', // Blue Violet
-                    '#E91E63', // Pink
-                    '#9C27B0', // Purple
-                    '#03A9F4', // Light Blue
-                ]}
-                tweenDuration={3000}
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                }}
-            />
-        </div>
-    );
+    // This component doesn't render any visible elements
+    // canvas-confetti creates its own canvas on the document body
+    return null;
 };
 
 export default PurchaseSuccessConfetti;
