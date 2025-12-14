@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriptionService } from '@/services/subscriptionService';
-import CongratulationsModal from '@/components/CongratulationsModal';
+import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
 
 const PaymentResult: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -277,15 +277,12 @@ const PaymentResult: React.FC = () => {
 
   return (
     <>
-      <CongratulationsModal
+      <PurchaseSuccessConfetti
         isOpen={showCongratulations}
-        onClose={handleCloseCongratulations}
-        planName={getPlanDisplayName(transactionDetails?.plan_id || '')}
-        billingCycle={transactionDetails?.billing_cycle || 'monthly'}
-        planFeatures={getPlanFeatures(
-          transactionDetails?.plan_id || '',
-          transactionDetails?.billing_cycle || 'monthly'
-        )}
+        onComplete={handleCloseCongratulations}
+        message={`${getPlanDisplayName(transactionDetails?.plan_id || '')} Plan Activated!`}
+        subMessage="You now have access to all premium features!"
+        duration={4000}
       />
 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -327,8 +324,8 @@ const PaymentResult: React.FC = () => {
                   <div className="flex justify-between">
                     <span>Status:</span>
                     <span className={`capitalize ${paymentStatus === 'success' ? 'text-green-600' :
-                        paymentStatus === 'failed' ? 'text-red-600' :
-                          'text-yellow-600'
+                      paymentStatus === 'failed' ? 'text-red-600' :
+                        'text-yellow-600'
                       }`}>
                       {paymentStatus}
                     </span>

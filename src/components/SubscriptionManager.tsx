@@ -21,7 +21,7 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import PaymentButton from './PaymentButton';
 import { Tables } from '@/types/database.types';
 import { useSubscription } from '@/hooks/useSubscription';
-import CongratulationsMessage from '@/components/CongratulationsMessage';
+import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
 import { SubscriptionService } from '@/services/subscriptionService';
 import IdentificationPacks from './IdentificationPacks';
 import { ShineBorder } from '@/components/ui/shine-border';
@@ -48,7 +48,6 @@ const SubscriptionManager: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsPlan, setCongratulationsPlan] = useState<string>('');
-  const [congratulationsFeatures, setCongratulationsFeatures] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -60,27 +59,7 @@ const SubscriptionManager: React.FC = () => {
           setCurrentSubscription(subscription);
           const planName = subscription.plan?.name || 'Premium Plan';
 
-          let features: string[] = [];
-          if (planName === 'Lite') {
-            features = [
-              '39 AI identifications/month',
-              'Advanced search (249 results)',
-              'Priority support',
-              '1200+ medicines database',
-              'Layman explanations'
-            ];
-          } else if (planName === 'Pro') {
-            features = [
-              '101 AI identifications/month',
-              'Advanced search (500 results)',
-              'Priority support',
-              '1200+ medicines database',
-              'PWA offline access'
-            ];
-          }
-
           setCongratulationsPlan(planName);
-          setCongratulationsFeatures(features);
           setShowCongratulations(true);
 
           setTimeout(() => fetchUserData(), 1000);
@@ -670,13 +649,13 @@ const SubscriptionManager: React.FC = () => {
         <IdentificationPacks />
       </div>
 
-      {/* Congratulations Message */}
-      <CongratulationsMessage
-        isVisible={showCongratulations}
-        planName={congratulationsPlan}
-        billingCycle="monthly"
-        planFeatures={congratulationsFeatures}
-        onDismiss={() => setShowCongratulations(false)}
+      {/* Success Confetti Celebration */}
+      <PurchaseSuccessConfetti
+        isOpen={showCongratulations}
+        onComplete={() => setShowCongratulations(false)}
+        message={`${congratulationsPlan} Plan Activated!`}
+        subMessage="You now have access to all premium features!"
+        duration={4000}
       />
     </>
   );

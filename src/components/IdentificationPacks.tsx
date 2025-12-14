@@ -6,7 +6,7 @@ import { Zap, Check, Loader2, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
-import CongratulationsMessage from '@/components/CongratulationsMessage';
+import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
 
 interface IdentificationPack {
   id: string;
@@ -49,7 +49,7 @@ const IdentificationPacks: React.FC = () => {
       } catch (dbError) {
         console.log('Database table not ready, using mock data');
       }
-      
+
       // Fallback to mock data
       const mockPacks = [
         {
@@ -61,7 +61,7 @@ const IdentificationPacks: React.FC = () => {
           is_active: true
         },
         {
-          id: 'pack-2', 
+          id: 'pack-2',
           name: 'Basic Pack',
           description: '10 extra AI identifications',
           identifications_count: 10,
@@ -70,14 +70,14 @@ const IdentificationPacks: React.FC = () => {
         },
         {
           id: 'pack-3',
-          name: 'Value Pack', 
+          name: 'Value Pack',
           description: '20 extra AI identifications',
           identifications_count: 20,
           price_inr: 30.00,
           is_active: true
         }
       ];
-      
+
       setPacks(mockPacks);
     } catch (error) {
       console.error('Error fetching packs:', error);
@@ -89,16 +89,16 @@ const IdentificationPacks: React.FC = () => {
 
   const fetchExtraIdentifications = async () => {
     if (!user) return;
-    
+
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('extra_identifications')
         .eq('id', user.id)
         .single();
-      
+
       if (error) throw error;
-      
+
       setExtraIdentifications(profile?.extra_identifications || 0);
     } catch (error) {
       console.error('Error fetching extra identifications:', error);
@@ -117,7 +117,7 @@ const IdentificationPacks: React.FC = () => {
     try {
       // First, create a top-up transaction record
       const transactionId = `pack_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       const { error: txError } = await supabase
         .from('topup_transactions')
         .insert({
@@ -136,12 +136,12 @@ const IdentificationPacks: React.FC = () => {
             price_inr: pack.price_inr
           }
         });
-      
+
       if (txError) {
         console.error('Transaction creation error:', txError);
         throw new Error(`Failed to initialize payment: ${txError.message}`);
       }
-      
+
       console.log('Top-up transaction created:', transactionId);
 
       // Create Razorpay order
@@ -164,28 +164,28 @@ const IdentificationPacks: React.FC = () => {
         console.error('Razorpay order error:', orderError);
         throw new Error(orderError.message || 'Failed to create Razorpay order');
       }
-      
+
       if (!orderData || !orderData.order_id) {
         console.error('Invalid order response:', orderData);
         throw new Error('Invalid order response from Razorpay');
       }
-      
+
       console.log('Razorpay order created successfully:', orderData.order_id);
-      
+
       // Update transaction with Razorpay order ID - MUST WAIT!
       const { error: updateOrderError } = await supabase
         .from('topup_transactions')
-        .update({ 
+        .update({
           razorpay_order_id: orderData.order_id,
           updated_at: new Date().toISOString()
         })
         .eq('transaction_id', transactionId);
-      
+
       if (updateOrderError) {
         console.error('Failed to update transaction with order_id:', updateOrderError);
         throw new Error(`Failed to save order details: ${updateOrderError.message}`);
       }
-      
+
       console.log('Transaction updated with order_id:', orderData.order_id);
 
       // Initialize Razorpay using server-provided fields
@@ -204,7 +204,7 @@ const IdentificationPacks: React.FC = () => {
               payment_id: response.razorpay_payment_id,
               signature: response.razorpay_signature ? 'present' : 'missing'
             });
-            
+
             // Update transaction with payment details
             console.log('Updating transaction with payment details...');
             const { error: updateError, data: updatedTx } = await supabase
@@ -223,7 +223,7 @@ const IdentificationPacks: React.FC = () => {
               console.error('❌ Failed to update transaction:', updateError);
               throw new Error('Failed to record payment details');
             }
-            
+
             console.log('✅ Transaction updated:', updatedTx);
 
             // Show processing message
@@ -234,7 +234,7 @@ const IdentificationPacks: React.FC = () => {
             try {
               // INSTANT PROCESSING: Call verify-payment immediately
               console.log('⚡ Calling verify-payment for instant processing...');
-              
+
               const { data: verifyResult, error: verifyError } = await supabase.functions.invoke('verify-payment', {
                 body: {
                   razorpay_order_id: response.razorpay_order_id,
@@ -260,25 +260,21 @@ const IdentificationPacks: React.FC = () => {
 
               if (verifyResult?.success) {
                 console.log('✅ Payment processed instantly!', verifyResult);
-                
+
                 // Fetch updated balance
                 await fetchExtraIdentifications();
-                
-                // Show instant success message
+
+                // Show instant success confetti
                 setCongratsPack(pack);
                 setShowCongratulations(true);
-                toast.success('🎉 Purchase Successful!', {
-                  description: `Congratulations! ${pack.identifications_count} AI identifications have been added instantly to your account!`,
-                  duration: 6000
-                });
-                
+
                 setPurchasing(null);
               } else {
                 throw new Error(verifyResult?.message || 'Payment processing failed');
               }
             } catch (instantError) {
               console.warn('⚠️ Instant verification failed, trying webhook fallback...', instantError);
-              
+
               // FALLBACK: Quick check if webhook already processed
               let attempts = 0;
               const maxAttempts = 3; // Only 3 quick attempts
@@ -287,7 +283,7 @@ const IdentificationPacks: React.FC = () => {
               const quickCheck = async () => {
                 attempts++;
                 console.log(`🔄 Quick check (${attempts}/${maxAttempts})`);
-                
+
                 const { data: transaction } = await supabase
                   .from('topup_transactions')
                   .select('status')
@@ -299,10 +295,6 @@ const IdentificationPacks: React.FC = () => {
                   await fetchExtraIdentifications();
                   setCongratsPack(pack);
                   setShowCongratulations(true);
-                  toast.success('🎉 Purchase Successful!', {
-                    description: `${pack.identifications_count} identifications added!`,
-                    duration: 5000
-                  });
                   setPurchasing(null);
                   return true;
                 }
@@ -376,99 +368,98 @@ const IdentificationPacks: React.FC = () => {
 
   return (
     <>
-      <CongratulationsMessage
-        isVisible={showCongratulations}
-        onDismiss={() => setShowCongratulations(false)}
-        type="topup"
-        planName={congratsPack?.name || 'Top-Up Pack'}
-        identificationsCount={congratsPack?.identifications_count || 0}
-        amount={congratsPack?.price_inr || 0}
+      <PurchaseSuccessConfetti
+        isOpen={showCongratulations}
+        onComplete={() => setShowCongratulations(false)}
+        message="Top-Up Successful!"
+        subMessage={`${congratsPack?.identifications_count || 0} AI identifications added to your account!`}
+        duration={4000}
       />
 
       <div className="space-y-4">
         {/* Identification Packs */}
         <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5" />
-            Top-Up Identification Packs
-          </CardTitle>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Need more AI identifications? Purchase a top-up pack instantly!
-          </p>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center p-8">
-              <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {packs.map((pack) => (
-                <Card 
-                  key={pack.id} 
-                  className="relative hover:shadow-lg transition-all border-2 hover:border-blue-300"
-                >
-                  <CardHeader className="text-center pb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-3">
-                      <Zap className="w-6 h-6 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">{pack.name}</CardTitle>
-                    <p className="text-sm text-gray-600">{pack.description}</p>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600">
-                        ₹{pack.price_inr}
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" />
+              Top-Up Identification Packs
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Need more AI identifications? Purchase a top-up pack instantly!
+            </p>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="w-8 h-8 animate-spin" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {packs.map((pack) => (
+                  <Card
+                    key={pack.id}
+                    className="relative hover:shadow-lg transition-all border-2 hover:border-blue-300"
+                  >
+                    <CardHeader className="text-center pb-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-3">
+                        <Zap className="w-6 h-6 text-white" />
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        {pack.identifications_count} identifications
-                      </div>
-                      <div className="text-xs text-green-600 font-semibold mt-2">
-                        ₹{(pack.price_inr / pack.identifications_count).toFixed(1)} per identification
-                      </div>
-                    </div>
+                      <CardTitle className="text-lg">{pack.name}</CardTitle>
+                      <p className="text-sm text-gray-600">{pack.description}</p>
+                    </CardHeader>
 
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span>Instant activation</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span>Valid for 1 year</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span>Use anytime</span>
-                      </li>
-                    </ul>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600">
+                          ₹{pack.price_inr}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          {pack.identifications_count} identifications
+                        </div>
+                        <div className="text-xs text-green-600 font-semibold mt-2">
+                          ₹{(pack.price_inr / pack.identifications_count).toFixed(1)} per identification
+                        </div>
+                      </div>
 
-                    <Button
-                      className="w-full"
-                      onClick={() => handlePurchase(pack)}
-                      disabled={purchasing === pack.id}
-                    >
-                      {purchasing === pack.id ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Buy Now
-                        </>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Instant activation</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Valid for 1 year</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Use anytime</span>
+                        </li>
+                      </ul>
+
+                      <Button
+                        className="w-full"
+                        onClick={() => handlePurchase(pack)}
+                        disabled={purchasing === pack.id}
+                      >
+                        {purchasing === pack.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Buy Now
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </>
   );
