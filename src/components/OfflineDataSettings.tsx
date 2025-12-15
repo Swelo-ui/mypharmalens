@@ -90,90 +90,91 @@ const OfflineDataSettings: React.FC = () => {
     };
 
     return (
-        <Card className="border-0 sm:border shadow-none sm:shadow-sm">
-            <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                            <Database className="w-5 h-5 text-[#0384c6]" />
+        <Card className="border-0 sm:border shadow-none sm:shadow-sm bg-white dark:bg-gray-900">
+            <CardHeader className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                        <CardTitle className="text-xl sm:text-xl flex items-center gap-2">
+                            <Database className="w-5 h-5 text-[#0384c6] flex-shrink-0" />
                             Offline Data
                         </CardTitle>
-                        <CardDescription className="text-sm mt-1">
+                        <CardDescription className="text-sm mt-1.5 leading-relaxed">
                             Download medicines database for offline access
                         </CardDescription>
                     </div>
                     <Badge
                         variant={isOnline ? 'default' : 'secondary'}
-                        className={`flex items-center gap-1 ${isOnline ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 flex-shrink-0 ${isOnline ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}
                     >
-                        {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+                        {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
                         {isOnline ? 'Online' : 'Offline'}
                     </Badge>
                 </div>
             </CardHeader>
 
-            <CardContent className="px-4 sm:px-6 pb-6 space-y-6">
+            <CardContent className="px-4 sm:px-6 pb-6 space-y-5">
                 {/* Status Card */}
-                <div className="p-4 rounded-xl border bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20">
+                <div className="p-4 sm:p-5 rounded-xl border border-blue-100 dark:border-blue-800 bg-gradient-to-br from-blue-50/70 to-cyan-50/70 dark:from-blue-950/30 dark:to-cyan-950/30">
                     {offlineStatus.isLoading ? (
-                        <div className="flex items-center gap-3 text-muted-foreground">
+                        <div className="flex items-center gap-3 text-muted-foreground py-2">
                             <Loader2 className="w-5 h-5 animate-spin" />
                             <span>Checking offline data status...</span>
                         </div>
                     ) : offlineStatus.available ? (
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             {/* Downloaded Status */}
                             <div className="flex items-start gap-3">
-                                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
+                                <div className="p-2.5 rounded-xl bg-green-100 dark:bg-green-900/40 flex-shrink-0">
                                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                                 </div>
-                                <div className="flex-1">
-                                    <h4 className="font-semibold text-green-700 dark:text-green-400">
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-semibold text-green-700 dark:text-green-400 text-base">
                                         Data Downloaded
                                     </h4>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-sm text-muted-foreground mt-0.5">
                                         Medicines are available offline
                                     </p>
                                 </div>
                                 {hasUpdates && (
-                                    <Badge className="bg-amber-100 text-amber-800 border-amber-200 animate-pulse">
+                                    <Badge className="bg-amber-50 text-amber-700 border border-amber-200 animate-pulse flex-shrink-0 px-2 py-1">
                                         <Sparkles className="w-3 h-3 mr-1" />
                                         Update Available
                                     </Badge>
                                 )}
                             </div>
 
-                            {/* Stats Grid */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/40 border">
-                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                                        <Database className="w-3 h-3" />
+                            {/* Stats Grid - 2x2 on mobile, row on tablet+ */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm">
+                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
+                                        <Database className="w-3.5 h-3.5" />
                                         Medicines
                                     </div>
-                                    <p className="font-semibold text-lg">
+                                    <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
                                         {offlineStatus.drugCount.toLocaleString()}
                                     </p>
                                 </div>
 
-                                <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/40 border">
-                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                                        <HardDrive className="w-3 h-3" />
+                                <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm">
+                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
+                                        <HardDrive className="w-3.5 h-3.5" />
                                         Storage Used
                                     </div>
-                                    <p className="font-semibold text-lg">
+                                    <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
                                         {offlineStatus.formattedSize}
                                     </p>
                                 </div>
+                            </div>
 
-                                <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/40 border col-span-2 sm:col-span-1">
-                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                                        <Calendar className="w-3 h-3" />
-                                        Last Updated
-                                    </div>
-                                    <p className="font-semibold text-sm sm:text-base">
-                                        {formatDate(offlineStatus.lastUpdated)}
-                                    </p>
+                            {/* Last Updated - Full width on mobile */}
+                            <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    Last Updated
                                 </div>
+                                <p className="font-semibold text-base text-gray-900 dark:text-gray-100">
+                                    {formatDate(offlineStatus.lastUpdated)}
+                                </p>
                             </div>
                         </div>
                     ) : (
@@ -228,7 +229,7 @@ const OfflineDataSettings: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3">
                     {offlineStatus.available ? (
                         <>
                             {/* Update Button */}
@@ -236,7 +237,7 @@ const OfflineDataSettings: React.FC = () => {
                                 <Button
                                     onClick={downloadOfflineData}
                                     disabled={isDownloading || !isOnline}
-                                    className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+                                    className="w-full h-12 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium text-base shadow-md"
                                 >
                                     {isDownloading ? (
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -266,7 +267,7 @@ const OfflineDataSettings: React.FC = () => {
                                 <AlertDialogTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                        className="w-full h-11 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 dark:border-red-800 dark:hover:bg-red-950/30 font-medium"
                                         disabled={isDownloading}
                                     >
                                         <Trash2 className="w-4 h-4 mr-2" />
@@ -310,9 +311,9 @@ const OfflineDataSettings: React.FC = () => {
                 </div>
 
                 {/* Info Note */}
-                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900">
-                    <p className="text-xs text-blue-700 dark:text-blue-400">
-                        <strong>💡 Tip:</strong> After downloading, you can search and view medicine details
+                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-100 dark:border-blue-800">
+                    <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                        <span className="font-medium">💡 Tip:</span> After downloading, you can search and view medicine details
                         even without internet. AI identification still requires internet connection.
                     </p>
                 </div>
