@@ -356,44 +356,42 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           )}
         </div>
 
-        <div className="flex space-x-8 overflow-x-auto pb-1">
+        <div className="flex w-full justify-between">
           <button
             onClick={() => setActiveTab('general')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
+              "flex-1 py-3 text-sm font-medium transition-colors border-b-2 -mb-px text-center",
               activeTab === 'general'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            General Information
+            General<br />Information
           </button>
 
           <button
             onClick={() => setActiveTab('usage')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
+              "flex-1 py-3 text-sm font-medium transition-colors border-b-2 -mb-px text-center",
               activeTab === 'usage'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Usage & Precautions
+            Usage &<br />Precautions
           </button>
 
           <button
             onClick={() => setActiveTab('alternatives')}
             className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap",
+              "flex-1 py-3 text-sm font-medium transition-colors border-b-2 -mb-px text-center",
               activeTab === 'alternatives'
                 ? "border-pharma-600 text-pharma-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Alternatives & Brands
+            Alternatives<br />& Brands
           </button>
-
-
         </div>
       </div>
 
