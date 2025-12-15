@@ -418,18 +418,24 @@ const SearchResults = () => {
 
             {/* Offline Data Download Banner - only show if user doesn't have offline data */}
             {hasOfflineData === false && (
-              <div className="mt-4 p-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-700 rounded-xl shadow-sm">
-                <div className="flex items-center gap-3">
+              <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-700 rounded-xl shadow-sm">
+                <div className="flex items-start gap-3 mb-3">
                   <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex-shrink-0">
                     <WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   </div>
-                  <p className="text-sm text-amber-800 dark:text-amber-200 flex-1">
-                    <span className="font-semibold">Enable offline search:</span>{' '}
-                    <span className="text-amber-700 dark:text-amber-300">Download medicine data to search without internet.</span>
-                  </p>
+                  <div>
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                      Enable offline search
+                    </p>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
+                      Download medicine data to search without internet.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-center">
                   <Link
                     to="/profile?tab=offline"
-                    className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-lg whitespace-nowrap transition-all flex-shrink-0 shadow-sm"
+                    className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-lg transition-all shadow-md hover:shadow-lg"
                   >
                     Download now →
                   </Link>
