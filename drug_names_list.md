@@ -3,8 +3,8 @@
 This document contains a comprehensive list of all drug names available in the MyPharmaLens application.
 
 ## Summary
-- **Total Unique Drugs**: 1193
-- **Last Updated**: 2025-11-23 - Complete update with all drugs from data files
+- **Total Unique Drugs**: 1243
+- **Last Updated**: 2025-12-15 - Added 50 new drugs including novel antidiabetics, cardiovascular, hematology, and specialty drugs
 - **Purpose**: Reference list for drug verification and duplicate prevention
 - **Note**: Count reflects all unique drug names found in the application's data files
 - **Data Sources**: All TypeScript data files in src/data directory
@@ -1203,3 +1203,54 @@ This document contains a comprehensive list of all drug names available in the M
 1191. Zinc Supplement
 1192. Ziprasidone
 1193. Zolpidem
+
+## Newly Added Drugs (December 2025)
+1194. Piroxicam Gel
+1195. Voglibose
+1196. Teneligliptin
+1197. Evogliptin
+1198. Trelagliptin
+1199. Ipragliflozin
+1200. Tofogliflozin
+1201. Luseogliflozin
+1202. Tirzepatide
+1203. Retatrutide
+1204. Orforglipron
+1205. Imeglimin
+1206. Bexagliflozin
+1207. Sotagliflozin
+1208. Finerenone
+1209. Inclisiran
+1210. Bempedoic Acid
+1211. Alirocumab
+1212. Evolocumab
+1213. Vericiguat
+1214. Omecamtiv Mecarbil
+1215. Mavacamten
+1216. Aficamten
+1217. Daprodustat
+1218. Roxadustat
+1219. Vadadustat
+1220. Luspatercept
+1221. Iptacopan
+1222. Pegcetacoplan
+1223. Danicopan
+1224. Mitapivat
+1225. Etranacogene Dezaparvovec
+1226. Valoctocogene Roxaparvovec
+1227. Fitusiran
+1228. Concizumab
+1229. Marstacimab
+1230. Mim8
+1231. Sparsentan
+1232. Atrasentan
+1233. Zibotentan
+1234. Setmelanotide
+1235. Tesomet
+1236. Cagrilintide
+1237. Survodutide
+1238. Pemvidutide
+1239. Resmetirom
+1240. Lanifibranor
+1241. Efruxifermin
+1242. Pegozafermin
