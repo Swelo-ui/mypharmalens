@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical } from 'lucide-react';
+import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -144,6 +144,12 @@ const Header = () => {
                         <span>Manage Subscription</span>
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile?tab=offline" className="flex items-center w-full cursor-pointer">
+                        <Download className="mr-2 h-4 w-4" />
+                        <span>Offline Data</span>
+                      </Link>
+                    </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 
@@ -229,8 +235,8 @@ const Header = () => {
                     key={link.path}
                     to={link.path}
                     className={`${isActive
-                        ? 'text-white'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'text-white'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
                       } text-sm font-medium transition-colors px-3 py-1.5 rounded-md relative`}
                   >
                     <span className="relative z-10">{link.name}</span>
@@ -298,6 +304,12 @@ const Header = () => {
                           <Link to="/subscription" className="flex items-center w-full cursor-pointer">
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Manage Subscription</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/profile?tab=offline" className="flex items-center w-full cursor-pointer">
+                            <Download className="mr-2 h-4 w-4" />
+                            <span>Offline Data</span>
                           </Link>
                         </DropdownMenuItem>
 

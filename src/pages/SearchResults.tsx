@@ -23,6 +23,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { hasReachedSearchLimit } from '@/utils/searchUsageTracker';
 import { searchOfflineDrugs, isOfflineDataAvailable, DrugOfflineData } from '@/services/offlineDrugStorage';
+import { Link } from 'react-router-dom';
 
 // Inline Levenshtein distance implementation to avoid missing module error
 function calculateLevenshteinDistance(a: string, b: string): number {
@@ -73,6 +74,7 @@ const SearchResults = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [usingOfflineData, setUsingOfflineData] = useState(false);
+  const [hasOfflineData, setHasOfflineData] = useState<boolean | null>(null);
 
   console.log("SearchResults component initialized");
   console.log("Search query:", searchQuery);
@@ -90,6 +92,20 @@ const SearchResults = () => {
       }
     };
     loadCategories();
+  }, []);
+
+  // Check if offline data is available
+  useEffect(() => {
+    const checkOfflineData = async () => {
+      try {
+        const available = await isOfflineDataAvailable();
+        setHasOfflineData(available);
+      } catch (error) {
+        console.error('Error checking offline data:', error);
+        setHasOfflineData(false);
+      }
+    };
+    checkOfflineData();
   }, []);
 
   // Calculate pagination
@@ -399,6 +415,26 @@ const SearchResults = () => {
               onSearch={handleSearch}
               placeholder="Search medications..."
             />
+
+            {/* Offline Data Download Banner - only show if user doesn't have offline data */}
+            {hasOfflineData === false && (
+              <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-100 dark:border-blue-800 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex items-start sm:items-center gap-2">
+                    <WifiOff className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <span className="font-medium">Enable offline search:</span> Download medicine data to search without internet.
+                    </p>
+                  </div>
+                  <Link
+                    to="/profile?tab=offline"
+                    className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 whitespace-nowrap underline underline-offset-2"
+                  >
+                    Download now →
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">

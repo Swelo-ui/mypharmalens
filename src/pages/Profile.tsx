@@ -14,12 +14,13 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { toast } from 'sonner';
 import { Loader2, Save, Key, User, Mail, Calendar, CreditCard, Info, LogOut } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentSubscription, usageStats, loading } = useSubscription();
 
   const [displayName, setDisplayName] = useState('');
@@ -44,6 +45,15 @@ const Profile = () => {
       toast.error('Failed to sign out');
     }
   };
+
+  // Handle tab query parameter from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam && ['profile', 'security', 'audio', 'subscription', 'offline'].includes(tabParam)) {
+      setTabValue(tabParam);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -420,10 +430,10 @@ const Profile = () => {
                           })()}` : ' (Unlimited)'}</p>
                           {extraIdentifications > 0 && (
                             <p className={`text-xs flex items-center gap-1 font-medium ${extraIdentifications >= 50 ? 'text-violet-600 dark:text-violet-400' :
-                                extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
-                                  extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
-                                    extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
-                                      'text-red-600 dark:text-red-400'
+                              extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
+                                extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
+                                  extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
+                                    'text-red-600 dark:text-red-400'
                               }`}>
                               +{extraIdentifications} bonus identifications
                             </p>
