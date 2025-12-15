@@ -1,4 +1,5 @@
 import { DrugData } from "@/components/DrugCard";
+import { getDrugsFromOffline, isOfflineDataAvailable } from "@/services/offlineDrugStorage";
 
 function calculateLevenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
@@ -103,12 +104,32 @@ export const loadDrugCategory = async (category: keyof typeof drugDataLoaders): 
   return drugs;
 };
 
-// Load all drug data (for search functionality)
+// Load all drug data with offline-first support
 export const loadAllDrugs = async (): Promise<DrugData[]> => {
+  // Return cached data if available
   if (allDrugsCache) {
     return allDrugsCache;
   }
 
+  // If offline and offline data is available, use IndexedDB data
+  if (!navigator.onLine) {
+    try {
+      const hasOfflineData = await isOfflineDataAvailable();
+      if (hasOfflineData) {
+        console.log('📴 Offline mode: Loading drugs from IndexedDB');
+        const offlineDrugs = await getDrugsFromOffline();
+        if (offlineDrugs.length > 0) {
+          // Cast offline data to DrugData type
+          allDrugsCache = offlineDrugs as unknown as DrugData[];
+          return allDrugsCache;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load offline data, falling back to bundled data:', error);
+    }
+  }
+
+  // Load from bundled data (normal flow)
   const allCategories = Object.keys(drugDataLoaders) as (keyof typeof drugDataLoaders)[];
   const allDrugsArrays = await Promise.all(
     allCategories.map(category => loadDrugCategory(category))

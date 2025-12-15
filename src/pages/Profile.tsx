@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AudioSettings from '@/components/AudioSettings';
+import OfflineDataSettings from '@/components/OfflineDataSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,12 +21,12 @@ const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuthStatus();
   const navigate = useNavigate();
   const { currentSubscription, usageStats, loading } = useSubscription();
-  
+
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [extraIdentifications, setExtraIdentifications] = useState(0);
-  
+
   // Password change states
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -54,17 +55,17 @@ const Profile = () => {
             .select('display_name, extra_identifications')
             .eq('id', user.id)
             .single();
-            
+
           if (error) {
             console.error('Error fetching profile:', error);
             return;
           }
-          
+
           if (data) {
             setDisplayName((data as { display_name: string | null }).display_name || '');
             setExtraIdentifications((data as any).extra_identifications || 0);
           }
-          
+
           // Set email from auth user
           setEmail(user.email || '');
         } catch (error) {
@@ -72,15 +73,15 @@ const Profile = () => {
         }
       }
     };
-    
+
     fetchUserProfile();
   }, [user]);
 
   const handleUpdateProfile = async () => {
     if (!user) return;
-    
+
     setIsUpdating(true);
-    
+
     try {
       // Update profile in the profiles table
       const { error } = await supabase
@@ -90,9 +91,9 @@ const Profile = () => {
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
-      
+
       if (error) throw error;
-      
+
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -101,40 +102,40 @@ const Profile = () => {
       setIsUpdating(false);
     }
   };
-  
+
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast.error('New passwords do not match');
       return;
     }
-    
+
     if (newPassword.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    
+
     setIsChangingPassword(true);
-    
+
     try {
       // First verify the current password
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: currentPassword,
       });
-      
+
       if (signInError) {
         toast.error('Current password is incorrect');
         setIsChangingPassword(false);
         return;
       }
-      
+
       // Then update the password
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
-      
+
       if (error) throw error;
-      
+
       toast.success('Password updated successfully');
       setCurrentPassword('');
       setNewPassword('');
@@ -186,7 +187,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex flex-col pt-16 pb-20">
       <Header />
-      
+
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold">Profile Settings</h1>
@@ -199,7 +200,7 @@ const Profile = () => {
             <LogOut className="mr-2 h-4 w-4" /> Sign Out
           </Button>
         </div>
-        
+
         <Tabs value={tabValue} onValueChange={setTabValue} className="w-full max-w-4xl mx-auto">
           <div className="sm:hidden mb-4">
             <Select value={tabValue} onValueChange={setTabValue}>
@@ -211,10 +212,11 @@ const Profile = () => {
                 <SelectItem value="security">Security</SelectItem>
                 <SelectItem value="audio">Audio Settings</SelectItem>
                 <SelectItem value="subscription">Subscription & Usage</SelectItem>
+                <SelectItem value="offline">Offline Data</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <TabsList className="hidden sm:grid w-full grid-cols-4 mb-6 sm:mb-8 h-12 sm:h-14">
+          <TabsList className="hidden sm:grid w-full grid-cols-5 mb-6 sm:mb-8 h-12 sm:h-14">
             <TabsTrigger value="profile" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
               <span className="text-center leading-tight">Profile<br className="sm:hidden" /><span className="hidden sm:inline"> Information</span></span>
             </TabsTrigger>
@@ -227,8 +229,11 @@ const Profile = () => {
             <TabsTrigger value="subscription" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
               <span className="text-center leading-tight">Subscription<br className="sm:hidden" /><span className="hidden sm:inline"> & Usage</span></span>
             </TabsTrigger>
+            <TabsTrigger value="offline" className="text-xs sm:text-sm px-1 sm:px-4 py-2 sm:py-3 flex items-center justify-center min-h-[2.5rem] sm:min-h-[3rem]">
+              <span className="text-center leading-tight">Offline<br className="sm:hidden" /><span className="hidden sm:inline"> Data</span></span>
+            </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="profile">
             <Card className="border-0 sm:border shadow-none sm:shadow-sm">
               <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
@@ -252,7 +257,7 @@ const Profile = () => {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="email" className="flex items-center text-sm font-medium">
                       <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
@@ -270,11 +275,11 @@ const Profile = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex justify-center sm:justify-end mt-8">
-                  <Button 
-                    variant="primary" 
-                    onClick={handleUpdateProfile} 
+                  <Button
+                    variant="primary"
+                    onClick={handleUpdateProfile}
                     disabled={isUpdating}
                     className="w-full sm:w-auto min-w-[140px]"
                   >
@@ -289,7 +294,7 @@ const Profile = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="security">
             <Card className="border-0 sm:border shadow-none sm:shadow-sm">
               <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4">
@@ -314,7 +319,7 @@ const Profile = () => {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="newPassword" className="text-sm font-medium block">
                       New Password
@@ -328,7 +333,7 @@ const Profile = () => {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="confirmPassword" className="text-sm font-medium block">
                       Confirm New Password
@@ -342,12 +347,12 @@ const Profile = () => {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div className="pt-6">
                     <div className="flex justify-center sm:justify-start">
-                      <Button 
-                        variant="primary" 
-                        onClick={handleChangePassword} 
+                      <Button
+                        variant="primary"
+                        onClick={handleChangePassword}
                         disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
                         className="w-full sm:w-auto min-w-[160px]"
                       >
@@ -364,7 +369,7 @@ const Profile = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="audio">
             <AudioSettings />
           </TabsContent>
@@ -414,30 +419,31 @@ const Profile = () => {
                             return monthlyLimit + extraIdentifications;
                           })()}` : ' (Unlimited)'}</p>
                           {extraIdentifications > 0 && (
-                            <p className={`text-xs flex items-center gap-1 font-medium ${
-                              extraIdentifications >= 50 ? 'text-violet-600 dark:text-violet-400' :
-                              extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
-                              extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
-                              extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
-                              'text-red-600 dark:text-red-400'
-                            }`}>
+                            <p className={`text-xs flex items-center gap-1 font-medium ${extraIdentifications >= 50 ? 'text-violet-600 dark:text-violet-400' :
+                                extraIdentifications >= 30 ? 'text-green-600 dark:text-green-400' :
+                                  extraIdentifications >= 10 ? 'text-blue-600 dark:text-blue-400' :
+                                    extraIdentifications >= 5 ? 'text-amber-600 dark:text-amber-400' :
+                                      'text-red-600 dark:text-red-400'
+                              }`}>
                               +{extraIdentifications} bonus identifications
                             </p>
                           )}
                           {usageStats.monthlyLimit >= 0 && (
                             <div className="w-full h-2 bg-gray-200 rounded">
-                              <div className="h-2 bg-[#0384c6] rounded" style={{ width: `${Math.min(100, (usageStats.identificationsUsed / Math.max((() => {
-                                const planName = usageStats.planName || 'Free';
-                                let monthlyLimit = 5;
-                                if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-                                  monthlyLimit = 5;
-                                } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-                                  monthlyLimit = 39;
-                                } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-                                  monthlyLimit = 101;
-                                }
-                                return monthlyLimit + extraIdentifications;
-                              })(), 1)) * 100)}%` }} />
+                              <div className="h-2 bg-[#0384c6] rounded" style={{
+                                width: `${Math.min(100, (usageStats.identificationsUsed / Math.max((() => {
+                                  const planName = usageStats.planName || 'Free';
+                                  let monthlyLimit = 5;
+                                  if (planName === 'Free' || planName.toLowerCase().includes('free')) {
+                                    monthlyLimit = 5;
+                                  } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
+                                    monthlyLimit = 39;
+                                  } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
+                                    monthlyLimit = 101;
+                                  }
+                                  return monthlyLimit + extraIdentifications;
+                                })(), 1)) * 100)}%`
+                              }} />
                             </div>
                           )}
                         </div>
@@ -453,6 +459,10 @@ const Profile = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="offline">
+            <OfflineDataSettings />
           </TabsContent>
         </Tabs>
       </main>
