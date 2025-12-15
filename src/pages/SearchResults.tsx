@@ -418,24 +418,48 @@ const SearchResults = () => {
 
             {/* Offline Data Download Banner - only show if user doesn't have offline data */}
             {hasOfflineData === false && (
-              <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-700 rounded-xl shadow-sm">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex-shrink-0">
-                    <WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-700 rounded-xl shadow-sm">
+                {/* Mobile: Vertical layout */}
+                <div className="flex flex-col sm:hidden gap-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 rounded-md flex-shrink-0">
+                      <WifiOff className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 leading-tight">
+                        Enable offline search
+                      </p>
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        Download medicine data to search without internet.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                      Enable offline search
-                    </p>
-                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
-                      Download medicine data to search without internet.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex justify-center">
                   <Link
                     to="/profile?tab=offline"
-                    className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-lg transition-all shadow-md hover:shadow-lg"
+                    className="w-full py-2 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-lg transition-all shadow-sm text-center"
+                  >
+                    Download now →
+                  </Link>
+                </div>
+
+                {/* Desktop: Horizontal layout with button at end */}
+                <div className="hidden sm:flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex-shrink-0">
+                      <WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                        Enable offline search
+                      </p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        Download medicine data to search without internet.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/profile?tab=offline"
+                    className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-lg transition-all shadow-sm whitespace-nowrap flex-shrink-0"
                   >
                     Download now →
                   </Link>
