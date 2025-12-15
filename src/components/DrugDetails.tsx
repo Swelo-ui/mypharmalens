@@ -60,10 +60,9 @@ interface DrugDetailsProps {
   className?: string;
 }
 
-import { HealthTopicsSection } from '@/components/health-topics/HealthTopicsSection';
 
 const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives' | 'resources'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives'>('general');
   const [showLaymanTerms, setShowLaymanTerms] = useState(false);
 
   const renderTabContent = () => {
@@ -247,15 +246,6 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           </div>
         );
 
-      case 'resources':
-        return (
-          <HealthTopicsSection
-            drugName={drug.name}
-            genericName={drug.genericName}
-            category={drug.category}
-            indications={drug.indications}
-          />
-        );
 
       default:
         return null;
@@ -403,18 +393,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             Alternatives & Brands
           </button>
 
-          <button
-            onClick={() => setActiveTab('resources')}
-            className={cn(
-              "py-3 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap flex items-center gap-1",
-              activeTab === 'resources'
-                ? "border-pharma-600 text-pharma-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            )}
-          >
-            <BookOpen className="h-3 w-3" />
-            Health Resources
-          </button>
+
         </div>
       </div>
 
