@@ -268,7 +268,13 @@ export async function clearOfflineData(): Promise<void> {
  */
 export async function searchOfflineDrugs(query: string): Promise<DrugOfflineData[]> {
     const drugs = await getDrugsFromOffline();
-    const lowerQuery = query.toLowerCase();
+
+    // If no query, return all drugs
+    if (!query || query.trim() === '') {
+        return drugs;
+    }
+
+    const lowerQuery = query.toLowerCase().trim();
 
     return drugs.filter(drug =>
         drug.name?.toLowerCase().includes(lowerQuery) ||

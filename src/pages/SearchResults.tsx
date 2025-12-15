@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Filter, X, ChevronDown, ChevronUp, Loader2, AlertCircle } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, ChevronUp, Loader2, AlertCircle, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,7 @@ import SearchLimitBar from '@/components/SearchLimitBar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { hasReachedSearchLimit } from '@/utils/searchUsageTracker';
+import { searchOfflineDrugs, isOfflineDataAvailable, DrugOfflineData } from '@/services/offlineDrugStorage';
 
 // Inline Levenshtein distance implementation to avoid missing module error
 function calculateLevenshteinDistance(a: string, b: string): number {
@@ -58,9 +59,10 @@ const SearchResults = () => {
   const isMobile = useIsMobile();
   const { isAuthenticated, user } = useAuthStatus();
   const { usageStats, getDatabaseSearchLimit } = useSubscription();
+  const { isOnline } = useOfflineDetection();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('q') || '';
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [allResults, setAllResults] = useState<DrugData[]>([]);
   const [displayedResults, setDisplayedResults] = useState<DrugData[]>([]);
@@ -70,10 +72,11 @@ const SearchResults = () => {
   const [itemsPerPage] = useState(20); // Show 20 items per page
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  const [usingOfflineData, setUsingOfflineData] = useState(false);
 
   console.log("SearchResults component initialized");
   console.log("Search query:", searchQuery);
-  
+
   // Load categories on component mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -111,7 +114,61 @@ const SearchResults = () => {
       try {
         console.log("Searching for:", searchQuery);
         console.log("Active filters:", activeFilters);
-        
+        console.log("Is online:", isOnline);
+
+        // Reset offline data indicator
+        setUsingOfflineData(false);
+
+        // Check if we're offline and have offline data available
+        if (!isOnline) {
+          console.log("Device is offline, checking for offline data...");
+          const offlineAvailable = await isOfflineDataAvailable();
+
+          if (offlineAvailable) {
+            console.log("Offline data available, using IndexedDB search");
+            setUsingOfflineData(true);
+
+            // Search offline data
+            const offlineResults = await searchOfflineDrugs(searchQuery || '');
+            console.log("Found offline results:", offlineResults.length);
+
+            // Convert DrugOfflineData to DrugData format
+            const formattedDrugs: DrugData[] = offlineResults.map((drug: DrugOfflineData) => ({
+              id: drug.id,
+              name: drug.name || 'Unknown',
+              genericName: drug.genericName || undefined,
+              category: drug.category || undefined,
+              description: drug.description || undefined,
+              brandNames: drug.brandNames || [],
+            }));
+
+            // Apply category filters if any are active
+            const finalResults = activeFilters.length > 0
+              ? formattedDrugs.filter(drug => drug.category && activeFilters.includes(drug.category))
+              : formattedDrugs;
+
+            setAllResults(finalResults);
+            setIsLoading(false);
+
+            if (finalResults.length > 0) {
+              toast.info('📴 Showing offline results', {
+                description: `Found ${finalResults.length} medicines from downloaded data`,
+                duration: 3000
+              });
+            }
+            return;
+          } else {
+            console.log("No offline data available");
+            toast.warning('📴 You are offline', {
+              description: 'Download offline data from Profile to search without internet',
+              duration: 5000
+            });
+            setAllResults([]);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         // Check limit only; decrement handled by RPC in handleSearch
         if (user && searchQuery) {
           const limitReached = await hasReachedSearchLimit(user.id);
@@ -124,20 +181,20 @@ const SearchResults = () => {
             return;
           }
         }
-        
+
         let useLocalData = true;
-        
+
         if (searchQuery) {
           // Try to fetch from Supabase first
           try {
             const databaseSearchLimit = getDatabaseSearchLimit();
-            const supabaseDrugs = await fetchDrugs({ 
+            const supabaseDrugs = await fetchDrugs({
               searchTerm: searchQuery,
               category: activeFilters.length > 0 ? activeFilters[0] : undefined,
               limit: 200, // Increase limit to get more results
               userSubscriptionLimit: databaseSearchLimit
             });
-            
+
             if (supabaseDrugs && supabaseDrugs.length > 0) {
               console.log("Found drugs in Supabase:", supabaseDrugs.length);
               // Map Supabase drugs to DrugData format using correct DB fields
@@ -150,7 +207,7 @@ const SearchResults = () => {
                 description: drug.description || undefined,
                 brandNames: Array.isArray(drug.brand_names) ? drug.brand_names : (drug.brand_names ? [drug.brand_names] : []),
               }));
-              
+
               setAllResults(formattedDrugs);
               useLocalData = false; // Don't use local data if Supabase found results
             } else {
@@ -160,7 +217,7 @@ const SearchResults = () => {
             console.log("Supabase search failed, falling back to local data:", supabaseError);
           }
         }
-        
+
         if (useLocalData) {
           const allDrugs = await loadAllDrugs();
           console.log("Searching local data with total entries:", allDrugs.length);
@@ -168,41 +225,41 @@ const SearchResults = () => {
           // Enhanced search logic to include brand names and fuzzy matching
           const filtered = searchQuery
             ? allDrugs.filter(drug => {
-                const query = searchQuery.toLowerCase();
-                
-                // Direct matches
-                const nameMatch = drug.name.toLowerCase().includes(query);
-                const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
-                const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
-                const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
-                const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
-                
-                // Brand name matching with comprehensive check
-                const brandMatch = drug.brandNames && 
-                  drug.brandNames.some(brand => brand.toLowerCase().includes(query));
-                
-                // Improved fuzzy matching for common misspellings
-                // Adjust threshold based on query length for better accuracy
-                const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-                const fuzzyMatch = calculateLevenshteinDistance(
-                  query, drug.name.toLowerCase()) <= threshold;
+              const query = searchQuery.toLowerCase();
 
-                // For very short queries, be more strict about fuzzy matching
-                const shouldUseFuzzy = query.length > 3;
-                
-                return nameMatch || genericMatch || manufacturerMatch || 
-                       categoryMatch || drugClassMatch || brandMatch || 
-                       (shouldUseFuzzy && fuzzyMatch);
-              })
+              // Direct matches
+              const nameMatch = drug.name.toLowerCase().includes(query);
+              const genericMatch = drug.genericName && drug.genericName.toLowerCase().includes(query);
+              const manufacturerMatch = drug.manufacturer && drug.manufacturer.toLowerCase().includes(query);
+              const categoryMatch = drug.category && drug.category.toLowerCase().includes(query);
+              const drugClassMatch = drug.drugClass && drug.drugClass.toLowerCase().includes(query);
+
+              // Brand name matching with comprehensive check
+              const brandMatch = drug.brandNames &&
+                drug.brandNames.some(brand => brand.toLowerCase().includes(query));
+
+              // Improved fuzzy matching for common misspellings
+              // Adjust threshold based on query length for better accuracy
+              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
+              const fuzzyMatch = calculateLevenshteinDistance(
+                query, drug.name.toLowerCase()) <= threshold;
+
+              // For very short queries, be more strict about fuzzy matching
+              const shouldUseFuzzy = query.length > 3;
+
+              return nameMatch || genericMatch || manufacturerMatch ||
+                categoryMatch || drugClassMatch || brandMatch ||
+                (shouldUseFuzzy && fuzzyMatch);
+            })
             : allDrugs;
-          
+
           console.log(`Found ${filtered.length} drugs in local data`);
-          
+
           // Apply category filters if any are active
           const finalResults = activeFilters.length > 0
             ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
             : filtered;
-          
+
           console.log(`After filtering: ${finalResults.length} drugs`);
           setAllResults(finalResults);
         }
@@ -213,36 +270,36 @@ const SearchResults = () => {
           const allDrugs = await loadAllDrugs();
           const filtered = searchQuery
             ? allDrugs.filter(drug => {
-                const query = searchQuery.toLowerCase();
-                
-                // Check main properties
-                if (drug.name.toLowerCase().includes(query)) return true;
-                if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
-                if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
-                if (drug.category && drug.category.toLowerCase().includes(query)) return true;
-                if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
+              const query = searchQuery.toLowerCase();
 
-                // Check brand names with improved matching
-                if (drug.brandNames && drug.brandNames.some(brand => 
-                  brand.toLowerCase().includes(query))) return true;
-                
-                // Improved fuzzy matching for common misspellings
-                const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
-                if (calculateLevenshteinDistance(
-                  query, drug.name.toLowerCase()) <= threshold) {
-                  return true;
-                }
-                
-                return false;
-              })
+              // Check main properties
+              if (drug.name.toLowerCase().includes(query)) return true;
+              if (drug.genericName && drug.genericName.toLowerCase().includes(query)) return true;
+              if (drug.manufacturer && drug.manufacturer.toLowerCase().includes(query)) return true;
+              if (drug.category && drug.category.toLowerCase().includes(query)) return true;
+              if (drug.drugClass && drug.drugClass.toLowerCase().includes(query)) return true;
+
+              // Check brand names with improved matching
+              if (drug.brandNames && drug.brandNames.some(brand =>
+                brand.toLowerCase().includes(query))) return true;
+
+              // Improved fuzzy matching for common misspellings
+              const threshold = Math.min(3, Math.max(1, Math.floor(query.length / 3)));
+              if (calculateLevenshteinDistance(
+                query, drug.name.toLowerCase()) <= threshold) {
+                return true;
+              }
+
+              return false;
+            })
             : allDrugs;
-            
+
           console.log(`Found ${filtered.length} drugs in local data after error`);
-          
+
           const finalResults = activeFilters.length > 0
             ? filtered.filter(drug => drug.category && activeFilters.includes(drug.category))
             : filtered;
-            
+
           setAllResults(finalResults);
         } catch (fallbackError) {
           console.error("Error loading fallback data:", fallbackError);
@@ -254,7 +311,8 @@ const SearchResults = () => {
     };
 
     loadDrugs();
-  }, [searchQuery, activeFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, activeFilters, isOnline]);
 
   const handleLoadMore = async () => {
     setIsLoadingMore(true);
@@ -269,7 +327,7 @@ const SearchResults = () => {
       const newFilters = prev.includes(category)
         ? prev.filter(f => f !== category)
         : [...prev, category];
-      
+
       // Reset to first page when filters change
       setCurrentPage(1);
       return newFilters;
@@ -283,7 +341,7 @@ const SearchResults = () => {
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) return;
-    
+
     // Check search limit before performing search
     if (isAuthenticated && user) {
       try {
@@ -292,7 +350,7 @@ const SearchResults = () => {
           const { data } = await supabase.rpc('check_and_decrement_search_limit', {
             p_user_id: user.id
           }) as { data: { can_search: boolean; searches_used: number; searches_limit: number; message?: string } | null };
-          
+
           if (data && !data.can_search) {
             toast.error(data.message || 'Search limit reached! Upgrade your plan to continue searching.');
             return;
@@ -304,7 +362,7 @@ const SearchResults = () => {
         console.error('Error checking search limit:', error);
       }
     }
-    
+
     const params = new URLSearchParams();
     if (query) {
       params.set('q', query);
@@ -319,7 +377,7 @@ const SearchResults = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
+
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="mb-8">
@@ -336,13 +394,13 @@ const SearchResults = () => {
               </div>
             </div>
 
-            <SearchBar 
-              fullWidth 
-              onSearch={handleSearch} 
-              placeholder="Search medications..." 
+            <SearchBar
+              fullWidth
+              onSearch={handleSearch}
+              placeholder="Search medications..."
             />
           </div>
-          
+
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters - Desktop */}
             <div className="hidden lg:block w-64 flex-shrink-0">
@@ -351,7 +409,7 @@ const SearchResults = () => {
                   <Filter className="h-4 w-4 mr-2" />
                   Filters
                   {activeFilters.length > 0 && (
-                    <button 
+                    <button
                       onClick={clearFilters}
                       className="ml-auto text-xs text-pharma-600 hover:text-pharma-800 transition-colors"
                     >
@@ -359,14 +417,14 @@ const SearchResults = () => {
                     </button>
                   )}
                 </h2>
-                
+
                 <div className="space-y-5">
                   <div>
                     <h3 className="text-sm font-medium mb-3">Categories</h3>
                     <div className="space-y-2">
                       {categories.map((category) => (
-                        <label 
-                          key={category} 
+                        <label
+                          key={category}
                           className="flex items-center cursor-pointer group"
                         >
                           <input
@@ -385,10 +443,10 @@ const SearchResults = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Mobile Filters Toggle */}
             <div className="lg:hidden mb-4">
-              <button 
+              <button
                 onClick={() => setFiltersVisible(!filtersVisible)}
                 className="w-full py-2 px-4 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800 shadow-sm"
               >
@@ -403,14 +461,14 @@ const SearchResults = () => {
                 </span>
                 <ChevronDown className="h-4 w-4" />
               </button>
-              
+
               {/* Mobile Filters Panel */}
               {filtersVisible && (
                 <div className="mt-2 p-4 glass-card rounded-xl animate-fade-in">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-medium">Categories</h3>
                     {activeFilters.length > 0 && (
-                      <button 
+                      <button
                         onClick={clearFilters}
                         className="text-xs text-pharma-600 hover:text-pharma-800 transition-colors"
                       >
@@ -418,11 +476,11 @@ const SearchResults = () => {
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-3">
                     {categories.map((category) => (
-                      <label 
-                        key={category} 
+                      <label
+                        key={category}
                         className="flex items-start cursor-pointer group"
                       >
                         <input
@@ -439,17 +497,17 @@ const SearchResults = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Active Filters - Mobile */}
               {activeFilters.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {activeFilters.map((filter) => (
-                    <div 
-                      key={filter} 
+                    <div
+                      key={filter}
                       className="bg-pharma-100 text-pharma-800 px-2 py-1 rounded-full text-xs font-medium flex items-center"
                     >
                       {filter}
-                      <button 
+                      <button
                         onClick={() => toggleFilter(filter)}
                         className="ml-1 rounded-full hover:bg-pharma-200 p-0.5"
                       >
@@ -460,7 +518,7 @@ const SearchResults = () => {
                 </div>
               )}
             </div>
-            
+
             {/* Results Section */}
             <div className="flex-1">
               {isLoading ? (
@@ -476,27 +534,35 @@ const SearchResults = () => {
                   {/* Results Header */}
                   <div className="flex justify-between items-center mb-6">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {searchQuery ? (
-                        <>
-                          Showing {displayedResults.length} of {allResults.length} results for "{searchQuery}"
-                          {activeFilters.length > 0 && (
-                            <span className="ml-2">
-                              (filtered by: {activeFilters.join(', ')})
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          Showing {displayedResults.length} of {allResults.length} medications
-                          {activeFilters.length > 0 && (
-                            <span className="ml-2">
-                              (filtered by: {activeFilters.join(', ')})
-                            </span>
-                          )}
-                        </>
-                      )}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {usingOfflineData && (
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 flex items-center gap-1">
+                            <WifiOff className="h-3 w-3" />
+                            Offline Mode
+                          </Badge>
+                        )}
+                        {searchQuery ? (
+                          <span>
+                            Showing {displayedResults.length} of {allResults.length} results for "{searchQuery}"
+                            {activeFilters.length > 0 && (
+                              <span className="ml-2">
+                                (filtered by: {activeFilters.join(', ')})
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span>
+                            Showing {displayedResults.length} of {allResults.length} medications
+                            {activeFilters.length > 0 && (
+                              <span className="ml-2">
+                                (filtered by: {activeFilters.join(', ')})
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    
+
                     {/* Mobile Filter Toggle */}
                     {isMobile && (
                       <Button
@@ -596,7 +662,7 @@ const SearchResults = () => {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
