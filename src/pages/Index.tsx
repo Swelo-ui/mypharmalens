@@ -10,6 +10,7 @@ import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain, Clock, Crown, ArrowRight, Stethoscope, AlertTriangle, Users, TrendingUp, Activity, Zap } from 'lucide-react';
+import CountUpNumber from '@/components/CountUpNumber';
 
 const Index = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -307,19 +308,27 @@ const Index = () => {
             {/* Feature Statistics */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 animate-on-scroll">
               <div className="text-center">
-                <div className="text-3xl font-bold text-pharma-600 mb-2">50+</div>
+                <div className="text-3xl font-bold text-pharma-600 mb-2">
+                  <CountUpNumber end={50} suffix="+" duration={2000} />
+                </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Symptom Categories</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-pharma-600 mb-2">1000+</div>
+                <div className="text-3xl font-bold text-pharma-600 mb-2">
+                  <CountUpNumber end={1000} suffix="+" duration={2200} delay={100} />
+                </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Drug Interactions</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-pharma-600 mb-2">99.9%</div>
+                <div className="text-3xl font-bold text-pharma-600 mb-2">
+                  <CountUpNumber end={99.9} suffix="%" duration={2400} delay={200} decimals={1} />
+                </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Safety Accuracy</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-pharma-600 mb-2">24/7</div>
+                <div className="text-3xl font-bold text-pharma-600 mb-2">
+                  24/7
+                </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Available</div>
               </div>
             </div>
@@ -530,11 +539,15 @@ const Index = () => {
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="p-4 bg-pharma-50 dark:bg-pharma-900/20 rounded-lg">
-                      <div className="text-2xl font-bold text-pharma-600">99.5%</div>
+                      <div className="text-2xl font-bold text-pharma-600">
+                        <CountUpNumber end={99.5} suffix="%" duration={2000} decimals={1} />
+                      </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Accuracy Rate</div>
                     </div>
                     <div className="p-4 bg-pharma-50 dark:bg-pharma-900/20 rounded-lg">
-                      <div className="text-2xl font-bold text-pharma-600">1000+</div>
+                      <div className="text-2xl font-bold text-pharma-600">
+                        <CountUpNumber end={1000} suffix="+" duration={2200} delay={100} />
+                      </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Medications</div>
                     </div>
                   </div>
