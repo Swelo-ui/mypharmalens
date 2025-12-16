@@ -156,20 +156,15 @@ const OfflineDataSettings: React.FC = () => {
                                 </div>
 
                                 <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm">
-                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
+                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
                                         <HardDrive className="w-3.5 h-3.5" />
                                         Storage Used
                                     </div>
-                                    <div className="flex items-baseline gap-2">
-                                        <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
-                                            {offlineStatus.formattedSize}
-                                        </p>
-                                        <span className="text-xs text-muted-foreground">
-                                            → {offlineStatus.formattedActualSize || '...'} actual
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        Data compresses to ~{offlineStatus.formattedActualSize || '...'} in browser
+                                    <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
+                                        {offlineStatus.formattedActualSize || offlineStatus.formattedSize}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1 leading-tight">
+                                        Compressed in browser
                                     </p>
                                 </div>
                             </div>
