@@ -1,8 +1,14 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "app.netlify.pharmalens.twa",
-    "sha256_cert_fingerprints": ["EA:C9:5C:2C:A3:9F:B8:3A:C7:19:76:B2:77:01:49:38:9A:46:8B:33:14:B4:A8:42:E7:FD:E0:DC:FE:AC:31:72"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.netlify.pharmalens.twa",
+      "sha256_cert_fingerprints": [
+        "EA:C9:5C:2C:A3:9F:B8:3A:C7:19:76:B2:77:01:49:38:9A:46:8B:33:14:B4:A8:42:E7:FD:E0:DC:FE:AC:31:72"
+      ]
+    }
   }
-}]
+]

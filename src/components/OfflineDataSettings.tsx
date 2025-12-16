@@ -158,10 +158,26 @@ const OfflineDataSettings: React.FC = () => {
                                 <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm">
                                     <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
                                         <HardDrive className="w-3.5 h-3.5" />
-                                        Storage Used
+                                        Data Size
                                     </div>
                                     <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
                                         {offlineStatus.formattedSize}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                        (estimated)
+                                    </p>
+                                </div>
+
+                                <div className="p-3.5 rounded-xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm col-span-2">
+                                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1.5">
+                                        <HardDrive className="w-3.5 h-3.5" />
+                                        Actual Storage (IndexedDB)
+                                    </div>
+                                    <p className="font-bold text-xl text-gray-900 dark:text-gray-100">
+                                        {offlineStatus.formattedActualSize || 'Calculating...'}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                        Browser compressed storage
                                     </p>
                                 </div>
                             </div>

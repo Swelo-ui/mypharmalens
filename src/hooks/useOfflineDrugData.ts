@@ -17,6 +17,7 @@ import {
     clearOfflineData,
     isOfflineDataAvailable,
     formatStorageSize,
+    getActualStorageSize,
     OfflineMetadata,
     DrugOfflineData
 } from '@/services/offlineDrugStorage';
@@ -35,6 +36,8 @@ export interface OfflineStatus {
     drugCount: number;
     sizeBytes: number;
     formattedSize: string;
+    actualIndexedDBSize: number;
+    formattedActualSize: string;
     isLoading: boolean;
 }
 
@@ -66,6 +69,8 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
         drugCount: 0,
         sizeBytes: 0,
         formattedSize: '0 B',
+        actualIndexedDBSize: 0,
+        formattedActualSize: '0 B',
         isLoading: true
     });
 
@@ -91,6 +96,10 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
             const metadata = await getOfflineMetadata();
             const available = await isOfflineDataAvailable();
 
+            // Get actual storage size from browser
+            const actualStorage = await getActualStorageSize();
+            const actualSize = actualStorage?.indexedDBSize || 0;
+
             if (metadata && available) {
                 setOfflineStatus({
                     available: true,
@@ -99,6 +108,8 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
                     drugCount: metadata.drugCount,
                     sizeBytes: metadata.sizeBytes,
                     formattedSize: formatStorageSize(metadata.sizeBytes),
+                    actualIndexedDBSize: actualSize,
+                    formattedActualSize: formatStorageSize(actualSize),
                     isLoading: false
                 });
 
@@ -113,6 +124,8 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
                     drugCount: 0,
                     sizeBytes: 0,
                     formattedSize: '0 B',
+                    actualIndexedDBSize: 0,
+                    formattedActualSize: '0 B',
                     isLoading: false
                 });
                 setHasUpdates(false);

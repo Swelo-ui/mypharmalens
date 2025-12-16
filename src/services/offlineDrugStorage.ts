@@ -322,3 +322,46 @@ export function formatStorageSize(bytes: number): string {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+/**
+ * Get actual storage size from browser's StorageManager API
+ * This returns the total site storage which includes IndexedDB, Cache, etc.
+ */
+export async function getActualStorageSize(): Promise<{
+    indexedDBSize: number;
+    totalUsage: number;
+    quota: number;
+} | null> {
+    try {
+        if ('storage' in navigator && 'estimate' in navigator.storage) {
+            const estimate = await navigator.storage.estimate();
+
+            // usageDetails.indexedDB is only available in some browsers
+            const usageDetails = (estimate as any).usageDetails;
+            const indexedDBSize = usageDetails?.indexedDB || 0;
+
+            return {
+                // If indexedDB specific size is available, use it; otherwise use total
+                indexedDBSize: indexedDBSize || estimate.usage || 0,
+                totalUsage: estimate.usage || 0,
+                quota: estimate.quota || 0
+            };
+        }
+
+        // Fallback: calculate from stored data if StorageManager not available
+        const drugs = await getDrugsFromOffline();
+        if (drugs.length > 0) {
+            const size = new Blob([JSON.stringify(drugs)]).size;
+            return {
+                indexedDBSize: size,
+                totalUsage: size,
+                quota: 0
+            };
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error getting storage estimate:', error);
+        return null;
+    }
+}
