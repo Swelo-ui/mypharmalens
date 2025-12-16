@@ -30,6 +30,7 @@
 - **⚠️ Drug Interactions Checker** - Real-time safety analysis with layman/medical terminology toggle
 - **📊 Comprehensive Database** - 1000+ medications with verified pharmaceutical data
 - **📱 Mobile-First Design** - Responsive PWA optimized for mobile cameras
+- **🎙️ Voice Search** - Hands-free medication search using speech recognition
 - **💾 Offline Data Download** - Download complete medication database for offline access
 - **💳 Secure Payments** - Razorpay integration with UPI and multiple payment methods
 - **🔐 Privacy-First** - Secure image processing without data storage
@@ -180,6 +181,27 @@ SSL Encryption     - Secure transactions
 - Anonymous usage statistics only
 - Standard Google Analytics privacy controls
 - Users can opt-out via browser settings
+
+</details>
+
+### 6. 🎙️ Voice Search
+
+<details>
+<summary><strong>Hands-Free Medication Search</strong></summary>
+
+**Available In:**
+- **Drug Search Bar** - Search for any medication by speaking its name
+- **Symptom Checker** - Describe your symptoms using voice
+- **Drug Interaction Checker** - Add medications to check via voice
+
+**Features:**
+- Uses Web Speech API for accurate recognition
+- Fuzzy matching to handle pronunciation variations
+- Works on all modern browsers (Chrome, Edge, Safari)
+- Auto-suggests medications as you speak
+- Supports both brand and generic names
+
+**Note:** Requires microphone permission and works best in quiet environments.
 
 </details>
 
@@ -358,7 +380,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Q1 2024
 - [ ] Native mobile apps (iOS/Android)
 - [x] Offline medication database ✅ **Completed!**
-- [ ] Voice-activated search
+- [x] Voice-activated search ✅ **Completed!**
 - [ ] Multi-language support
 
 ### Q2 2024

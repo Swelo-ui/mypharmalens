@@ -73,6 +73,14 @@ const FAQ = () => {
           "@type": "Answer",
           "text": "Yes, we use Google Analytics to understand how users interact with our app and to improve our services. We only collect anonymous usage data like page views and feature usage. We do NOT track your medication searches, health data, or personal information. You can opt-out anytime using browser privacy settings or the Google Analytics opt-out extension."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Does PharmaLens support voice search?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! PharmaLens has voice search functionality. You can search for medications, describe symptoms, and add drugs to the interaction checker using your voice. Just tap the microphone icon and speak the medication name or your symptoms. Voice search uses the Web Speech API and works on all modern browsers."
+        }
       }
     ]
   };
@@ -231,6 +239,13 @@ const FAQ = () => {
               <AccordionTrigger>Where is my offline data stored?</AccordionTrigger>
               <AccordionContent>
                 When you download offline data, it's stored locally in your browser's IndexedDB storage on your device only. This data never leaves your device and is not synced to any servers. The storage is persistent, meaning it remains even when you close the browser. You have full control to view the storage size and delete the data anytime from the Profile settings. Clearing your browser data will also remove the offline database.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-20">
+              <AccordionTrigger>Does PharmaLens support voice search?</AccordionTrigger>
+              <AccordionContent>
+                Yes! PharmaLens has built-in voice search functionality. You can use it in three places: 1) The main drug search bar - tap the microphone icon and speak the medication name, 2) The Symptom Checker - describe your symptoms using voice, 3) The Drug Interaction Checker - add medications by speaking their names. Voice search uses your browser's Web Speech API for accurate recognition and includes fuzzy matching to handle pronunciation variations. It works best in Chrome, Edge, and Safari browsers.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
