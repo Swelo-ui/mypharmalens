@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 import AudioSettings from '@/components/AudioSettings';
 import OfflineDataSettings from '@/components/OfflineDataSettings';
 import { Button } from '@/components/ui/button';
@@ -196,6 +197,11 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen flex flex-col pt-16 pb-20">
+      <SEOHead
+        title="Profile Settings | PharmaLens"
+        description="Manage your PharmaLens account settings, subscriptions, and preferences."
+        noIndex={true}
+      />
       <Header />
 
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-8">

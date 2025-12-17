@@ -2,10 +2,17 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 
 const Privacy = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="Privacy Policy - PharmaLens Data Protection"
+        description="PharmaLens privacy policy. Learn how we protect your data, handle medication images, and ensure your privacy when using our AI pill identification and drug information app."
+        keywords="pharmalens privacy, medication app privacy policy, pill identifier data protection, drug database privacy, GDPR compliance"
+        canonicalUrl="/privacy"
+      />
       <Header />
 
       <main className="flex-1 pt-24 pb-16">

@@ -16,6 +16,7 @@ import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 import SearchBar from '@/components/SearchBar';
 import DrugCard from '@/components/DrugCard';
 import SearchLimitBar from '@/components/SearchLimitBar';
@@ -392,6 +393,18 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title={searchQuery
+          ? `${searchQuery} - Search Medications | PharmaLens Drug Database`
+          : "All Medications - Complete Drug Database | PharmaLens"
+        }
+        description={searchQuery
+          ? `Search results for "${searchQuery}" in PharmaLens medication database. Find drug information, side effects, dosages, interactions, and alternatives.`
+          : "Browse PharmaLens complete medication database. Search over 1000+ drugs with detailed information including dosages, side effects, drug interactions, and brand names."
+        }
+        keywords={`${searchQuery ? searchQuery + ', ' : ''}medication database, drug search, medicine lookup, pill finder, drug information, pharmaceutical database, medication list, drug side effects, dosage information`}
+        canonicalUrl={searchQuery ? `/search?q=${encodeURIComponent(searchQuery)}` : "/search"}
+      />
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
