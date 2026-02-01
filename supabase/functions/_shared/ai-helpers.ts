@@ -165,6 +165,30 @@ OUTPUT FORMAT (JSON only):
 // ============================================================================
 
 /**
+ * Clean HTML by removing scripts, styles, and non-drug content
+ * Reduces token count significantly while preserving drug information
+ */
+function cleanHTMLForExtraction(html: string): string {
+  return html
+    // Remove scripts and styles
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    // Remove navigation and footer
+    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+    // Remove ads and sidebars
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
+    .replace(/class="[^"]*ad[^"]*"/gi, '')
+    // Remove HTML tags but keep text
+    .replace(/<[^>]+>/g, ' ')
+    // Clean up whitespace
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 6000); // Limit to 6000 chars (was 50,000)
+}
+
+/**
  * Intelligent web scraping - extract drug data from HTML
  */
 export async function extractDataFromHTML(
@@ -172,33 +196,30 @@ export async function extractDataFromHTML(
   drugName: string,
   source: string = 'website'
 ): Promise<AIResponse> {
-  const prompt = `You are an expert web scraper. Extract pharmaceutical information for "${drugName}" from this ${source} HTML content.
+  // Pre-clean HTML to reduce tokens (Step 1 optimization)
+  const cleanedHTML = cleanHTMLForExtraction(html);
 
-HTML Content (truncated to first 50000 chars):
-${html.substring(0, 50000)}
+  const prompt = `Extract pharmaceutical info for "${drugName}" from this ${source} content.
 
-Extract the following information in JSON format:
+CONTENT:
+${cleanedHTML}
+
+Return JSON:
 {
   "name": "Drug name",
   "genericName": "Active ingredient",
   "manufacturer": "Company",
   "category": "Drug category",
-  "description": "What it treats",
-  "sideEffects": ["Effect 1", "Effect 2"],
-  "warnings": ["Warning 1", "Warning 2"],
+  "description": "What it treats (50 words max)",
+  "sideEffects": ["Top 5 effects"],
+  "warnings": ["Top 3 warnings"],
   "dosage": "Typical dosage",
   "storage": "Storage instructions",
-  "price": "Price if available",
-  "availability": "Available/Out of stock",
-  "indications": ["Use 1", "Use 2"],
-  "contraindications": ["Contraindication 1"]
+  "indications": ["Top 5 uses"],
+  "contraindications": ["Top 3"]
 }
 
-IMPORTANT:
-- Only extract information that is clearly present in the HTML
-- Use "Not available" for missing fields
-- Ignore advertisements and unrelated content
-- Focus on pharmaceutical data only`;
+Use "Not available" for missing fields. Be concise.`;
 
   return await callTextAI(
     prompt,
@@ -206,12 +227,13 @@ IMPORTANT:
     OPENROUTER_API_KEY,
     SUPABASE_URL,
     {
-      maxTokens: 4096,
+      maxTokens: 800, // Reduced from 4096
       temperature: 0.1,
       responseFormat: 'json'
     }
   );
 }
+
 
 /**
  * Correct and clean scraped drug data
