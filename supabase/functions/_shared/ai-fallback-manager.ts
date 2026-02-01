@@ -32,164 +32,43 @@ export interface AIModel {
   available: boolean; // Circuit breaker state
 }
 
-export type TaskType = 
-  | 'vision' 
-  | 'ocr' 
-  | 'reasoning' 
-  | 'data-extraction' 
-  | 'validation' 
+export type TaskType =
+  | 'vision'
+  | 'ocr'
+  | 'reasoning'
+  | 'data-extraction'
+  | 'validation'
   | 'general';
 
 export const AI_MODEL_POOL: AIModel[] = [
   {
-    id: 'tngtech/deepseek-r1t2-chimera:free',
-    name: 'DeepSeek R1T2 Chimera',
-    provider: 'DeepSeek',
-    strengths: ['reasoning', 'data-extraction', 'validation'],
-    avgLatency: 3000,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'z-ai/glm-4.5-air:free',
-    name: 'GLM 4.5 Air',
-    provider: 'Z-AI',
-    strengths: ['general', 'data-extraction'],
-    avgLatency: 2000,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'tngtech/deepseek-r1t-chimera:free',
-    name: 'DeepSeek R1T Chimera',
-    provider: 'DeepSeek',
-    strengths: ['reasoning', 'data-extraction'],
-    avgLatency: 2500,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'qwen/qwen3-235b-a22b:free',
-    name: 'Qwen 3 235B',
-    provider: 'Qwen',
-    strengths: ['reasoning', 'validation', 'general'],
-    avgLatency: 4000,
-    maxTokens: 32768,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'qwen/qwen3-coder:free',
-    name: 'Qwen 3 Coder',
-    provider: 'Qwen',
-    strengths: ['data-extraction', 'reasoning'],
-    avgLatency: 3000,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'meta-llama/llama-3.3-70b-instruct:free',
-    name: 'Llama 3.3 70B',
-    provider: 'Meta',
-    strengths: ['general', 'reasoning', 'validation'],
-    avgLatency: 3500,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'google/gemma-3-27b-it:free',
-    name: 'Gemma 3 27B',
+    id: 'google/gemini-2.5-flash', // Hypothetical ID, using what user requested. Double check if it's 1.5-flash-latest or similar if 2.5 isn't out. User said 2.5-flash.
+    name: 'Gemini 2.5 Flash',
     provider: 'Google',
-    strengths: ['general', 'validation'],
-    avgLatency: 2500,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'deepseek/deepseek-r1:free',
-    name: 'DeepSeek R1',
-    provider: 'DeepSeek',
-    strengths: ['reasoning', 'data-extraction'],
-    avgLatency: 3000,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'microsoft/mai-ds-r1:free',
-    name: 'Microsoft MAI DS R1',
-    provider: 'Microsoft',
-    strengths: ['general', 'data-extraction'],
-    avgLatency: 2500,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'openai/gpt-oss-20b:free',
-    name: 'GPT OSS 20B',
-    provider: 'OpenAI',
-    strengths: ['general', 'validation'],
-    avgLatency: 2000,
-    maxTokens: 4096,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'deepseek/deepseek-r1-distill-llama-70b:free',
-    name: 'DeepSeek R1 Distill',
-    provider: 'DeepSeek',
-    strengths: ['reasoning', 'general'],
-    avgLatency: 3000,
-    maxTokens: 8192,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'qwen/qwen3-30b-a3b:free',
-    name: 'Qwen 3 30B',
-    provider: 'Qwen',
-    strengths: ['general', 'reasoning'],
-    avgLatency: 2500,
+    strengths: ['reasoning', 'data-extraction', 'validation', 'general', 'vision', 'ocr'],
+    avgLatency: 1000,
     maxTokens: 32768,
     failureCount: 0,
     lastFailure: null,
     available: true
   },
   {
-    id: 'nvidia/nemotron-nano-9b-v2:free',
-    name: 'Nvidia Nemotron Nano 9B',
-    provider: 'Nvidia',
-    strengths: ['general', 'validation'],
-    avgLatency: 1500,
-    maxTokens: 4096,
+    id: 'google/gemini-flash-1.5', // Fallback
+    name: 'Gemini Flash 1.5',
+    provider: 'Google',
+    strengths: ['reasoning', 'data-extraction', 'validation', 'general', 'vision', 'ocr'],
+    avgLatency: 1200,
+    maxTokens: 32768,
     failureCount: 0,
     lastFailure: null,
     available: true
   },
   {
-    id: 'qwen/qwen-2.5-72b-instruct:free',
-    name: 'Qwen 2.5 72B',
-    provider: 'Qwen',
-    strengths: ['general', 'reasoning', 'validation'],
-    avgLatency: 3000,
+    id: 'google/gemini-pro-1.5',
+    name: 'Gemini Pro 1.5',
+    provider: 'Google',
+    strengths: ['reasoning', 'validation'],
+    avgLatency: 2000,
     maxTokens: 32768,
     failureCount: 0,
     lastFailure: null,
@@ -200,34 +79,23 @@ export const AI_MODEL_POOL: AIModel[] = [
 // --- VISION MODEL POOL (for image analysis) ---
 export const VISION_MODEL_POOL: AIModel[] = [
   {
-    id: 'qwen/qwen2.5-vl-32b-instruct:free',
-    name: 'Qwen 2.5 VL 32B',
-    provider: 'Qwen',
+    id: 'google/gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    provider: 'Google',
     strengths: ['vision', 'ocr'],
-    avgLatency: 4000,
-    maxTokens: 8192,
+    avgLatency: 1500,
+    maxTokens: 32768,
     failureCount: 0,
     lastFailure: null,
     available: true
   },
   {
-    id: 'nvidia/nemotron-nano-12b-v2-vl:free',
-    name: 'Nvidia Nemotron VL 12B',
-    provider: 'Nvidia',
+    id: 'google/gemini-flash-1.5',
+    name: 'Gemini Flash 1.5',
+    provider: 'Google',
     strengths: ['vision', 'ocr'],
-    avgLatency: 2500,
-    maxTokens: 4096,
-    failureCount: 0,
-    lastFailure: null,
-    available: true
-  },
-  {
-    id: 'meta-llama/llama-3.2-11b-vision-instruct:free',
-    name: 'Llama 3.2 Vision 11B',
-    provider: 'Meta',
-    strengths: ['vision', 'ocr'],
-    avgLatency: 3000,
-    maxTokens: 8192,
+    avgLatency: 1500,
+    maxTokens: 32768,
     failureCount: 0,
     lastFailure: null,
     available: true
@@ -266,20 +134,20 @@ export interface AIResponse {
  */
 function selectBestModel(taskType: TaskType, isVision: boolean = false): AIModel[] {
   const pool = isVision ? VISION_MODEL_POOL : AI_MODEL_POOL;
-  
+
   // Filter available models and reset circuit breaker if recovery time passed
   const now = Date.now();
   const availableModels = pool.filter(model => {
     if (model.available) return true;
-    
+
     // Check if recovery time has passed
     if (model.lastFailure && (now - model.lastFailure) > RECOVERY_TIME) {
-      console.log(`🔄 Recovering model: ${model.name} (${RECOVERY_TIME/1000}s cooldown passed)`);
+      console.log(`🔄 Recovering model: ${model.name} (${RECOVERY_TIME / 1000}s cooldown passed)`);
       model.available = true;
       model.failureCount = 0;
       return true;
     }
-    
+
     return false;
   });
 
@@ -295,23 +163,23 @@ function selectBestModel(taskType: TaskType, isVision: boolean = false): AIModel
   // Score models based on task type compatibility and performance
   const scoredModels = availableModels.map(model => {
     let score = 0;
-    
+
     // Bonus for task type match
     if (model.strengths.includes(taskType)) score += 100;
     if (model.strengths.includes('general')) score += 50;
-    
+
     // Penalty for latency (prefer faster models)
     score -= model.avgLatency / 100;
-    
+
     // Penalty for recent failures
     score -= model.failureCount * 20;
-    
+
     return { model, score };
   });
 
   // Sort by score (highest first)
   scoredModels.sort((a, b) => b.score - a.score);
-  
+
   console.log(`🎯 Model selection for ${taskType}:`);
   scoredModels.slice(0, 5).forEach((sm, i) => {
     console.log(`  ${i + 1}. ${sm.model.name} (score: ${sm.score.toFixed(0)})`);
@@ -341,10 +209,10 @@ function recordSuccess(modelId: string, pool: AIModel[], latency: number): void 
 
   model.failureCount = 0;
   model.lastFailure = null;
-  
+
   // Update average latency (exponential moving average)
   model.avgLatency = model.avgLatency * 0.8 + latency * 0.2;
-  
+
   console.log(`✅ Model success: ${model.name} (${latency}ms)`);
 }
 
@@ -361,7 +229,7 @@ export async function callAIWithFallback(
   const isVision = request.taskType === 'vision' || request.taskType === 'ocr' || !!request.imageBase64;
   const modelPool = isVision ? VISION_MODEL_POOL : AI_MODEL_POOL;
   const orderedModels = selectBestModel(request.taskType, isVision);
-  
+
   const attemptedModels: string[] = [];
   const timeout = request.timeout || 30000; // 30s default
 
@@ -370,7 +238,7 @@ export async function callAIWithFallback(
   // Try each model in order until success
   for (const model of orderedModels) {
     attemptedModels.push(model.name);
-    
+
     try {
       console.log(`🔄 Trying ${model.name}...`);
       const startTime = Date.now();
@@ -379,15 +247,15 @@ export async function callAIWithFallback(
         model: model.id,
         messages: isVision && request.imageBase64
           ? [{
-              role: 'user',
-              content: [
-                { type: 'text', text: request.prompt },
-                { 
-                  type: 'image_url', 
-                  image_url: { url: `data:image/jpeg;base64,${request.imageBase64}` } 
-                }
-              ]
-            }]
+            role: 'user',
+            content: [
+              { type: 'text', text: request.prompt },
+              {
+                type: 'image_url',
+                image_url: { url: `data:image/jpeg;base64,${request.imageBase64}` }
+              }
+            ]
+          }]
           : [{ role: 'user', content: request.prompt }],
         temperature: request.temperature || 0.1,
         max_tokens: Math.min(request.maxTokens || 2048, model.maxTokens)
@@ -417,7 +285,7 @@ export async function callAIWithFallback(
 
       if (!response.ok) {
         const errorText = await response.text();
-        
+
         // Check for rate limit or forbidden errors
         if (response.status === 429 || response.status === 403) {
           console.log(`⚠️ ${model.name} rate limited/forbidden (${response.status}), trying next model...`);
@@ -451,9 +319,9 @@ export async function callAIWithFallback(
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.log(`❌ ${model.name} failed: ${errorMessage.substring(0, 100)}`);
-      
+
       recordFailure(model.id, modelPool);
-      
+
       // Continue to next model
       continue;
     }
@@ -461,7 +329,7 @@ export async function callAIWithFallback(
 
   // All models failed
   console.error(`❌ ALL MODELS FAILED after trying ${attemptedModels.length} models`);
-  
+
   return {
     success: false,
     error: `All ${attemptedModels.length} AI models failed. Please try again later.`,

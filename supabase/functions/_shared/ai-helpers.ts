@@ -2,12 +2,15 @@
  * ===============================================================================
  * AI HELPERS - Wrapper functions for drug identification stages
  * ===============================================================================
- * 
+ *
  * These helpers wrap the AI fallback manager with drug-specific logic
  * and provide standardized interfaces for all AI-dependent stages.
- * 
+ *
  * ===============================================================================
  */
+
+// Fix for "Cannot find name 'Deno'"
+declare const Deno: any;
 
 import { callVisionAI, callTextAI, type AIResponse } from './ai-fallback-manager.ts';
 
@@ -110,7 +113,7 @@ export async function performCriticalVisionAI(
   imageBase64: string,
   knownIssues: string[] = []
 ): Promise<AIResponse> {
-  const issuesText = knownIssues.length > 0 
+  const issuesText = knownIssues.length > 0
     ? `\n\nKNOWN IMAGE ISSUES: ${knownIssues.join(', ')}`
     : '';
 
@@ -427,7 +430,7 @@ export async function geminiExtractName(
   }
   const prompt = 'Extract ONLY the drug/medication name from this image. Return JSON: {"name":"drug name"}';
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2000);
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   const body = {
     contents: [
@@ -477,7 +480,7 @@ export async function geminiValidateData(
   }
   const prompt = `Validate and correct this drug information. Ensure brand/generic consistency and active ingredients. Return JSON only.`;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2000);
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   const body = {
     contents: [
@@ -503,7 +506,7 @@ export async function geminiValidateData(
     const json = await res.json();
     const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
     let data: unknown = text;
-    try { data = JSON.parse(text); } catch {}
+    try { data = JSON.parse(text); } catch { }
     return { success: true, text, data, modelUsed: 'gemini-1.5-flash', latency, attemptedModels: [] };
   } catch (e) {
     clearTimeout(timeoutId);

@@ -12,7 +12,7 @@ const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 
 // Use free vision model for critical analysis (qwen-2-vl-72b requires credits)
-const QWEN_VISION_MODEL = 'qwen/qwen2.5-vl-32b-instruct:free';
+const QWEN_VISION_MODEL = 'google/gemini-2.5-flash';
 
 interface CriticalVisionData {
   // Core identification (matches frontend DrugCard & DrugDetails)
@@ -22,25 +22,25 @@ interface CriticalVisionData {
   manufacturer: string;
   category: string;
   description: string;
-  
+
   // Dosage and administration (matches frontend format)
   dosageAndAdmin: string;
   strength: string;
   dosageForm: string;
-  
+
   // Safety arrays (matches frontend DrugDetails format)
   sideEffects: string[];
   warnings: string[];
   interactions: string[];
   indications: string[];
   contraindications: string[];
-  
+
   // Storage and usage
   storage: string;
   mechanism: string;
   pregnancy: string;
   prescriptionStatus: string;
-  
+
   // Physical characteristics
   imprint: string;
   color: string;
@@ -49,20 +49,20 @@ interface CriticalVisionData {
   activeIngredients: string[];
   drugClass: string;
   brandNames: string[];
-  
+
   // Dates and regulatory
   batchNumber: string;
   mfgDate: string;
   expDate: string;
   mrp: string;
-  
+
   // Quality metrics
   imageQuality: number;
   imageChallenges: string[];
   confidence: string;
   confidenceScore: number;
   verified: boolean;
-  
+
   // Blister pack specifics
   totalSlots: number;
   filledSlots: number;
@@ -71,34 +71,34 @@ interface CriticalVisionData {
   slotConditionMap: string[];
   usageEstimated: string;
   physicalCondition: string;
-  
+
   // Tampering and safety
   tamperingDetected: boolean;
   tamperingSigns: string[];
   safeToUse: boolean;
   safetyWarnings: string[];
   riskLevel: string;
-  
+
   // OCR data
   ocrConfidence: number;
   rawOcrText: string;
   cleanedText: string;
   partialReads: Array<{ text: string; confidence: number; likely: string }>;
   inferenceUsed: boolean;
-  
+
   // Alternatives and recommendations
   alternatives: Array<{ product_name: string; confidence: number; reasoning: string }>;
   retakeNeeded: boolean;
   retakeTips: string[];
   retakeReason: string;
-  
+
   // Metadata
   analysisMethod: string;
   processingMode: string;
   modelUsed: string;
   detectedLanguages: string[];
   disclaimer: string;
-  
+
   [key: string]: unknown; // Allow additional dynamic properties
 }
 
@@ -124,12 +124,12 @@ export async function performCriticalVisionAnalysis(
   }
 ): Promise<CriticalVisionResult> {
   const startTime = Date.now();
-  
+
   console.log('🔬 === CRITICAL VISION ANALYSIS (Qwen) ===');
   console.log(`   Mode: ${context?.mode || 'standard'}`);
   console.log(`   Previous failure: ${context?.previousAttemptFailed || false}`);
   console.log(`   Known issues: ${context?.knownIssues?.join(', ') || 'none'}`);
-  
+
   if (!OPENROUTER_API_KEY) {
     console.error('❌ OpenRouter API key missing');
     return {
@@ -140,21 +140,21 @@ export async function performCriticalVisionAnalysis(
       processingTime: Date.now() - startTime
     };
   }
-  
+
   try {
     // Build context-aware prompt
     let contextualPrompt = CRITICAL_MEDICINE_VISION_PROMPT;
-    
+
     if (context?.previousAttemptFailed) {
       contextualPrompt += `\n\n⚠️ IMPORTANT: Previous identification attempt failed. This image may be extremely challenging. Use maximum inference and reconstruction capabilities.`;
     }
-    
+
     if (context?.knownIssues && context.knownIssues.length > 0) {
       contextualPrompt += `\n\n📋 Known Image Issues: ${context.knownIssues.join(', ')}\nFocus analysis on working around these specific challenges.`;
     }
-    
+
     console.log('📤 Sending to Qwen Vision API...');
-    
+
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -187,19 +187,19 @@ export async function performCriticalVisionAnalysis(
         response_format: { type: 'json_object' }
       })
     });
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
     }
-    
+
     const result = await response.json();
     const content = result.choices?.[0]?.message?.content;
-    
+
     if (!content) {
       throw new Error('No content in Qwen response');
     }
-    
+
     // Parse JSON response
     let analysisData;
     try {
@@ -213,13 +213,13 @@ export async function performCriticalVisionAnalysis(
         throw new Error('Failed to parse Qwen JSON response');
       }
     }
-    
+
     const processingTime = Date.now() - startTime;
-    
+
     // Extract key metrics
     const confidence = analysisData.confidence_analysis?.overall_confidence || 0;
     const retakeNeeded = analysisData.confidence_analysis?.retake_needed || confidence < 50;
-    
+
     console.log('✅ Critical vision analysis complete');
     console.log(`   Overall confidence: ${confidence}%`);
     console.log(`   Identified: ${analysisData.ocr_extraction?.product_name || 'Unknown'}`);
@@ -228,10 +228,10 @@ export async function performCriticalVisionAnalysis(
     console.log(`   Tampering detected: ${analysisData.physical_condition?.tampering_detected || false}`);
     console.log(`   Retake needed: ${retakeNeeded}`);
     console.log(`   Processing time: ${processingTime}ms`);
-    
+
     // Transform to PharmaLens format
     const pharmaLensData = transformQwenToPharmaLensFormat(analysisData);
-    
+
     return {
       success: true,
       data: pharmaLensData,
@@ -239,19 +239,19 @@ export async function performCriticalVisionAnalysis(
       retakeNeeded,
       processingTime
     };
-    
+
   } catch (error) {
     const processingTime = Date.now() - startTime;
     console.error(`❌ Critical vision analysis failed after ${processingTime}ms:`, error);
-    
+
     // 🚀 AI FALLBACK FOR CRITICAL VISION ANALYSIS
     console.log('🤖 === ACTIVATING CRITICAL VISION AI FALLBACK ===');
     console.log('   Primary Qwen model failed, trying AI fallback...');
-    
+
     try {
       // Import AI helpers for fallback
       const { extractDrugFromImage } = await import('./ai-helpers.ts');
-      
+
       // Create enhanced prompt for critical analysis
       const fallbackPrompt = `You are analyzing a challenging medicine image with known issues: ${context?.knownIssues?.join(', ') || 'unknown'}.
       
@@ -286,40 +286,40 @@ Return detailed JSON with:
 Focus on pharmaceutical accuracy. This is for patient safety.`;
 
       const fallbackResponse = await extractDrugFromImage(imageBase64, fallbackPrompt);
-      
+
       if (fallbackResponse.success && fallbackResponse.data) {
         console.log('✅ Critical Vision AI Fallback succeeded!');
-        
+
         // Transform fallback data to expected format with type guards
         const fallbackData = fallbackResponse.data as Record<string, unknown>;
-        
+
         // Helper function to safely get string value
         const getString = (key: string): string => {
           const value = fallbackData[key];
           return typeof value === 'string' ? value : '';
         };
-        
+
         // Helper function to safely get array value
         const getStringArray = (key: string): string[] => {
           const value = fallbackData[key];
           return Array.isArray(value) ? value.filter(v => typeof v === 'string') : [];
         };
-        
+
         // Helper function to safely get boolean value
         const getBoolean = (key: string, defaultValue: boolean): boolean => {
           const value = fallbackData[key];
           return typeof value === 'boolean' ? value : defaultValue;
         };
-        
+
         // Helper function to safely get number value
         const getNumber = (key: string, defaultValue: number): number => {
           const value = fallbackData[key];
           return typeof value === 'number' ? value : defaultValue;
         };
-        
+
         const confidenceStr = getString('confidence');
         const confidence = confidenceStr === 'high' ? 80 : confidenceStr === 'medium' ? 60 : 40;
-        
+
         const criticalData: CriticalVisionData = {
           id: crypto.randomUUID(),
           name: getString('name') || 'Unknown Medication',
@@ -382,7 +382,7 @@ Focus on pharmaceutical accuracy. This is for patient safety.`;
           detectedLanguages: ['English'],
           disclaimer: 'Analysis performed via AI fallback due to primary model failure'
         };
-        
+
         return {
           success: true,
           data: criticalData,
@@ -396,7 +396,7 @@ Focus on pharmaceutical accuracy. This is for patient safety.`;
     } catch (fallbackError) {
       console.error('❌ Critical Vision AI Fallback error:', fallbackError);
     }
-    
+
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -477,13 +477,13 @@ interface QwenAnalysisData {
 function transformQwenToPharmaLensFormat(qwenData: QwenAnalysisData): CriticalVisionData {
   // Extract warnings as array
   const warningsText = qwenData.ocr_extraction?.warnings || qwenData.safety_warnings?.specific_warnings?.join('. ') || '';
-  const warningsArray = qwenData.safety_warnings?.specific_warnings || 
-                       (warningsText ? [warningsText] : []);
-  
+  const warningsArray = qwenData.safety_warnings?.specific_warnings ||
+    (warningsText ? [warningsText] : []);
+
   // Build description from available data
-  const description = qwenData.ocr_extraction?.composition_full || 
-                     `${qwenData.classification?.therapeutic_class || 'Medication'} - ${qwenData.classification?.primary_category || 'Unknown category'}`;
-  
+  const description = qwenData.ocr_extraction?.composition_full ||
+    `${qwenData.classification?.therapeutic_class || 'Medication'} - ${qwenData.classification?.primary_category || 'Unknown category'}`;
+
   return {
     // Core identification (matches frontend format)
     id: crypto.randomUUID(),
@@ -492,26 +492,26 @@ function transformQwenToPharmaLensFormat(qwenData: QwenAnalysisData): CriticalVi
     manufacturer: qwenData.ocr_extraction?.manufacturer_name || '',
     category: qwenData.classification?.primary_category || 'unknown',
     description: description,
-    
+
     // Dosage and administration (matches frontend format)
-    dosageAndAdmin: `${qwenData.ocr_extraction?.strength || ''} ${qwenData.ocr_extraction?.dosage_form || ''}`.trim() || 
-                   'Consult physician for dosage',
+    dosageAndAdmin: `${qwenData.ocr_extraction?.strength || ''} ${qwenData.ocr_extraction?.dosage_form || ''}`.trim() ||
+      'Consult physician for dosage',
     strength: qwenData.ocr_extraction?.strength || '',
     dosageForm: qwenData.ocr_extraction?.dosage_form || '',
-    
+
     // Safety arrays (matches frontend DrugDetails format)
     sideEffects: [], // Qwen doesn't provide this, will be empty
     warnings: warningsArray,
     interactions: [], // Qwen doesn't provide this, will be empty
     indications: qwenData.classification?.probable_indications || [],
     contraindications: [], // Qwen doesn't provide this, will be empty
-    
+
     // Storage and usage
     storage: qwenData.ocr_extraction?.storage_instructions || '',
     mechanism: '', // Not provided by Qwen
     pregnancy: '', // Not provided by Qwen
     prescriptionStatus: '', // Not provided by Qwen
-    
+
     // Physical characteristics
     imprint: qwenData.ocr_extraction?.batch_number || '',
     color: extractColorFromAnalysis(qwenData),
@@ -520,19 +520,19 @@ function transformQwenToPharmaLensFormat(qwenData: QwenAnalysisData): CriticalVi
     activeIngredients: qwenData.classification?.active_ingredients || [],
     drugClass: qwenData.classification?.therapeutic_class || '',
     brandNames: [], // Not provided by Qwen
-    
+
     // Dates and regulatory
     batchNumber: qwenData.ocr_extraction?.batch_number || '',
     mfgDate: qwenData.ocr_extraction?.mfg_date || '',
     expDate: qwenData.ocr_extraction?.exp_date || '',
     mrp: qwenData.ocr_extraction?.mrp || '',
-    
+
     // Quality metrics
-    confidence: (qwenData.confidence_analysis?.overall_confidence ?? 0) >= 80 ? 'high' : 
-                (qwenData.confidence_analysis?.overall_confidence ?? 0) >= 50 ? 'medium' : 'low',
+    confidence: (qwenData.confidence_analysis?.overall_confidence ?? 0) >= 80 ? 'high' :
+      (qwenData.confidence_analysis?.overall_confidence ?? 0) >= 50 ? 'medium' : 'low',
     confidenceScore: qwenData.confidence_analysis?.overall_confidence ?? 0,
     verified: (qwenData.confidence_analysis?.overall_confidence ?? 0) >= 70,
-    
+
     // Quality and condition
     imageQuality: qwenData.image_quality?.readability_score || 0,
     imageChallenges: qwenData.image_quality?.image_challenges || [],
@@ -540,7 +540,7 @@ function transformQwenToPharmaLensFormat(qwenData: QwenAnalysisData): CriticalVi
     tamperingDetected: qwenData.physical_condition?.tampering_detected || false,
     tamperingSigns: qwenData.physical_condition?.tampering_signs || [],
     safeToUse: qwenData.safety_warnings?.safe_to_use || false,
-    
+
     // Blister pack specifics
     totalSlots: qwenData.regions_detected?.total_capsule_slots || 0,
     filledSlots: qwenData.regions_detected?.filled_slots || 0,
@@ -548,33 +548,33 @@ function transformQwenToPharmaLensFormat(qwenData: QwenAnalysisData): CriticalVi
     damagedSlots: qwenData.regions_detected?.damaged_slots || 0,
     slotConditionMap: qwenData.regions_detected?.slot_map || [],
     usageEstimated: qwenData.physical_condition?.usage_estimated || '0%',
-    
+
     // Alternatives
     alternatives: qwenData.confidence_analysis?.alternative_identifications || [],
-    
+
     // OCR data
     ocrConfidence: qwenData.ocr_extraction?.ocr_confidence || 0,
     rawOcrText: qwenData.ocr_extraction?.raw_ocr_text || '',
     cleanedText: qwenData.ocr_extraction?.cleaned_text || '',
     partialReads: qwenData.ocr_extraction?.partial_reads || [],
     inferenceUsed: qwenData.ocr_extraction?.inference_used || false,
-    
+
     // Safety
     safetyWarnings: qwenData.safety_warnings?.specific_warnings || [],
     riskLevel: qwenData.safety_warnings?.risk_level || 'unknown',
     disclaimer: qwenData.disclaimer || '',
-    
+
     // Retake recommendation
     retakeNeeded: qwenData.confidence_analysis?.retake_needed || false,
     retakeTips: qwenData.confidence_analysis?.retake_tips || [],
     retakeReason: qwenData.image_quality?.retake_recommendation || '',
-    
+
     // Metadata
     analysisMethod: 'critical-vision-qwen',
     processingMode: 'advanced',
     modelUsed: QWEN_VISION_MODEL,
     detectedLanguages: qwenData.ocr_extraction?.detected_languages || ['English'],
-    
+
     // Full Qwen response for debugging
     _qwenRawData: qwenData
   };
@@ -587,13 +587,13 @@ function extractColorFromAnalysis(qwenData: QwenAnalysisData): string {
   // Try to extract color from various fields
   const text = qwenData.ocr_extraction?.cleaned_text || '';
   const colors = ['red', 'blue', 'green', 'yellow', 'white', 'orange', 'pink', 'purple', 'brown', 'black'];
-  
+
   for (const color of colors) {
     if (text.toLowerCase().includes(color)) {
       return color;
     }
   }
-  
+
   return '';
 }
 
@@ -612,7 +612,7 @@ interface PreviousResult {
  */
 export function shouldUseCriticalAnalysis(previousResult?: PreviousResult): boolean {
   if (!previousResult) return true; // Always use for first attempt
-  
+
   const triggers = [
     previousResult.confidence === 'low',
     previousResult.name === 'Unknown Medication',
@@ -622,6 +622,6 @@ export function shouldUseCriticalAnalysis(previousResult?: PreviousResult): bool
     previousResult.imprint === '' && previousResult.name !== '',
     previousResult.error !== undefined
   ];
-  
+
   return triggers.some(trigger => trigger === true);
 }

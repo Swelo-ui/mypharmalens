@@ -7,8 +7,8 @@
 
 const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const THINKING_AI_MODEL = 'deepseek/deepseek-r1:free'; // Advanced reasoning AI
-const WEB_SEARCH_MODEL = 'tngtech/deepseek-r1t2-chimera:free'; // Web scraping AI
+const THINKING_AI_MODEL = 'google/gemini-2.5-flash'; // Advanced reasoning AI
+const WEB_SEARCH_MODEL = 'google/gemini-2.5-flash'; // Web scraping AI
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
@@ -53,7 +53,7 @@ async function planSearchStrategy(
     visibleText?: string;
   }
 ): Promise<{ searchQuery: string; strategy: string; confidence: number; reasoning?: string }> {
-  
+
   const prompt = `You are a pharmaceutical research AI. Analyze the partial drug information and plan an optimal web search strategy.
 
 AVAILABLE INFORMATION:
@@ -103,7 +103,7 @@ Think through this carefully and return ONLY valid JSON.`;
 
     const result = await response.json();
     const content = result.choices?.[0]?.message?.content || '{}';
-    
+
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -114,9 +114,9 @@ Think through this carefully and return ONLY valid JSON.`;
       console.log(`   Confidence: ${(plan.confidence * 100).toFixed(1)}%`);
       return plan;
     }
-    
+
     throw new Error('No valid JSON in response');
-    
+
   } catch (error) {
     console.error('❌ Planning error:', error);
     // Fallback: Use drug name if available
@@ -132,7 +132,7 @@ Think through this carefully and return ONLY valid JSON.`;
  * STEP 2: Execute intelligent web search for drug information
  */
 async function searchDrugOnWeb(searchQuery: string, drugName?: string): Promise<any> {
-  
+
   const prompt = `You are a pharmaceutical data extractor. Search for comprehensive information about this medication.
 
 SEARCH QUERY: "${searchQuery}"
@@ -191,7 +191,7 @@ Search the web intelligently and return ONLY valid JSON with complete informatio
 
     const result = await response.json();
     const content = result.choices?.[0]?.message?.content || '{}';
-    
+
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -203,9 +203,9 @@ Search the web intelligently and return ONLY valid JSON with complete informatio
       console.log(`   Confidence: ${(drugInfo.confidence * 100).toFixed(1)}%`);
       return drugInfo;
     }
-    
+
     throw new Error('No valid JSON in web search response');
-    
+
   } catch (error) {
     console.error('❌ Web search error:', error);
     return null;
@@ -228,16 +228,16 @@ export async function performIntelligentWebSearch(
     completeness?: number;
   }
 ): Promise<WebSearchResult> {
-  
+
   console.log(`\n🔍 === INTELLIGENT WEB SEARCH TRIGGERED ===`);
   console.log(`   Strip Condition: ${partialInfo.stripCondition || 'Unknown'}`);
   console.log(`   Available Info: ${partialInfo.drugName || partialInfo.genericName || 'Minimal'}`);
   console.log(`   Completeness: ${partialInfo.completeness || 0}%`);
-  
+
   try {
     // STEP 1: AI plans optimal search strategy
     const searchPlan = await planSearchStrategy(partialInfo);
-    
+
     if (searchPlan.confidence < 0.3) {
       console.log(`\n⚠️ Low confidence in search plan - insufficient information`);
       return {
@@ -246,13 +246,13 @@ export async function performIntelligentWebSearch(
         confidence: searchPlan.confidence
       };
     }
-    
+
     // STEP 2: Execute web search with AI reasoning
     const drugInfo = await searchDrugOnWeb(
       searchPlan.searchQuery,
       partialInfo.drugName
     );
-    
+
     if (!drugInfo) {
       return {
         success: false,
@@ -260,12 +260,12 @@ export async function performIntelligentWebSearch(
         searchStrategy: searchPlan.strategy
       };
     }
-    
+
     // STEP 3: Return comprehensive result
     console.log(`\n✅ INTELLIGENT WEB SEARCH SUCCESSFUL!`);
     console.log(`   Strategy: ${searchPlan.strategy}`);
     console.log(`   Confidence: ${(drugInfo.confidence * 100).toFixed(1)}%`);
-    
+
     return {
       success: true,
       drugInfo: {
@@ -291,7 +291,7 @@ export async function performIntelligentWebSearch(
       sourcesSearched: drugInfo.sources || [],
       confidence: drugInfo.confidence || 0.7
     };
-    
+
   } catch (error) {
     console.error('❌ Intelligent web search error:', error);
     return {
@@ -309,32 +309,32 @@ export function shouldUseIntelligentWebSearch(
   visionResult: any,
   completeness?: number
 ): boolean {
-  
+
   // Trigger if strip is damaged/torn
-  if (visionResult?.stripCondition && 
-      ['torn', 'damaged', 'cut', 'partial'].includes(visionResult.stripCondition)) {
+  if (visionResult?.stripCondition &&
+    ['torn', 'damaged', 'cut', 'partial'].includes(visionResult.stripCondition)) {
     console.log(`\n🚨 Damaged strip detected → Intelligent web search recommended`);
     return true;
   }
-  
+
   // Trigger if completeness is low
   if (completeness !== undefined && completeness < 40) {
     console.log(`\n⚠️ Low completeness (${completeness}%) → Intelligent web search recommended`);
     return true;
   }
-  
+
   // Trigger if drug name is unknown but we have some identifying info
   if ((!visionResult?.name || visionResult.name.toLowerCase().includes('unknown')) &&
-      (visionResult?.imprint || visionResult?.genericName)) {
+    (visionResult?.imprint || visionResult?.genericName)) {
     console.log(`\n🔍 Unknown drug but have identifiers → Intelligent web search recommended`);
     return true;
   }
-  
+
   // Trigger if image quality is very poor
   if (visionResult?.imageQuality !== undefined && visionResult.imageQuality < 30) {
     console.log(`\n📉 Poor image quality (${visionResult.imageQuality}%) → Intelligent web search recommended`);
     return true;
   }
-  
+
   return false;
 }

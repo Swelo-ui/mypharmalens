@@ -5,7 +5,7 @@ declare const Deno: { env: { get: (key: string) => string | undefined } };
 
 const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const OPENROUTER_CACHE_VALIDATOR_MODEL = 'meituan/longcat-flash-chat:free'; // Smart, fast, free model
+const OPENROUTER_CACHE_VALIDATOR_MODEL = 'google/gemini-2.5-flash'; // High performance, consistent model
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 
 /**
@@ -31,7 +31,7 @@ export async function aiCompareDrugNames(
   }
 
   try {
-    console.log(`\n🤖 AI Drug Comparison:`);  
+    console.log(`\n🤖 AI Drug Comparison:`);
     console.log(`   Extracted: "${extractedName}" (Generic: "${extractedGeneric || 'N/A'}")`);
     console.log(`   Matched: "${matchedName}" (Generic: "${matchedGeneric || 'N/A'}")`);
 

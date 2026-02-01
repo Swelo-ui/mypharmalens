@@ -1,4 +1,6 @@
 import "xhr";
+// Fix for "Cannot find name 'Deno'"
+declare const Deno: any;
 import { checkDrugCache as checkCacheIntegration, checkDrugCacheWithValidation } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
 import { performCriticalVisionAnalysis, shouldUseCriticalAnalysis } from '../_shared/critical-vision-analysis.ts';
@@ -6,6 +8,7 @@ import { cleanText, cleanMechanismText, cleanTextArray, normalizeDrugName, gener
 import { geminiExtractName, geminiValidateData as _geminiValidateData } from '../_shared/ai-helpers.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
 import { isRateLimitError, createRateLimitResponse, getRateLimitErrorMessage, logRateLimit } from '../_shared/rate-limit-handler.ts';
+import { findJanaushadhiAlternative, JanaushadhiMatch } from '../_shared/janaushadhi-lookup.ts';
 // AI fallback imports (will be used when adding intelligent fallbacks)
 // import {
 //   extractDrugFromImage,
@@ -23,20 +26,19 @@ const corsHeaders = {
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
-// Vision model hierarchy: Qwen (primary) → Nvidia (secondary) → Meta Llama 4 (fallback)
-const VISION_MODEL_PRIMARY = 'qwen/qwen2.5-vl-32b-instruct:free';      // Best for pharmaceutical OCR
-const VISION_MODEL_SECONDARY = 'nvidia/nemotron-nano-12b-v2-vl:free'; // Fast alternative
-const VISION_MODEL_FALLBACK = 'meta-llama/llama-4-maverick:free';      // Final fallback
+// Vision model hierarchy: Gemini (primary) → Gemini Flash 3 (fallback) - Optimized 2-tier cascade
+const VISION_MODEL_PRIMARY = 'google/gemini-2.5-flash';      // Primary OCR & Vision
+const VISION_MODEL_FALLBACK = 'google/gemini-flash-3-preview'; // Fallback for all AI tasks
 
-// Web scraping model: DeepSeek R1T2 Chimera for intelligent HTML parsing
-const WEB_SCRAPING_MODEL = 'tngtech/deepseek-r1t2-chimera:free';       // Best for web scraping & reasoning
+// Web scraping model: Use primary Gemini for consistency
+const WEB_SCRAPING_MODEL = 'google/gemini-2.5-flash';       // Primary for web scraping & reasoning
 
 // Standard Mode data cleaner - Clean all data but NO rate limiting
 // Removes markdown/asterisks but returns FULL data (no item limits)
 // deno-lint-ignore no-explicit-any
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
-  
+
   return {
     ...data,
     // Clean array fields - remove asterisks/markdown but keep ALL items
@@ -260,7 +262,7 @@ function createResponse(data: DrugIdentificationResult, status = 200) {
 async function performSmartPreProcessing(imageBase64: string): Promise<PreProcessingResult> {
   console.log('\n🧠 === SMART PRE-PROCESSING STAGE ===');
   const startTime = Date.now();
-  
+
   try {
     // Quick vision analysis to determine image complexity
     const analysisPrompt = `Analyze this pharmaceutical image and determine:
@@ -280,7 +282,7 @@ Return ONLY JSON:
 }`;
 
     const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
-    
+
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -307,13 +309,13 @@ Return ONLY JSON:
       const result = await response.json();
       const content = result.choices?.[0]?.message?.content || '{}';
       const jsonMatch = content.match(/\{[\s\S]*\}/);
-      
+
       if (jsonMatch) {
         const analysis = JSON.parse(jsonMatch[0]);
         const imageQuality = analysis.imageQuality || 50;
         const challenges = analysis.challenges || [];
         const recommendedMode = analysis.recommendedMode || 'standard';
-        
+
         // Determine complexity based on quality and challenges
         let complexity: 'simple' | 'moderate' | 'complex' = 'simple';
         if (imageQuality < 40 || challenges.length > 2) {
@@ -321,7 +323,7 @@ Return ONLY JSON:
         } else if (imageQuality < 70 || challenges.length > 0) {
           complexity = 'moderate';
         }
-        
+
         const result: PreProcessingResult = {
           imageComplexity: complexity,
           suggestedMode: recommendedMode === 'enhanced' ? 'enhanced' : 'standard',
@@ -335,7 +337,7 @@ Return ONLY JSON:
             imageQuality < 50 ? '💡 Better lighting recommended' : ''
           ].filter(r => r.length > 0)
         };
-        
+
         const processingTime = Date.now() - startTime;
         console.log(`   Image Complexity: ${result.imageComplexity.toUpperCase()}`);
         console.log(`   Quality Score: ${result.qualityScore}/100`);
@@ -343,14 +345,14 @@ Return ONLY JSON:
         console.log(`   Challenges: ${result.challenges.join(', ') || 'None'}`);
         console.log(`   Processing Time: ${processingTime}ms`);
         console.log(`🧠 === PRE-PROCESSING COMPLETE ===\n`);
-        
+
         return result;
       }
     }
   } catch (error) {
     console.error(`❌ Pre-processing error:`, error);
   }
-  
+
   // Fallback result if analysis fails
   return {
     imageComplexity: 'moderate',
@@ -362,30 +364,136 @@ Return ONLY JSON:
   };
 }
 
+// 🛡️ STAGE 2: HALLUCINATION CHECK - Safety mechanism to filter OCR errors
+// Verifies if the extracted drug name actually exists in pharmaceutical knowledge
+interface HallucinationCheckResult {
+  isValid: boolean;
+  correctedName?: string;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  suggestedAlternatives?: string[];
+}
+
+async function performHallucinationCheck(extractedName: string, genericName?: string): Promise<HallucinationCheckResult> {
+  console.log('\\n🛡️ === STAGE 2: HALLUCINATION CHECK ===');
+  console.log(`   Verifying: "${extractedName}" (Generic: "${genericName || 'N/A'}")`);
+  const startTime = Date.now();
+
+  try {
+    const prompt = `You are a pharmaceutical verification expert. Your task is to verify if this drug name is REAL and EXISTS in actual pharmaceutical databases.
+
+EXTRACTED DRUG NAME: "${extractedName}"
+EXTRACTED GENERIC NAME: "${genericName || 'Not provided'}"
+
+CRITICAL VERIFICATION TASKS:
+1. Is "${extractedName}" a REAL pharmaceutical product that exists?
+2. If NOT, is it likely an OCR error? (e.g., "CROCIB" might be OCR misread of "CROCIN")
+3. If it's an OCR error, what is the CORRECT drug name?
+4. Does the generic name match what this drug should contain?
+
+COMMON OCR ERRORS TO CHECK:
+- Letters confused: B↔D, I↔L, O↔0, S↔5, G↔6, N↔M
+- Missing letters or extra characters
+- Partial names (only part of the full name visible)
+
+OUTPUT (JSON only):
+{
+  "isValid": true/false,
+  "originalName": "${extractedName}",
+  "correctedName": "Actual drug name if OCR error detected, or null if valid",
+  "confidence": "high/medium/low",
+  "reasoning": "Brief explanation of verification result",
+  "suggestedAlternatives": ["Similar real drugs if verification failed"],
+  "genericMatch": true/false
+}
+
+Be STRICT - only mark as valid if you are confident this is a real pharmaceutical product.
+Return ONLY JSON:`;
+
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+        'X-Title': 'PharmaLens Hallucination Check'
+      },
+      body: JSON.stringify({
+        model: VISION_MODEL_PRIMARY, // Use same Gemini model for consistency
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.1,
+        max_tokens: 512
+      })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content || '{}';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+
+      if (jsonMatch) {
+        const verification = JSON.parse(jsonMatch[0]);
+        const processingTime = Date.now() - startTime;
+
+        if (verification.isValid) {
+          console.log(`   ✅ VERIFIED: "${extractedName}" is a real pharmaceutical product`);
+          console.log(`   Confidence: ${verification.confidence}`);
+        } else if (verification.correctedName) {
+          console.log(`   🔄 OCR CORRECTION: "${extractedName}" → "${verification.correctedName}"`);
+          console.log(`   Reasoning: ${verification.reasoning}`);
+        } else {
+          console.log(`   ❌ REJECTED: "${extractedName}" appears to be a hallucination/OCR error`);
+          console.log(`   Suggestions: ${verification.suggestedAlternatives?.join(', ') || 'None'}`);
+        }
+        console.log(`   Processing Time: ${processingTime}ms`);
+        console.log(`🛡️ === HALLUCINATION CHECK COMPLETE ===\\n`);
+
+        return {
+          isValid: verification.isValid || false,
+          correctedName: verification.correctedName || undefined,
+          confidence: verification.confidence || 'low',
+          reasoning: verification.reasoning || 'Verification completed',
+          suggestedAlternatives: verification.suggestedAlternatives || []
+        };
+      }
+    }
+  } catch (error) {
+    console.error(`   ❌ Hallucination check error:`, error);
+  }
+
+  // Fallback: Assume valid if check fails (don't block the pipeline)
+  console.log(`   ⚠️ Verification unavailable, proceeding with caution`);
+  return {
+    isValid: true,
+    confidence: 'low',
+    reasoning: 'Verification service unavailable, proceeding with original name'
+  };
+}
+
 // Calculate quality score based on data completeness and source reliability
 function calculateQualityScore(data: DrugData, sources: string[]): QualityScore {
   let dataCompleteness = 0;
   let sourceReliability = 0;
   let validationLevel = 0;
-  
+
   // Data completeness (0-100)
   const requiredFields = ['name', 'genericName', 'description', 'sideEffects', 'warnings'];
   const optionalFields = ['indications', 'contraindications', 'mechanism', 'dosageAndAdmin'];
-  
+
   requiredFields.forEach(field => {
     const value = data[field as keyof DrugData];
     if (value && (typeof value === 'string' ? value.length > 0 : Array.isArray(value) && value.length > 0)) {
       dataCompleteness += 15;
     }
   });
-  
+
   optionalFields.forEach(field => {
     const value = data[field as keyof DrugData];
     if (value && (typeof value === 'string' ? value.length > 0 : Array.isArray(value) && value.length > 0)) {
       dataCompleteness += 6.25;
     }
   });
-  
+
   // Source reliability (0-100)
   const reliableSourceScores: Record<string, number> = {
     'cache-search': 95,
@@ -398,11 +506,11 @@ function calculateQualityScore(data: DrugData, sources: string[]): QualityScore 
     'critical-vision-analysis': 70,
     'ai-powered-fallback': 65
   };
-  
+
   sources.forEach(source => {
     sourceReliability = Math.max(sourceReliability, reliableSourceScores[source] || 50);
   });
-  
+
   // Validation level (0-100)
   if (sources.includes('cache-search') || sources.includes('local-database-smart-search')) {
     validationLevel = 90; // AI validated
@@ -413,13 +521,13 @@ function calculateQualityScore(data: DrugData, sources: string[]): QualityScore 
   } else {
     validationLevel = 50; // Single source
   }
-  
+
   const overall = Math.round((dataCompleteness * 0.4 + sourceReliability * 0.35 + validationLevel * 0.25));
-  
+
   let confidence: Confidence = 'low';
   if (overall >= 80) confidence = 'high';
   else if (overall >= 60) confidence = 'medium';
-  
+
   return {
     overall,
     dataCompleteness: Math.round(dataCompleteness),
@@ -441,19 +549,19 @@ function enrichResponseMetadata(
   }
   const successfulStages = stages.filter(s => s.success).map(s => s.name);
   const failedStages = stages.filter(s => !s.success).map(s => s.name);
-  
+
   const qualityMetrics = calculateQualityScore(data, successfulStages);
-  
-  const cacheStatus: 'hit' | 'miss' | 'partial' = 
+
+  const cacheStatus: 'hit' | 'miss' | 'partial' =
     successfulStages.includes('cache-search') ? 'hit' :
-    successfulStages.includes('local-database-smart-search') ? 'partial' : 'miss';
-  
-  const aiValidationUsed = stages.some(s => 
-    s.name.includes('ai-powered') || 
+      successfulStages.includes('local-database-smart-search') ? 'partial' : 'miss';
+
+  const aiValidationUsed = stages.some(s =>
+    s.name.includes('ai-powered') ||
     s.name.includes('critical-vision') ||
     s.name.includes('intelligent-scraping')
   );
-  
+
   const metadata: EnrichedMetadata = {
     processingPipeline: successfulStages,
     qualityMetrics,
@@ -464,7 +572,7 @@ function enrichResponseMetadata(
     fallbacksTriggered: failedStages,
     timestamp: new Date().toISOString()
   };
-  
+
   return {
     ...data,
     _metadata: metadata,
@@ -495,7 +603,7 @@ async function checkLocalDatabase(drugName: string, threshold: number = 0.75): P
       },
       body: JSON.stringify({ query: drugName, threshold })
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       if (data?.data) {
@@ -536,23 +644,22 @@ async function checkDrugCache(
   return null;
 }
 
-// OpenRouter Vision with 3-tier fallback: Qwen → Nvidia → Gemini 2.0
+// OpenRouter Vision with 2-tier fallback: Gemini 2.5 Flash → Gemini Flash 3 Preview
 async function performOpenRouterAnalysis(imageBase64: string, modelIndex: number = 0): Promise<VisionResult | null> {
-  // Select model based on index: 0 = Qwen, 1 = Nvidia, 2 = Gemini 2.0
+  // Select model based on index: 0 = Gemini 2.5 Flash (Primary), 1 = Gemini Flash 3 Preview (Fallback)
   const models = [
-    { id: VISION_MODEL_PRIMARY, name: 'Qwen 2.5-VL' },
-    { id: VISION_MODEL_SECONDARY, name: 'Nvidia Nemotron' },
-    { id: VISION_MODEL_FALLBACK, name: 'Gemini 2.0 Flash' }
+    { id: VISION_MODEL_PRIMARY, name: 'Gemini 2.5 Flash' },
+    { id: VISION_MODEL_FALLBACK, name: 'Gemini Flash 3 Preview' }
   ];
-  
+
   const currentModel = models[modelIndex];
   if (!currentModel) return null; // All models exhausted
-  
+
   const { id: modelToUse, name: modelName } = currentModel;
-  
+
   try {
-    console.log(`🔄 Using OpenRouter Vision (${modelName}) as fallback...`);
-    
+    console.log(`🔄 Using OpenRouter Vision (${modelName})...`);
+
     const prompt = `You are a fast pharmaceutical drug identifier. Extract key info from this medicine image.
 
 CRITICAL: Also detect if the image has challenging conditions that need advanced analysis.
@@ -605,7 +712,8 @@ Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
           ]
         }],
         temperature: 0.1,
-        max_tokens: 512 // Standard Mode: Fast response
+        max_tokens: 512, // Standard Mode: Fast response
+        response_format: { type: 'json_object' } // Force structured JSON output
       })
     });
 
@@ -615,7 +723,7 @@ Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
 
     const openRouterResponse = await response.json();
     const content = openRouterResponse.choices?.[0]?.message?.content || '';
-    
+
     // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -627,35 +735,35 @@ Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
         console.error(`❌ OpenRouter (${modelName}) JSON parse error:`, parseError);
       }
     }
-    
+
     throw new Error(`No valid JSON in OpenRouter (${modelName}) response`);
   } catch (error) {
     console.error(`❌ OpenRouter Vision (${modelName}) failed:`, error);
-    
-    // Try next model in cascade: Qwen → Nvidia → Gemini 2.0
+
+    // Try next model in cascade: Gemini 2.5 Flash → Gemini Flash 3 Preview
     const nextModelIndex = modelIndex + 1;
-    if (nextModelIndex < 3 && OPENROUTER_API_KEY) {
-      const nextModelName = models[nextModelIndex]?.name || 'Next model';
+    if (nextModelIndex < 2 && OPENROUTER_API_KEY) {
+      const nextModelName = models[nextModelIndex]?.name || 'Fallback model';
       console.log(`🔄 ${modelName} failed, trying ${nextModelName}...`);
       return await performOpenRouterAnalysis(imageBase64, nextModelIndex);
     }
-    
-    console.log('❌ All 3 OpenRouter vision models exhausted');
-    
+
+    console.log('❌ All Gemini vision models exhausted (2-tier cascade)');
+
     // Return user-friendly error instead of null
     throw new Error('Server not responding. All vision analysis services are currently unavailable. Please try again later or contact us for support.');
   }
 }
 
-// Intelligent Web Scraping with DeepSeek R1T2 Chimera
+// Intelligent Web Scraping with Gemini 2.5 Flash
 async function intelligentWebScraping(drugName: string, source: '1mg' | 'medlineplus'): Promise<ScrapedDrugData> {
   console.log(`🕷️ Intelligent web scraping for "${drugName}" from ${source}...`);
-  
+
   try {
     // Step 1: Construct search URL
     let searchUrl: string;
     let url: string;
-    
+
     if (source === '1mg') {
       searchUrl = `https://www.1mg.com/search/all?name=${encodeURIComponent(drugName)}`;
       url = searchUrl; // Will be updated after search
@@ -663,9 +771,9 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
       searchUrl = `https://medlineplus.gov/druginfo/meds/${encodeURIComponent(drugName.toLowerCase().replace(/\s+/g, ''))}.html`;
       url = searchUrl; // Will be updated after search
     }
-    
+
     console.log(`   Fetching: ${searchUrl}`);
-    
+
     const response = await fetch(searchUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -676,14 +784,14 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
         'Upgrade-Insecure-Requests': '1'
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const html = await response.text();
     console.log(`   HTML fetched: ${html.length} characters`);
-    
+
     // Step 2: Use DeepSeek R1T2 Chimera to intelligently extract drug data
     const extractionPrompt = `You are an expert web scraper specializing in pharmaceutical data extraction. Analyze this HTML content from ${source} and extract comprehensive drug information.
 
@@ -770,8 +878,8 @@ OUTPUT FORMAT (JSON):
 
 Return ONLY valid JSON. Be thorough but accurate.`;
 
-    console.log(`   Using DeepSeek R1T2 Chimera for intelligent extraction...`);
-    
+    console.log(`   Using Gemini 2.5 Flash for intelligent extraction...`);
+
     const aiResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -791,48 +899,48 @@ Return ONLY valid JSON. Be thorough but accurate.`;
         top_p: 0.9
       })
     });
-    
+
     if (!aiResponse.ok) {
-      throw new Error(`DeepSeek API error: ${aiResponse.status} ${aiResponse.statusText}`);
+      throw new Error(`Gemini API error: ${aiResponse.status} ${aiResponse.statusText}`);
     }
-    
+
     const aiResult = await aiResponse.json();
     const extractedContent = aiResult.choices?.[0]?.message?.content || '';
-    
-    console.log(`   DeepSeek response: ${extractedContent.substring(0, 200)}...`);
-    
+
+    console.log(`   Gemini response: ${extractedContent.substring(0, 200)}...`);
+
     // Parse JSON from AI response
     const jsonMatch = extractedContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {
         const parsedData = JSON.parse(jsonMatch[0]);
         console.log(`✅ Intelligent scraping success: ${parsedData.name} (${parsedData.dataCompleteness}% complete)`);
-        
+
         // Add metadata
-        parsedData.scrapingMethod = 'DeepSeek R1T2 Chimera';
+        parsedData.scrapingMethod = 'Gemini 2.5 Flash';
         parsedData.source = source;
         parsedData.scrapedAt = new Date().toISOString();
-        
+
         return parsedData;
       } catch (parseError) {
         console.error(`❌ JSON parse error:`, parseError);
         throw new Error('Failed to parse extracted data');
       }
     } else {
-      console.error(`❌ No JSON found in DeepSeek response`);
+      console.error(`❌ No JSON found in Gemini response`);
       throw new Error('No structured data extracted');
     }
-    
+
   } catch (error) {
     console.error(`❌ Intelligent web scraping failed for ${source}:`, error);
     throw error;
   }
 }
 
-// Data correction and validation using DeepSeek R1T2 Chimera
+// Data correction and validation using Gemini 2.5 Flash
 async function correctAndValidateData(rawData: ScrapedDrugData, drugName: string): Promise<ScrapedDrugData> {
   console.log(`🔍 Correcting and validating data for "${drugName}"...`);
-  
+
   try {
     const correctionPrompt = `You are a pharmaceutical data validator and corrector. Review this extracted drug data and correct any errors, inconsistencies, or missing information.
 
@@ -894,8 +1002,8 @@ OUTPUT FORMAT (JSON):
 
 Return ONLY valid JSON with corrected and validated data.`;
 
-    console.log(`   Using DeepSeek R1T2 Chimera for data correction...`);
-    
+    console.log(`   Using Gemini R1T2 Chimera for data correction...`);
+
     const correctionResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -915,25 +1023,25 @@ Return ONLY valid JSON with corrected and validated data.`;
         top_p: 0.8
       })
     });
-    
+
     if (!correctionResponse.ok) {
-      throw new Error(`DeepSeek correction API error: ${correctionResponse.status}`);
+      throw new Error(`Gemini correction API error: ${correctionResponse.status}`);
     }
-    
+
     const correctionResult = await correctionResponse.json();
     const correctedContent = correctionResult.choices?.[0]?.message?.content || '';
-    
+
     // Parse corrected JSON
     const jsonMatch = correctedContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {
         const correctedData = JSON.parse(jsonMatch[0]);
         console.log(`✅ Data correction complete: Quality ${correctedData.dataQuality}%, Completeness ${correctedData.completeness}%`);
-        
+
         // Add correction metadata
         correctedData.correctedAt = new Date().toISOString();
-        correctedData.correctionMethod = 'DeepSeek R1T2 Chimera';
-        
+        correctedData.correctionMethod = 'Gemini 2.5 Flash';
+
         return correctedData;
       } catch (parseError) {
         console.error(`❌ Correction JSON parse error:`, parseError);
@@ -943,7 +1051,7 @@ Return ONLY valid JSON with corrected and validated data.`;
       console.error(`❌ No JSON in correction response`);
       return rawData; // Return original if correction fails
     }
-    
+
   } catch (error) {
     console.error(`❌ Data correction failed:`, error);
     return rawData; // Return original data if correction fails
@@ -960,7 +1068,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const { imageBase64 } = await req.json();
-    
+
     console.log('='.repeat(80));
     console.log(`⚡ STANDARD MODE - SPEED OPTIMIZED (30-40% FASTER!)`);
     console.log('='.repeat(80));
@@ -991,7 +1099,7 @@ Deno.serve(async (req: Request) => {
         data: preProcessingResult,
         processingTime: Date.now() - overallStartTime
       });
-      
+
       // Show recommendations to user (would be shown in UI)
       if (preProcessingResult.recommendations.length > 0) {
         console.log('\n📢 Pre-Processing Recommendations:');
@@ -1020,16 +1128,16 @@ Deno.serve(async (req: Request) => {
       }, 400);
     }
 
-    // Stage 1: OpenRouter Vision (Qwen → Nvidia → Gemini 2.0 cascade)
-    console.log('🔍 Stage 1: OpenRouter Vision Analysis (Qwen → Nvidia → Gemini 2.0)...');
-    
+    // Stage 1: OpenRouter Vision (Gemini 2.5 Flash → Gemini Flash 3 Preview cascade)
+    console.log('🔍 Stage 1: OpenRouter Vision Analysis (Gemini 2.5 Flash → Gemini Flash 3 Preview)...');
+
     let visionResult;
     try {
       visionResult = await performOpenRouterAnalysis(imageBase64);
     } catch (error) {
       // Handle the case when all 3 vision models fail
       console.error('❌ All vision models failed:', error);
-      
+
       stages.push({
         name: 'openrouter-vision',
         success: false,
@@ -1046,7 +1154,7 @@ Deno.serve(async (req: Request) => {
         processingTime: Date.now() - overallStartTime
       }, 503); // 503 Service Unavailable
     }
-    
+
     stages.push({
       name: 'openrouter-vision',
       success: !!visionResult,
@@ -1061,7 +1169,37 @@ Deno.serve(async (req: Request) => {
     let genericName = validatedResult?.genericName || '';
     console.log(`📝 Validated - Brand: "${drugName}", Generic: "${genericName}"`);
 
-    // 🔍 DEBUG: Log ALL challenge detection fields
+    // �️ STAGE 2: HALLUCINATION CHECK - Verify drug name exists before proceeding
+    if (drugName && drugName !== 'Unknown' && !drugName.toLowerCase().includes('unknown')) {
+      console.log('\\n🛡️ Running Hallucination Check to verify OCR accuracy...');
+      try {
+        const hallucinationResult = await performHallucinationCheck(drugName, genericName);
+
+        stages.push({
+          name: 'hallucination-check',
+          success: hallucinationResult.isValid || !!hallucinationResult.correctedName,
+          data: hallucinationResult,
+          processingTime: Date.now() - overallStartTime
+        });
+
+        if (!hallucinationResult.isValid && hallucinationResult.correctedName) {
+          // OCR error detected - use corrected name
+          console.log(`🔄 OCR CORRECTION APPLIED: "${drugName}" → "${hallucinationResult.correctedName}"`);
+          drugName = hallucinationResult.correctedName;
+        } else if (!hallucinationResult.isValid && !hallucinationResult.correctedName) {
+          // Drug name not recognized and no correction available
+          console.log(`⚠️ Drug name "${drugName}" not verified - proceeding with caution`);
+          if (hallucinationResult.suggestedAlternatives && hallucinationResult.suggestedAlternatives.length > 0) {
+            // Try the first suggested alternative
+            console.log(`   Trying first suggested alternative: "${hallucinationResult.suggestedAlternatives[0]}"`);
+            drugName = hallucinationResult.suggestedAlternatives[0];
+          }
+        }
+      } catch (error) {
+        console.error('⚠️ Hallucination check failed, continuing with original name:', error);
+      }
+    }
+    // �🔍 DEBUG: Log ALL challenge detection fields
     console.log('\n🔍 === CHALLENGE DETECTION DEBUG (STANDARD MODE) ===');
     console.log(`   needsCriticalAnalysis: ${validatedResult?.needsCriticalAnalysis}`);
     console.log(`   tornOrCut: ${validatedResult?.tornOrCut}`);
@@ -1074,17 +1212,17 @@ Deno.serve(async (req: Request) => {
 
     // Check if image has challenging conditions detected by OCR
     // 🚨 MORE AGGRESSIVE: Also trigger on low confidence or "Unknown" drug name
-    const hasChallenges = validatedResult?.needsCriticalAnalysis || 
-                         validatedResult?.tornOrCut || 
-                         validatedResult?.blurry || 
-                         validatedResult?.reflective ||
-                         validatedResult?.partialView ||
-                         (validatedResult?.imageChallenges && validatedResult.imageChallenges.length > 0) ||
-                         (validatedResult?.imageQuality && validatedResult.imageQuality < 50) ||
-                         validatedResult?.confidence === 'low' ||
-                         drugName === 'Unknown' ||
-                         drugName.toLowerCase().includes('unknown');
-    
+    const hasChallenges = validatedResult?.needsCriticalAnalysis ||
+      validatedResult?.tornOrCut ||
+      validatedResult?.blurry ||
+      validatedResult?.reflective ||
+      validatedResult?.partialView ||
+      (validatedResult?.imageChallenges && validatedResult.imageChallenges.length > 0) ||
+      (validatedResult?.imageQuality && validatedResult.imageQuality < 50) ||
+      validatedResult?.confidence === 'low' ||
+      drugName === 'Unknown' ||
+      drugName.toLowerCase().includes('unknown');
+
     if (hasChallenges) {
       console.log('\n⚠️ === CHALLENGING IMAGE CONDITIONS DETECTED ===');
       console.log(`   Challenges: ${validatedResult?.imageChallenges?.join(', ') || 'Low quality/confidence'}`);
@@ -1094,7 +1232,7 @@ Deno.serve(async (req: Request) => {
       console.log(`   Reflective: ${validatedResult?.reflective ? 'YES' : 'No'}`);
       console.log(`   Partial View: ${validatedResult?.partialView ? 'YES' : 'No'}`);
       console.log(`   🚨 TRIGGERING CRITICAL VISION ANALYSIS IMMEDIATELY...`);
-      
+
       // Trigger Critical Vision Analysis for challenging images
       try {
         const criticalStage = await performCriticalVisionAnalysis(imageBase64, {
@@ -1102,19 +1240,19 @@ Deno.serve(async (req: Request) => {
           knownIssues: validatedResult?.imageChallenges || ['challenging_conditions'],
           mode: 'standard'
         });
-        
+
         if (criticalStage.success && criticalStage.confidence >= 60 && criticalStage.data) {
           console.log(`✅ CRITICAL VISION IDENTIFIED: ${criticalStage.data.name} (${criticalStage.confidence}% confidence)`);
           console.log(`   Condition: ${criticalStage.data.physicalCondition}`);
           console.log(`   Safe to use: ${criticalStage.data.safeToUse ? 'Yes ✅' : 'No ❌'}`);
-          
+
           stages.push({
             name: 'critical-vision-analysis',
             success: true,
             data: criticalStage.data,
             processingTime: Date.now() - overallStartTime
           });
-          
+
           // Enrich with metadata using Unified Response Layer
           const enrichedData = enrichResponseMetadata(
             {
@@ -1126,10 +1264,10 @@ Deno.serve(async (req: Request) => {
             preProcessingResult,
             overallStartTime
           );
-          
+
           console.log(`\n✅ Critical Vision Analysis handled challenging image successfully!`);
           console.log(`=`.repeat(80));
-          
+
           return createResponse({
             success: true,
             data: enrichedData,
@@ -1151,142 +1289,142 @@ Deno.serve(async (req: Request) => {
     // Stage 1.5: If OCR failed, try OpenRouter Vision fallback (dual model)
     if (!validatedResult || drugName === 'Unknown' || drugName.toLowerCase().includes('unknown')) {
       console.log('\n🔄 === GEMINI OCR FAILED - TRYING OPENROUTER VISION FALLBACK ===');
-      
+
       // Try OpenRouter Vision (Qwen 2.5-VL → Nvidia Nemotron cascade)
       const openRouterResult = await performOpenRouterAnalysis(imageBase64);
-      
+
       if (openRouterResult && openRouterResult?.name && openRouterResult.name !== 'Unknown') {
         console.log('✅ OPENROUTER VISION SUCCESS!');
         console.log(`   Model used: ${openRouterResult.fallbackUsed || 'Qwen 2.5-VL'}`);
         console.log(`   Extracted drug name: "${openRouterResult.name}"`);
         console.log(`   Extracted generic: "${openRouterResult.genericName || 'N/A'}"`);
-        
+
         // Update drugName and genericName for cache/local DB search
         drugName = openRouterResult.name;
         genericName = openRouterResult.genericName || '';
-        
+
         stages.push({
           name: 'openrouter-vision-fallback',
           success: true,
           data: openRouterResult,
           processingTime: Date.now() - overallStartTime
         });
-        
+
         console.log('✅ OpenRouter Vision provided drug name - continuing to cache/local DB search...\n');
       } else {
         console.log('❌ OpenRouter Vision also failed - trying multi-source comprehensive analysis...');
-        
+
         // Stage 1.6: Last resort - multi-source comprehensive analysis
         console.log('\n🔄 === ACTIVATING MULTI-SOURCE COMPREHENSIVE FALLBACK ===');
         console.log('⚡ Calling multi-source API for direct image analysis...');
-        
+
         try {
-        const multiSourceResponse = await fetch(`${SUPABASE_URL}/functions/v1/multi-source-drug-api`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          },
-          body: JSON.stringify({ 
-            imageBase64,
-            fallbackMode: true // Signal that this is a fallback request
-          })
-        });
+          const multiSourceResponse = await fetch(`${SUPABASE_URL}/functions/v1/multi-source-drug-api`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({
+              imageBase64,
+              fallbackMode: true // Signal that this is a fallback request
+            })
+          });
 
-        if (multiSourceResponse.ok) {
-          const multiSourceData = await multiSourceResponse.json();
-          
-          if (multiSourceData.success && multiSourceData.data) {
-            console.log('✅ Multi-source comprehensive analysis SUCCESSFUL!');
-            const completeness = multiSourceData.data.completeness || 0;
-            const isVerified = !!multiSourceData.data.verified;
-            console.log(`   Drug identified: ${multiSourceData.data.name || 'N/A'}`);
-            console.log(`   Generic: ${multiSourceData.data.genericName || 'N/A'}`);
-            console.log(`   Completeness: ${completeness}%`);
-            console.log(`   Verified: ${isVerified}`);
-            
-            // Accept results with moderate quality (50%+) to ensure Standard Mode works
-            // Standard Mode focuses on speed + basic accuracy, not comprehensive data
-            if (isVerified || completeness >= 50) {
-              stages.push({
-                name: 'multi-source-comprehensive-fallback',
-                success: true,
-                data: multiSourceData.data,
-                processingTime: Date.now() - overallStartTime
-              });
+          if (multiSourceResponse.ok) {
+            const multiSourceData = await multiSourceResponse.json();
 
-              // Enrich comprehensive fallback data with metadata  
-              const enrichedComprehensiveData = enrichResponseMetadata(
-                multiSourceData.data,
-                stages,
-                preProcessingResult,
-                overallStartTime
-              );
-              
-              return createResponse({
-                success: true,
-                data: enrichedComprehensiveData,
-                processingStages: stages.map(s => s.name),
-                confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
-                fallbackUsed: true,
-                processingTime: Date.now() - overallStartTime
-              });
-            } else {
-              console.log(`⚠️ Multi-source data quality moderate (${completeness}%), will try to improve with AI`);
-              // Update drugName and genericName from multi-source for further processing
-              if (multiSourceData.data.name && multiSourceData.data.name !== 'Unknown') {
-                drugName = multiSourceData.data.name;
-                genericName = multiSourceData.data.genericName || '';
-                console.log(`✅ Updated from multi-source - Brand: "${drugName}", Generic: "${genericName}"`);
+            if (multiSourceData.success && multiSourceData.data) {
+              console.log('✅ Multi-source comprehensive analysis SUCCESSFUL!');
+              const completeness = multiSourceData.data.completeness || 0;
+              const isVerified = !!multiSourceData.data.verified;
+              console.log(`   Drug identified: ${multiSourceData.data.name || 'N/A'}`);
+              console.log(`   Generic: ${multiSourceData.data.genericName || 'N/A'}`);
+              console.log(`   Completeness: ${completeness}%`);
+              console.log(`   Verified: ${isVerified}`);
+
+              // Accept results with moderate quality (50%+) to ensure Standard Mode works
+              // Standard Mode focuses on speed + basic accuracy, not comprehensive data
+              if (isVerified || completeness >= 50) {
+                stages.push({
+                  name: 'multi-source-comprehensive-fallback',
+                  success: true,
+                  data: multiSourceData.data,
+                  processingTime: Date.now() - overallStartTime
+                });
+
+                // Enrich comprehensive fallback data with metadata  
+                const enrichedComprehensiveData = enrichResponseMetadata(
+                  multiSourceData.data,
+                  stages,
+                  preProcessingResult,
+                  overallStartTime
+                );
+
+                return createResponse({
+                  success: true,
+                  data: enrichedComprehensiveData,
+                  processingStages: stages.map(s => s.name),
+                  confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
+                  fallbackUsed: true,
+                  processingTime: Date.now() - overallStartTime
+                });
+              } else {
+                console.log(`⚠️ Multi-source data quality moderate (${completeness}%), will try to improve with AI`);
+                // Update drugName and genericName from multi-source for further processing
+                if (multiSourceData.data.name && multiSourceData.data.name !== 'Unknown') {
+                  drugName = multiSourceData.data.name;
+                  genericName = multiSourceData.data.genericName || '';
+                  console.log(`✅ Updated from multi-source - Brand: "${drugName}", Generic: "${genericName}"`);
+                }
               }
+            } else {
+              console.log('⚠️ Multi-source API returned no usable data');
             }
           } else {
-            console.log('⚠️ Multi-source API returned no usable data');
+            console.log(`⚠️ Multi-source API failed: ${multiSourceResponse.status}`);
           }
-        } else {
-          console.log(`⚠️ Multi-source API failed: ${multiSourceResponse.status}`);
-        }
         } catch (error) {
           console.error(`❌ Multi-source comprehensive fallback error:`, error);
         }
       }
-      
+
       console.log('=== COMPREHENSIVE FALLBACK COMPLETE ===\n');
     }
 
     // ⚡ OPTIMIZATION 1: PARALLEL CACHE + LOCAL DB SEARCH (30-40% faster!)
     console.log('⚡ Stage 2+3: PARALLEL Cache + Local DB Search (OPTIMIZED)...');
-    
+
     // Helper: Optimized early exit for fast cache hits and quality data
     const shouldEarlyExit = (data: DrugData): boolean => {
       // Safe number extraction with fallbacks
-      const completeness = typeof data.completeness === 'number' ? data.completeness : 
-                          (typeof data.cacheCompleteness === 'number' ? data.cacheCompleteness : 0);
+      const completeness = typeof data.completeness === 'number' ? data.completeness :
+        (typeof data.cacheCompleteness === 'number' ? data.cacheCompleteness : 0);
       const confidence = data.confidence || 'low';
       const fromCache = Boolean(data.fromCache);
       const qualityScore = typeof data.qualityScore === 'number' ? data.qualityScore : 0;
-      
+
       // Immediate exit for cache hits with reasonable completeness
       if (fromCache && completeness >= 60) {
         console.log(`\n🚀 IMMEDIATE CACHE EXIT: ${completeness}% complete cache hit!`);
         return true;
       }
-      
+
       // Early exit for high-quality non-cache data  
       if (!fromCache && completeness >= 85 && (confidence === 'high' || qualityScore >= 85)) {
         console.log(`\n⚡ EARLY EXIT: ${completeness}% complete + ${confidence} confidence!`);
         return true;
       }
-      
+
       // Quick exit for any very complete data
       if (completeness >= 95) {
         console.log(`\n⚡ QUICK EXIT: ${completeness}% completion achieved!`);
         return true;
       }
-      
+
       return false;
     };
-    
+
     if ((!drugName || drugName.toLowerCase().includes('unknown')) && imageBase64) {
       const g = await geminiExtractName(imageBase64);
       if (g.success) {
@@ -1296,6 +1434,9 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // Declare persistent variable for Janaushadhi result across all stages
+    let janaushadhiResult: any = { found: false };
+
     if ((drugName && !drugName.toLowerCase().includes('unknown')) || (genericName && !genericName.toLowerCase().includes('unknown'))) {
       const candidates = new Set<string>();
       generateNameAliases(drugName || '').forEach(v => candidates.add(v));
@@ -1303,7 +1444,7 @@ Deno.serve(async (req: Request) => {
         generateNameAliases(genericName).forEach(v => candidates.add(v));
       }
       const uniqueVariations = [...candidates].filter(v => v && v.trim().length > 1);
-      
+
       // Build queries for local DB
       const searchQueries: string[] = [];
       if (drugName && drugName !== 'Unknown' && !drugName.toLowerCase().includes('unknown')) {
@@ -1317,13 +1458,13 @@ Deno.serve(async (req: Request) => {
         searchQueries.push(gn.replace(/[-\s]/g, ''));
       }
       const uniqueQueries = [...new Set(searchQueries)].filter(q => q && q.length > 2);
-      
+
       console.log(`⚡ PARALLEL: ${uniqueVariations.length} cache + ${uniqueQueries.length} DB queries`);
-      
+
       // ⚡ RUN ALL SEARCHES IN PARALLEL (cache + all DB thresholds)
       const thresholds = [0.90, 0.80, 0.70]; // Extended AI validation range
-      const allPromises: Promise<{ type: 'cache'|'db', data: unknown, key?: string, thresh?: number }>[] = [];
-      
+      const allPromises: Promise<{ type: 'cache' | 'db', data: unknown, key?: string, thresh?: number }>[] = [];
+
       // Cache promises with validation data from vision analysis
       const extractedValidationInfo = {
         genericNames: genericName ? [genericName] : [],
@@ -1331,13 +1472,13 @@ Deno.serve(async (req: Request) => {
         color: visionResult?.color,
         shape: visionResult?.shape
       };
-      
+
       uniqueVariations.forEach(v => {
         allPromises.push(
           checkDrugCache(v, extractedValidationInfo).then(d => ({ type: 'cache' as const, data: d, key: v }))
         );
       });
-      
+
       // Local DB promises (all thresholds in parallel)
       uniqueQueries.forEach(q => {
         thresholds.forEach(t => {
@@ -1346,22 +1487,44 @@ Deno.serve(async (req: Request) => {
           );
         });
       });
-      
+
+      // 🏥 JANAUSHADHI LOOKUP - Run in parallel for generic alternatives
+      // Assigned to function-scoped variable for persistence across stages
+      const janaushadhiPromise = findJanaushadhiAlternative(drugName, genericName);
+
       const start = Date.now();
-      const results = await Promise.allSettled(allPromises);
-      console.log(`⚡ ${results.length} parallel searches done in ${Date.now()-start}ms!`);
-      
+      let results: any[];
+      // Use block-scoped variable for results, update function-scoped janaushadhiResult
+      const [promiseResults, jResult] = await Promise.all([
+        Promise.allSettled(allPromises),
+        janaushadhiPromise
+      ]);
+      results = promiseResults;
+      janaushadhiResult = jResult;
+
+      console.log(`⚡ ${results.length} parallel searches + Janaushadhi done in ${Date.now() - start}ms!`);
+
+      // Log Janaushadhi result
+      if (janaushadhiResult.found) {
+        console.log(`🏥 JANAUSHADHI MATCH: "${janaushadhiResult.genericName}" at ₹${janaushadhiResult.mrp}`);
+        if (janaushadhiResult.savings) {
+          console.log(`   💰 Potential savings: ${janaushadhiResult.savings}`);
+        }
+      } else {
+        console.log(`🏥 No Janaushadhi alternative found`);
+      }
+
       // Process cache hits first (highest quality)
       const cacheHits = results
         .filter(r => r.status === 'fulfilled' && r.value.type === 'cache' && r.value.data)
         .map(r => r.status === 'fulfilled' ? r.value : null)
         .filter((r): r is NonNullable<typeof r> => r !== null);
-      
+
       if (cacheHits.length > 0) {
         const hit = cacheHits[0];
         const hitData = hit.data as DrugData;
         console.log(`✅ CACHE HIT: "${hit.key}"! (${hitData.completeness || hitData.cacheCompleteness || 'Unknown'}% complete)`);
-        
+
         stages.push({
           name: 'cache-search',
           success: true,
@@ -1376,11 +1539,16 @@ Deno.serve(async (req: Request) => {
           preProcessingResult,
           overallStartTime
         );
-        
+
+        // 🏥 Add Janaushadhi alternative to response
+        if (janaushadhiResult.found) {
+          (enrichedCacheData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
+        }
+
         console.log(`🚀 IMMEDIATE CACHE RETURN - No further processing needed`);
         console.log(`   Cache completeness: ${hitData.completeness || hitData.cacheCompleteness || 'Unknown'}%`);
         console.log(`   Processing time: ${Date.now() - overallStartTime}ms`);
-        
+
         return createResponse({
           success: true,
           data: enrichedCacheData,
@@ -1390,20 +1558,20 @@ Deno.serve(async (req: Request) => {
           processingTime: Date.now() - overallStartTime
         });
       }
-      
+
       // Process local DB hits (with AI validation for 70-90%)
       const dbHits = results
         .filter(r => r.status === 'fulfilled' && r.value.type === 'db' && r.value.data)
         .map(r => r.status === 'fulfilled' ? r.value : null)
         .filter((r): r is NonNullable<typeof r> => r !== null)
         .sort((a, b) => (b.thresh || 0) - (a.thresh || 0)); // Highest threshold first
-      
+
       for (const dbHit of dbHits) {
         const matchedDrugName = (dbHit.data as { name?: string; genericName?: string })?.name || '';
         const matchedGenericName = (dbHit.data as { name?: string; genericName?: string })?.genericName;
-        
+
         console.log(`🎯 DB HIT: "${matchedDrugName}" (${(dbHit.thresh! * 100).toFixed(0)}%)`);
-        
+
         // ⚡ EXTENDED AI VALIDATION: 70-90% (was 75-85%)
         if (dbHit.thresh! < 0.90) {
           console.log(`🔐 AI validating ${(dbHit.thresh! * 100).toFixed(0)}% match...`);
@@ -1413,14 +1581,14 @@ Deno.serve(async (req: Request) => {
             matchedDrugName,
             matchedGenericName
           );
-          
+
           if (!aiValidation.isSame) {
             console.log(`❌ AI rejected: ${aiValidation.reasoning}`);
             continue;
           }
           console.log(`✅ AI confirmed: ${aiValidation.reasoning}`);
         }
-        
+
         stages.push({
           name: 'local-database-smart-search',
           success: true,
@@ -1434,7 +1602,12 @@ Deno.serve(async (req: Request) => {
           preProcessingResult,
           overallStartTime
         );
-        
+
+        // 🏥 Add Janaushadhi alternative to response
+        if (janaushadhiResult.found) {
+          (enrichedLocalData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
+        }
+
         // ⚡ OPTIMIZED EXIT CHECK - More lenient for database hits
         const dbData = dbHit.data as DrugData;
         if (shouldEarlyExit(dbData) || (dbHit.thresh! >= 0.85 && dbData.name && dbData.genericName)) {
@@ -1448,7 +1621,7 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
         }
-        
+
         return createResponse({
           success: true,
           data: enrichedLocalData,
@@ -1458,7 +1631,7 @@ Deno.serve(async (req: Request) => {
           processingTime: Date.now() - overallStartTime
         });
       }
-      
+
       console.log('❌ No results from parallel cache + DB search');
     }
 
@@ -1469,9 +1642,9 @@ Deno.serve(async (req: Request) => {
     if (drugName && drugName !== 'Unknown') {
       const searchTerm = drugName;
       console.log(`⚡ Launching PARALLEL scraping: 1mg.com + MedlinePlus`);
-      
+
       const scrapingStart = Date.now();
-      
+
       // ⚡ RUN BOTH SCRAPING + VALIDATION IN PARALLEL
       const scrapingResults = await Promise.allSettled([
         intelligentWebScraping(searchTerm, '1mg')
@@ -1481,15 +1654,15 @@ Deno.serve(async (req: Request) => {
           .then(raw => raw ? correctAndValidateData(raw, searchTerm) : null)
           .then(data => ({ source: 'medlineplus', data }))
       ]);
-      
+
       const scrapingTime = Date.now() - scrapingStart;
-      console.log(`⚡ Parallel scraping done in ${scrapingTime}ms (vs ~${scrapingTime*2}ms sequential)`);
-      
+      console.log(`⚡ Parallel scraping done in ${scrapingTime}ms (vs ~${scrapingTime * 2}ms sequential)`);
+
       // Process 1mg result
       const oneMgResult = scrapingResults[0].status === 'fulfilled' ? scrapingResults[0].value : null;
       if (oneMgResult?.data) {
         console.log(`✅ 1mg.com: ${oneMgResult.data.dataQuality || 0}% quality`);
-        
+
         stages.push({
           name: '1mg-intelligent-scraping',
           success: true,
@@ -1499,7 +1672,12 @@ Deno.serve(async (req: Request) => {
 
         const limitedData = limitDataForStandardMode(oneMgResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
-        
+
+        // 🏥 Add Janaushadhi alternative
+        if (janaushadhiResult && janaushadhiResult.found) {
+          (enrichedData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
+        }
+
         // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
         if (shouldEarlyExit(limitedData) || (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 70)) {
           console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${oneMgResult.data.dataQuality || 'Unknown'}%`);
@@ -1512,7 +1690,7 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
         }
-        
+
         return createResponse({
           success: true,
           data: enrichedData,
@@ -1524,12 +1702,12 @@ Deno.serve(async (req: Request) => {
       } else {
         stages.push({ name: '1mg-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
       }
-      
+
       // Process MedlinePlus result
       const medlinePlusResult = scrapingResults[1].status === 'fulfilled' ? scrapingResults[1].value : null;
       if (medlinePlusResult?.data) {
         console.log(`✅ MedlinePlus: ${medlinePlusResult.data.dataQuality || 0}% quality`);
-        
+
         stages.push({
           name: 'medlineplus-intelligent-scraping',
           success: true,
@@ -1539,7 +1717,12 @@ Deno.serve(async (req: Request) => {
 
         const limitedData = limitDataForStandardMode(medlinePlusResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
-        
+
+        // 🏥 Add Janaushadhi alternative
+        if (janaushadhiResult && janaushadhiResult.found) {
+          (enrichedData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
+        }
+
         // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
         if (shouldEarlyExit(limitedData) || (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 70)) {
           console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${medlinePlusResult.data.dataQuality || 'Unknown'}%`);
@@ -1552,7 +1735,7 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
         }
-        
+
         return createResponse({
           success: true,
           data: enrichedData,
@@ -1564,7 +1747,7 @@ Deno.serve(async (req: Request) => {
       } else {
         stages.push({ name: 'medlineplus-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
       }
-      
+
       console.log('❌ Both parallel web scraping attempts failed');
     }
 
@@ -1584,14 +1767,14 @@ Deno.serve(async (req: Request) => {
 
         if (multiSourceResponse.ok) {
           const multiSourceData = await multiSourceResponse.json();
-          
+
           if (multiSourceData.success && multiSourceData.data) {
             console.log('✅ Multi-source API successful!');
             const completeness = multiSourceData.data.completeness || 0;
             const isVerified = !!multiSourceData.data.verified;
             console.log(`   Data completeness: ${completeness}%`);
             console.log(`   Verified: ${isVerified}`);
-            
+
             // Standard Mode: Accept results with 50%+ completeness (balance speed + accuracy)
             if (isVerified || completeness >= 50) {
               stages.push({
@@ -1608,7 +1791,7 @@ Deno.serve(async (req: Request) => {
                 preProcessingResult,
                 overallStartTime
               );
-              
+
               return createResponse({
                 success: true,
                 data: enrichedMultiSourceApiData,
@@ -1619,8 +1802,8 @@ Deno.serve(async (req: Request) => {
               });
             } else {
               console.log(`⚠️ Multi-source quality low (${completeness}%), trying AI enhancement...`);
-        }
-      }
+            }
+          }
         }
       } catch (error) {
         console.error(`❌ Multi-source API error:`, error);
@@ -1634,7 +1817,7 @@ Deno.serve(async (req: Request) => {
     console.log(`   Reason: All fast lookups failed (cache, DB, scraping, multi-source)`);
     console.log(`   Strategy: Fresh AI image analysis (ignore potentially incorrect OCR)`);
     console.log(`   OCR extracted: "${drugName}" (may be incorrect)`);
-    
+
     try {
       // Call identify-drug API for fresh AI-powered identification
       // Don't pass drugName - let AI analyze the image fresh to avoid OCR errors
@@ -1645,7 +1828,7 @@ Deno.serve(async (req: Request) => {
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           imageBase64,
           options: {
             standardMode: true,  // Signal this is from Standard Mode
@@ -1653,22 +1836,22 @@ Deno.serve(async (req: Request) => {
           }
         }),
       });
-      
+
       if (aiFallbackResponse.ok) {
         const aiResult = await aiFallbackResponse.json();
-        
+
         if (aiResult.success && aiResult.data && aiResult.data.name !== "Unknown Medication") {
           console.log(`✅ AI enhancement SUCCESSFUL!`);
           console.log(`   AI identified: ${aiResult.data.name}`);
           console.log(`   Confidence: ${aiResult.data.confidence || 'medium'}`);
-          
+
           stages.push({
             name: 'ai-powered-fallback',
             success: true,
             data: aiResult.data,
             processingTime: Date.now() - overallStartTime
           });
-          
+
           // Return AI-enhanced result with Standard Mode optimizations and metadata
           const limitedAiData = limitDataForStandardMode({ // Standard Mode: Top 5 items only
             ...aiResult.data,
@@ -1680,7 +1863,7 @@ Deno.serve(async (req: Request) => {
             preProcessingResult,
             overallStartTime
           );
-          
+
           return createResponse({
             success: true,
             data: enrichedAiData,
@@ -1698,17 +1881,17 @@ Deno.serve(async (req: Request) => {
     } catch (aiError) {
       console.error(`❌ AI enhancement error:`, aiError);
     }
-    
+
     console.log(`🤖 === AI ENHANCEMENT COMPLETE ===\n`);
-    
+
     // Stage 6.2: Intelligent Web Search (NEW!) - for torn/damaged strips
     // Automatically triggered when strip is damaged or information is incomplete
     console.log('🌐 Stage 6.2: Intelligent AI Web Search...');
-    
-    const stripCondition = visionResult?.tornOrCut ? 'torn' : 
-                          (visionResult?.partialView ? 'partial' : 
-                          (visionResult?.blurry ? 'blurry' : 'good'));
-    
+
+    const stripCondition = visionResult?.tornOrCut ? 'torn' :
+      (visionResult?.partialView ? 'partial' :
+        (visionResult?.blurry ? 'blurry' : 'good'));
+
     const qualityResult = calculateQualityScore({
       name: drugName,
       genericName: genericName,
@@ -1716,14 +1899,14 @@ Deno.serve(async (req: Request) => {
       sideEffects: [],
       warnings: []
     } as DrugData, stages.map(s => s.name));
-    
+
     const currentCompleteness = qualityResult.overall;
-    
+
     if (shouldUseIntelligentWebSearch(visionResult, currentCompleteness)) {
       console.log('🧠 === INTELLIGENT WEB SEARCH ACTIVATED ===');
       console.log(`   Trigger: ${stripCondition} strip or low completeness (${currentCompleteness}%)`);
       console.log(`   Strategy: AI thinks + searches web for complete information`);
-      
+
       try {
         const webSearchResult = await performIntelligentWebSearch({
           drugName: drugName || undefined,
@@ -1735,21 +1918,21 @@ Deno.serve(async (req: Request) => {
           visibleText: undefined,
           completeness: currentCompleteness
         });
-        
+
         if (webSearchResult.success && webSearchResult.drugInfo) {
           console.log(`✅ INTELLIGENT WEB SEARCH SUCCESSFUL!`);
           console.log(`   Drug: ${webSearchResult.drugInfo.name}`);
           console.log(`   Strategy: ${webSearchResult.searchStrategy}`);
           console.log(`   Sources: ${webSearchResult.sourcesSearched?.length || 0} sources`);
           console.log(`   Confidence: ${(webSearchResult.confidence || 0) * 100}%`);
-          
+
           stages.push({
             name: 'intelligent-web-search',
             success: true,
             data: webSearchResult.drugInfo,
             processingTime: Date.now() - overallStartTime
           });
-          
+
           // Enrich web search data with metadata
           const enrichedWebSearchData = enrichResponseMetadata(
             webSearchResult.drugInfo as DrugData,
@@ -1757,7 +1940,7 @@ Deno.serve(async (req: Request) => {
             preProcessingResult,
             overallStartTime
           );
-          
+
           return createResponse({
             success: true,
             data: {
@@ -1781,42 +1964,42 @@ Deno.serve(async (req: Request) => {
     } else {
       console.log(`ℹ️ Intelligent web search not needed (good strip condition, sufficient info)`);
     }
-    
+
     console.log(`🌐 === INTELLIGENT WEB SEARCH COMPLETE ===\n`);
-    
+
     // Stage 6.5: Critical Vision Analysis (Qwen) for challenging images
     console.log('🔬 Stage 6.5: Critical Vision Analysis...');
-    if (shouldUseCriticalAnalysis({ 
-      confidence: 'low', 
-      name: drugName || 'Unknown', 
+    if (shouldUseCriticalAnalysis({
+      confidence: 'low',
+      name: drugName || 'Unknown',
       ocrConfidence: 40,
-      imageQuality: 50 
+      imageQuality: 50
     })) {
       console.log('🔬 === CRITICAL VISION ANALYSIS (Qwen) ACTIVATED ===');
       console.log('   Reason: Low confidence or challenging image detected');
       console.log('   Strategy: Deep vision analysis with text reconstruction');
-      
+
       try {
         const criticalResult = await performCriticalVisionAnalysis(imageBase64, {
           previousAttemptFailed: !drugName || drugName === '' || drugName === 'Unknown',
           knownIssues: ['low_ocr_confidence', 'partial_text', 'standard_mode_exhausted'],
           mode: 'standard'
         });
-        
+
         if (criticalResult.success && criticalResult.confidence >= 60) {
           console.log(`✅ Critical vision analysis succeeded!`);
           console.log(`   Identified: ${criticalResult.data?.name}`);
           console.log(`   Confidence: ${criticalResult.confidence}%`);
           console.log(`   Physical condition: ${criticalResult.data?.physicalCondition}`);
           console.log(`   Tampering detected: ${criticalResult.data?.tamperingDetected}`);
-          
+
           stages.push({
             name: 'critical-vision-analysis',
             success: true,
             data: criticalResult.data,
             processingTime: Date.now() - overallStartTime
           });
-          
+
           // Enrich critical vision data with metadata
           const enrichedCriticalData = enrichResponseMetadata(
             (criticalResult.data || {}) as DrugData,
@@ -1824,7 +2007,7 @@ Deno.serve(async (req: Request) => {
             preProcessingResult,
             overallStartTime
           );
-          
+
           return createResponse({
             success: true,
             data: enrichedCriticalData,
@@ -1841,12 +2024,12 @@ Deno.serve(async (req: Request) => {
         console.error(`❌ Critical vision analysis error:`, criticalError);
       }
     }
-    
+
     console.log(`🔬 === CRITICAL VISION ANALYSIS COMPLETE ===\n`);
-    
+
     // Stage 7: Final Fallback - Return Safe Failure
     console.log('🔍 Stage 7: Final Data Validation...');
-    
+
     // Build fallback data for UI safety
     const fallbackData: PartialDrugData = {
       id: crypto.randomUUID(),
@@ -1883,15 +2066,15 @@ Deno.serve(async (req: Request) => {
         "Visit a pharmacy for professional identification"
       ] as string[]
     };
-    
+
     const hasBasicInfo = false;
     const hasVisualInfo = false;
-    
+
     console.log('📊 Final Data Quality Report:');
     console.log(`   Has basic info: ${hasBasicInfo}`);
     console.log(`   Has visual info: ${hasVisualInfo}`);
     console.log(`   All stages completed: ${stages.length}`);
-    
+
     fallbackData.dataQuality = {
       hasBasicInfo,
       hasVisualInfo,
@@ -1920,18 +2103,18 @@ Deno.serve(async (req: Request) => {
 
   } catch (error) {
     console.error('Standard drug identification error:', error);
-    
+
     // Check if this is a rate limit error
     if (isRateLimitError(error as Error)) {
       logRateLimit('Standard Mode', (error as Error).message);
-      
+
       const rateLimitResponse = createRateLimitResponse(Date.now() - overallStartTime);
       return createResponse(rateLimitResponse, 200);
     }
-    
+
     return createResponse({
       success: false,
-      error: isRateLimitError(error as Error) ? 
+      error: isRateLimitError(error as Error) ?
         getRateLimitErrorMessage() :
         (error as Error).message || "An unexpected error occurred",
       processingStages: stages.map(s => s.name),
