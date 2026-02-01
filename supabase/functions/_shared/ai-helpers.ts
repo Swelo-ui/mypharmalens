@@ -283,7 +283,7 @@ RULES:
     OPENROUTER_API_KEY,
     SUPABASE_URL,
     {
-      maxTokens: 4096,
+      maxTokens: 800, // Reduced from 4096 - Step 2 optimization
       temperature: 0.1,
       responseFormat: 'json'
     }
@@ -338,7 +338,7 @@ Use known information provided above to fill fields accurately.`;
     OPENROUTER_API_KEY,
     SUPABASE_URL,
     {
-      maxTokens: 3072,
+      maxTokens: 1000, // Reduced from 3072 - Step 2 optimization
       temperature: 0.1,
       responseFormat: 'json'
     }
@@ -435,7 +435,7 @@ Be thorough but fair in your assessment.`;
     OPENROUTER_API_KEY,
     SUPABASE_URL,
     {
-      maxTokens: 1024,
+      maxTokens: 512, // Reduced from 1024 - Step 2 optimization
       temperature: 0.1,
       responseFormat: 'json'
     }
