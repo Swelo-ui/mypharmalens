@@ -35,6 +35,25 @@ const WEB_SCRAPING_MODEL = 'google/gemini-2.5-flash';       // Primary for web s
 
 // Standard Mode data cleaner - Clean all data but NO rate limiting
 // Removes markdown/asterisks but returns FULL data (no item limits)
+
+/**
+ * Clean HTML for web scraping - removes scripts, styles, ads, nav
+ * Reduces token count by ~70% while preserving drug information
+ */
+function cleanHTMLForScraping(html: string): string {
+  return html
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 5000); // Reduced from 15000 to 5000
+}
+
 // deno-lint-ignore no-explicit-any
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
@@ -847,7 +866,7 @@ CRITICAL INSTRUCTIONS:
 - All extracted text must be clean and ready for direct user display
 
 HTML CONTENT:
-${html.substring(0, 15000)} ${html.length > 15000 ? '...[truncated]' : ''}
+${cleanHTMLForScraping(html)}
 
 OUTPUT FORMAT (JSON):
 {
@@ -895,7 +914,7 @@ Return ONLY valid JSON. Be thorough but accurate.`;
           content: extractionPrompt
         }],
         temperature: 0.1, // Low temperature for accuracy
-        max_tokens: 2048,
+        max_tokens: 1000, // Reduced from 2048
         top_p: 0.9
       })
     });

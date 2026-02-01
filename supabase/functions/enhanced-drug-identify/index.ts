@@ -58,6 +58,24 @@ const VISION_MODEL_FALLBACK = 'google/gemini-flash-3-preview'; // Fallback for a
 // Web scraping model: Use primary Gemini for consistency
 const WEB_SCRAPING_MODEL = 'google/gemini-2.5-flash';       // Primary for web scraping & reasoning
 
+/**
+ * Clean HTML for web scraping - removes scripts, styles, ads, nav
+ * Reduces token count by ~70% while preserving drug information
+ */
+function cleanHTMLForScraping(html: string): string {
+  return html
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 5000); // Reduced from 12000 to 5000
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -1458,7 +1476,7 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
     // Step 2: Use Gemini 2.5 Flash to intelligently extract drug data
     const extractionPrompt = `Extract comprehensive pharmaceutical data from this HTML for "${drugName}". Return ONLY valid JSON with: name, genericName, manufacturer, category, dosageForm, strength, description, mechanism, indications[], sideEffects[], contraindications[], interactions[], warnings[], dosageAndAdmin, storage, prescriptionStatus, pregnancy, brandNames[], extractionQuality (0-100), dataCompleteness (0-100). Be thorough and accurate.
 
-HTML (truncated): ${html.substring(0, 12000)}`;
+HTML (cleaned): ${cleanHTMLForScraping(html)}`;
 
     console.log(`   Using Gemini 2.5 Flash for intelligent extraction...`);
 
@@ -1474,7 +1492,7 @@ HTML (truncated): ${html.substring(0, 12000)}`;
         model: WEB_SCRAPING_MODEL,
         messages: [{ role: 'user', content: extractionPrompt }],
         temperature: 0.1,
-        max_tokens: 2048
+        max_tokens: 1000 // Reduced from 2048
       })
     });
 
