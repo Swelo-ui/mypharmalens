@@ -58,6 +58,83 @@ function cleanHTMLForScraping(html: string): string {
     .substring(0, 5000); // Reduced from 15000 to 5000
 }
 
+/**
+ * Validate drug data fields to ensure they contain meaningful information
+ * Detects placeholder text, empty values, and triggers fallback when needed
+ */
+function validateDrugFields(data: DrugData, fieldName?: string): { isValid: boolean; missingFields: string[]; hasPlaceholders: boolean } {
+  const missingFields: string[] = [];
+  let hasPlaceholders = false;
+
+  // Placeholder patterns to detect
+  const placeholderPatterns = [
+    /^not available$/i,
+    /^n\/a$/i,
+    /^unknown$/i,
+    /^not found$/i,
+    /^information not (available|found)$/i,
+    /^data not available$/i,
+    /^no (data|information)$/i,
+    /^\s*$/  // Empty or whitespace only
+  ];
+
+  // Helper: Check if value is a placeholder
+  const isPlaceholder = (value: string | undefined | null): boolean => {
+    if (!value || typeof value !== 'string') return true;
+    const trimmed = value.trim();
+    if (trimmed.length === 0) return true;
+    return placeholderPatterns.some(pattern => pattern.test(trimmed));
+  };
+
+  // Helper: Check if array has meaningful data
+  const hasValidArrayData = (arr: unknown): boolean => {
+    if (!Array.isArray(arr)) return false;
+    if (arr.length === 0) return false;
+    // Check if array items are not placeholders
+    return arr.some(item => typeof item === 'string' && !isPlaceholder(item));
+  };
+
+  // Critical fields that must have real data (not placeholders)
+  const criticalStringFields: (keyof DrugData)[] = ['description', 'mechanism', 'dosageAndAdmin'];
+  const criticalArrayFields: (keyof DrugData)[] = ['sideEffects', 'warnings', 'indications'];
+
+  // Validate string fields
+  criticalStringFields.forEach(field => {
+    const value = data[field];
+    if (typeof value === 'string' && isPlaceholder(value)) {
+      missingFields.push(field as string);
+      hasPlaceholders = true;
+    } else if (!value || (typeof value === 'string' && value.trim().length === 0)) {
+      missingFields.push(field as string);
+    }
+  });
+
+  // Validate array fields
+  criticalArrayFields.forEach(field => {
+    const value = data[field];
+    if (!hasValidArrayData(value)) {
+      missingFields.push(field as string);
+      if (Array.isArray(value) && value.some(item => typeof item === 'string' && isPlaceholder(item))) {
+        hasPlaceholders = true;
+      }
+    }
+  });
+
+  const isValid = missingFields.length === 0 && !hasPlaceholders;
+
+  if (!isValid) {
+    console.log(`⚠️ FIELD VALIDATION FAILED:`);
+    if (missingFields.length > 0) {
+      console.log(`   Missing/Invalid fields: ${missingFields.join(', ')}`);
+    }
+    if (hasPlaceholders) {
+      console.log(`   Contains placeholder text ("Not available", "N/A", etc.)`);
+    }
+  }
+
+  return { isValid, missingFields, hasPlaceholders };
+}
+
 // deno-lint-ignore no-explicit-any
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
@@ -874,8 +951,9 @@ FORMATTING RULES (CRITICAL):
 - NEVER use asterisks (**text**), underscores (__text__), or any markdown
 - Write naturally without bold/italic markers
 - Do NOT use phrases like "not explicitly listed" or "not visible on packaging"
-- If information is unavailable, simply omit it or use "Not available"
 - All text should be clean, professional, and ready for direct display
+- CRITICAL: For missing fields, use empty string "" or empty array []
+- Prioritize extracting real data. If information is truly not found, use empty string "" or empty array [].
 
 4. **Usage Information**:
    - Dosage and administration instructions
@@ -888,14 +966,16 @@ FORMATTING RULES (CRITICAL):
    - Price information (if available)
    - Availability status
 
-CRITICAL INSTRUCTIONS:
+CRITICAL DATA EXTRACTION RULES:
 - Focus ONLY on the drug "${drugName}" - ignore other search results
-- Extract EXACT text from the webpage - don't invent information
-- If information is not available, mark as "Not available" or leave empty
-- Prioritize accuracy over completeness
-- Look for structured data in tables, lists, and sections
+- Extract EXACT, COMPLETE text from the webpage - be thorough
+- For description: Extract full medical description, what condition it treats, how it helps
+- For mechanism: Extract the complete mechanism of action explanation
+- For ALL fields: Search the entire page content carefully before concluding data is missing
+- If truly not found, use empty string "" or empty array [] - validation will trigger enhancement
+- Prioritize completeness AND accuracy - extract all available information
+- Look for structured data in tables, lists, sections, and paragraph content
 - Use PLAIN TEXT ONLY - NO markdown, asterisks, or formatting markers
-- NEVER use phrases like "not explicitly listed" or "not visible on packaging"
 - All extracted text must be clean and ready for direct user display
 
 HTML CONTENT:
@@ -1090,6 +1170,67 @@ Return ONLY valid JSON with corrected and validated data.`;
         const correctedData = JSON.parse(jsonMatch[0]);
         console.log(`✅ Data correction complete: Quality ${correctedData.dataQuality}%, Completeness ${correctedData.completeness}%`);
 
+        // 🛡️ CRITICAL VALIDATION: Check if corrected data has real information
+        const validation = validateDrugFields(correctedData as DrugData);
+
+        if (!validation.isValid) {
+          console.log(`⚠️ Corrected data still has missing/invalid fields: ${validation.missingFields.join(', ')}`);
+          console.log(`   Attempting to fill missing fields with pharmaceutical knowledge...`);
+
+          // Try to enhance missing fields using AI
+          try {
+            const enhancementPrompt = `You are a pharmaceutical database expert. The following drug data is missing these fields: ${validation.missingFields.join(', ')}.
+
+DRUG: ${drugName}
+EXISTING DATA:
+${JSON.stringify(correctedData, null, 2)}
+
+Provide ONLY the missing information based on your pharmaceutical knowledge. Return JSON with ONLY these fields:
+${validation.missingFields.map(f => `"${f}": "complete information here"`).join(',\n')}
+
+IMPORTANT:
+- Provide real, accurate pharmaceutical information
+- NEVER use "Not available", "N/A", or placeholder text
+- If you truly don't have information, use empty string "" or []
+- Be thorough and complete in your descriptions`;
+
+            const enhancementResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+                'X-Title': 'PharmaLens Field Enhancement'
+              },
+              body: JSON.stringify({
+                model: WEB_SCRAPING_MODEL,
+                messages: [{ role: 'user', content: enhancementPrompt }],
+                temperature: 0.1,
+                max_tokens: 500
+              })
+            });
+
+            if (enhancementResponse.ok) {
+              const enhancementResult = await enhancementResponse.json();
+              const enhancementContent = enhancementResult.choices?.[0]?.message?.content || '{}';
+              const enhancementMatch = enhancementContent.match(/\{[\s\S]*\}/);
+
+              if (enhancementMatch) {
+                const enhancement = JSON.parse(enhancementMatch[0]);
+                // Merge enhanced fields into corrected data
+                validation.missingFields.forEach(field => {
+                  if (enhancement[field]) {
+                    (correctedData as any)[field] = enhancement[field];
+                    console.log(`   ✅ Enhanced field: ${field}`);
+                  }
+                });
+              }
+            }
+          } catch (enhancementError) {
+            console.error(`❌ Field enhancement failed:`, enhancementError);
+          }
+        }
+
         // Add correction metadata
         correctedData.correctedAt = new Date().toISOString();
         correctedData.correctionMethod = 'Gemini 2.5 Flash';
@@ -1100,12 +1241,12 @@ Return ONLY valid JSON with corrected and validated data.`;
         return rawData; // Return original if correction fails
       }
     } else {
-      console.error(`❌ No JSON in correction response`);
+      console.error(`❌ No JSON found in correction response`);
       return rawData; // Return original if correction fails
     }
 
   } catch (error) {
-    console.error(`❌ Data correction failed:`, error);
+    console.error(`❌ Data correction error:`, error);
     return rawData; // Return original data if correction fails
   }
 }
@@ -1737,6 +1878,19 @@ Deno.serve(async (req: Request) => {
           processingTime: Date.now() - overallStartTime
         });
 
+        // 🛡️ Validate data before returning - ensure no "Not available" placeholders
+        const validation = validateDrugFields(oneMgResult.data as DrugData);
+        if (validation.hasPlaceholders) {
+          console.log(`⚠️ 1mg data contains placeholder text - applying cleanup...`);
+          // Remove placeholder fields
+          validation.missingFields.forEach(field => {
+            const value = (oneMgResult.data as any)[field];
+            if (typeof value === 'string' && /not available|n\/a|unknown/i.test(value)) {
+              (oneMgResult.data as any)[field] = ''; // Clear placeholder
+            }
+          });
+        }
+
         const limitedData = limitDataForStandardMode(oneMgResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
 
@@ -1781,6 +1935,19 @@ Deno.serve(async (req: Request) => {
           data: medlinePlusResult.data,
           processingTime: Date.now() - overallStartTime
         });
+
+        // 🛡️ Validate data before returning - ensure no "Not available" placeholders
+        const validation = validateDrugFields(medlinePlusResult.data as DrugData);
+        if (validation.hasPlaceholders) {
+          console.log(`⚠️ MedlinePlus data contains placeholder text - applying cleanup...`);
+          // Remove placeholder fields
+          validation.missingFields.forEach(field => {
+            const value = (medlinePlusResult.data as any)[field];
+            if (typeof value === 'string' && /not available|n\/a|unknown/i.test(value)) {
+              (medlinePlusResult.data as any)[field] = ''; // Clear placeholder
+            }
+          });
+        }
 
         const limitedData = limitDataForStandardMode(medlinePlusResult.data);
         const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);

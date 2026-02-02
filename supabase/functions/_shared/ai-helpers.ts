@@ -210,16 +210,16 @@ Return JSON:
   "genericName": "Active ingredient",
   "manufacturer": "Company",
   "category": "Drug category",
-  "description": "What it treats (50 words max)",
-  "sideEffects": ["Top 5 effects"],
-  "warnings": ["Top 3 warnings"],
+  "description": "What it treats (complete description, not summary)",
+  "sideEffects": ["Top 8 effects"],
+  "warnings": ["Top 5 warnings"],
   "dosage": "Typical dosage",
   "storage": "Storage instructions",
-  "indications": ["Top 5 uses"],
-  "contraindications": ["Top 3"]
+  "indications": ["Top 8 uses"],
+  "contraindications": ["Top 5"]
 }
 
-Use "Not available" for missing fields. Be concise.`;
+CRITICAL: For missing fields, use empty string "" or empty array [] - NEVER use "Not available", "N/A", or placeholder text. Be thorough in extraction.`;
 
   return await callTextAI(
     prompt,
@@ -314,23 +314,22 @@ Provide detailed information in this JSON format:
   "genericName": "Active ingredient",
   "category": "Drug category (e.g., Analgesic, Antibiotic)",
   "drugClass": "Pharmacological class",
-  "description": "What this drug is and what it treats",
-  "mechanism": "How it works in the body",
-  "indications": ["Condition 1", "Condition 2"],
+  "description": "Complete description of what this drug is and what it treats",
+  "mechanism": "Complete explanation of how it works in the body",
+  "indications": ["Condition 1", "Condition 2", ...],
   "dosageAndAdmin": "Typical dosage and administration",
-  "sideEffects": ["Side effect 1", "Side effect 2"],
-  "warnings": ["Warning 1", "Warning 2"],
-  "contraindications": ["Contraindication 1"],
-  "interactions": ["Drug interaction 1"],
+  "sideEffects": ["Side effect 1", "Side effect 2", ...],
+  "warnings": ["Warning 1", "Warning 2", ...],
+  "contraindications": ["Contraindication 1", ...],
+  "interactions": ["Drug interaction 1", ...],
   "storage": "Storage instructions",
   "manufacturer": "Company name (if known)",
   "prescriptionStatus": "OTC or Prescription",
-  "brandNames": ["Brand 1", "Brand 2"],
+  "brandNames": ["Brand 1", "Brand 2", ...],
   "pregnancy": "Pregnancy category or safety info"
 }
 
-Be accurate and comprehensive. If unsure about any field, use "Not available" or empty array.
-Use known information provided above to fill fields accurately.`;
+CRITICAL: Provide real, complete pharmaceutical information. For fields you don't have information for, use empty string "" or empty array [] - NEVER use "Not available" or placeholder text. Be thorough and accurate. Use known information provided above to fill fields accurately.`;
 
   return await callTextAI(
     prompt,
