@@ -58,7 +58,7 @@ function cleanHTMLForScraping(html: string): string {
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
 
-  // Helper: Limit text to 40 words max
+  // Helper: Limit text to max words (avoids verbose essays, saves tokens)
   const limitWords = (text: string, maxWords: number = 40): string => {
     if (!text) return text;
     const words = text.split(/\s+/);
@@ -66,24 +66,18 @@ function limitDataForStandardMode(data: any): any {
     return words.slice(0, maxWords).join(' ') + '...';
   };
 
-  // Helper: Limit array to top N items
-  const limitArray = (arr: string[], max: number = 5): string[] => {
-    if (!Array.isArray(arr)) return [];
-    return cleanTextArray(arr).slice(0, max);
-  };
-
   return {
     ...data,
-    // OPTIMIZED: Limit arrays to TOP 5 items (saves ~30% tokens)
-    sideEffects: limitArray(data.sideEffects, 5),
-    warnings: limitArray(data.warnings, 5),
-    interactions: limitArray(data.interactions, 5),
-    indications: limitArray(data.indications, 5),
-    contraindications: limitArray(data.contraindications, 5),
-    brandNames: limitArray(data.brandNames, 5),
-    // OPTIMIZED: Limit descriptions to 40 words
-    description: limitWords(cleanText(data.description || ''), 40),
-    mechanism: limitWords(cleanMechanismText(data.mechanism || ''), 30),
+    // Keep ALL array items (no limit) - just clean formatting
+    sideEffects: Array.isArray(data.sideEffects) ? cleanTextArray(data.sideEffects) : [],
+    warnings: Array.isArray(data.warnings) ? cleanTextArray(data.warnings) : [],
+    interactions: Array.isArray(data.interactions) ? cleanTextArray(data.interactions) : [],
+    indications: Array.isArray(data.indications) ? cleanTextArray(data.indications) : [],
+    contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications) : [],
+    brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames) : [],
+    // LIMIT TEXT LENGTH ONLY (avoid verbose essays, save tokens)
+    description: limitWords(cleanText(data.description || ''), 50),
+    mechanism: limitWords(cleanMechanismText(data.mechanism || ''), 40),
     dosageAndAdmin: data.dosageAndAdmin ? cleanText(data.dosageAndAdmin) : data.dosageAndAdmin,
     storage: data.storage ? cleanText(data.storage) : data.storage,
     pregnancy: data.pregnancy ? cleanText(data.pregnancy) : data.pregnancy
