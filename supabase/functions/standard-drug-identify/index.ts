@@ -529,7 +529,8 @@ Return ONLY JSON:`;
         model: VALIDATION_MODEL, // Use LITE model for validation (cost savings)
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 300 // Reduced from 512
+        max_tokens: 500, // Raised from 300 to prevent JSON truncation
+        stop: ["}"] // Stop immediately when JSON ends
       })
     });
 
@@ -1019,8 +1020,9 @@ Return ONLY valid JSON. Be thorough but accurate.`;
           content: extractionPrompt
         }],
         temperature: 0.1, // Low temperature for accuracy
-        max_tokens: 700, // Reduced from 1000 (cost optimization)
-        top_p: 0.9
+        max_tokens: 1000, // Raised from 700 to prevent JSON truncation (finish_reason: length)
+        top_p: 0.9,
+        stop: ["}"] // CRITICAL: Stop immediately when JSON ends to prevent extra tokens
       })
     });
 
@@ -1030,11 +1032,34 @@ Return ONLY valid JSON. Be thorough but accurate.`;
 
     const aiResult = await aiResponse.json();
     const extractedContent = aiResult.choices?.[0]?.message?.content || '';
+    const finishReason = aiResult.choices?.[0]?.finish_reason || 'unknown';
 
-    console.log(`   Gemini response: ${extractedContent.substring(0, 200)}...`);
+    // 🚨 CRITICAL: Detect if response was truncated (finish_reason: length)
+    if (finishReason === 'length') {
+      console.error(`⚠️ RESPONSE TRUNCATED! finish_reason: ${finishReason}`);
+      console.error(`   This means max_tokens was hit before AI finished writing.`);
+      console.error(`   Attempting to salvage partial JSON...`);
+    }
 
-    // Parse JSON from AI response
-    const jsonMatch = extractedContent.match(/\{[\s\S]*\}/);
+    console.log(`   Gemini response (finish_reason: ${finishReason}): ${extractedContent.substring(0, 200)}...`);
+
+    // Parse JSON from AI response - handle potentially truncated responses
+    let jsonContent = extractedContent;
+
+    // If response was truncated, try to fix incomplete JSON
+    if (finishReason === 'length' && !jsonContent.trim().endsWith('}')) {
+      console.log(`   Attempting to auto-close truncated JSON...`);
+      // Count open braces and close them
+      const openBraces = (jsonContent.match(/{/g) || []).length;
+      const closeBraces = (jsonContent.match(/}/g) || []).length;
+      const missingBraces = openBraces - closeBraces;
+      if (missingBraces > 0) {
+        jsonContent = jsonContent + '}'.repeat(missingBraces);
+        console.log(`   Added ${missingBraces} closing brace(s) to fix truncation`);
+      }
+    }
+
+    const jsonMatch = jsonContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {
         const parsedData = JSON.parse(jsonMatch[0]);
@@ -1044,11 +1069,15 @@ Return ONLY valid JSON. Be thorough but accurate.`;
         parsedData.scrapingMethod = 'Gemini 2.5 Flash Lite'; // Cost-optimized
         parsedData.source = source;
         parsedData.scrapedAt = new Date().toISOString();
+        parsedData._finishReason = finishReason; // Track if response was truncated
 
         return parsedData;
       } catch (parseError) {
         console.error(`❌ JSON parse error:`, parseError);
-        throw new Error('Failed to parse extracted data');
+        if (finishReason === 'length') {
+          console.error(`   JSON parsing failed due to truncation. Response was cut off at max_tokens limit.`);
+        }
+        throw new Error(`Failed to parse extracted data (finish_reason: ${finishReason})`);
       }
     } else {
       console.error(`❌ No JSON found in Gemini response`);
@@ -1143,8 +1172,9 @@ Return ONLY valid JSON with corrected and validated data.`;
           content: correctionPrompt
         }],
         temperature: 0.05, // Very low temperature for accuracy
-        max_tokens: 800, // Reduced from 2048 (cost optimization)
-        top_p: 0.8
+        max_tokens: 1000, // Raised from 800 to prevent JSON truncation (finish_reason: length)
+        top_p: 0.8,
+        stop: ["}"] // CRITICAL: Stop immediately when JSON ends to prevent extra tokens
       })
     });
 
@@ -1154,13 +1184,34 @@ Return ONLY valid JSON with corrected and validated data.`;
 
     const correctionResult = await correctionResponse.json();
     const correctedContent = correctionResult.choices?.[0]?.message?.content || '';
+    const finishReason = correctionResult.choices?.[0]?.finish_reason || 'unknown';
 
-    // Parse corrected JSON
-    const jsonMatch = correctedContent.match(/\{[\s\S]*\}/);
+    // 🚨 CRITICAL: Detect if response was truncated (finish_reason: length)
+    if (finishReason === 'length') {
+      console.error(`⚠️ CORRECTION RESPONSE TRUNCATED! finish_reason: ${finishReason}`);
+      console.error(`   This means max_tokens was hit before AI finished writing.`);
+    }
+
+    // Parse corrected JSON - handle potentially truncated responses
+    let jsonContent = correctedContent;
+
+    // If response was truncated, try to fix incomplete JSON
+    if (finishReason === 'length' && !jsonContent.trim().endsWith('}')) {
+      console.log(`   Attempting to auto-close truncated correction JSON...`);
+      const openBraces = (jsonContent.match(/{/g) || []).length;
+      const closeBraces = (jsonContent.match(/}/g) || []).length;
+      const missingBraces = openBraces - closeBraces;
+      if (missingBraces > 0) {
+        jsonContent = jsonContent + '}'.repeat(missingBraces);
+        console.log(`   Added ${missingBraces} closing brace(s) to fix truncation`);
+      }
+    }
+
+    const jsonMatch = jsonContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {
         const correctedData = JSON.parse(jsonMatch[0]);
-        console.log(`✅ Data correction complete: Quality ${correctedData.dataQuality}%, Completeness ${correctedData.completeness}%`);
+        console.log(`✅ Data correction complete (finish_reason: ${finishReason}): Quality ${correctedData.dataQuality}%, Completeness ${correctedData.completeness}%`);
 
         // 🛡️ CRITICAL VALIDATION: Check if corrected data has real information
         const validation = validateDrugFields(correctedData as DrugData);
