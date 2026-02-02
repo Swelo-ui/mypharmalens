@@ -66,7 +66,7 @@ function validateDrugFields(data: DrugData, fieldName?: string): { isValid: bool
   const missingFields: string[] = [];
   let hasPlaceholders = false;
 
-  // Placeholder patterns to detect
+  // Placeholder patterns to detect - EXPANDED to catch more cases
   const placeholderPatterns = [
     /^not available$/i,
     /^n\/a$/i,
@@ -75,6 +75,11 @@ function validateDrugFields(data: DrugData, fieldName?: string): { isValid: bool
     /^information not (available|found)$/i,
     /^data not available$/i,
     /^no (data|information)$/i,
+    /^not specified$/i,
+    /not specified on packaging/i,  // Frontend fallback text
+    /not explicitly listed/i,
+    /not visible on packaging/i,
+    /consult (your )?(healthcare|doctor|physician)/i,  // Generic fallback
     /^\s*$/  // Empty or whitespace only
   ];
 
@@ -95,8 +100,9 @@ function validateDrugFields(data: DrugData, fieldName?: string): { isValid: bool
   };
 
   // Critical fields that must have real data (not placeholders)
-  const criticalStringFields: (keyof DrugData)[] = ['description', 'mechanism', 'dosageAndAdmin'];
-  const criticalArrayFields: (keyof DrugData)[] = ['sideEffects', 'warnings', 'indications'];
+  // EXPANDED: Now includes contraindications, interactions, pregnancy for complete drug info
+  const criticalStringFields: (keyof DrugData)[] = ['description', 'mechanism', 'dosageAndAdmin', 'pregnancy'];
+  const criticalArrayFields: (keyof DrugData)[] = ['sideEffects', 'warnings', 'indications', 'contraindications', 'interactions'];
 
   // Validate string fields
   criticalStringFields.forEach(field => {
@@ -133,6 +139,138 @@ function validateDrugFields(data: DrugData, fieldName?: string): { isValid: bool
   }
 
   return { isValid, missingFields, hasPlaceholders };
+}
+
+/**
+ * PHARMACEUTICAL KNOWLEDGE ENHANCEMENT
+ * Uses AI pharmaceutical knowledge to fill in missing critical drug information.
+ * This is the KEY function that ensures complete drug data even when:
+ * - Web scraping returns empty fields
+ * - Image only shows drug name (packaging doesn't list side effects, etc.)
+ * - Data sources have incomplete information
+ */
+async function enhanceWithPharmaceuticalKnowledge(
+  data: DrugData,
+  drugName: string,
+  genericName?: string
+): Promise<DrugData> {
+  // Validate current data to find missing fields
+  const validation = validateDrugFields(data);
+
+  if (validation.isValid) {
+    console.log(`✅ All critical fields present - no enhancement needed`);
+    return data;
+  }
+
+  console.log(`\n🧪 === PHARMACEUTICAL KNOWLEDGE ENHANCEMENT ===`);
+  console.log(`   Drug: ${drugName} (${genericName || 'unknown generic'})`);
+  console.log(`   Missing fields: ${validation.missingFields.join(', ')}`);
+
+  try {
+    const enhancementPrompt = `You are a pharmaceutical database expert with comprehensive knowledge of medications worldwide. 
+
+DRUG TO ENHANCE: "${drugName}"${genericName ? ` (Generic: ${genericName})` : ''}
+
+MISSING INFORMATION NEEDED:
+${validation.missingFields.map(f => `- ${f}`).join('\n')}
+
+YOUR TASK: Provide COMPLETE, ACCURATE pharmaceutical information for the missing fields above.
+
+CRITICAL RULES:
+1. Use your pharmaceutical knowledge database - this is REAL drug information, not hypothetical
+2. For side effects: List 5-8 common side effects actually associated with this drug/drug class
+3. For contraindications: List 5-8 conditions where this drug should NOT be used
+4. For interactions: List 5-8 drugs/substances that interact with this medication
+5. For pregnancy: Provide the FDA pregnancy category and safety information
+6. For mechanism: Explain how the drug works in the body (pharmacological mechanism)
+7. For warnings: List 5-8 important safety warnings
+8. For indications: List 5-8 conditions this medication treats
+
+FORMATTING RULES:
+- Use PLAIN TEXT ONLY - no markdown, asterisks, or formatting
+- Be specific and medically accurate
+- NEVER say "consult your doctor" or "not available" - provide actual data
+- Each array item should be a complete, informative statement
+
+OUTPUT (JSON with ONLY the requested missing fields):
+{
+${validation.missingFields.map(field => {
+      if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications'].includes(field)) {
+        return `  "${field}": ["item1", "item2", "item3", "item4", "item5"]`;
+      } else {
+        return `  "${field}": "complete information here"`;
+      }
+    }).join(',\n')}
+}`;
+
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get("SUPABASE_URL") || '',
+        'X-Title': 'PharmaLens Pharmaceutical Enhancement'
+      },
+      body: JSON.stringify({
+        model: WEB_SCRAPING_MODEL,
+        messages: [{ role: 'user', content: enhancementPrompt }],
+        temperature: 0.1,
+        max_tokens: 1200, // Larger for comprehensive data
+        stop: ["}"] // Stop at JSON end
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`❌ Pharmaceutical enhancement API error: ${response.status}`);
+      return data;
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content || '';
+    const finishReason = result.choices?.[0]?.finish_reason || 'unknown';
+
+    // Handle potential truncation
+    let jsonContent = content;
+    if (finishReason === 'length' && !jsonContent.trim().endsWith('}')) {
+      const openBraces = (jsonContent.match(/{/g) || []).length;
+      const closeBraces = (jsonContent.match(/}/g) || []).length;
+      const missingBraces = openBraces - closeBraces;
+      if (missingBraces > 0) {
+        jsonContent = jsonContent + '}'.repeat(missingBraces);
+      }
+    }
+
+    const jsonMatch = jsonContent.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const enhancement = JSON.parse(jsonMatch[0]);
+
+      // Merge enhanced fields into data
+      let enhancedCount = 0;
+      validation.missingFields.forEach(field => {
+        if (enhancement[field]) {
+          const value = enhancement[field];
+          // Validate the enhanced value is not a placeholder
+          if (Array.isArray(value) && value.length > 0) {
+            (data as any)[field] = value;
+            enhancedCount++;
+            console.log(`   ✅ Enhanced ${field}: ${value.length} items`);
+          } else if (typeof value === 'string' && value.trim().length > 10) {
+            (data as any)[field] = value;
+            enhancedCount++;
+            console.log(`   ✅ Enhanced ${field}: ${value.substring(0, 50)}...`);
+          }
+        }
+      });
+
+      console.log(`🧪 Enhancement complete: ${enhancedCount}/${validation.missingFields.length} fields filled`);
+      console.log(`🧪 === PHARMACEUTICAL ENHANCEMENT COMPLETE ===\n`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error(`❌ Pharmaceutical enhancement failed:`, error);
+    return data;
+  }
 }
 
 // deno-lint-ignore no-explicit-any
@@ -915,48 +1053,42 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
     console.log(`   HTML fetched: ${html.length} characters`);
 
     // Step 2: Use DeepSeek R1T2 Chimera to intelligently extract drug data
-    const extractionPrompt = `You are an expert PHARMACEUTICAL DATABASE with comprehensive drug knowledge. Extract drug information from this webpage AND supplement with your pharmaceutical knowledge.
+    const extractionPrompt = `You are an expert web scraper specializing in pharmaceutical data extraction. Analyze this HTML content from ${source} and extract comprehensive drug information.
 
 TARGET DRUG: "${drugName}"
-
-CRITICAL INSTRUCTION: You are NOT just scraping the webpage. You are a pharmaceutical expert who:
-1. FIRST extracts what's available on the webpage
-2. THEN supplements ANY missing fields with your comprehensive pharmaceutical knowledge
-
-NEVER say "Not specified on packaging" or "Not found on webpage" - instead, provide the actual pharmaceutical information from your knowledge base.
 
 EXTRACTION REQUIREMENTS:
 1. **Drug Identification**:
    - Brand name (exact match for "${drugName}")
-   - Generic name / Active ingredient (from page OR your knowledge)
-   - Manufacturer / Company (from page OR your knowledge)
-   - Drug class / Category (from page OR your knowledge)
+   - Generic name / Active ingredient
+   - Manufacturer / Company
+   - Drug class / Category
 
 2. **Physical Properties**:
    - Dosage form (tablet, syrup, injection, etc.)
    - Strength/Dosage (mg, ml, etc.)
    - Color, shape, imprint (if available)
 
-3. **Medical Information** (MANDATORY - use your pharmaceutical knowledge if not on page):
-   - Mechanism of action (how it works) - ALWAYS provide this
+3. **Medical Information**:
+   - Mechanism of action (how it works)
    - Indications (what it treats) - list 5-8 conditions
-   - Side effects - list 8-10 common ones (REQUIRED)
-   - Contraindications - list 5-8 conditions to avoid (REQUIRED)
-   - Drug interactions - list 5-8 important ones (REQUIRED)
-   - Warnings and precautions - list 5-8 key warnings (REQUIRED)
+   - Side effects - list 8-10 common ones
+   - Contraindications - list 5-8 conditions to avoid
+   - Drug interactions - list 5-8 important ones
+   - Warnings and precautions - list 5-8 key warnings
 
 FORMATTING RULES (CRITICAL):
 - Use PLAIN TEXT ONLY - NO markdown formatting
 - NEVER use asterisks (**text**), underscores (__text__), or any markdown
 - Write naturally without bold/italic markers
-- NEVER say "not specified on packaging", "not found on webpage", "not available"
-- If webpage lacks data, USE YOUR PHARMACEUTICAL KNOWLEDGE to fill fields
+- Do NOT use phrases like "not explicitly listed" or "not visible on packaging"
 - All text should be clean, professional, and ready for direct display
-- For fields you truly cannot determine, use empty string "" or empty array []
+- CRITICAL: For missing fields, use empty string "" or empty array []
+- Prioritize extracting real data. If information is truly not found, use empty string "" or empty array [].
 
 4. **Usage Information**:
-   - Dosage and administration instructions (REQUIRED - use standard dosing if not on page)
-   - Storage conditions (use standard "Store below 25°C" if not specified)
+   - Dosage and administration instructions
+   - Storage conditions
    - Prescription status (OTC/Prescription/Controlled)
    - Pregnancy category/safety
 
@@ -965,16 +1097,17 @@ FORMATTING RULES (CRITICAL):
    - Price information (if available)
    - Availability status
 
-CRITICAL DATA RULES:
+CRITICAL DATA EXTRACTION RULES:
 - Focus ONLY on the drug "${drugName}" - ignore other search results
-- Extract from webpage FIRST, then supplement with your pharmaceutical knowledge
-- For description: Provide comprehensive medical description
-- For mechanism: ALWAYS explain how the drug works
-- For side effects: ALWAYS list common side effects (you KNOW these!)
-- For interactions: ALWAYS list drug interactions (you KNOW these!)
-- Prioritize completeness - a pharmaceutical database should have ALL fields populated
-- Use your knowledge of pharmacology to fill any gaps
+- Extract EXACT, COMPLETE text from the webpage - be thorough
+- For description: Extract full medical description, what condition it treats, how it helps
+- For mechanism: Extract the complete mechanism of action explanation
+- For ALL fields: Search the entire page content carefully before concluding data is missing
+- If truly not found, use empty string "" or empty array [] - validation will trigger enhancement
+- Prioritize completeness AND accuracy - extract all available information
+- Look for structured data in tables, lists, sections, and paragraph content
 - Use PLAIN TEXT ONLY - NO markdown, asterisks, or formatting markers
+- All extracted text must be clean and ready for direct user display
 
 HTML CONTENT:
 ${cleanHTMLForScraping(html)}
@@ -1100,41 +1233,35 @@ async function correctAndValidateData(rawData: ScrapedDrugData, drugName: string
   console.log(`🔍 Correcting and validating data for "${drugName}"...`);
 
   try {
-    const correctionPrompt = `You are a PHARMACEUTICAL EXPERT with comprehensive drug knowledge. Your job is to VALIDATE, CORRECT, and FILL IN MISSING FIELDS.
+    const correctionPrompt = `You are a pharmaceutical data validator and corrector. Review this extracted drug data and correct any errors, inconsistencies, or missing information.
 
 TARGET DRUG: "${drugName}"
 
 RAW EXTRACTED DATA:
 ${JSON.stringify(rawData, null, 2)}
 
-CRITICAL MISSION: Ensure ALL fields are populated with accurate pharmaceutical data. If the input data is missing fields, USE YOUR PHARMACEUTICAL KNOWLEDGE to provide accurate information.
-
-VALIDATION AND COMPLETION TASKS:
-1. **Data Accuracy**: Check if all information is medically accurate
-2. **FILL MISSING FIELDS**: If sideEffects, contraindications, interactions, or warnings are empty, FILL THEM from your pharmaceutical knowledge
+VALIDATION TASKS:
+1. **Data Accuracy**: Check if all information is medically accurate and consistent
+2. **Completeness**: Identify missing critical information
 3. **Formatting**: Standardize formats (dosages, drug names, etc.)
 4. **Deduplication**: Remove duplicate entries in arrays
-5. **Medical Validation**: Ensure all data is realistic and medically accurate
-6. **Quality Scoring**: Rate the overall data quality 0-100
-
-MANDATORY FIELDS (MUST NOT BE EMPTY):
-- sideEffects: ALWAYS provide 5-10 common side effects from your knowledge
-- contraindications: ALWAYS provide 3-5 conditions when drug should not be used
-- interactions: ALWAYS provide 3-5 drug interactions
-- warnings: ALWAYS provide 3-5 important warnings
-- mechanism: ALWAYS explain how the drug works
-- description: ALWAYS provide a comprehensive description
+5. **Medical Validation**: Ensure side effects, interactions, and indications are realistic
+6. **Consistency**: Check that generic name matches brand name
+7. **Quality Scoring**: Rate the overall data quality 0-100
 
 CORRECTION RULES:
 - Fix obvious typos and formatting issues
 - Standardize drug names (proper capitalization)
 - Ensure dosage formats are consistent (e.g., "500mg" not "500 mg")
 - Remove HTML artifacts or encoding issues
-- FILL empty arrays with real pharmaceutical data
+- Validate that side effects are real medical terms
+- Check that indications match the drug's actual uses
+- Ensure interactions are with real drug names
+- Standardize manufacturer names
 - REMOVE ALL MARKDOWN FORMATTING (**, __, *, etc.)
-- NEVER output "not specified on packaging" or similar phrases
-- NEVER leave critical fields empty - use your pharmaceutical knowledge
+- Remove phrases like "not explicitly listed" or "not visible on packaging"
 - Ensure all text is plain, clean, and ready for direct user display
+- Replace any bold markers with plain text
 
 OUTPUT FORMAT (JSON):
 {
@@ -1144,18 +1271,18 @@ OUTPUT FORMAT (JSON):
   "category": "Corrected drug class",
   "dosageForm": "Standardized form",
   "strength": "Standardized strength",
-  "description": "COMPLETE description (REQUIRED - never empty)",
-  "mechanism": "COMPLETE mechanism of action (REQUIRED - never empty)",
-  "indications": ["condition1", "condition2", ...],
-  "sideEffects": ["REQUIRED - at least 5 side effects"],
-  "contraindications": ["REQUIRED - at least 3 contraindications"],
-  "interactions": ["REQUIRED - at least 3 drug interactions"],
-  "warnings": ["REQUIRED - at least 3 warnings"],
+  "description": "Corrected description",
+  "mechanism": "Validated mechanism",
+  "indications": ["validated_condition1", "validated_condition2", ...],
+  "sideEffects": ["validated_effect1", "validated_effect2", ...],
+  "contraindications": ["validated_contraindication1", ...],
+  "interactions": ["validated_drug1", "validated_drug2", ...],
+  "warnings": ["validated_warning1", "validated_warning2", ...],
   "dosageAndAdmin": "Corrected instructions",
   "storage": "Standardized storage",
   "prescriptionStatus": "Validated status",
   "pregnancy": "Corrected pregnancy info",
-  "brandNames": ["brand1", "brand2", ...],
+  "brandNames": ["corrected_brand1", "corrected_brand2", ...],
   "price": "Formatted price",
   "availability": "Validated availability",
   "dataQuality": 0-100,
@@ -1164,7 +1291,7 @@ OUTPUT FORMAT (JSON):
   "validationNotes": "Any important notes about the data quality"
 }
 
-Return ONLY valid JSON with corrected, validated, and COMPLETE data.`;
+Return ONLY valid JSON with corrected and validated data.`;
 
     console.log(`   Using Gemini R1T2 Chimera for data correction...`);
 
@@ -1946,7 +2073,15 @@ Deno.serve(async (req: Request) => {
         }
 
         const limitedData = limitDataForStandardMode(oneMgResult.data);
-        const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
+
+        // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields with AI knowledge
+        const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
+          limitedData as DrugData,
+          oneMgResult.data.name || drugName,
+          oneMgResult.data.genericName || genericName
+        );
+
+        const enrichedData = enrichResponseMetadata(enhancedWithPharmaKnowledge as any, stages, preProcessingResult, overallStartTime);
 
         // 🏥 Add Janaushadhi alternative
         if (janaushadhiResult && janaushadhiResult.found) {
@@ -2004,7 +2139,15 @@ Deno.serve(async (req: Request) => {
         }
 
         const limitedData = limitDataForStandardMode(medlinePlusResult.data);
-        const enrichedData = enrichResponseMetadata(limitedData, stages, preProcessingResult, overallStartTime);
+
+        // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields with AI knowledge
+        const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
+          limitedData as DrugData,
+          medlinePlusResult.data.name || drugName,
+          medlinePlusResult.data.genericName || genericName
+        );
+
+        const enrichedData = enrichResponseMetadata(enhancedWithPharmaKnowledge as any, stages, preProcessingResult, overallStartTime);
 
         // 🏥 Add Janaushadhi alternative
         if (janaushadhiResult && janaushadhiResult.found) {
@@ -2073,8 +2216,15 @@ Deno.serve(async (req: Request) => {
               });
 
               // Enrich multi-source API data with metadata
+              // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
+              const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
+                multiSourceData.data as DrugData,
+                multiSourceData.data.name || drugName,
+                multiSourceData.data.genericName || genericName
+              );
+
               const enrichedMultiSourceApiData = enrichResponseMetadata(
-                multiSourceData.data,
+                enhancedWithPharmaKnowledge as any,
                 stages,
                 preProcessingResult,
                 overallStartTime
@@ -2145,8 +2295,16 @@ Deno.serve(async (req: Request) => {
             ...aiResult.data,
             standardModeFallback: true
           });
+
+          // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
+          const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
+            limitedAiData as DrugData,
+            aiResult.data.name || drugName,
+            aiResult.data.genericName || genericName
+          );
+
           const enrichedAiData = enrichResponseMetadata(
-            limitedAiData,
+            enhancedWithPharmaKnowledge as any,
             stages,
             preProcessingResult,
             overallStartTime
@@ -2222,8 +2380,15 @@ Deno.serve(async (req: Request) => {
           });
 
           // Enrich web search data with metadata
-          const enrichedWebSearchData = enrichResponseMetadata(
+          // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
+          const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
             webSearchResult.drugInfo as DrugData,
+            webSearchResult.drugInfo.name || drugName,
+            webSearchResult.drugInfo.genericName || genericName
+          );
+
+          const enrichedWebSearchData = enrichResponseMetadata(
+            enhancedWithPharmaKnowledge as any,
             stages,
             preProcessingResult,
             overallStartTime
@@ -2289,8 +2454,16 @@ Deno.serve(async (req: Request) => {
           });
 
           // Enrich critical vision data with metadata
+          // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
+          const criticalData = (criticalResult.data || {}) as DrugData;
+          const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
+            criticalData,
+            criticalData.name || drugName,
+            criticalData.genericName || genericName
+          );
+
           const enrichedCriticalData = enrichResponseMetadata(
-            (criticalResult.data || {}) as DrugData,
+            enhancedWithPharmaKnowledge as any,
             stages,
             preProcessingResult,
             overallStartTime

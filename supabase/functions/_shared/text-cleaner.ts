@@ -36,11 +36,7 @@ export function cleanText(text: string): string {
     .replace(/not explicitly listed on (the )?visible packaging\.?/gi, '')
     .replace(/not (explicitly )?listed on (the )?packaging\.?/gi, '')
     .replace(/not visible on (the )?packaging\.?/gi, '')
-    .replace(/not specified on (the )?(visible )?packaging\.?/gi, '')
-    .replace(/not mentioned on (the )?packaging\.?/gi, '')
-    .replace(/not found on (the )?packaging\.?/gi, '')
     .replace(/information not available on (the )?package\.?/gi, '')
-    .replace(/not available on (the )?packaging\.?/gi, '')
 
     // Remove extra whitespace and normalize
     .replace(/\s+/g, ' ')
