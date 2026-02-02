@@ -139,14 +139,6 @@ function validateDrugFields(data: DrugData, fieldName?: string): { isValid: bool
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
 
-  // Helper: Limit text to max words (avoids verbose essays, saves tokens)
-  const limitWords = (text: string, maxWords: number = 40): string => {
-    if (!text) return text;
-    const words = text.split(/\s+/);
-    if (words.length <= maxWords) return text;
-    return words.slice(0, maxWords).join(' ') + '...';
-  };
-
   return {
     ...data,
     // Keep ALL array items (no limit) - just clean formatting
@@ -156,9 +148,9 @@ function limitDataForStandardMode(data: any): any {
     indications: Array.isArray(data.indications) ? cleanTextArray(data.indications) : [],
     contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications) : [],
     brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames) : [],
-    // LIMIT TEXT LENGTH ONLY (avoid verbose essays, save tokens)
-    description: limitWords(cleanText(data.description || ''), 50),
-    mechanism: limitWords(cleanMechanismText(data.mechanism || ''), 40),
+    // NO WORD LIMITS - show full text (better UX, complete information)
+    description: cleanText(data.description || ''),
+    mechanism: cleanMechanismText(data.mechanism || ''),
     dosageAndAdmin: data.dosageAndAdmin ? cleanText(data.dosageAndAdmin) : data.dosageAndAdmin,
     storage: data.storage ? cleanText(data.storage) : data.storage,
     pregnancy: data.pregnancy ? cleanText(data.pregnancy) : data.pregnancy
