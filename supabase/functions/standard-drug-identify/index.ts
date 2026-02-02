@@ -58,18 +58,32 @@ function cleanHTMLForScraping(html: string): string {
 function limitDataForStandardMode(data: any): any {
   if (!data) return data;
 
+  // Helper: Limit text to 40 words max
+  const limitWords = (text: string, maxWords: number = 40): string => {
+    if (!text) return text;
+    const words = text.split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
+  };
+
+  // Helper: Limit array to top N items
+  const limitArray = (arr: string[], max: number = 5): string[] => {
+    if (!Array.isArray(arr)) return [];
+    return cleanTextArray(arr).slice(0, max);
+  };
+
   return {
     ...data,
-    // Clean array fields - remove asterisks/markdown but keep ALL items
-    sideEffects: Array.isArray(data.sideEffects) ? cleanTextArray(data.sideEffects) : [],
-    warnings: Array.isArray(data.warnings) ? cleanTextArray(data.warnings) : [],
-    interactions: Array.isArray(data.interactions) ? cleanTextArray(data.interactions) : [],
-    indications: Array.isArray(data.indications) ? cleanTextArray(data.indications) : [],
-    contraindications: Array.isArray(data.contraindications) ? cleanTextArray(data.contraindications) : [],
-    brandNames: Array.isArray(data.brandNames) ? cleanTextArray(data.brandNames) : [],
-    // Clean scalar fields to remove asterisks and markdown
-    description: data.description ? cleanText(data.description) : data.description,
-    mechanism: data.mechanism ? cleanMechanismText(data.mechanism) : data.mechanism,
+    // OPTIMIZED: Limit arrays to TOP 5 items (saves ~30% tokens)
+    sideEffects: limitArray(data.sideEffects, 5),
+    warnings: limitArray(data.warnings, 5),
+    interactions: limitArray(data.interactions, 5),
+    indications: limitArray(data.indications, 5),
+    contraindications: limitArray(data.contraindications, 5),
+    brandNames: limitArray(data.brandNames, 5),
+    // OPTIMIZED: Limit descriptions to 40 words
+    description: limitWords(cleanText(data.description || ''), 40),
+    mechanism: limitWords(cleanMechanismText(data.mechanism || ''), 30),
     dosageAndAdmin: data.dosageAndAdmin ? cleanText(data.dosageAndAdmin) : data.dosageAndAdmin,
     storage: data.storage ? cleanText(data.storage) : data.storage,
     pregnancy: data.pregnancy ? cleanText(data.pregnancy) : data.pregnancy
@@ -155,7 +169,13 @@ type Confidence = 'high' | 'medium' | 'low';
 
 interface VisionResult {
   name?: string;
+  nameSource?: 'visible' | 'partial' | 'corrected';
   genericName?: string;
+  manufacturer?: string;
+  manufacturerSource?: 'visible' | 'partial' | 'not_visible';
+  strength?: string;
+  verified?: boolean;
+  correctedFrom?: string | null;
   description?: string;
   confidence?: Confidence;
   color?: string;
@@ -172,6 +192,7 @@ interface VisionResult {
   imageChallenges?: string[];
   imageQuality?: number;
 }
+
 
 interface ScrapedDrugData {
   name: string;
@@ -679,26 +700,40 @@ async function performOpenRouterAnalysis(imageBase64: string, modelIndex: number
   try {
     console.log(`🔄 Using OpenRouter Vision (${modelName})...`);
 
-    const prompt = `You are a fast pharmaceutical drug identifier. Extract key info from this medicine image.
+    const prompt = `You are an expert pharmaceutical drug identifier. Extract ALL visible drug information from this medicine image.
 
-CRITICAL: Also detect if the image has challenging conditions that need advanced analysis.
+CRITICAL TASKS:
+1. Extract ALL visible text from packaging (brand name, generic name, manufacturer, strength)
+2. Verify the drug name is REAL (not OCR error or hallucination)
+3. Detect image quality issues
 
-INSTRUCTIONS (Speed-optimized):
-1. Brand Name: Exact name on package (e.g., "Naxdom 500")
-2. Generic/Active Ingredient: From composition section
-3. Confidence: high/medium/low based on text clarity
-4. **Image Challenges**: Detect if image has:
-   - "torn" or "cut" - Strip/blister is torn, cut, or damaged
-   - "blurry" - Text is unclear or out of focus
-   - "reflective" - Foil or packaging has glare/reflection
-   - "partial" - Only partial view of medicine/packaging
-   - "damaged" - Packaging is physically damaged
-5. **needsCriticalAnalysis**: Set to true if ANY of above challenges exist OR confidence is low
+EXTRACTION RULES:
+- Brand Name: Exact name on package (e.g., "Crocin 650", "Dolo 650")
+- Generic Name: Active ingredient from composition (e.g., "Paracetamol 650mg")
+- Manufacturer: Company name if visible (e.g., "GSK", "Micro Labs"). If NOT visible, set to "not_visible"
+- Strength: Dosage if visible (e.g., "500mg", "650mg")
+
+DRUG VERIFICATION (IMPORTANT):
+- Is this a REAL pharmaceutical product?
+- If name looks like OCR error (e.g., "CROC1N" → "CROCIN"), provide corrected name
+- Set verified=true ONLY if confident drug exists
+
+IMAGE CHALLENGES:
+- "torn" - Strip is torn/cut/damaged
+- "blurry" - Text unclear
+- "reflective" - Glare on foil
+- "partial" - Partial view only
 
 OUTPUT (JSON only):
 {
-  "name": "Brand name",
+  "name": "Brand name (verified or corrected)",
+  "nameSource": "visible/partial/corrected",
   "genericName": "Active ingredient",
+  "manufacturer": "Company name or not_visible",
+  "manufacturerSource": "visible/partial/not_visible",
+  "strength": "Dosage if visible",
+  "verified": true/false,
+  "correctedFrom": "Original OCR if corrected, null otherwise",
   "confidence": "high/medium/low",
   "imageChallenges": ["torn", "blurry", etc.],
   "needsCriticalAnalysis": true/false,
@@ -709,7 +744,7 @@ OUTPUT (JSON only):
   "partialView": true/false
 }
 
-Be FAST and ACCURATE. Detect challenging conditions. Return ONLY JSON:`;
+Be ACCURATE. Extract manufacturer if visible. Verify drug is real. Return ONLY JSON:`;
 
     const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
 
@@ -1188,8 +1223,23 @@ Deno.serve(async (req: Request) => {
     let genericName = validatedResult?.genericName || '';
     console.log(`📝 Validated - Brand: "${drugName}", Generic: "${genericName}"`);
 
-    // �️ STAGE 2: HALLUCINATION CHECK - Verify drug name exists before proceeding
-    if (drugName && drugName !== 'Unknown' && !drugName.toLowerCase().includes('unknown')) {
+    // 🛡️ STAGE 2: HALLUCINATION CHECK - SKIP if OCR already verified
+    // OPTIMIZATION: OCR now includes verification, skip separate API call if verified
+    const ocrAlreadyVerified = validatedResult?.verified === true && validatedResult?.confidence === 'high';
+
+    if (ocrAlreadyVerified) {
+      console.log('✅ OCR already verified drug - SKIPPING hallucination check (saves 1 API call)');
+      // Use corrected name if OCR corrected it
+      if (validatedResult?.correctedFrom) {
+        console.log(`🔄 OCR auto-corrected: "${validatedResult.correctedFrom}" → "${drugName}"`);
+      }
+      stages.push({
+        name: 'hallucination-check-skipped',
+        success: true,
+        data: { skipped: true, reason: 'OCR verified', verified: true },
+        processingTime: Date.now() - overallStartTime
+      });
+    } else if (drugName && drugName !== 'Unknown' && !drugName.toLowerCase().includes('unknown')) {
       console.log('\\n🛡️ Running Hallucination Check to verify OCR accuracy...');
       try {
         const hallucinationResult = await performHallucinationCheck(drugName, genericName);
