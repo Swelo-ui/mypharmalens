@@ -8,36 +8,40 @@
  */
 export function cleanText(text: string): string {
   if (!text || typeof text !== 'string') return text;
-  
+
   return text
     // Remove markdown bold formatting (**text** or __text__)
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/__(.*?)__/g, '$1')
-    
+
     // Remove single asterisks used for emphasis (*text*)
     .replace(/\*(.*?)\*/g, '$1')
-    
+
     // Remove markdown headers (# ## ### etc.)
     .replace(/^#{1,6}\s+/gm, '')
-    
+
     // Remove markdown bullet points (- * +)
     .replace(/^[\s]*[-\*\+]\s+/gm, '')
-    
+
     // Remove numbered lists (1. 2. etc.)
     .replace(/^[\s]*\d+\.\s+/gm, '')
-    
+
     // Remove markdown links [text](url)
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-    
+
     // Remove HTML tags if any
     .replace(/<[^>]*>/g, '')
-    
+
     // Remove misleading phrases about packaging/visibility
     .replace(/not explicitly listed on (the )?visible packaging\.?/gi, '')
     .replace(/not (explicitly )?listed on (the )?packaging\.?/gi, '')
     .replace(/not visible on (the )?packaging\.?/gi, '')
+    .replace(/not specified on (the )?(visible )?packaging\.?/gi, '')
+    .replace(/not mentioned on (the )?packaging\.?/gi, '')
+    .replace(/not found on (the )?packaging\.?/gi, '')
     .replace(/information not available on (the )?package\.?/gi, '')
-    
+    .replace(/not available on (the )?packaging\.?/gi, '')
+
     // Remove extra whitespace and normalize
     .replace(/\s+/g, ' ')
     .trim();
@@ -48,7 +52,7 @@ export function cleanText(text: string): string {
  */
 export function cleanTextArray(textArray: string[]): string[] {
   if (!Array.isArray(textArray)) return textArray;
-  
+
   return textArray
     .map(text => cleanText(text))
     .filter(text => text && text.length > 0); // Remove empty strings
@@ -60,34 +64,34 @@ export function cleanTextArray(textArray: string[]): string[] {
 // deno-lint-ignore no-explicit-any
 export function cleanDrugData(drugData: Record<string, any>): Record<string, any> {
   if (!drugData || typeof drugData !== 'object') return drugData;
-  
+
   const cleaned = { ...drugData };
-  
+
   // Clean string fields
   const stringFields = [
     'name', 'genericName', 'manufacturer', 'category', 'drugClass',
-    'description', 'dosageAndAdmin', 'storage', 'mechanism', 
+    'description', 'dosageAndAdmin', 'storage', 'mechanism',
     'prescriptionStatus', 'pregnancy'
   ];
-  
+
   stringFields.forEach(field => {
     if (cleaned[field] && typeof cleaned[field] === 'string') {
       cleaned[field] = cleanText(cleaned[field] as string);
     }
   });
-  
+
   // Clean array fields
   const arrayFields = [
-    'sideEffects', 'warnings', 'interactions', 'indications', 
+    'sideEffects', 'warnings', 'interactions', 'indications',
     'contraindications', 'brandNames'
   ];
-  
+
   arrayFields.forEach(field => {
     if (cleaned[field] && Array.isArray(cleaned[field])) {
       cleaned[field] = cleanTextArray(cleaned[field] as string[]);
     }
   });
-  
+
   return cleaned;
 }
 
@@ -96,16 +100,16 @@ export function cleanDrugData(drugData: Record<string, any>): Record<string, any
  */
 export function cleanMechanismText(mechanism: string): string {
   if (!mechanism) return mechanism;
-  
+
   return cleanText(mechanism)
     // Remove common AI prefixes
     .replace(/^This medication (works by|acts by|functions by)\s*/i, '')
     .replace(/^The mechanism of action (is|involves)\s*/i, '')
     .replace(/^Mechanism:\s*/i, '')
-    
+
     // Remove drug name repetitions at start
     .replace(/^[A-Za-z\s\-]+\s+(works by|acts by|functions by)\s*/i, '')
-    
+
     // Ensure proper capitalization
     .replace(/^[a-z]/, match => match.toUpperCase());
 }
@@ -115,13 +119,13 @@ export function cleanMechanismText(mechanism: string): string {
  */
 export function cleanSideEffectText(effect: string): string {
   if (!effect) return effect;
-  
+
   return cleanText(effect)
     // Remove common prefixes
     .replace(/^(Side effect:|Common:|Rare:|Serious:)\s*/i, '')
     .replace(/^May cause\s*/i, '')
     .replace(/^Can lead to\s*/i, '')
-    
+
     // Ensure proper capitalization
     .replace(/^[a-z]/, match => match.toUpperCase());
 }

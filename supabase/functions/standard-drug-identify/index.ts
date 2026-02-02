@@ -915,42 +915,48 @@ async function intelligentWebScraping(drugName: string, source: '1mg' | 'medline
     console.log(`   HTML fetched: ${html.length} characters`);
 
     // Step 2: Use DeepSeek R1T2 Chimera to intelligently extract drug data
-    const extractionPrompt = `You are an expert web scraper specializing in pharmaceutical data extraction. Analyze this HTML content from ${source} and extract comprehensive drug information.
+    const extractionPrompt = `You are an expert PHARMACEUTICAL DATABASE with comprehensive drug knowledge. Extract drug information from this webpage AND supplement with your pharmaceutical knowledge.
 
 TARGET DRUG: "${drugName}"
+
+CRITICAL INSTRUCTION: You are NOT just scraping the webpage. You are a pharmaceutical expert who:
+1. FIRST extracts what's available on the webpage
+2. THEN supplements ANY missing fields with your comprehensive pharmaceutical knowledge
+
+NEVER say "Not specified on packaging" or "Not found on webpage" - instead, provide the actual pharmaceutical information from your knowledge base.
 
 EXTRACTION REQUIREMENTS:
 1. **Drug Identification**:
    - Brand name (exact match for "${drugName}")
-   - Generic name / Active ingredient
-   - Manufacturer / Company
-   - Drug class / Category
+   - Generic name / Active ingredient (from page OR your knowledge)
+   - Manufacturer / Company (from page OR your knowledge)
+   - Drug class / Category (from page OR your knowledge)
 
 2. **Physical Properties**:
    - Dosage form (tablet, syrup, injection, etc.)
    - Strength/Dosage (mg, ml, etc.)
    - Color, shape, imprint (if available)
 
-3. **Medical Information**:
-   - Mechanism of action (how it works)
+3. **Medical Information** (MANDATORY - use your pharmaceutical knowledge if not on page):
+   - Mechanism of action (how it works) - ALWAYS provide this
    - Indications (what it treats) - list 5-8 conditions
-   - Side effects - list 8-10 common ones
-   - Contraindications - list 5-8 conditions to avoid
-   - Drug interactions - list 5-8 important ones
-   - Warnings and precautions - list 5-8 key warnings
+   - Side effects - list 8-10 common ones (REQUIRED)
+   - Contraindications - list 5-8 conditions to avoid (REQUIRED)
+   - Drug interactions - list 5-8 important ones (REQUIRED)
+   - Warnings and precautions - list 5-8 key warnings (REQUIRED)
 
 FORMATTING RULES (CRITICAL):
 - Use PLAIN TEXT ONLY - NO markdown formatting
 - NEVER use asterisks (**text**), underscores (__text__), or any markdown
 - Write naturally without bold/italic markers
-- Do NOT use phrases like "not explicitly listed" or "not visible on packaging"
+- NEVER say "not specified on packaging", "not found on webpage", "not available"
+- If webpage lacks data, USE YOUR PHARMACEUTICAL KNOWLEDGE to fill fields
 - All text should be clean, professional, and ready for direct display
-- CRITICAL: For missing fields, use empty string "" or empty array []
-- Prioritize extracting real data. If information is truly not found, use empty string "" or empty array [].
+- For fields you truly cannot determine, use empty string "" or empty array []
 
 4. **Usage Information**:
-   - Dosage and administration instructions
-   - Storage conditions
+   - Dosage and administration instructions (REQUIRED - use standard dosing if not on page)
+   - Storage conditions (use standard "Store below 25°C" if not specified)
    - Prescription status (OTC/Prescription/Controlled)
    - Pregnancy category/safety
 
@@ -959,17 +965,16 @@ FORMATTING RULES (CRITICAL):
    - Price information (if available)
    - Availability status
 
-CRITICAL DATA EXTRACTION RULES:
+CRITICAL DATA RULES:
 - Focus ONLY on the drug "${drugName}" - ignore other search results
-- Extract EXACT, COMPLETE text from the webpage - be thorough
-- For description: Extract full medical description, what condition it treats, how it helps
-- For mechanism: Extract the complete mechanism of action explanation
-- For ALL fields: Search the entire page content carefully before concluding data is missing
-- If truly not found, use empty string "" or empty array [] - validation will trigger enhancement
-- Prioritize completeness AND accuracy - extract all available information
-- Look for structured data in tables, lists, sections, and paragraph content
+- Extract from webpage FIRST, then supplement with your pharmaceutical knowledge
+- For description: Provide comprehensive medical description
+- For mechanism: ALWAYS explain how the drug works
+- For side effects: ALWAYS list common side effects (you KNOW these!)
+- For interactions: ALWAYS list drug interactions (you KNOW these!)
+- Prioritize completeness - a pharmaceutical database should have ALL fields populated
+- Use your knowledge of pharmacology to fill any gaps
 - Use PLAIN TEXT ONLY - NO markdown, asterisks, or formatting markers
-- All extracted text must be clean and ready for direct user display
 
 HTML CONTENT:
 ${cleanHTMLForScraping(html)}
@@ -1095,35 +1100,41 @@ async function correctAndValidateData(rawData: ScrapedDrugData, drugName: string
   console.log(`🔍 Correcting and validating data for "${drugName}"...`);
 
   try {
-    const correctionPrompt = `You are a pharmaceutical data validator and corrector. Review this extracted drug data and correct any errors, inconsistencies, or missing information.
+    const correctionPrompt = `You are a PHARMACEUTICAL EXPERT with comprehensive drug knowledge. Your job is to VALIDATE, CORRECT, and FILL IN MISSING FIELDS.
 
 TARGET DRUG: "${drugName}"
 
 RAW EXTRACTED DATA:
 ${JSON.stringify(rawData, null, 2)}
 
-VALIDATION TASKS:
-1. **Data Accuracy**: Check if all information is medically accurate and consistent
-2. **Completeness**: Identify missing critical information
+CRITICAL MISSION: Ensure ALL fields are populated with accurate pharmaceutical data. If the input data is missing fields, USE YOUR PHARMACEUTICAL KNOWLEDGE to provide accurate information.
+
+VALIDATION AND COMPLETION TASKS:
+1. **Data Accuracy**: Check if all information is medically accurate
+2. **FILL MISSING FIELDS**: If sideEffects, contraindications, interactions, or warnings are empty, FILL THEM from your pharmaceutical knowledge
 3. **Formatting**: Standardize formats (dosages, drug names, etc.)
 4. **Deduplication**: Remove duplicate entries in arrays
-5. **Medical Validation**: Ensure side effects, interactions, and indications are realistic
-6. **Consistency**: Check that generic name matches brand name
-7. **Quality Scoring**: Rate the overall data quality 0-100
+5. **Medical Validation**: Ensure all data is realistic and medically accurate
+6. **Quality Scoring**: Rate the overall data quality 0-100
+
+MANDATORY FIELDS (MUST NOT BE EMPTY):
+- sideEffects: ALWAYS provide 5-10 common side effects from your knowledge
+- contraindications: ALWAYS provide 3-5 conditions when drug should not be used
+- interactions: ALWAYS provide 3-5 drug interactions
+- warnings: ALWAYS provide 3-5 important warnings
+- mechanism: ALWAYS explain how the drug works
+- description: ALWAYS provide a comprehensive description
 
 CORRECTION RULES:
 - Fix obvious typos and formatting issues
 - Standardize drug names (proper capitalization)
 - Ensure dosage formats are consistent (e.g., "500mg" not "500 mg")
 - Remove HTML artifacts or encoding issues
-- Validate that side effects are real medical terms
-- Check that indications match the drug's actual uses
-- Ensure interactions are with real drug names
-- Standardize manufacturer names
+- FILL empty arrays with real pharmaceutical data
 - REMOVE ALL MARKDOWN FORMATTING (**, __, *, etc.)
-- Remove phrases like "not explicitly listed" or "not visible on packaging"
+- NEVER output "not specified on packaging" or similar phrases
+- NEVER leave critical fields empty - use your pharmaceutical knowledge
 - Ensure all text is plain, clean, and ready for direct user display
-- Replace any bold markers with plain text
 
 OUTPUT FORMAT (JSON):
 {
@@ -1133,18 +1144,18 @@ OUTPUT FORMAT (JSON):
   "category": "Corrected drug class",
   "dosageForm": "Standardized form",
   "strength": "Standardized strength",
-  "description": "Corrected description",
-  "mechanism": "Validated mechanism",
-  "indications": ["validated_condition1", "validated_condition2", ...],
-  "sideEffects": ["validated_effect1", "validated_effect2", ...],
-  "contraindications": ["validated_contraindication1", ...],
-  "interactions": ["validated_drug1", "validated_drug2", ...],
-  "warnings": ["validated_warning1", "validated_warning2", ...],
+  "description": "COMPLETE description (REQUIRED - never empty)",
+  "mechanism": "COMPLETE mechanism of action (REQUIRED - never empty)",
+  "indications": ["condition1", "condition2", ...],
+  "sideEffects": ["REQUIRED - at least 5 side effects"],
+  "contraindications": ["REQUIRED - at least 3 contraindications"],
+  "interactions": ["REQUIRED - at least 3 drug interactions"],
+  "warnings": ["REQUIRED - at least 3 warnings"],
   "dosageAndAdmin": "Corrected instructions",
   "storage": "Standardized storage",
   "prescriptionStatus": "Validated status",
   "pregnancy": "Corrected pregnancy info",
-  "brandNames": ["corrected_brand1", "corrected_brand2", ...],
+  "brandNames": ["brand1", "brand2", ...],
   "price": "Formatted price",
   "availability": "Validated availability",
   "dataQuality": 0-100,
@@ -1153,7 +1164,7 @@ OUTPUT FORMAT (JSON):
   "validationNotes": "Any important notes about the data quality"
 }
 
-Return ONLY valid JSON with corrected and validated data.`;
+Return ONLY valid JSON with corrected, validated, and COMPLETE data.`;
 
     console.log(`   Using Gemini R1T2 Chimera for data correction...`);
 
