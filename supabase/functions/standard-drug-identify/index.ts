@@ -26,12 +26,16 @@ const corsHeaders = {
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
-// Vision model hierarchy: Gemini (primary) → Gemini Flash 3 (fallback) - Optimized 2-tier cascade
-const VISION_MODEL_PRIMARY = 'google/gemini-2.5-flash';      // Primary OCR & Vision
-const VISION_MODEL_FALLBACK = 'google/gemini-flash-3-preview'; // Fallback for all AI tasks
+// COST-OPTIMIZED MODEL SELECTION:
+// - OCR Stage: Full Gemini 2.5 Flash (best extraction power - crucial for accuracy)
+// - Other Stages: Gemini 2.5 Flash Lite (validation, web scraping, correction - 50% cheaper)
+const VISION_MODEL_PRIMARY = 'google/gemini-2.5-flash';        // PRIMARY: OCR & Vision extraction (ALWAYS use for best accuracy)
+const VISION_MODEL_LITE = 'google/gemini-2.5-flash-lite';      // LITE: Validation, fallback, non-critical tasks
+const VISION_MODEL_FALLBACK = 'google/gemini-2.5-flash-lite';  // Fallback for vision tasks (was gemini-flash-3-preview)
 
-// Web scraping model: Use primary Gemini for consistency
-const WEB_SCRAPING_MODEL = 'google/gemini-2.5-flash';       // Primary for web scraping & reasoning
+// Web scraping & validation: Use LITE model for cost savings
+const WEB_SCRAPING_MODEL = 'google/gemini-2.5-flash-lite';    // LITE for web scraping & reasoning
+const VALIDATION_MODEL = 'google/gemini-2.5-flash-lite';       // LITE for hallucination check & validation
 
 // Standard Mode data cleaner - Clean all data but NO rate limiting
 // Removes markdown/asterisks but returns FULL data (no item limits)
@@ -326,7 +330,7 @@ Return ONLY JSON:
         'X-Title': 'PharmaLens Smart Pre-Processing'
       },
       body: JSON.stringify({
-        model: VISION_MODEL_PRIMARY,
+        model: VISION_MODEL_LITE, // Use LITE model for pre-processing (not critical OCR)
         messages: [{
           role: 'user',
           content: [
@@ -453,10 +457,10 @@ Return ONLY JSON:`;
         'X-Title': 'PharmaLens Hallucination Check'
       },
       body: JSON.stringify({
-        model: VISION_MODEL_PRIMARY, // Use same Gemini model for consistency
+        model: VALIDATION_MODEL, // Use LITE model for validation (cost savings)
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 512
+        max_tokens: 300 // Reduced from 512
       })
     });
 
@@ -943,7 +947,7 @@ Return ONLY valid JSON. Be thorough but accurate.`;
           content: extractionPrompt
         }],
         temperature: 0.1, // Low temperature for accuracy
-        max_tokens: 1000, // Reduced from 2048
+        max_tokens: 700, // Reduced from 1000 (cost optimization)
         top_p: 0.9
       })
     });
@@ -965,7 +969,7 @@ Return ONLY valid JSON. Be thorough but accurate.`;
         console.log(`✅ Intelligent scraping success: ${parsedData.name} (${parsedData.dataCompleteness}% complete)`);
 
         // Add metadata
-        parsedData.scrapingMethod = 'Gemini 2.5 Flash';
+        parsedData.scrapingMethod = 'Gemini 2.5 Flash Lite'; // Cost-optimized
         parsedData.source = source;
         parsedData.scrapedAt = new Date().toISOString();
 
@@ -1067,7 +1071,7 @@ Return ONLY valid JSON with corrected and validated data.`;
           content: correctionPrompt
         }],
         temperature: 0.05, // Very low temperature for accuracy
-        max_tokens: 2048,
+        max_tokens: 800, // Reduced from 2048 (cost optimization)
         top_p: 0.8
       })
     });

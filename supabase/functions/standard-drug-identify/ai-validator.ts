@@ -5,7 +5,7 @@ declare const Deno: { env: { get: (key: string) => string | undefined } };
 
 const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const OPENROUTER_CACHE_VALIDATOR_MODEL = 'google/gemini-2.5-flash'; // High performance, consistent model
+const OPENROUTER_CACHE_VALIDATOR_MODEL = 'google/gemini-2.5-flash-lite'; // LITE model for cost savings
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 
 /**
@@ -102,7 +102,7 @@ Respond with JSON only:`;
         model: OPENROUTER_CACHE_VALIDATOR_MODEL,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 256
+        max_tokens: 180 // Reduced from 256
       })
     });
 

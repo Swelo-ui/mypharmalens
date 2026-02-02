@@ -8,7 +8,7 @@ import { aiCompareDrugNames } from './ai-validator.ts';
 // OpenRouter config for advanced validation
 const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const VALIDATION_MODEL = 'meituan/longcat-flash-chat:free';
+const VALIDATION_MODEL = 'google/gemini-2.5-flash-lite'; // LITE model for cost savings (was free model)
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
@@ -42,7 +42,7 @@ async function validateCachedDataAccuracy(
     shape?: string;
   }
 ): Promise<{ isValid: boolean; confidence: number; reason: string }> {
-  
+
   const prompt = `You are a pharmaceutical expert validating drug identification accuracy.
 
 CACHED DRUG DATA:
@@ -98,7 +98,7 @@ RETURN JSON:
 
     const result = await response.json();
     const validation = JSON.parse(result.choices[0].message.content);
-    
+
     console.log(`\n🔍 CACHE DATA VALIDATION:`);
     console.log(`   Valid: ${validation.isValid}`);
     console.log(`   Confidence: ${(validation.confidence * 100).toFixed(1)}%`);
@@ -106,9 +106,9 @@ RETURN JSON:
     if (validation.concerns?.length > 0) {
       console.log(`   ⚠️ Concerns: ${validation.concerns.join(', ')}`);
     }
-    
+
     return validation;
-    
+
   } catch (error) {
     console.error('❌ Cache validation error:', error);
     // Fail-safe: Allow cache hit but flag low confidence
@@ -127,7 +127,7 @@ function transformCacheData(cacheData: any): any {
   // Ensure we have meaningful defaults for Standard Mode UI
   const drugName = cacheData.drug_name || 'Unknown Medication';
   const genericName = cacheData.generic_name || cacheData.drug_name || '';
-  
+
   return {
     id: cacheData.id,
     name: drugName,
@@ -136,23 +136,23 @@ function transformCacheData(cacheData: any): any {
     category: cacheData.category || cacheData.drug_class || 'Pharmaceutical Product',
     description: cacheData.description || `${drugName} is a pharmaceutical product. Consult healthcare provider for detailed information.`,
     dosageAndAdmin: cacheData.dosage_and_admin || 'Follow dosage instructions on packaging or as prescribed by healthcare provider',
-    sideEffects: Array.isArray(cacheData.side_effects) ? cacheData.side_effects : 
+    sideEffects: Array.isArray(cacheData.side_effects) ? cacheData.side_effects :
       (cacheData.side_effects ? [cacheData.side_effects] : ['Consult healthcare provider for side effects information']),
-    warnings: Array.isArray(cacheData.warnings) ? cacheData.warnings : 
+    warnings: Array.isArray(cacheData.warnings) ? cacheData.warnings :
       (cacheData.warnings ? [cacheData.warnings] : ['Read all warnings on packaging before use', 'Consult healthcare provider if you have medical conditions']),
-    interactions: Array.isArray(cacheData.interactions) ? cacheData.interactions : 
+    interactions: Array.isArray(cacheData.interactions) ? cacheData.interactions :
       (cacheData.interactions ? [cacheData.interactions] : ['Inform healthcare provider about all medications you are taking']),
     storage: cacheData.storage || 'Store at room temperature away from moisture, heat, and light. Keep out of reach of children.',
     mechanism: cacheData.mechanism || 'Mechanism of action information available from healthcare provider',
-    indications: Array.isArray(cacheData.indications) ? cacheData.indications : 
+    indications: Array.isArray(cacheData.indications) ? cacheData.indications :
       (cacheData.indications ? [cacheData.indications] : ['Consult healthcare provider for usage information']),
-    contraindications: Array.isArray(cacheData.contraindications) ? cacheData.contraindications : 
+    contraindications: Array.isArray(cacheData.contraindications) ? cacheData.contraindications :
       (cacheData.contraindications ? [cacheData.contraindications] : ['Consult healthcare provider about contraindications']),
     prescriptionStatus: cacheData.prescription_status || 'Consult pharmacist',
     pregnancy: cacheData.pregnancy || 'Consult healthcare provider before use during pregnancy',
     verified: Boolean(cacheData.verified),
     drugClass: cacheData.drug_class || cacheData.category || '',
-    brandNames: Array.isArray(cacheData.brand_names) ? cacheData.brand_names : 
+    brandNames: Array.isArray(cacheData.brand_names) ? cacheData.brand_names :
       (cacheData.brand_names ? [cacheData.brand_names] : []),
     confidence: cacheData.confidence || 'high', // Cache hits should be high confidence
     imprint: cacheData.imprint || '',
@@ -182,14 +182,14 @@ export async function checkDrugCacheWithValidation(
     shape?: string;
   }
 ): Promise<any | null> {
-  
+
   // First get the basic cache match
   const cacheResult = await checkDrugCache(drugName);
-  
+
   if (!cacheResult) {
     return null;
   }
-  
+
   // CRITICAL: Validate the cached data is actually correct
   console.log(`\n🔐 VALIDATING CACHE DATA ACCURACY...`);
   const validation = await validateCachedDataAccuracy(cacheResult, {
@@ -199,7 +199,7 @@ export async function checkDrugCacheWithValidation(
     color: extractedInfo?.color,
     shape: extractedInfo?.shape
   });
-  
+
   // Reject cache hit if validation fails or confidence too low
   if (!validation.isValid || validation.confidence < 0.7) {
     console.log(`\n❌ CACHE DATA REJECTED - ACCURACY VALIDATION FAILED!`);
@@ -209,10 +209,10 @@ export async function checkDrugCacheWithValidation(
     console.log(`   Will perform fresh identification instead...`);
     return null;
   }
-  
+
   console.log(`\n✅ CACHE DATA VALIDATED - Accuracy confirmed`);
   console.log(`   Validation confidence: ${(validation.confidence * 100).toFixed(1)}%`);
-  
+
   // Add validation metadata to result
   return {
     ...cacheResult,
@@ -228,7 +228,7 @@ export async function checkDrugCacheWithValidation(
  */
 function normalizeDrugName(name: string): string {
   if (!name) return '';
-  
+
   return name
     .toLowerCase()
     .trim()
@@ -251,29 +251,29 @@ function normalizeDrugName(name: string): string {
 function calculateNameSimilarity(name1: string, name2: string): number {
   const n1 = normalizeDrugName(name1);
   const n2 = normalizeDrugName(name2);
-  
+
   // Exact match after normalization
   if (n1 === n2) return 1.0;
-  
+
   // One is substring of other (e.g., "M2-TONE" in "M2-TONE SYRUP")
   if (n1.includes(n2) || n2.includes(n1)) {
     const shorter = n1.length < n2.length ? n1 : n2;
     const longer = n1.length >= n2.length ? n1 : n2;
     return shorter.length / longer.length;
   }
-  
+
   // Calculate Levenshtein distance
   const matrix: number[][] = [];
   const len1 = n1.length;
   const len2 = n2.length;
-  
+
   for (let i = 0; i <= len1; i++) {
     matrix[i] = [i];
   }
   for (let j = 0; j <= len2; j++) {
     matrix[0][j] = j;
   }
-  
+
   for (let i = 1; i <= len1; i++) {
     for (let j = 1; j <= len2; j++) {
       const cost = n1[i - 1] === n2[j - 1] ? 0 : 1;
@@ -284,7 +284,7 @@ function calculateNameSimilarity(name1: string, name2: string): number {
       );
     }
   }
-  
+
   const distance = matrix[len1][len2];
   const maxLen = Math.max(len1, len2);
   return maxLen === 0 ? 1.0 : 1 - (distance / maxLen);
@@ -303,7 +303,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
     console.log(`\n🔍 === INTELLIGENT CACHE CHECK START ===`);
     console.log(`   Original drug name: "${drugName}"`);
     console.log(`   Normalized: "${normalizeDrugName(drugName)}"`);
-    
+
     // Strategy 1: Try exact RPC match first (fastest)
     console.log(`\n   Strategy 1: Exact RPC match (by brand or generic)...`);
     const { data, error } = await supabase
@@ -326,47 +326,47 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
       console.log(`🔍 === CACHE CHECK END (EXACT HIT) ===\n`);
       return transformCacheData(data);
     }
-    
+
     console.log(`   No exact match, trying fuzzy matching...`);
-    
+
     // Strategy 2: Fuzzy matching with all cached drugs
     console.log(`\n   Strategy 2: Intelligent fuzzy matching...`);
-    
+
     // Get all cached drug names for fuzzy comparison
     const { data: allCachedDrugs, error: fetchError } = await supabase
       .from('drug_identification_cache')
       .select('id, drug_name, generic_name, completeness_score')
       .gte('completeness_score', 50)  // Only compare with quality entries
       .limit(1000);  // Reasonable limit
-    
+
     if (fetchError) {
       console.error(`❌ Failed to fetch cached drugs for fuzzy match:`, fetchError);
       console.log(`🔍 === CACHE CHECK END (ERROR) ===\n`);
       return null;
     }
-    
+
     if (!allCachedDrugs || allCachedDrugs.length === 0) {
       console.log(`❌ No cached drugs available for comparison`);
       console.log(`🔍 === CACHE CHECK END (MISS) ===\n`);
       return null;
     }
-    
+
     console.log(`   Comparing against ${allCachedDrugs.length} cached entries...`);
-    
+
     // Find best match using intelligent similarity
     let bestMatch: any = null;
     let bestScore = 0;
     const SIMILARITY_THRESHOLD = 0.75;  // Optimized threshold for accuracy
     const HIGH_CONFIDENCE_THRESHOLD = 0.90;  // Skip AI validation for very high matches
-    
+
     // Collect all candidates above threshold for debugging
-    const candidates: Array<{drug: any, score: number}> = [];
-    
+    const candidates: Array<{ drug: any, score: number }> = [];
+
     for (const cached of allCachedDrugs) {
       const scoreBrand = calculateNameSimilarity(drugName, cached.drug_name);
       const scoreGeneric = cached.generic_name ? calculateNameSimilarity(drugName, cached.generic_name) : 0;
       const score = Math.max(scoreBrand, scoreGeneric);
-      
+
       // Log top candidates for debugging
       if (score >= 0.5) {  // Log anything above 50% similarity
         candidates.push({ drug: cached, score });
@@ -377,7 +377,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
         bestMatch = cached;
       }
     }
-    
+
     // Sort and log top candidates for debugging
     if (candidates.length > 0) {
       candidates.sort((a, b) => b.score - a.score);
@@ -387,14 +387,14 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
         console.log(`      ${marker} ${i + 1}. "${c.drug.drug_name}" - ${(c.score * 100).toFixed(1)}% match`);
       });
     }
-    
+
     if (bestMatch) {
       console.log(`\n🎯 FUZZY MATCH FOUND (ABOVE ${(SIMILARITY_THRESHOLD * 100).toFixed(0)}% THRESHOLD)!`);
       console.log(`   Input: "${drugName}"`);
       console.log(`   Matched: "${bestMatch.drug_name}"`);
       console.log(`   Similarity: ${(bestScore * 100).toFixed(1)}%`);
       console.log(`   Completeness: ${bestMatch.completeness_score}%`);
-      
+
       // Optimize AI validation: Skip for very high similarity matches (90%+)
       if (bestScore >= HIGH_CONFIDENCE_THRESHOLD) {
         console.log(`\n🚀 SKIPPING AI VALIDATION - High confidence match (${(bestScore * 100).toFixed(1)}%)`);
@@ -407,7 +407,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
           bestMatch.drug_name,
           bestMatch.generic_name
         );
-        
+
         // Only accept cache hit if AI confirms it's the SAME drug
         if (!aiValidation.isSame) {
           console.log(`\n❌ AI REJECTED CACHE HIT!`);
@@ -417,30 +417,30 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
           console.log(`🔍 === CACHE CHECK END (AI REJECTED) ===\n`);
           return null;
         }
-        
+
         console.log(`\n✅ AI VALIDATED CACHE HIT!`);
         console.log(`   AI Confidence: ${(aiValidation.confidence * 100).toFixed(1)}%`);
         console.log(`   Reasoning: ${aiValidation.reasoning}`);
       }
-      
+
       // Fetch full data for the matched drug
       const { data: fullData, error: fullError } = await supabase
         .from('drug_identification_cache')
         .select('*')
         .eq('id', bestMatch.id)
         .single();
-      
+
       if (fullError || !fullData) {
         console.error(`❌ Failed to fetch full data for matched drug`);
         console.log(`🔍 === CACHE CHECK END (ERROR) ===\n`);
         return null;
       }
-      
+
       console.log(`✅ Full data retrieved successfully`);
       console.log(`🔍 === CACHE CHECK END (AI-VALIDATED HIT) ===\n`);
       return transformCacheData(fullData);
     }
-    
+
     console.log(`❌ No fuzzy match found (best score: ${(bestScore * 100).toFixed(1)}%)`);
     console.log(`🔍 === CACHE CHECK END (MISS) ===\n`);
     return null;
@@ -460,7 +460,7 @@ export async function checkDrugCache(drugName: string): Promise<any | null> {
 export async function saveDrugToCache(drugData: any): Promise<void> {
   try {
     const drugName = drugData.name;
-    
+
     if (!drugName || drugName === 'Unknown Medication' || drugName.toLowerCase().includes('unknown')) {
       console.log('Skipping cache save for unknown drug');
       return;
@@ -472,7 +472,7 @@ export async function saveDrugToCache(drugData: any): Promise<void> {
     fields.forEach(field => {
       if (drugData[field] && String(drugData[field]).trim().length > 5) completeness += 12;
     });
-    
+
     const arrayFields = ['sideEffects', 'warnings', 'interactions', 'indications', 'contraindications'];
     arrayFields.forEach(field => {
       if (Array.isArray(drugData[field]) && drugData[field].length > 0) completeness += 8;
@@ -518,7 +518,7 @@ export async function saveDrugToCache(drugData: any): Promise<void> {
     console.log(`📤 Calling save_drug_to_cache RPC...`);
     console.log(`   Drug name: ${drugName}`);
     console.log(`   Completeness: ${completeness}%`);
-    
+
     const { data, error } = await supabase.rpc('save_drug_to_cache', {
       p_drug_name: drugName,
       p_drug_data: cacheData
