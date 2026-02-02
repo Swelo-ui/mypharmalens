@@ -26,6 +26,10 @@ const corsHeaders = {
 const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
+// Supabase configuration - CRITICAL for API calls
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+
 // COST-OPTIMIZED MODEL SELECTION:
 // - OCR Stage: Full Gemini 2.5 Flash (best extraction power - crucial for accuracy)
 // - Other Stages: Gemini 2.5 Flash Lite (validation, web scraping, correction - 50% cheaper)
@@ -834,9 +838,7 @@ function enrichResponseMetadata(
   } as EnrichedResponse;
 }
 
-// Import functions from enhanced-drug-identify for reuse
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
+// Functions for local database search (uses SUPABASE_URL and SUPABASE_ANON_KEY from top of file)
 
 async function checkLocalDatabase(drugName: string, threshold: number = 0.75): Promise<unknown> {
   try {
