@@ -525,6 +525,18 @@ const DrugIdentify = () => {
         } else if (drugData?.success === false) {
           // Function executed but couldn't identify the drug
           console.warn(`${analysisMode} identification failed:`, drugData.error);
+
+          if (drugData.data?.retakeRecommended) {
+            toast.error("Low Image Quality Detected", {
+              description: "Please ensure the brand name is clearly visible and in focus.",
+              duration: 5000,
+            });
+
+            throw new Error(
+              "Safety Protocol: Identification process halted due to insufficient image clarity. To ensure medical accuracy, please retake the photo with better lighting and focus on the text."
+            );
+          }
+
           throw new Error(drugData.error || 'Unable to identify this medication. Please try again with a clearer image.');
         } else {
           // Unexpected response format
