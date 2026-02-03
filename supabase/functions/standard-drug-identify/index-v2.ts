@@ -113,18 +113,19 @@ async function performVisionOCR(imageBase64: string): Promise<VisionResult | nul
 
     const prompt = `You are a pharmaceutical OCR expert. Analyze this medicine image carefully.
 
-EXTRACT ALL VISIBLE INFORMATION:
-- Product/Brand name (most important - look for largest text)
+EXTRACT ONLY VISIBLE IDENTITY INFORMATION:
+- Product/Brand name (most important)
 - Generic/Active ingredient name
 - Manufacturer/Company name
-- Strength/Dosage (e.g., "500mg", "10mg")
-- Dosage form (tablet, capsule, syrup, etc.)
-- Category (antibiotic, painkiller, antacid, etc.)
-- Physical appearance (color, shape)
+- Strength/Dosage (e.g., "500mg")
+- Dosage form (tablet, syrup, etc.)
+- Physical appearance (color, shape) of the pill/package
 - Any visible codes/imprints
 - Expiry date, Manufacturing date
 - Batch/Lot number
 - MRP price
+
+DO NOT GENERATE GENERAL DESCRIPTIONS OR USAGE INFO. FOCUS ON EXTRACTING TEXT.
 
 HANDLING DIFFICULT IMAGES:
 - If image is torn/cut: extract what's visible, infer the rest
@@ -132,27 +133,25 @@ HANDLING DIFFICULT IMAGES:
 - If partially visible: make educated guesses based on pharmaceutical knowledge
 
 CONFIDENCE SCORING (0-100):
-- 90-100: Clear image, all text readable
-- 70-89: Mostly readable, some inference
-- 50-69: Significant inference required
-- Below 50: Very difficult, low confidence
+- 90-100: Clear
+- 70-89: Mostly readable
+- 50-69: Inference used
+- Below 50: Low confidence
 
-CRITICAL: Return ONLY valid JSON, no markdown, no explanations:
+CRITICAL: Return ONLY valid JSON:
 {
   "name": "Product name",
   "genericName": "Active ingredient",
   "manufacturer": "Company name",
   "strength": "Dosage strength",
-  "dosageForm": "tablet/capsule/syrup/etc",
-  "category": "drug category",
-  "description": "Brief description of what it's used for",
-  "color": "medicine color",
-  "shape": "tablet shape",
-  "imprint": "any codes/markings",
-  "expDate": "expiry date if visible",
-  "mfgDate": "manufacturing date if visible",
-  "batchNumber": "batch/lot number if visible",
-  "mrp": "price if visible",
+  "dosageForm": "dosage form",
+  "color": "visual color",
+  "shape": "visual shape",
+  "imprint": "codes/markings",
+  "expDate": "date string",
+  "mfgDate": "date string",
+  "batchNumber": "batch string",
+  "mrp": "price string",
   "confidence": 0-100,
   "ocrText": "all visible text extracted"
 }`;
