@@ -736,8 +736,8 @@ Return ONLY JSON:`;
         model: VALIDATION_MODEL, // Use LITE model for validation (cost savings)
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 500, // Raised from 300 to prevent JSON truncation
-        stop: ["}"] // Stop immediately when JSON ends
+        max_tokens: 500 // Raised from 300 to prevent JSON truncation
+        // REMOVED: stop: ["}"] - causes premature truncation on nested JSON objects
       })
     });
 
@@ -1226,8 +1226,8 @@ Return ONLY valid JSON. Be thorough but accurate.`;
         }],
         temperature: 0.1, // Low temperature for accuracy
         max_tokens: 1000, // Raised from 700 to prevent JSON truncation (finish_reason: length)
-        top_p: 0.9,
-        stop: ["}"] // CRITICAL: Stop immediately when JSON ends to prevent extra tokens
+        top_p: 0.9
+        // REMOVED: stop: ["}"] - causes premature truncation on nested JSON objects
       })
     });
 
@@ -1378,8 +1378,8 @@ Return ONLY valid JSON with corrected and validated data.`;
         }],
         temperature: 0.05, // Very low temperature for accuracy
         max_tokens: 1000, // Raised from 800 to prevent JSON truncation (finish_reason: length)
-        top_p: 0.8,
-        stop: ["}"] // CRITICAL: Stop immediately when JSON ends to prevent extra tokens
+        top_p: 0.8
+        // REMOVED: stop: ["}"] - causes premature truncation on nested JSON objects
       })
     });
 
