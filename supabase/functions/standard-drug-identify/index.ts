@@ -219,8 +219,8 @@ ${validation.missingFields.map(field => {
         model: WEB_SCRAPING_MODEL,
         messages: [{ role: 'user', content: enhancementPrompt }],
         temperature: 0.1,
-        max_tokens: 1200, // Larger for comprehensive data
-        stop: ["}"] // Stop at JSON end
+        max_tokens: 2000, // Increased for comprehensive pharmaceutical data
+        response_format: { type: 'json_object' }  // Proper JSON mode instead of stop sequence
       })
     });
 
@@ -275,6 +275,71 @@ ${validation.missingFields.map(field => {
     console.error(`❌ Pharmaceutical enhancement failed:`, error);
     return data;
   }
+}
+
+/**
+ * UNIFIED SUCCESS RESPONSE CREATOR
+ * Single function that handles: enrichment + pharmaceutical enhancement + response creation
+ * This ensures ALL successful responses go through pharmaceutical enhancement automatically.
+ * Reduces code duplication from 4+ scattered calls to 1 centralized function.
+ */
+interface SuccessResponseParams {
+  data: DrugData | ScrapedDrugData;
+  stages: ProcessingStage[];
+  preProcessingResult: PreProcessingResult;
+  overallStartTime: number;
+  confidence: 'high' | 'medium' | 'low';
+  fallbackUsed: boolean;
+  drugName: string;
+  genericName?: string;
+  janaushadhiResult?: JanaushadhiMatch;
+}
+
+async function createEnhancedSuccessResponse(params: SuccessResponseParams): Promise<Response> {
+  const {
+    data,
+    stages,
+    preProcessingResult,
+    overallStartTime,
+    confidence,
+    fallbackUsed,
+    drugName,
+    genericName,
+    janaushadhiResult
+  } = params;
+
+  // Step 1: Enrich with metadata
+  const enrichedData = enrichResponseMetadata(
+    data as DrugData,
+    stages,
+    preProcessingResult,
+    overallStartTime
+  );
+
+  // Step 2: Add Janaushadhi alternative if available
+  if (janaushadhiResult?.found) {
+    (enrichedData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
+  }
+
+  // Step 3: Apply pharmaceutical knowledge enhancement (CRITICAL for complete data)
+  const enhancedData = await enhanceWithPharmaceuticalKnowledge(
+    enrichedData as DrugData,
+    (data as DrugData).name || drugName,
+    (data as DrugData).genericName || genericName
+  );
+
+  // Step 4: Create final response
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: enhancedData,
+      processingStages: stages.map(s => s.name),
+      confidence,
+      fallbackUsed,
+      processingTime: Date.now() - overallStartTime
+    }),
+    { headers: corsHeaders }
+  );
 }
 
 // deno-lint-ignore no-explicit-any
@@ -1659,13 +1724,15 @@ Deno.serve(async (req: Request) => {
           console.log(`\n✅ Critical Vision Analysis handled challenging image successfully!`);
           console.log(`=`.repeat(80));
 
-          return createResponse({
-            success: true,
-            data: enrichedData,
-            processingStages: stages.map(s => s.name),
+          return await createEnhancedSuccessResponse({
+            data: { ...criticalStage.data, criticalAnalysisUsed: true, challengingImageHandled: true },
+            stages,
+            preProcessingResult,
+            overallStartTime,
             confidence: criticalStage.confidence >= 80 ? 'high' : 'medium',
             fallbackUsed: true,
-            processingTime: Date.now() - overallStartTime
+            drugName,
+            genericName
           });
         } else {
           console.log(`⚠️ Critical Vision Analysis ran but confidence too low (${criticalStage.confidence}%)`);
@@ -1744,21 +1811,15 @@ Deno.serve(async (req: Request) => {
                   processingTime: Date.now() - overallStartTime
                 });
 
-                // Enrich comprehensive fallback data with metadata  
-                const enrichedComprehensiveData = enrichResponseMetadata(
-                  multiSourceData.data,
+                return await createEnhancedSuccessResponse({
+                  data: multiSourceData.data,
                   stages,
                   preProcessingResult,
-                  overallStartTime
-                );
-
-                return createResponse({
-                  success: true,
-                  data: enrichedComprehensiveData,
-                  processingStages: stages.map(s => s.name),
+                  overallStartTime,
                   confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
                   fallbackUsed: true,
-                  processingTime: Date.now() - overallStartTime
+                  drugName: multiSourceData.data.name || drugName,
+                  genericName: multiSourceData.data.genericName || genericName
                 });
               } else {
                 console.log(`⚠️ Multi-source data quality moderate (${completeness}%), will try to improve with AI`);
@@ -1923,30 +1984,20 @@ Deno.serve(async (req: Request) => {
           processingTime: Date.now() - overallStartTime
         });
 
-        // For cache hits, immediately enrich and return - no need for further processing
-        const enrichedCacheData = enrichResponseMetadata(
-          hitData,
-          stages,
-          preProcessingResult,
-          overallStartTime
-        );
-
-        // 🏥 Add Janaushadhi alternative to response
-        if (janaushadhiResult.found) {
-          (enrichedCacheData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
-        }
-
         console.log(`🚀 IMMEDIATE CACHE RETURN - No further processing needed`);
         console.log(`   Cache completeness: ${hitData.completeness || hitData.cacheCompleteness || 'Unknown'}%`);
         console.log(`   Processing time: ${Date.now() - overallStartTime}ms`);
 
-        return createResponse({
-          success: true,
-          data: enrichedCacheData,
-          processingStages: stages.map(s => s.name),
+        return await createEnhancedSuccessResponse({
+          data: hitData,
+          stages,
+          preProcessingResult,
+          overallStartTime,
           confidence: 'high',
           fallbackUsed: false,
-          processingTime: Date.now() - overallStartTime
+          drugName: hitData.name || drugName,
+          genericName: hitData.genericName || genericName,
+          janaushadhiResult
         });
       }
 
@@ -1987,39 +2038,24 @@ Deno.serve(async (req: Request) => {
           processingTime: Date.now() - overallStartTime
         });
 
-        const enrichedLocalData = enrichResponseMetadata(
-          dbHit.data as DrugData,
-          stages,
-          preProcessingResult,
-          overallStartTime
-        );
-
-        // 🏥 Add Janaushadhi alternative to response
-        if (janaushadhiResult.found) {
-          (enrichedLocalData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
-        }
-
-        // ⚡ OPTIMIZED EXIT CHECK - More lenient for database hits
+        // ⚡ Use unified response creator for DB hits
         const dbData = dbHit.data as DrugData;
+        const dbConfidence = dbHit.thresh! >= 0.90 ? 'high' : 'medium';
+
         if (shouldEarlyExit(dbData) || (dbHit.thresh! >= 0.85 && dbData.name && dbData.genericName)) {
           console.log(`🎯 FAST DB RETURN: ${dbHit.thresh! >= 0.85 ? 'High' : 'Good'} confidence match`);
-          return createResponse({
-            success: true,
-            data: enrichedLocalData,
-            processingStages: stages.map(s => s.name),
-            confidence: dbHit.thresh! >= 0.90 ? 'high' : 'medium',
-            fallbackUsed: false,
-            processingTime: Date.now() - overallStartTime
-          });
         }
 
-        return createResponse({
-          success: true,
-          data: enrichedLocalData,
-          processingStages: stages.map(s => s.name),
-          confidence: dbHit.thresh! >= 0.90 ? 'high' : 'medium',
+        return await createEnhancedSuccessResponse({
+          data: dbData,
+          stages,
+          preProcessingResult,
+          overallStartTime,
+          confidence: dbConfidence as 'high' | 'medium' | 'low',
           fallbackUsed: false,
-          processingTime: Date.now() - overallStartTime
+          drugName: matchedDrugName || drugName,
+          genericName: matchedGenericName || genericName,
+          janaushadhiResult
         });
       }
 
@@ -2075,41 +2111,22 @@ Deno.serve(async (req: Request) => {
         }
 
         const limitedData = limitDataForStandardMode(oneMgResult.data);
+        const oneMgConfidence = (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 80) ? 'high' : 'medium';
 
-        // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields with AI knowledge
-        const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
-          limitedData as DrugData,
-          oneMgResult.data.name || drugName,
-          oneMgResult.data.genericName || genericName
-        );
-
-        const enrichedData = enrichResponseMetadata(enhancedWithPharmaKnowledge as any, stages, preProcessingResult, overallStartTime);
-
-        // 🏥 Add Janaushadhi alternative
-        if (janaushadhiResult && janaushadhiResult.found) {
-          (enrichedData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
-        }
-
-        // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
         if (shouldEarlyExit(limitedData) || (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 70)) {
           console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${oneMgResult.data.dataQuality || 'Unknown'}%`);
-          return createResponse({
-            success: true,
-            data: enrichedData,
-            processingStages: stages.map(s => s.name),
-            confidence: (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 80) ? 'high' : 'medium',
-            fallbackUsed: true,
-            processingTime: Date.now() - overallStartTime
-          });
         }
 
-        return createResponse({
-          success: true,
-          data: enrichedData,
-          processingStages: stages.map(s => s.name),
-          confidence: (oneMgResult.data.dataQuality && oneMgResult.data.dataQuality > 80) ? 'high' : 'medium',
+        return await createEnhancedSuccessResponse({
+          data: limitedData as DrugData,
+          stages,
+          preProcessingResult,
+          overallStartTime,
+          confidence: oneMgConfidence as 'high' | 'medium' | 'low',
           fallbackUsed: true,
-          processingTime: Date.now() - overallStartTime
+          drugName: oneMgResult.data.name || drugName,
+          genericName: oneMgResult.data.genericName || genericName,
+          janaushadhiResult
         });
       } else {
         stages.push({ name: '1mg-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
@@ -2141,41 +2158,22 @@ Deno.serve(async (req: Request) => {
         }
 
         const limitedData = limitDataForStandardMode(medlinePlusResult.data);
+        const medlineConfidence = (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 80) ? 'high' : 'medium';
 
-        // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields with AI knowledge
-        const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
-          limitedData as DrugData,
-          medlinePlusResult.data.name || drugName,
-          medlinePlusResult.data.genericName || genericName
-        );
-
-        const enrichedData = enrichResponseMetadata(enhancedWithPharmaKnowledge as any, stages, preProcessingResult, overallStartTime);
-
-        // 🏥 Add Janaushadhi alternative
-        if (janaushadhiResult && janaushadhiResult.found) {
-          (enrichedData as DrugData & { janaushadhiAlternative?: JanaushadhiMatch }).janaushadhiAlternative = janaushadhiResult;
-        }
-
-        // ⚡ OPTIMIZED EXIT CHECK - More balanced for scraped data
         if (shouldEarlyExit(limitedData) || (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 70)) {
           console.log(`🕷️ FAST SCRAPING RETURN: Quality score ${medlinePlusResult.data.dataQuality || 'Unknown'}%`);
-          return createResponse({
-            success: true,
-            data: enrichedData,
-            processingStages: stages.map(s => s.name),
-            confidence: (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 80) ? 'high' : 'medium',
-            fallbackUsed: true,
-            processingTime: Date.now() - overallStartTime
-          });
         }
 
-        return createResponse({
-          success: true,
-          data: enrichedData,
-          processingStages: stages.map(s => s.name),
-          confidence: (medlinePlusResult.data.dataQuality && medlinePlusResult.data.dataQuality > 80) ? 'high' : 'medium',
+        return await createEnhancedSuccessResponse({
+          data: limitedData as DrugData,
+          stages,
+          preProcessingResult,
+          overallStartTime,
+          confidence: medlineConfidence as 'high' | 'medium' | 'low',
           fallbackUsed: true,
-          processingTime: Date.now() - overallStartTime
+          drugName: medlinePlusResult.data.name || drugName,
+          genericName: medlinePlusResult.data.genericName || genericName,
+          janaushadhiResult
         });
       } else {
         stages.push({ name: 'medlineplus-intelligent-scraping', success: false, data: null, processingTime: Date.now() - overallStartTime });
@@ -2217,28 +2215,15 @@ Deno.serve(async (req: Request) => {
                 processingTime: Date.now() - overallStartTime
               });
 
-              // Enrich multi-source API data with metadata
-              // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
-              const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
-                multiSourceData.data as DrugData,
-                multiSourceData.data.name || drugName,
-                multiSourceData.data.genericName || genericName
-              );
-
-              const enrichedMultiSourceApiData = enrichResponseMetadata(
-                enhancedWithPharmaKnowledge as any,
+              return await createEnhancedSuccessResponse({
+                data: multiSourceData.data,
                 stages,
                 preProcessingResult,
-                overallStartTime
-              );
-
-              return createResponse({
-                success: true,
-                data: enrichedMultiSourceApiData,
-                processingStages: stages.map(s => s.name),
-                confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium'),
+                overallStartTime,
+                confidence: isVerified ? 'high' : (completeness >= 90 ? 'high' : 'medium') as 'high' | 'medium' | 'low',
                 fallbackUsed: true,
-                processingTime: Date.now() - overallStartTime
+                drugName: multiSourceData.data.name || drugName,
+                genericName: multiSourceData.data.genericName || genericName
               });
             } else {
               console.log(`⚠️ Multi-source quality low (${completeness}%), trying AI enhancement...`);
@@ -2292,33 +2277,21 @@ Deno.serve(async (req: Request) => {
             processingTime: Date.now() - overallStartTime
           });
 
-          // Return AI-enhanced result with Standard Mode optimizations and metadata
-          const limitedAiData = limitDataForStandardMode({ // Standard Mode: Top 5 items only
+          // Return AI-enhanced result with Standard Mode optimizations
+          const limitedAiData = limitDataForStandardMode({
             ...aiResult.data,
             standardModeFallback: true
           });
 
-          // 🧪 PHARMACEUTICAL ENHANCEMENT: Fill in any missing critical fields
-          const enhancedWithPharmaKnowledge = await enhanceWithPharmaceuticalKnowledge(
-            limitedAiData as DrugData,
-            aiResult.data.name || drugName,
-            aiResult.data.genericName || genericName
-          );
-
-          const enrichedAiData = enrichResponseMetadata(
-            enhancedWithPharmaKnowledge as any,
+          return await createEnhancedSuccessResponse({
+            data: limitedAiData as DrugData,
             stages,
             preProcessingResult,
-            overallStartTime
-          );
-
-          return createResponse({
-            success: true,
-            data: enrichedAiData,
-            processingStages: stages.map(s => s.name),
-            confidence: aiResult.data.confidence || 'medium',
+            overallStartTime,
+            confidence: (aiResult.data.confidence || 'medium') as 'high' | 'medium' | 'low',
             fallbackUsed: true,
-            processingTime: Date.now() - overallStartTime
+            drugName: aiResult.data.name || drugName,
+            genericName: aiResult.data.genericName || genericName
           });
         } else {
           console.log(`⚠️ AI enhancement returned unknown or no data`);
