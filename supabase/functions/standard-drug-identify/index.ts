@@ -133,16 +133,17 @@ STEP 2: EXTRACT VISIBLE IDENTITY INFORMATION
 
 DO NOT GENERATE GENERAL DESCRIPTIONS OR USAGE INFO. FOCUS ON EXTRACTING TEXT.
 
-HANDLING DIFFICULT IMAGES:
-- If image is torn/cut: extract what's visible, infer the rest
-- If blurry: use context clues and common drug patterns
-- If partially visible: make educated guesses based on pharmaceutical knowledge
+HANDLING DIFFICULT IMAGES (CRITICAL):
+- If image is blurry/unclear: DO NOT RETURN "Unknown". Make your BEST GUESS based on visible letters.
+- Partial Text: If you see "Do..650", infer "Dolo 650".
+- Prioritize extracting *any* potential name over rejecting the image.
+- It is better to be slightly wrong (which we can correct) than to return nothing.
 
 CONFIDENCE SCORING (0-100):
-- 90-100: Clear
-- 70-89: Mostly readable
-- 50-69: Inference used
-- Below 50: Low confidence
+- 90-100: Crystal clear
+- 60-89: Readable but slightly blurry
+- 30-59: Blurry/Partial but guessed (ACCEPTABLE)
+- Below 30: Unreadable
 
 CRITICAL: Return ONLY valid JSON:
 {
@@ -543,7 +544,11 @@ Deno.serve(async (req: Request) => {
       processingTime: Date.now() - startTime
     });
 
-    if (!visionResult || !visionResult.name || visionResult.name.toLowerCase() === 'unknown') {
+    const isNameUnknown = !visionResult || !visionResult.name || visionResult.name.toLowerCase() === 'unknown';
+    const isGenericUnknown = !visionResult || !visionResult.genericName || visionResult.genericName.toLowerCase() === 'unknown';
+
+    // FAIL-SAFE: Only stop if BOTH name and generic are unknown
+    if (isNameUnknown && isGenericUnknown) {
       console.log('⚠️ Vision OCR failed to identify drug name');
 
       // Return helpful error with retake suggestion
