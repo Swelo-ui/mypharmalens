@@ -24,7 +24,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
 // Models
-const VISION_MODEL = 'google/gemini-2.5-flash';          // Best for OCR
+const VISION_MODEL = 'google/gemini-2.5-flash-lite';          // Best balance of Speed/Cost
 const ENHANCEMENT_MODEL = 'google/gemini-2.5-flash-lite'; // For knowledge enhancement
 
 // ============================================================================
@@ -113,7 +113,13 @@ async function performVisionOCR(imageBase64: string): Promise<VisionResult | nul
 
   const prompt = `You are a pharmaceutical OCR expert. Analyze this medicine image carefully.
 
-EXTRACT ONLY VISIBLE IDENTITY INFORMATION:
+STEP 1: THINK & REASON
+- First, analyze the image quality, text clarity, and orientation.
+- Identify the most prominent text (likely the Brand Name).
+- Distinguish between Brand Name and Generic Name based on font size/style.
+- Assess confidence based on visibility.
+
+STEP 2: EXTRACT VISIBLE IDENTITY INFORMATION
 - Product/Brand name (most important)
 - Generic/Active ingredient name
 - Manufacturer/Company name
@@ -140,6 +146,7 @@ CONFIDENCE SCORING (0-100):
 
 CRITICAL: Return ONLY valid JSON:
 {
+  "_reasoning": "Brief thought process about image quality and text identification...",
   "name": "Product name",
   "genericName": "Active ingredient",
   "manufacturer": "Company name",
