@@ -513,7 +513,8 @@ Deno.serve(async (req: Request) => {
 
   try {
     // Parse request
-    const { image } = await req.json();
+    const body = await req.json();
+    const image = body.image || body.imageBase64;
 
     if (!image) {
       return createResponse({
