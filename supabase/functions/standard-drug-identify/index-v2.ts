@@ -547,9 +547,9 @@ Deno.serve(async (req: Request) => {
         const isNameUnknown = !visionResult || !visionResult.name || visionResult.name.toLowerCase() === 'unknown';
         const isGenericUnknown = !visionResult || !visionResult.genericName || visionResult.genericName.toLowerCase() === 'unknown';
 
-        // FAIL-SAFE: Only stop if BOTH name and generic are unknown
+        // FAIL-SAFE: Check if extracted data is "meaningless" (No Name + No Generic)
         if (isNameUnknown && isGenericUnknown) {
-            console.log('⚠️ Vision OCR failed to identify drug name');
+            console.log('⚠️ Vision OCR failed: No Identifiers Found (Meaningless Data Detected)');
 
             // Return helpful error with retake suggestion
             return createResponse({
