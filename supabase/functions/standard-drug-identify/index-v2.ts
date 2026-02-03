@@ -334,7 +334,7 @@ async function enhanceWithAIKnowledge(
 
     console.log(`   Missing fields: ${missingFields.join(', ')}`);
 
-    const prompt = `You are a pharmaceutical database expert. Provide comprehensive information for this medication.
+    const prompt = `You are a pharmaceutical database expert. Provide essential information for this medication.
 
 DRUG: "${drugName}"${genericName ? ` (Generic: ${genericName})` : ''}
 
@@ -343,19 +343,19 @@ ${missingFields.map(f => `- ${f}`).join('\n')}
 
 REQUIREMENTS:
 1. Use accurate pharmaceutical knowledge
-2. For arrays (sideEffects, warnings, etc.): provide 5-8 items each
-3. For text fields: provide detailed, informative content
-4. Use PLAIN TEXT only - no markdown, asterisks, or formatting
-5. NEVER use placeholder text like "Not available" or "Consult doctor"
-6. Be specific and medically accurate
+2. For arrays (sideEffects, warnings): provide top 3-5 most critical items
+3. For text fields: provide concise, clear summaries (max 2 sentences)
+4. Use PLAIN TEXT only - no markdown
+5. NEVER use placeholders ("Not available")
+6. Focus on patient safety
 
-RETURN ONLY VALID JSON WITH THE REQUESTED FIELDS:
+RETURN ONLY VALID JSON:
 {
 ${missingFields.map(field => {
         if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications'].includes(field)) {
-            return `  "${field}": ["item1", "item2", "item3", "item4", "item5"]`;
+            return `  "${field}": ["critical_item1", "critical_item2", "critical_item3"]`;
         } else {
-            return `  "${field}": "detailed information here"`;
+            return `  "${field}": "Concise summary here"`;
         }
     }).join(',\n')}
 }`;
