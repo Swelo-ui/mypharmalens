@@ -249,7 +249,7 @@ async function enrichFromSources(
   console.log(`   Variations: ${uniqueVariations.join(', ')}`);
 
   // Parallel search: Cache + Database
-  const searchPromises: Promise<{ type: 'cache' | 'db'; data: any; key: string }>[] = [];
+  const searchPromises: Promise<{ type: 'cache' | 'db'; data: unknown; key: string }>[] = [];
 
   // Cache searches
   uniqueVariations.forEach(variation => {
