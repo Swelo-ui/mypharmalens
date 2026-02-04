@@ -830,6 +830,12 @@ Deno.serve(async (req: Request) => {
     try {
         if (janaushadhiPromise) {
             const ja = await janaushadhiPromise;
+            
+            // Ensure MRP is a number to prevent "0" string issues
+            if (ja.found && ja.mrp !== undefined) {
+                ja.mrp = Number(ja.mrp);
+            }
+
             // ALWAYS attach the result so frontend knows we checked
             drugData.janaushadhiAlternative = ja;
             
@@ -843,6 +849,8 @@ Deno.serve(async (req: Request) => {
                     saved: ja.savings,
                     description: ja.advice,
                     drugCode: ja.drugCode,
+                    strength: ja.strength,
+                    formulation: ja.formulation,
                     isJanaushadhi: true,
                     type: 'Generic Alternative'
                 };

@@ -10,6 +10,8 @@ export interface JanaushadhiMatch {
     genericName?: string;
     mrp?: number;
     category?: string;
+    strength?: string;
+    formulation?: string;
     matchType?: 'ingredient' | 'fulltext' | 'exact';
     savings?: string;
     savingsAmount?: number;
@@ -96,6 +98,8 @@ export async function findJanaushadhiAlternative(
             genericName: bestMatch.generic_name,
             mrp: bestMatch.mrp,
             category: bestMatch.category,
+            strength: bestMatch.strength,
+            formulation: bestMatch.formulation,
             matchType: bestMatch.match_type,
             savings,
             savingsAmount,

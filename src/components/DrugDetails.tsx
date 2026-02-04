@@ -55,10 +55,14 @@ export interface DetailedDrugData {
   recommendations?: string[];
   janaushadhiAlternative?: {
     found: boolean;
+    drugCode?: string;
     genericName?: string;
     mrp?: number;
     savings?: string;
     advice?: string;
+    category?: string;
+    strength?: string;
+    formulation?: string;
   };
 }
 
@@ -208,62 +212,112 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
             {/* Janaushadhi Section - Always Visible */}
             {drug.janaushadhiAlternative && (
               <div className={cn(
-                "rounded-xl p-4 border mb-4 transition-all",
+                "rounded-xl border mb-6 transition-all overflow-hidden",
                 drug.janaushadhiAlternative.found
-                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                  ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
                   : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700"
               )}>
-                <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "p-2 rounded-full flex-shrink-0",
-                    drug.janaushadhiAlternative.found ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-500"
-                  )}>
-                    {drug.janaushadhiAlternative.found ? <Shield className="h-5 w-5" /> : <Info className="h-5 w-5" />}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={cn(
-                      "text-sm font-bold mb-1",
-                      drug.janaushadhiAlternative.found ? "text-green-800 dark:text-green-300" : "text-gray-700 dark:text-gray-300"
-                    )}>
-                      {drug.janaushadhiAlternative.found ? "Janaushadhi Generic Available" : "Janaushadhi Status"}
-                    </h4>
-                    
-                    {drug.janaushadhiAlternative.found ? (
-                      <>
-                        <p className="text-sm text-green-700 dark:text-green-400 mb-2">
-                          {drug.janaushadhiAlternative.genericName}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                          <span className="text-lg font-bold text-green-800 dark:text-green-300">
-                            ₹{drug.janaushadhiAlternative.mrp}
+                {drug.janaushadhiAlternative.found ? (
+                  <div className="p-5">
+                    {/* Header with Badge and Code */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-green-100 dark:bg-green-900/40 p-2.5 rounded-xl text-green-700 dark:text-green-400 shadow-sm">
+                          <Shield className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-green-900 dark:text-green-300 text-base">Janaushadhi Generic</h4>
+                          <span className="inline-flex items-center text-[10px] uppercase tracking-wider text-green-700 dark:text-green-400 font-bold bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full mt-1">
+                            Govt. Initiative
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {drug.janaushadhiAlternative.drugCode && (
+                        <div className="text-right bg-white/50 dark:bg-black/20 px-3 py-1.5 rounded-lg border border-green-100 dark:border-green-900/30">
+                          <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold block">PMBJP Code</span>
+                          <span className="font-mono text-sm font-bold text-gray-700 dark:text-gray-300">
+                            {drug.janaushadhiAlternative.drugCode}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Generic Name */}
+                    <div className="mb-4">
+                      <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Generic Name</h5>
+                      <p className="font-medium text-gray-900 dark:text-white text-lg leading-snug">
+                        {drug.janaushadhiAlternative.genericName}
+                      </p>
+                      {(drug.janaushadhiAlternative.strength || drug.janaushadhiAlternative.formulation) && (
+                        <div className="flex gap-2 mt-2">
+                           {drug.janaushadhiAlternative.strength && (
+                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                               {drug.janaushadhiAlternative.strength}
+                             </span>
+                           )}
+                           {drug.janaushadhiAlternative.formulation && (
+                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                               {drug.janaushadhiAlternative.formulation}
+                             </span>
+                           )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Price and Action */}
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white dark:bg-gray-800/60 rounded-xl p-4 border border-green-100 dark:border-green-900/30 shadow-sm">
+                      <div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Estimated Price (MRP)</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-bold text-green-700 dark:text-green-400">
+                            {drug.janaushadhiAlternative.mrp && drug.janaushadhiAlternative.mrp > 0 
+                              ? `₹${drug.janaushadhiAlternative.mrp}` 
+                              : 'Check Store'}
                           </span>
                           {drug.janaushadhiAlternative.savings && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-200 text-green-800">
+                            <span className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold bg-green-100 text-green-700 border border-green-200">
                               Save {drug.janaushadhiAlternative.savings}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-green-600 dark:text-green-400 mb-3 italic">
-                          {drug.janaushadhiAlternative.advice}
-                        </p>
-                        <a 
-                          href="https://janaushadhi.gov.in/near-by-kendra" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm whitespace-nowrap"
-                        >
-                          Find Nearest Store <Search className="ml-1 h-3 w-3" />
-                        </a>
-                      </>
-                    ) : (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        No direct match found in the Pradhan Mantri Bhartiya Janaushadhi Pariyojana database.
-                        <br />
-                        <span className="text-xs mt-1 block">You can still ask for generic equivalents at your local pharmacy.</span>
-                      </p>
+                      </div>
+                      
+                      <a 
+                        href="https://janaushadhi.gov.in/near-by-kendra" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex justify-center items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                      >
+                        Locate Store <Search className="h-4 w-4" />
+                      </a>
+                    </div>
+                    
+                    {/* Advice / Footer */}
+                    {drug.janaushadhiAlternative.advice && (
+                        <div className="mt-4 flex items-start gap-3 text-xs text-green-800 dark:text-green-300 bg-green-100/50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-900/10">
+                            <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-green-600" />
+                            <p className="leading-relaxed font-medium">{drug.janaushadhiAlternative.advice}</p>
+                        </div>
                     )}
                   </div>
-                </div>
+                ) : (
+                  <div className="p-4 flex items-start gap-3">
+                     <div className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                        <Info className="h-5 w-5" />
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                          Janaushadhi Status
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          No direct match found in the Pradhan Mantri Bhartiya Janaushadhi Pariyojana database.
+                          <br />
+                          <span className="text-xs mt-1 block opacity-80">You can still ask for generic equivalents at your local pharmacy.</span>
+                        </p>
+                     </div>
+                  </div>
+                )}
               </div>
             )}
 
