@@ -7,8 +7,8 @@
 
 const OPENROUTER_API_KEY = Deno?.env?.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const THINKING_AI_MODEL = 'google/gemini-2.5-flash'; // Advanced reasoning AI
-const WEB_SEARCH_MODEL = 'google/gemini-2.5-flash'; // Web scraping AI
+const THINKING_AI_MODEL = 'google/gemini-2.5-flash-lite'; // Advanced reasoning AI
+const WEB_SEARCH_MODEL = 'google/gemini-2.5-flash-lite'; // Web scraping AI
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 
@@ -51,34 +51,33 @@ async function planSearchStrategy(
     shape?: string;
     stripCondition?: 'torn' | 'damaged' | 'cut' | 'partial' | 'blurry' | 'good';
     visibleText?: string;
+    partialReads?: Array<{ text: string; confidence: number; likely: string }>;
   }
 ): Promise<{ searchQuery: string; strategy: string; confidence: number; reasoning?: string }> {
 
-  const prompt = `You are a pharmaceutical research AI. Analyze the partial drug information and plan an optimal web search strategy.
+  const prompt = `You are a Forensic Pharmacist. Your job is to reconstruct the identity of a medicine from incomplete fragments.
 
-AVAILABLE INFORMATION:
+AVAILABLE EVIDENCE:
 - Drug Name: ${partialInfo.drugName || 'Unknown'}
 - Generic Name: ${partialInfo.genericName || 'Unknown'}
 - Imprint/Code: ${partialInfo.imprint || 'None visible'}
-- Color: ${partialInfo.color || 'Unknown'}
-- Shape: ${partialInfo.shape || 'Unknown'}
-- Strip Condition: ${partialInfo.stripCondition || 'Unknown'}
+- Color/Shape: ${partialInfo.color || 'Unknown'} / ${partialInfo.shape || 'Unknown'}
 - Visible Text: ${partialInfo.visibleText || 'None'}
+- Partial Fragments: ${JSON.stringify(partialInfo.partialReads || [])}
 
 TASK:
-1. Analyze what information is most reliable
-2. Plan the best search strategy to find complete drug information
-3. Generate optimal search query for web search
+1. Analyze the "Partial Fragments" and "Visible Text".
+2. Deduce the likely drug name (e.g., "D..lo 6..0" -> "Dolo 650").
+3. Check if the deduced name matches the shape/color.
+4. Formulate a search strategy to confirm this hypothesis.
 
 RETURN JSON:
 {
-  "searchQuery": "Best search query to find this drug",
-  "strategy": "Explanation of search strategy",
+  "searchQuery": "Reconstructed Name OR Best Guess",
+  "strategy": "Forensic reconstruction logic...",
   "confidence": 0.0-1.0,
-  "reasoning": "Step-by-step thinking process"
-}
-
-Think through this carefully and return ONLY valid JSON.`;
+  "reasoning": "Step-by-step deduction..."
+}`;
 
   try {
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
@@ -225,6 +224,7 @@ export async function performIntelligentWebSearch(
     shape?: string;
     stripCondition?: 'torn' | 'damaged' | 'cut' | 'partial' | 'blurry' | 'good';
     visibleText?: string;
+    partialReads?: Array<{ text: string; confidence: number; likely: string }>;
     completeness?: number;
   }
 ): Promise<WebSearchResult> {
@@ -309,6 +309,12 @@ export function shouldUseIntelligentWebSearch(
   visionResult: any,
   completeness?: number
 ): boolean {
+
+  // Trigger if confidence is low (< 70%)
+  if (visionResult?.confidenceScore !== undefined && visionResult.confidenceScore < 70) {
+    console.log(`\n⚠️ Low Confidence (${visionResult.confidenceScore}%) → Forensic Analysis Triggered`);
+    return true;
+  }
 
   // Trigger if strip is damaged/torn
   if (visionResult?.stripCondition &&

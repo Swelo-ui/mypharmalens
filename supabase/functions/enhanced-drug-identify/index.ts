@@ -127,6 +127,7 @@ interface CriticalVisionData {
   activeIngredients?: string[];
   packSize?: string;
   manufacturerAddress?: string;
+  partialReads?: Array<{ text: string; confidence: number; likely: string }>;
 }
 
 type UnknownRecord = Record<string, unknown>;
@@ -295,7 +296,8 @@ async function enrichData(
         genericName: currentData.genericName,
         imprint: currentData.imprint,
         stripCondition: mapPhysicalConditionToStripCondition(visionResult.physicalCondition),
-        visibleText: visionResult.rawOcrText
+        visibleText: visionResult.rawOcrText,
+        partialReads: visionResult.partialReads || []
     });
 
     if (searchResult.success && searchResult.drugInfo) {
