@@ -247,10 +247,10 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                           {drug.janaushadhiAlternative.advice}
                         </p>
                         <a 
-                          href="http://janaushadhi.gov.in/StoreDetails.aspx" 
+                          href="https://janaushadhi.gov.in/near-by-kendra" 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                          className="inline-flex items-center text-xs font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm whitespace-nowrap"
                         >
                           Find Nearest Store <Search className="ml-1 h-3 w-3" />
                         </a>
