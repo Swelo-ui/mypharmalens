@@ -1,3 +1,6 @@
+---
+alwaysApply: false
+---
 [byterover-mcp]
 
 [byterover-mcp]
