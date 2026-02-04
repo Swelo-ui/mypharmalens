@@ -1,5 +1,8 @@
 import "xhr";
-declare const Deno: any;
+declare const Deno: {
+  env: { get: (key: string) => string | undefined };
+  serve: (handler: (req: Request) => Promise<Response>) => void;
+};
 import { checkDrugCacheWithValidation } from './cache-integration.ts';
 import { cleanText, cleanTextArray, normalizeDrugName, generateNameAliases } from '../_shared/text-cleaner.ts';
 import { findJanaushadhiAlternative, JanaushadhiMatch } from '../_shared/janaushadhi-lookup.ts';
@@ -61,6 +64,7 @@ interface DrugData {
   dataSource?: string;
   processingTime?: number;
   janaushadhiAlternative?: JanaushadhiMatch;
+  alternatives?: Record<string, unknown>[];
 }
 
 interface VisionResult {
@@ -245,7 +249,7 @@ async function enrichFromSources(
   console.log(`   Variations: ${uniqueVariations.join(', ')}`);
 
   // Parallel search: Cache + Database
-  const searchPromises: Promise<{ type: 'cache' | 'db'; data: any; key: string }>[] = [];
+  const searchPromises: Promise<{ type: 'cache' | 'db'; data: unknown; key: string }>[] = [];
 
   // Cache searches
   uniqueVariations.forEach(variation => {
@@ -280,7 +284,7 @@ async function enrichFromSources(
   return null;
 }
 
-async function searchLocalDatabase(drugName: string): Promise<any> {
+async function searchLocalDatabase(drugName: string): Promise<unknown> {
   const normalizedName = normalizeDrugName(drugName);
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/search_drugs_by_name`, {
@@ -399,11 +403,11 @@ ${missingFields.map(field => {
           const value = enhancement[field];
           if (value) {
             if (Array.isArray(value) && value.length > 0) {
-              (partialData as any)[field] = cleanTextArray(value);
+              (partialData as Record<string, unknown>)[field] = cleanTextArray(value);
               enhancedCount++;
               console.log(`   ✅ Enhanced ${field}: ${value.length} items`);
             } else if (typeof value === 'string' && value.length > 10) {
-              (partialData as any)[field] = cleanText(value);
+              (partialData as Record<string, unknown>)[field] = cleanText(value);
               enhancedCount++;
               console.log(`   ✅ Enhanced ${field}`);
             }
@@ -462,39 +466,57 @@ function ensureCompleteData(
     mrp: partialData.mrp || '',
     confidence: partialData.confidence || 'medium',
     dataSource: partialData.dataSource || 'ai-analysis',
-    processingTime: partialData.processingTime
+    processingTime: partialData.processingTime,
+    alternatives: partialData.alternatives || []
   };
 }
 
-function normalizeToDrugData(data: any, confidence: 'high' | 'medium' | 'low'): DrugData {
+function getString(obj: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const value = obj[key];
+    if (typeof value === 'string') return value;
+  }
+  return '';
+}
+
+function getStringArray(obj: Record<string, unknown>, keys: string[]): string[] {
+  for (const key of keys) {
+    const value = obj[key];
+    if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string');
+  }
+  return [];
+}
+
+function normalizeToDrugData(inputData: unknown, confidence: 'high' | 'medium' | 'low'): DrugData {
+  const data = (inputData || {}) as Record<string, unknown>;
   return {
-    id: data.id || crypto.randomUUID(),
-    name: data.name || data.drug_name || '',
-    genericName: data.genericName || data.generic_name || '',
-    manufacturer: data.manufacturer || '',
-    category: data.category || data.drug_class || '',
-    description: data.description || '',
-    strength: data.strength || '',
-    dosageForm: data.dosageForm || data.dosage_form || '',
-    dosageAndAdmin: data.dosageAndAdmin || data.dosage_and_admin || '',
-    mechanism: data.mechanism || data.mechanism_of_action || '',
-    sideEffects: cleanTextArray(data.sideEffects || data.side_effects || []),
-    warnings: cleanTextArray(data.warnings || []),
-    interactions: cleanTextArray(data.interactions || data.drug_interactions || []),
-    indications: cleanTextArray(data.indications || data.uses || []),
-    contraindications: cleanTextArray(data.contraindications || []),
-    pregnancy: data.pregnancy || data.pregnancy_category || '',
-    storage: data.storage || data.storage_conditions || '',
-    prescriptionStatus: data.prescriptionStatus || data.prescription_status || '',
-    color: data.color || '',
-    shape: data.shape || '',
-    imprint: data.imprint || '',
-    expDate: data.expDate || data.exp_date || '',
-    mfgDate: data.mfgDate || data.mfg_date || '',
-    batchNumber: data.batchNumber || data.batch_number || '',
-    mrp: data.mrp || '',
+    id: getString(data, ['id']) || crypto.randomUUID(),
+    name: getString(data, ['name', 'drug_name']),
+    genericName: getString(data, ['genericName', 'generic_name']),
+    manufacturer: getString(data, ['manufacturer']),
+    category: getString(data, ['category', 'drug_class']),
+    description: getString(data, ['description']),
+    strength: getString(data, ['strength']),
+    dosageForm: getString(data, ['dosageForm', 'dosage_form']),
+    dosageAndAdmin: getString(data, ['dosageAndAdmin', 'dosage_and_admin']),
+    mechanism: getString(data, ['mechanism', 'mechanism_of_action']),
+    sideEffects: cleanTextArray(getStringArray(data, ['sideEffects', 'side_effects'])),
+    warnings: cleanTextArray(getStringArray(data, ['warnings'])),
+    interactions: cleanTextArray(getStringArray(data, ['interactions', 'drug_interactions'])),
+    indications: cleanTextArray(getStringArray(data, ['indications', 'uses'])),
+    contraindications: cleanTextArray(getStringArray(data, ['contraindications'])),
+    pregnancy: getString(data, ['pregnancy', 'pregnancy_category']),
+    storage: getString(data, ['storage', 'storage_conditions']),
+    prescriptionStatus: getString(data, ['prescriptionStatus', 'prescription_status']),
+    color: getString(data, ['color']),
+    shape: getString(data, ['shape']),
+    imprint: getString(data, ['imprint']),
+    expDate: getString(data, ['expDate', 'exp_date']),
+    mfgDate: getString(data, ['mfgDate', 'mfg_date']),
+    batchNumber: getString(data, ['batchNumber', 'batch_number']),
+    mrp: getString(data, ['mrp']),
     confidence,
-    dataSource: data.dataSource || 'database'
+    dataSource: getString(data, ['dataSource']) || 'database'
   };
 }
 
@@ -634,6 +656,23 @@ Deno.serve(async (req: Request) => {
           const janaushadhiResult = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
           if (janaushadhiResult.found) {
             drugData.janaushadhiAlternative = janaushadhiResult;
+            
+            // Add to alternatives list for UI visibility
+            const janaushadhiEntry = {
+                name: janaushadhiResult.genericName,
+                brand: "Janaushadhi Pariyojana",
+                manufacturer: "Bureau of Pharma PSUs of India (BPPI)",
+                price: `₹${janaushadhiResult.mrp}`,
+                saved: janaushadhiResult.savings,
+                description: janaushadhiResult.advice,
+                drugCode: janaushadhiResult.drugCode,
+                isJanaushadhi: true,
+                type: 'Generic Alternative'
+            };
+            
+            drugData.alternatives = drugData.alternatives || [];
+            drugData.alternatives.unshift(janaushadhiEntry);
+            
             console.log(`🏥 Janaushadhi alternative found: ₹${janaushadhiResult.mrp}`);
           }
       }

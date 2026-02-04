@@ -76,7 +76,7 @@ interface DrugData {
   liverWarning?: string;
   
   // Metadata
-  alternatives?: unknown[];
+  alternatives?: Record<string, unknown>[];
   imageQuality?: number;
   imageChallenges?: string[];
   retakeNeeded?: boolean;
@@ -823,6 +823,23 @@ Deno.serve(async (req: Request) => {
         const ja = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
         if (ja.found) {
             drugData.janaushadhiAlternative = ja;
+            
+            // Add to alternatives list for UI visibility
+            const janaushadhiEntry = {
+                name: ja.genericName,
+                brand: "Janaushadhi Pariyojana",
+                manufacturer: "Bureau of Pharma PSUs of India (BPPI)",
+                price: `₹${ja.mrp}`,
+                saved: ja.savings,
+                description: ja.advice,
+                drugCode: ja.drugCode,
+                isJanaushadhi: true,
+                type: 'Generic Alternative'
+            };
+            
+            drugData.alternatives = drugData.alternatives || [];
+            drugData.alternatives.unshift(janaushadhiEntry);
+
             console.log(`   🏥 Janaushadhi Found: ₹${ja.mrp}`);
         }
     }
