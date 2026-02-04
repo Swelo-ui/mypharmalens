@@ -6,10 +6,9 @@ import { findJanaushadhiAlternative, JanaushadhiMatch } from '../_shared/janaush
 import { isRateLimitError, createRateLimitResponse, logRateLimit } from '../_shared/rate-limit-handler.ts';
 
 // ============================================================================
-// STANDARD DRUG IDENTIFY V2 - SIMPLIFIED & ROBUST
+// STANDARD DRUG IDENTIFY V2 - AGGRESSIVE & ROBUST
 // ============================================================================
-// Designed for reliability over complexity
-// 4 Essential Stages: Vision → Enrich → Enhance → Response
+// Updated: Removes early safety checks, enforces "Thinking" mode, validates at the end.
 // ============================================================================
 
 const corsHeaders = {
@@ -24,8 +23,9 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
 // Models
-const VISION_MODEL = 'google/gemini-2.5-flash-lite';          // Best balance of Speed/Cost
-const ENHANCEMENT_MODEL = 'google/gemini-2.5-flash-lite'; // For knowledge enhancement
+// Using Flash-Lite for speed/cost, but with "Thinking" prompt engineering
+const VISION_MODEL = 'google/gemini-2.5-flash-lite';          
+const ENHANCEMENT_MODEL = 'google/gemini-2.5-flash-lite'; 
 
 // ============================================================================
 // TYPES
@@ -80,6 +80,7 @@ interface VisionResult {
   mrp?: string;
   confidence: number;
   ocrText?: string;
+  _thinking?: string; // Captured reasoning
 }
 
 interface ProcessingStage {
@@ -105,50 +106,37 @@ function createResponse(body: object, status = 200): Response {
 // ============================================================================
 
 async function performVisionOCR(imageBase64: string): Promise<VisionResult | null> {
-  console.log('\n📷 === STAGE 1: VISION OCR ===');
+  console.log('\n📷 === STAGE 1: VISION OCR (Aggressive Mode) ===');
 
   const cleanBase64 = imageBase64.includes('base64,')
     ? imageBase64.split('base64,')[1]
     : imageBase64;
 
-  const prompt = `You are a pharmaceutical OCR expert. Analyze this medicine image carefully.
+  // Updated Prompt: Enforces "Thinking" and allows low-confidence guesses
+  const prompt = `You are a pharmaceutical OCR expert. Your goal is to EXTRACT TEXT at all costs.
 
-STEP 1: THINK & REASON
-- First, analyze the image quality, text clarity, and orientation.
-- Identify the most prominent text (likely the Brand Name).
-- Distinguish between Brand Name and Generic Name based on font size/style.
-- Assess confidence based on visibility.
+STEP 1: THINKING MODE (Chain of Thought)
+- Analyze the image pixel-by-pixel.
+- Identify every fragment of text, even if blurry or cut off.
+- Reconstruct words from partial letters (e.g., "Do..650" -> "Dolo 650").
+- Filter out noise/logos to find the Brand Name.
+- Cross-reference visible text to deduce the most likely drug name.
 
-STEP 2: EXTRACT VISIBLE IDENTITY INFORMATION
-- Product/Brand name (most important)
-- Generic/Active ingredient name
-- Manufacturer/Company name
-- Strength/Dosage (e.g., "500mg")
-- Dosage form (tablet, syrup, etc.)
-- Physical appearance (color, shape) of the pill/package
-- Any visible codes/imprints
-- Expiry date, Manufacturing date
-- Batch/Lot number
-- MRP price
+STEP 2: EXTRACTION
+- Extract the Product/Brand Name. If unsure, output your best guess.
+- Extract the Generic Name (Active Ingredients).
+- Extract Strength, Dosage Form, Manufacturer.
 
-DO NOT GENERATE GENERAL DESCRIPTIONS OR USAGE INFO. FOCUS ON EXTRACTING TEXT.
+CRITICAL RULES:
+1. NEVER return "Unknown" if *any* text is visible. GUESS based on the "Thinking" step.
+2. It is better to return a hallucinatory name (which we will verify later) than nothing.
+3. If the image is blurry, say so in "_thinking" but still provide a name.
+4. Extract raw text into "ocrText" for fallback analysis.
 
-HANDLING DIFFICULT IMAGES (CRITICAL):
-- If image is blurry/unclear: DO NOT RETURN "Unknown". Make your BEST GUESS based on visible letters.
-- Partial Text: If you see "Do..650", infer "Dolo 650".
-- Prioritize extracting *any* potential name over rejecting the image.
-- It is better to be slightly wrong (which we can correct) than to return nothing.
-
-CONFIDENCE SCORING (0-100):
-- 90-100: Crystal clear
-- 60-89: Readable but slightly blurry
-- 30-59: Blurry/Partial but guessed (ACCEPTABLE)
-- Below 30: Unreadable
-
-CRITICAL: Return ONLY valid JSON:
+RETURN JSON ONLY:
 {
-  "_reasoning": "Brief thought process about image quality and text identification...",
-  "name": "Product name",
+  "_thinking": "Step-by-step reasoning: 1. Saw text 'P-C-M'. 2. Inferred 'PCM'. 3. Deduced 'Paracetamol'...",
+  "name": "Product name (Best Guess)",
   "genericName": "Active ingredient",
   "manufacturer": "Company name",
   "strength": "Dosage strength",
@@ -161,7 +149,7 @@ CRITICAL: Return ONLY valid JSON:
   "batchNumber": "batch string",
   "mrp": "price string",
   "confidence": 0-100,
-  "ocrText": "all visible text extracted"
+  "ocrText": "raw visible text"
 }`;
 
   try {
@@ -182,7 +170,7 @@ CRITICAL: Return ONLY valid JSON:
             { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${cleanBase64}` } }
           ]
         }],
-        temperature: 0.1,
+        temperature: 0.1, // Keep low for consistency, but prompt encourages guessing
         max_tokens: 1500,
         response_format: { type: 'json_object' }
       })
@@ -206,7 +194,6 @@ CRITICAL: Return ONLY valid JSON:
     try {
       visionData = JSON.parse(content);
     } catch {
-      // Try regex extraction as fallback
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         visionData = JSON.parse(jsonMatch[0]);
@@ -217,6 +204,7 @@ CRITICAL: Return ONLY valid JSON:
     }
 
     console.log(`✅ Vision OCR Success:`);
+    console.log(`   Thinking: ${visionData._thinking?.substring(0, 100)}...`);
     console.log(`   Name: ${visionData.name || 'Unknown'}`);
     console.log(`   Generic: ${visionData.genericName || 'Unknown'}`);
     console.log(`   Confidence: ${visionData.confidence || 0}%`);
@@ -238,6 +226,12 @@ async function enrichFromSources(
   genericName?: string
 ): Promise<DrugData | null> {
   console.log('\n🔍 === STAGE 2: DATA ENRICHMENT ===');
+  
+  if (!drugName || drugName.toLowerCase() === 'unknown') {
+      console.log('⚠️ Skipping enrichment: No valid drug name');
+      return null;
+  }
+
   console.log(`   Searching for: "${drugName}" / "${genericName || 'N/A'}"`);
 
   // Generate name variations
@@ -278,8 +272,6 @@ async function enrichFromSources(
     if (result.status === 'fulfilled' && result.value.data) {
       const { type, data, key } = result.value;
       console.log(`✅ Found in ${type}: "${key}"`);
-
-      // Normalize to DrugData format
       return normalizeToDrugData(data, 'high');
     }
   }
@@ -320,7 +312,10 @@ async function enhanceWithAIKnowledge(
   genericName?: string
 ): Promise<DrugData> {
   console.log('\n🧪 === STAGE 3: AI KNOWLEDGE ENHANCEMENT ===');
-  console.log(`   Enhancing: "${drugName}"`);
+  
+  // If name is still unknown, we can't enhance much, but we'll try
+  const targetName = drugName !== 'Unknown' ? drugName : (genericName || 'Unknown Medication');
+  console.log(`   Enhancing: "${targetName}"`);
 
   // Check which fields are missing
   const missingFields: string[] = [];
@@ -344,7 +339,7 @@ async function enhanceWithAIKnowledge(
 
   const prompt = `You are a pharmaceutical database expert. Provide essential information for this medication.
 
-DRUG: "${drugName}"${genericName ? ` (Generic: ${genericName})` : ''}
+DRUG: "${targetName}"${genericName ? ` (Generic: ${genericName})` : ''}
 
 PROVIDE INFORMATION FOR THESE FIELDS:
 ${missingFields.map(f => `- ${f}`).join('\n')}
@@ -388,7 +383,7 @@ ${missingFields.map(field => {
 
     if (!response.ok) {
       console.error(`❌ Enhancement API error: ${response.status}`);
-      return ensureCompleteData(partialData, drugName, genericName);
+      return ensureCompleteData(partialData, targetName, genericName);
     }
 
     const result = await response.json();
@@ -425,7 +420,7 @@ ${missingFields.map(field => {
     console.error('❌ Enhancement error:', error);
   }
 
-  return ensureCompleteData(partialData, drugName, genericName);
+  return ensureCompleteData(partialData, targetName, genericName);
 }
 
 // ============================================================================
@@ -437,13 +432,15 @@ function ensureCompleteData(
   drugName: string,
   genericName?: string
 ): DrugData {
+  const displayName = drugName !== 'Unknown' ? drugName : 'Unidentified Medication';
+  
   return {
     id: partialData.id || crypto.randomUUID(),
-    name: partialData.name || drugName,
+    name: partialData.name || displayName,
     genericName: partialData.genericName || genericName || '',
     manufacturer: partialData.manufacturer || '',
     category: partialData.category || 'Medication',
-    description: partialData.description || `${drugName} is a pharmaceutical product.`,
+    description: partialData.description || `${displayName} is a pharmaceutical product.`,
     strength: partialData.strength || '',
     dosageForm: partialData.dosageForm || '',
     dosageAndAdmin: partialData.dosageAndAdmin || 'Take as directed by your physician.',
@@ -515,7 +512,7 @@ Deno.serve(async (req: Request) => {
   const stages: ProcessingStage[] = [];
 
   console.log('\n' + '='.repeat(60));
-  console.log('🔬 STANDARD DRUG IDENTIFY V2');
+  console.log('🔬 STANDARD DRUG IDENTIFY V2 (AGGRESSIVE)');
   console.log('='.repeat(60));
 
   try {
@@ -533,72 +530,53 @@ Deno.serve(async (req: Request) => {
     }
 
     // ========================================================================
-    // STAGE 1: VISION OCR
+    // STAGE 1: VISION OCR (Aggressive)
     // ========================================================================
     const visionResult = await performVisionOCR(image);
 
     stages.push({
       name: 'vision-ocr',
-      success: !!visionResult?.name,
+      success: !!visionResult?.name && visionResult.name !== 'Unknown',
       data: visionResult,
       processingTime: Date.now() - startTime
     });
 
-    const isNameUnknown = !visionResult || !visionResult.name || visionResult.name.toLowerCase() === 'unknown';
-    const isGenericUnknown = !visionResult || !visionResult.genericName || visionResult.genericName.toLowerCase() === 'unknown';
-
-    // FAIL-SAFE: Check if extracted data is "meaningless" (No Name + No Generic)
-    if (isNameUnknown && isGenericUnknown) {
-      console.log('⚠️ Vision OCR failed: No Identifiers Found (Meaningless Data Detected)');
-
-      // Return helpful error with retake suggestion
-      return createResponse({
-        success: false,
-        error: 'Could not identify medication. Please try a clearer photo.',
-        data: {
-          id: crypto.randomUUID(),
-          name: 'Unknown',
-          genericName: 'Error Occurred',
-          description: 'The image could not be processed. Please ensure the medication name is clearly visible and retake the photo.',
-          confidence: 'low',
-          retakeRecommended: true,
-          retakeTips: [
-            'Ensure good lighting',
-            'Keep medication label in focus',
-            'Capture the full packaging',
-            'Avoid reflections and shadows'
-          ]
-        },
-        processingStages: stages.map(s => s.name),
-        confidence: 'low',
-        processingTime: Date.now() - startTime
-      });
-    }
-
-    const drugName = visionResult.name;
-    const genericName = visionResult.genericName;
-    console.log(`\n✅ Identified: "${drugName}" / "${genericName}"`);
+    // NOTE: Removed early failure check here. We proceed even if "Unknown".
+    
+    const drugName = visionResult?.name || 'Unknown';
+    const genericName = visionResult?.genericName;
+    console.log(`\n✅ Identified (Stage 1): "${drugName}" / "${genericName || 'N/A'}"`);
 
     // ========================================================================
     // STAGE 2: DATA ENRICHMENT (Cache + Database)
     // ========================================================================
     let drugData: DrugData | null = null;
 
-    try {
-      drugData = await enrichFromSources(drugName, genericName);
-      stages.push({
-        name: 'data-enrichment',
-        success: !!drugData,
-        data: drugData ? { source: 'cache/database' } : null,
-        processingTime: Date.now() - startTime
-      });
-    } catch (error) {
-      console.error('❌ Enrichment error:', error);
-      stages.push({
-        name: 'data-enrichment',
-        success: false,
-        processingTime: Date.now() - startTime
-      });
+    if (drugName !== 'Unknown') {
+        try {
+          drugData = await enrichFromSources(drugName, genericName);
+          stages.push({
+            name: 'data-enrichment',
+            success: !!drugData,
+            data: drugData ? { source: 'cache/database' } : null,
+            processingTime: Date.now() - startTime
+          });
+        } catch (error) {
+          console.error('❌ Enrichment error:', error);
+          stages.push({
+            name: 'data-enrichment',
+            success: false,
+            processingTime: Date.now() - startTime
+          });
+        }
+    } else {
+        console.log('⚠️ Skipping Stage 2 (Unknown Name)');
+        stages.push({
+            name: 'data-enrichment',
+            success: false,
+            data: { skipped: true },
+            processingTime: Date.now() - startTime
+        });
     }
 
     // Merge vision data into drug data if not found in cache/db
@@ -607,19 +585,19 @@ Deno.serve(async (req: Request) => {
         id: crypto.randomUUID(),
         name: drugName,
         genericName: genericName || '',
-        manufacturer: visionResult.manufacturer || '',
-        category: visionResult.category || '',
-        description: visionResult.description || '',
-        strength: visionResult.strength || '',
-        dosageForm: visionResult.dosageForm || '',
-        color: visionResult.color || '',
-        shape: visionResult.shape || '',
-        imprint: visionResult.imprint || '',
-        expDate: visionResult.expDate || '',
-        mfgDate: visionResult.mfgDate || '',
-        batchNumber: visionResult.batchNumber || '',
-        mrp: visionResult.mrp || '',
-        confidence: visionResult.confidence >= 80 ? 'high' : visionResult.confidence >= 50 ? 'medium' : 'low',
+        manufacturer: visionResult?.manufacturer || '',
+        category: visionResult?.category || '',
+        description: visionResult?.description || '',
+        strength: visionResult?.strength || '',
+        dosageForm: visionResult?.dosageForm || '',
+        color: visionResult?.color || '',
+        shape: visionResult?.shape || '',
+        imprint: visionResult?.imprint || '',
+        expDate: visionResult?.expDate || '',
+        mfgDate: visionResult?.mfgDate || '',
+        batchNumber: visionResult?.batchNumber || '',
+        mrp: visionResult?.mrp || '',
+        confidence: (visionResult?.confidence || 0) >= 80 ? 'high' : (visionResult?.confidence || 0) >= 50 ? 'medium' : 'low',
         sideEffects: [],
         warnings: [],
         interactions: [],
@@ -652,10 +630,12 @@ Deno.serve(async (req: Request) => {
     // STAGE 4: JANAUSHADHI LOOKUP + FINAL RESPONSE
     // ========================================================================
     try {
-      const janaushadhiResult = await findJanaushadhiAlternative(genericName || drugName);
-      if (janaushadhiResult.found) {
-        drugData.janaushadhiAlternative = janaushadhiResult;
-        console.log(`🏥 Janaushadhi alternative found: ₹${janaushadhiResult.mrp}`);
+      if (drugData.name !== 'Unknown' && (drugData.name || drugData.genericName)) {
+          const janaushadhiResult = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
+          if (janaushadhiResult.found) {
+            drugData.janaushadhiAlternative = janaushadhiResult;
+            console.log(`🏥 Janaushadhi alternative found: ₹${janaushadhiResult.mrp}`);
+          }
       }
     } catch (error) {
       console.error('❌ Janaushadhi lookup error:', error);
@@ -663,6 +643,32 @@ Deno.serve(async (req: Request) => {
 
     // Set processing time
     drugData.processingTime = Date.now() - startTime;
+
+    // FINAL VALIDATION: Check if we have a meaningful result
+    const isMeaningless = 
+        drugData.name === 'Unknown' && 
+        (!drugData.genericName || drugData.genericName === 'Unknown');
+
+    if (isMeaningless) {
+        console.log('⚠️ Final Result is Meaningless - Triggering Retry Suggestion');
+        return createResponse({
+            success: false,
+            error: 'Could not identify medication. Please try a clearer photo.',
+            data: {
+              ...drugData,
+              retakeRecommended: true,
+              retakeTips: [
+                'Ensure good lighting',
+                'Keep medication label in focus',
+                'Capture the full packaging',
+                'Avoid reflections and shadows'
+              ]
+            },
+            processingStages: stages.map(s => s.name),
+            confidence: 'low',
+            processingTime: drugData.processingTime
+          });
+    }
 
     // Log success
     console.log('\n' + '='.repeat(60));
