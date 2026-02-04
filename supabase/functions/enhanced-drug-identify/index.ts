@@ -827,32 +827,44 @@ Deno.serve(async (req: Request) => {
     const drugData = ensureDrugDataForUI(await enrichData(visionData, stages));
 
     // --- STAGE 3: JANAUSHADHI ---
-    if (janaushadhiPromise) {
-        const ja = await janaushadhiPromise;
-        // ALWAYS attach the result so frontend knows we checked
-        drugData.janaushadhiAlternative = ja;
-        
-        if (ja.found) {
-            // Add to alternatives list for UI visibility (legacy support)
-            const janaushadhiEntry = {
-                name: ja.genericName,
-                brand: "Janaushadhi Pariyojana",
-                manufacturer: "Bureau of Pharma PSUs of India (BPPI)",
-                price: `₹${ja.mrp}`,
-                saved: ja.savings,
-                description: ja.advice,
-                drugCode: ja.drugCode,
-                isJanaushadhi: true,
-                type: 'Generic Alternative'
-            };
+    try {
+        if (janaushadhiPromise) {
+            const ja = await janaushadhiPromise;
+            // ALWAYS attach the result so frontend knows we checked
+            drugData.janaushadhiAlternative = ja;
             
-            drugData.alternatives = drugData.alternatives || [];
-            drugData.alternatives.unshift(janaushadhiEntry);
+            if (ja.found) {
+                // Add to alternatives list for UI visibility (legacy support)
+                const janaushadhiEntry = {
+                    name: ja.genericName,
+                    brand: "Janaushadhi Pariyojana",
+                    manufacturer: "Bureau of Pharma PSUs of India (BPPI)",
+                    price: `₹${ja.mrp}`,
+                    saved: ja.savings,
+                    description: ja.advice,
+                    drugCode: ja.drugCode,
+                    isJanaushadhi: true,
+                    type: 'Generic Alternative'
+                };
+                
+                drugData.alternatives = drugData.alternatives || [];
+                drugData.alternatives.unshift(janaushadhiEntry);
 
-            console.log(`   🏥 Janaushadhi Found: ₹${ja.mrp}`);
+                console.log(`   🏥 Janaushadhi Found: ₹${ja.mrp}`);
+            } else {
+                console.log(`   🏥 Janaushadhi Not Found`);
+            }
         } else {
-             console.log(`   🏥 Janaushadhi Not Found`);
+             drugData.janaushadhiAlternative = { found: false };
         }
+    } catch (e) {
+        console.error('   ❌ Janaushadhi Stage Error:', e);
+        drugData.janaushadhiAlternative = { found: false };
+    }
+
+    // Final safety check
+    if (!drugData.janaushadhiAlternative) {
+        drugData.janaushadhiAlternative = { found: false };
     }
 
     const isMeaningless =

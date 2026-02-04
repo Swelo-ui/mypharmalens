@@ -689,9 +689,19 @@ Deno.serve(async (req: Request) => {
           } else {
              console.log(`🏥 Janaushadhi not found (Parallel)`);
           }
+      } else {
+          // If no promise was started (e.g. unknown name), explicit set to not found
+           drugData.janaushadhiAlternative = { found: false };
       }
     } catch (error) {
       console.error('❌ Janaushadhi lookup error:', error);
+      // Fallback on error
+      drugData.janaushadhiAlternative = { found: false };
+    }
+    
+    // FINAL SAFETY CHECK: Ensure it's never undefined
+    if (!drugData.janaushadhiAlternative) {
+        drugData.janaushadhiAlternative = { found: false };
     }
 
     // Set processing time
