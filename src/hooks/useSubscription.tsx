@@ -16,13 +16,6 @@ export type SubscriptionPlan = Tables<"subscription_plans">;
 export type UserSubscription = Tables<"user_subscriptions"> & {
   plan?: SubscriptionPlan;
 };
-const LEGACY_EMAIL_VERIFICATION_CUTOFF = '2026-02-04T00:00:00.000Z';
-const isLegacyUser = (createdAt?: string | null) => {
-  if (!createdAt) return false;
-  const createdTime = new Date(createdAt).getTime();
-  const cutoffTime = new Date(LEGACY_EMAIL_VERIFICATION_CUTOFF).getTime();
-  return Number.isFinite(createdTime) && Number.isFinite(cutoffTime) && createdTime < cutoffTime;
-};
 
 export const useSubscription = () => {
   const { user, isAuthenticated } = useAuthStatus();
@@ -583,12 +576,6 @@ export const useSubscription = () => {
     if (!isAuthenticated || !user?.id) {
       const guestUsage = parseInt(localStorage.getItem('guest_identifications_used') || '0');
       return guestUsage < GUEST_LIMITS.IDENTIFICATIONS;
-    }
-
-    const isEmailConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
-    const isLegacy = isLegacyUser(user?.created_at);
-    if (!isEmailConfirmed && !isLegacy) {
-      return false;
     }
 
     // Get current usage count

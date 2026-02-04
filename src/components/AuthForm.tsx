@@ -19,7 +19,6 @@ const AuthForm = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState('');
   const navigate = useNavigate();
-  const LEGACY_EMAIL_VERIFICATION_CUTOFF = '2026-02-04T00:00:00.000Z';
   const disposableEmailDomains = new Set([
     '10minutemail.com',
     '10minutemail.net',
@@ -39,12 +38,6 @@ const AuthForm = () => {
   const getEmailDomain = (value: string) => {
     const atIndex = value.lastIndexOf('@');
     return atIndex === -1 ? '' : value.slice(atIndex + 1);
-  };
-  const isLegacyUser = (createdAt?: string | null) => {
-    if (!createdAt) return false;
-    const createdTime = new Date(createdAt).getTime();
-    const cutoffTime = new Date(LEGACY_EMAIL_VERIFICATION_CUTOFF).getTime();
-    return Number.isFinite(createdTime) && Number.isFinite(cutoffTime) && createdTime < cutoffTime;
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -117,16 +110,6 @@ const AuthForm = () => {
 
       if (error) {
         throw error;
-      }
-
-      const isEmailConfirmed = !!data.user?.email_confirmed_at || !!data.user?.confirmed_at;
-      const isLegacy = isLegacyUser(data.user?.created_at);
-      if (!isEmailConfirmed && !isLegacy) {
-        await supabase.auth.signOut();
-        toast.error("Please confirm your email before signing in.", {
-          description: "Check your inbox for the verification link."
-        });
-        return;
       }
 
       toast.success("Signed in successfully");

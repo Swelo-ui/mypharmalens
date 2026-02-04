@@ -24,14 +24,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { playDrugIdentificationSound } from '@/utils/audioService';
 import SEOHead from '@/components/SEOHead';
 
-const LEGACY_EMAIL_VERIFICATION_CUTOFF = '2026-02-04T00:00:00.000Z';
-const isLegacyUser = (createdAt?: string | null) => {
-  if (!createdAt) return false;
-  const createdTime = new Date(createdAt).getTime();
-  const cutoffTime = new Date(LEGACY_EMAIL_VERIFICATION_CUTOFF).getTime();
-  return Number.isFinite(createdTime) && Number.isFinite(cutoffTime) && createdTime < cutoffTime;
-};
-
 const extractImageFeatures = (base64Image: string): Promise<string> => {
   return new Promise((resolve) => {
     // This is a simplified feature extraction
@@ -676,16 +668,6 @@ const DrugIdentify = () => {
         console.log('✨ Special access granted - unlimited identifications');
         // Continue with processing
       } else {
-        const isEmailConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
-        const isLegacy = isLegacyUser(user?.created_at);
-        if (isAuthenticated && user && !isEmailConfirmed && !isLegacy) {
-          toast.error('Please verify your email to use AI identification.', {
-            description: 'Check your inbox and click the verification link.',
-            duration: 6000
-          });
-          return;
-        }
-
         // Check subscription limits before processing, guard loading first
         if (loading) {
           toast.info("Loading your subscription details... please wait a moment.");
