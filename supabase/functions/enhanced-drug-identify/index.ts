@@ -161,6 +161,26 @@ function mapPhysicalConditionToStripCondition(physicalCondition: string | undefi
   return undefined;
 }
 
+function extractRawBase64Image(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) return '';
+
+  if (trimmed.startsWith('data:')) {
+    const commaIndex = trimmed.indexOf(',');
+    if (commaIndex === -1) return '';
+    const dataPart = trimmed.slice(commaIndex + 1);
+    return dataPart.replace(/\s+/g, '');
+  }
+
+  if (trimmed.includes('base64,')) {
+    const parts = trimmed.split('base64,');
+    const last = parts[parts.length - 1] ?? '';
+    return last.replace(/\s+/g, '');
+  }
+
+  return trimmed.replace(/\s+/g, '');
+}
+
 // ============================================================================
 // HELPER: Create Response
 // ============================================================================
@@ -587,10 +607,15 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    const image = body.image || body.imageBase64;
+    const rawImage = body.image || body.imageBase64;
 
-    if (!image) {
+    if (!rawImage) {
       return createResponse({ error: 'No image provided' }, 400);
+    }
+
+    const image = typeof rawImage === 'string' ? extractRawBase64Image(rawImage) : '';
+    if (!image) {
+      return createResponse({ error: 'Invalid image data provided' }, 400);
     }
 
     // --- STAGE 1: VISION ---
@@ -603,7 +628,32 @@ Deno.serve(async (req: Request) => {
     });
 
     if (!visionData) {
-        throw new Error('Vision analysis failed completely');
+      const processingTime = Date.now() - startTime;
+      return createResponse({
+        success: false,
+        error: 'Could not process image. Please try a clearer photo.',
+        data: ensureDrugDataForUI({
+          id: crypto.randomUUID(),
+          name: 'Unknown Medication',
+          genericName: '',
+          sideEffects: [],
+          warnings: [],
+          interactions: [],
+          indications: [],
+          contraindications: [],
+          confidence: 'low',
+          retakeNeeded: true,
+          retakeTips: [
+            'Ensure good lighting',
+            'Keep the label in focus',
+            'Capture the full packaging',
+            'Avoid reflections and shadows'
+          ]
+        } as DrugData),
+        processingStages: stages.map(s => s.name),
+        confidence: 'low',
+        processingTime
+      }, 200);
     }
 
     // --- STAGE 2: ENRICHMENT ---
