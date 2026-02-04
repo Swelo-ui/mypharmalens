@@ -71,15 +71,16 @@ export async function findJanaushadhiAlternative(
             return { found: false };
         }
 
-        // Get the best match (lowest price)
+        // Get the best match (ordered by RPC)
         const bestMatch = matches[0];
+        const bestMrp = typeof bestMatch.mrp === 'number' ? bestMatch.mrp : Number(bestMatch.mrp);
 
         // Calculate savings if brand MRP is provided
         let savings: string | undefined;
         let savingsAmount: number | undefined;
 
-        if (brandMrp && brandMrp > bestMatch.mrp) {
-            savingsAmount = brandMrp - bestMatch.mrp;
+        if (brandMrp && Number.isFinite(bestMrp) && brandMrp > bestMrp) {
+            savingsAmount = brandMrp - bestMrp;
             const savingsPercent = Math.round((savingsAmount / brandMrp) * 100);
             savings = `${savingsPercent}%`;
         }
@@ -87,7 +88,7 @@ export async function findJanaushadhiAlternative(
         // Generate helpful advice
         const advice = generateAdvice(bestMatch, savings, savingsAmount);
 
-        console.log(`   ✅ Found: "${bestMatch.generic_name}" at ₹${bestMatch.mrp}`);
+        console.log(`   ✅ Found: "${bestMatch.generic_name}" at ₹${Number.isFinite(bestMrp) ? bestMrp : bestMatch.mrp}`);
         console.log(`   💰 Potential savings: ${savings || 'N/A'}`);
         console.log(`   ⏱️ Lookup time: ${processingTime}ms`);
         console.log('🏥 === JANAUSHADHI LOOKUP COMPLETE ===\n');
@@ -96,7 +97,7 @@ export async function findJanaushadhiAlternative(
             found: true,
             drugCode: bestMatch.drug_code,
             genericName: bestMatch.generic_name,
-            mrp: bestMatch.mrp,
+            mrp: Number.isFinite(bestMrp) ? bestMrp : undefined,
             category: bestMatch.category,
             strength: bestMatch.strength,
             formulation: bestMatch.formulation,
