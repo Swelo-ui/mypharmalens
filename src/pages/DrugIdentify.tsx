@@ -812,7 +812,9 @@ const DrugIdentify = () => {
                 imprint: drugData.imprint,
                 color: drugData.color,
                 shape: drugData.shape,
-                possibleNames: drugData.possibleNames
+                possibleNames: drugData.possibleNames,
+                janaushadhiAlternative: drugData.janaushadhiAlternative,
+                similarDrugs: drugData.alternatives || []
               };
 
               setIdentifiedDrug(formattedDrugData);
