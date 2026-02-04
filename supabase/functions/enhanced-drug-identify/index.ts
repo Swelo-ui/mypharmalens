@@ -821,10 +821,11 @@ Deno.serve(async (req: Request) => {
     // --- STAGE 3: JANAUSHADHI ---
     if (drugData.name && drugData.name !== 'Unknown Medication') {
         const ja = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
+        // ALWAYS attach the result so frontend knows we checked
+        drugData.janaushadhiAlternative = ja;
+        
         if (ja.found) {
-            drugData.janaushadhiAlternative = ja;
-            
-            // Add to alternatives list for UI visibility
+            // Add to alternatives list for UI visibility (legacy support)
             const janaushadhiEntry = {
                 name: ja.genericName,
                 brand: "Janaushadhi Pariyojana",
@@ -841,6 +842,8 @@ Deno.serve(async (req: Request) => {
             drugData.alternatives.unshift(janaushadhiEntry);
 
             console.log(`   🏥 Janaushadhi Found: ₹${ja.mrp}`);
+        } else {
+             console.log(`   🏥 Janaushadhi Not Found`);
         }
     }
 

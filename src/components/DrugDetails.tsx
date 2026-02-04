@@ -53,6 +53,13 @@ export interface DetailedDrugData {
   shape?: string;
   possibleNames?: string[];
   recommendations?: string[];
+  janaushadhiAlternative?: {
+    found: boolean;
+    genericName?: string;
+    mrp?: number;
+    savings?: string;
+    advice?: string;
+  };
 }
 
 interface DrugDetailsProps {
@@ -198,6 +205,68 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
       case 'alternatives':
         return (
           <div className="space-y-4">
+            {/* Janaushadhi Section - Always Visible */}
+            {drug.janaushadhiAlternative && (
+              <div className={cn(
+                "rounded-xl p-4 border mb-4 transition-all",
+                drug.janaushadhiAlternative.found
+                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                  : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700"
+              )}>
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "p-2 rounded-full flex-shrink-0",
+                    drug.janaushadhiAlternative.found ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-500"
+                  )}>
+                    {drug.janaushadhiAlternative.found ? <Shield className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={cn(
+                      "text-sm font-bold mb-1",
+                      drug.janaushadhiAlternative.found ? "text-green-800 dark:text-green-300" : "text-gray-700 dark:text-gray-300"
+                    )}>
+                      {drug.janaushadhiAlternative.found ? "Janaushadhi Generic Available" : "Janaushadhi Status"}
+                    </h4>
+                    
+                    {drug.janaushadhiAlternative.found ? (
+                      <>
+                        <p className="text-sm text-green-700 dark:text-green-400 mb-2">
+                          {drug.janaushadhiAlternative.genericName}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                          <span className="text-lg font-bold text-green-800 dark:text-green-300">
+                            ₹{drug.janaushadhiAlternative.mrp}
+                          </span>
+                          {drug.janaushadhiAlternative.savings && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-200 text-green-800">
+                              Save {drug.janaushadhiAlternative.savings}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-green-600 dark:text-green-400 mb-3 italic">
+                          {drug.janaushadhiAlternative.advice}
+                        </p>
+                        <a 
+                          href="http://janaushadhi.gov.in/StoreDetails.aspx" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-xs font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                        >
+                          Find Nearest Store <Search className="ml-1 h-3 w-3" />
+                        </a>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        No direct match found in the Pradhan Mantri Bhartiya Janaushadhi Pariyojana database.
+                        <br />
+                        <span className="text-xs mt-1 block">You can still ask for generic equivalents at your local pharmacy.</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {drug.brandNames && drug.brandNames.length > 0 && (
               <div className="glass-card p-4">
                 <h3 className="text-sm font-medium mb-3">Brand Names</h3>

@@ -249,7 +249,7 @@ async function enrichFromSources(
   console.log(`   Variations: ${uniqueVariations.join(', ')}`);
 
   // Parallel search: Cache + Database
-  const searchPromises: Promise<{ type: 'cache' | 'db'; data: unknown; key: string }>[] = [];
+  const searchPromises: Promise<{ type: 'cache' | 'db'; data: any; key: string }>[] = [];
 
   // Cache searches
   uniqueVariations.forEach(variation => {
@@ -654,9 +654,11 @@ Deno.serve(async (req: Request) => {
     try {
       if (drugData.name !== 'Unknown' && (drugData.name || drugData.genericName)) {
           const janaushadhiResult = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
+          
+          // ALWAYS attach the result
+          drugData.janaushadhiAlternative = janaushadhiResult;
+
           if (janaushadhiResult.found) {
-            drugData.janaushadhiAlternative = janaushadhiResult;
-            
             // Add to alternatives list for UI visibility
             const janaushadhiEntry = {
                 name: janaushadhiResult.genericName,
