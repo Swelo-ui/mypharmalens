@@ -570,6 +570,16 @@ Deno.serve(async (req: Request) => {
     console.log(`\n✅ Identified (Stage 1): "${drugName}" / "${genericName || 'N/A'}"`);
 
     // ========================================================================
+    // START PARALLEL TASKS
+    // ========================================================================
+    // Start Janaushadhi lookup immediately if we have a name
+    let janaushadhiPromise: Promise<JanaushadhiMatch> | null = null;
+    if (drugName !== 'Unknown' && (drugName || genericName)) {
+        console.log(`⚡ Starting parallel Janaushadhi lookup for: "${drugName}"`);
+        janaushadhiPromise = findJanaushadhiAlternative(genericName || drugName);
+    }
+
+    // ========================================================================
     // STAGE 2: DATA ENRICHMENT (Cache + Database)
     // ========================================================================
     let drugData: DrugData | null = null;
@@ -652,8 +662,8 @@ Deno.serve(async (req: Request) => {
     // STAGE 4: JANAUSHADHI LOOKUP + FINAL RESPONSE
     // ========================================================================
     try {
-      if (drugData.name !== 'Unknown' && (drugData.name || drugData.genericName)) {
-          const janaushadhiResult = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
+      if (janaushadhiPromise) {
+          const janaushadhiResult = await janaushadhiPromise;
           
           // ALWAYS attach the result
           drugData.janaushadhiAlternative = janaushadhiResult;
@@ -675,7 +685,9 @@ Deno.serve(async (req: Request) => {
             drugData.alternatives = drugData.alternatives || [];
             drugData.alternatives.unshift(janaushadhiEntry);
             
-            console.log(`🏥 Janaushadhi alternative found: ₹${janaushadhiResult.mrp}`);
+            console.log(`🏥 Janaushadhi alternative found (Parallel): ₹${janaushadhiResult.mrp}`);
+          } else {
+             console.log(`🏥 Janaushadhi not found (Parallel)`);
           }
       }
     } catch (error) {

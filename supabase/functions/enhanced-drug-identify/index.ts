@@ -816,11 +816,19 @@ Deno.serve(async (req: Request) => {
     }
 
     // --- STAGE 2: ENRICHMENT ---
+    
+    // Start Janaushadhi lookup in parallel
+    let janaushadhiPromise: Promise<JanaushadhiMatch> | null = null;
+    if (visionData.name && visionData.name !== 'Unknown Medication') {
+         console.log(`⚡ Starting parallel Janaushadhi lookup for: "${visionData.name}"`);
+         janaushadhiPromise = findJanaushadhiAlternative(visionData.genericName || visionData.name);
+    }
+
     const drugData = ensureDrugDataForUI(await enrichData(visionData, stages));
 
     // --- STAGE 3: JANAUSHADHI ---
-    if (drugData.name && drugData.name !== 'Unknown Medication') {
-        const ja = await findJanaushadhiAlternative(drugData.genericName || drugData.name);
+    if (janaushadhiPromise) {
+        const ja = await janaushadhiPromise;
         // ALWAYS attach the result so frontend knows we checked
         drugData.janaushadhiAlternative = ja;
         
