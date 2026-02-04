@@ -214,7 +214,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <div className={cn(
                 "rounded-xl border mb-6 transition-all overflow-hidden",
                 drug.janaushadhiAlternative.found
-                  ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
+                  ? "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 border-rose-200 dark:border-rose-800"
                   : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700"
               )}>
                 {drug.janaushadhiAlternative.found ? (
@@ -222,19 +222,19 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                     {/* Header with Badge and Code */}
                     <div className="flex justify-between items-start gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="bg-green-100 dark:bg-green-900/40 p-2 rounded-lg text-green-700 dark:text-green-400 shadow-sm">
+                        <div className="bg-rose-100 dark:bg-rose-900/40 p-2 rounded-lg text-rose-700 dark:text-rose-400 shadow-sm">
                           <Shield className="h-5 w-5" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-green-900 dark:text-green-300 text-sm">Janaushadhi Generic</h4>
-                          <span className="inline-flex items-center text-[10px] uppercase tracking-wider text-green-700 dark:text-green-400 font-semibold bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full mt-1">
+                          <h4 className="font-semibold text-rose-900 dark:text-rose-300 text-sm">Janaushadhi Generic</h4>
+                          <span className="inline-flex items-center text-[10px] uppercase tracking-wider text-rose-700 dark:text-rose-400 font-semibold bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 rounded-full mt-1">
                             Govt. Initiative
                           </span>
                         </div>
                       </div>
                       
                       {drug.janaushadhiAlternative.drugCode && (
-                        <div className="text-right bg-white/50 dark:bg-black/20 px-2.5 py-1 rounded-md border border-green-100 dark:border-green-900/30 flex-shrink-0">
+                        <div className="text-right bg-white/50 dark:bg-black/20 px-2.5 py-1 rounded-md border border-rose-100 dark:border-rose-900/30 flex-shrink-0">
                           <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold block">PMBJP Code</span>
                           <span className="font-mono text-xs font-semibold text-gray-700 dark:text-gray-300">
                             {drug.janaushadhiAlternative.drugCode}
@@ -266,17 +266,17 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                     </div>
 
                     {/* Price and Action */}
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 bg-white dark:bg-gray-800/60 rounded-xl p-3.5 border border-green-100 dark:border-green-900/30 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 bg-white dark:bg-gray-800/60 rounded-xl p-3.5 border border-rose-100 dark:border-rose-900/30 shadow-sm">
                       <div>
                         <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Estimated Price (MRP)</span>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold text-green-700 dark:text-green-400 leading-none">
+                          <span className="text-2xl font-bold text-rose-700 dark:text-rose-400 leading-none">
                             {drug.janaushadhiAlternative.mrp && drug.janaushadhiAlternative.mrp > 0 
                               ? `₹${Number(drug.janaushadhiAlternative.mrp).toFixed(2)}` 
                               : 'Price varies'}
                           </span>
                           {drug.janaushadhiAlternative.savings && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">
                               Save {drug.janaushadhiAlternative.savings}
                             </span>
                           )}
@@ -287,7 +287,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                         href="https://janaushadhi.gov.in/near-by-kendra" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex justify-center items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
+                        className="inline-flex justify-center items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
                       >
                         Locate Store <Search className="h-4 w-4" />
                       </a>
@@ -295,8 +295,8 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                     
                     {/* Advice / Footer */}
                     {drug.janaushadhiAlternative.advice && (
-                        <div className="mt-3 flex items-start gap-2.5 text-xs text-green-800 dark:text-green-300 bg-green-100/50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-900/10">
-                            <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-green-600" />
+                        <div className="mt-3 flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-300 bg-rose-100/50 dark:bg-rose-900/20 p-3 rounded-lg border border-rose-100 dark:border-rose-900/10">
+                            <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-rose-600" />
                             <p className="leading-relaxed">{drug.janaushadhiAlternative.advice}</p>
                         </div>
                     )}
@@ -321,9 +321,9 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               </div>
             )}
 
-            {drug.brandNames && drug.brandNames.length > 0 && (
+            {drug.brandNames && drug.brandNames.length > 0 ? (
               <div className="glass-card p-4">
-                <h3 className="text-sm font-medium mb-3">Brand Names</h3>
+                <h3 className="text-sm font-medium mb-3">Popular Brand Names</h3>
                 <div className="flex flex-wrap gap-2">
                   {(drug.brandNames ?? []).map((brand, index) => (
                     <div key={index} className="inline-flex items-center rounded-full px-2.5 py-0.5 bg-pharma-50 dark:bg-pharma-900/20 text-pharma-600 dark:text-pharma-300 text-xs font-medium">
@@ -333,40 +333,14 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                   ))}
                 </div>
               </div>
-            )}
-
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Similar medications or alternatives to {drug.name}.
-            </p>
-
-            {drug.similarDrugs && drug.similarDrugs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(drug.similarDrugs ?? []).map((similar) => (
-                  <div key={similar.id} className="glass-card p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-pharma-100 dark:bg-pharma-900/30 flex items-center justify-center mr-3">
-                        <Pill className="h-4 w-4 text-pharma-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium">{similar.name}</h4>
-                        <a
-                          href={`/drug/${similar.id}`}
-                          className="text-xs text-pharma-600 hover:text-pharma-700 transition-colors hover:underline"
-                        >
-                          View details
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             ) : (
               <div className="glass-card p-6 text-center">
-                <Search className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 dark:text-gray-400">No alternatives found for this medication.</p>
+                 <Search className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                 <p className="text-gray-600 dark:text-gray-400">No popular brand names found for this medication.</p>
               </div>
             )}
           </div>
+
         );
 
 

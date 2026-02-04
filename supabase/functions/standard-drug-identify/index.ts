@@ -65,6 +65,7 @@ interface DrugData {
   processingTime?: number;
   janaushadhiAlternative?: JanaushadhiMatch;
   alternatives?: Record<string, unknown>[];
+  brandNames?: string[];
 }
 
 interface VisionResult {
@@ -85,6 +86,7 @@ interface VisionResult {
   confidence: number;
   ocrText?: string;
   _thinking?: string; // Captured reasoning
+  brandNames?: string[];
 }
 
 interface ProcessingStage {
@@ -153,7 +155,8 @@ RETURN JSON ONLY:
   "batchNumber": "batch string",
   "mrp": "price string",
   "confidence": 0-100,
-  "ocrText": "raw visible text"
+  "ocrText": "raw visible text",
+  "brandNames": ["Brand1", "Brand2", "Brand3"]
 }`;
 
   try {
@@ -333,6 +336,7 @@ async function enhanceWithAIKnowledge(
   if (!partialData.pregnancy) missingFields.push('pregnancy');
   if (!partialData.dosageAndAdmin) missingFields.push('dosageAndAdmin');
   if (!partialData.storage) missingFields.push('storage');
+  if (!partialData.brandNames?.length) missingFields.push('brandNames');
 
   if (missingFields.length === 0) {
     console.log('   All fields present - no enhancement needed');
@@ -359,8 +363,8 @@ REQUIREMENTS:
 RETURN ONLY VALID JSON:
 {
 ${missingFields.map(field => {
-    if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications'].includes(field)) {
-      return `  "${field}": ["critical_item1", "critical_item2", "critical_item3"]`;
+    if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications', 'brandNames'].includes(field)) {
+      return `  "${field}": ["item1", "item2", "item3"]`;
     } else {
       return `  "${field}": "Concise summary here"`;
     }
@@ -467,7 +471,8 @@ function ensureCompleteData(
     confidence: partialData.confidence || 'medium',
     dataSource: partialData.dataSource || 'ai-analysis',
     processingTime: partialData.processingTime,
-    alternatives: partialData.alternatives || []
+    alternatives: partialData.alternatives || [],
+    brandNames: partialData.brandNames || []
   };
 }
 
@@ -516,7 +521,8 @@ function normalizeToDrugData(inputData: unknown, confidence: 'high' | 'medium' |
     batchNumber: getString(data, ['batchNumber', 'batch_number']),
     mrp: getString(data, ['mrp']),
     confidence,
-    dataSource: getString(data, ['dataSource']) || 'database'
+    dataSource: getString(data, ['dataSource']) || 'database',
+    brandNames: cleanTextArray(getStringArray(data, ['brandNames', 'brand_names', 'popular_brands']))
   };
 }
 

@@ -63,6 +63,7 @@ interface DrugData {
   dataSource?: string;
   processingTime?: number;
   janaushadhiAlternative?: JanaushadhiMatch;
+  brandNames?: string[];
   
   // Enhanced Fields for UI Sections
   activeIngredients?: string[];
@@ -130,6 +131,7 @@ interface CriticalVisionData {
   packSize?: string;
   manufacturerAddress?: string;
   partialReads?: Array<{ text: string; confidence: number; likely: string }>;
+  brandNames?: string[];
 }
 
 type UnknownRecord = Record<string, unknown>;
@@ -388,6 +390,7 @@ async function enhanceWithAIKnowledge(
   if (!currentData.pregnancy) missingFields.push('pregnancy');
   if (!currentData.dosageAndAdmin) missingFields.push('dosageAndAdmin');
   if (!currentData.storage) missingFields.push('storage');
+  if (!currentData.brandNames?.length) missingFields.push('brandNames');
 
   if (missingFields.length === 0) {
     console.log('   All fields present - no enhancement needed');
@@ -426,8 +429,8 @@ CRITICAL STYLE GUIDELINES (S-TIER QUALITY):
 RETURN ONLY VALID JSON (No Markdown):
 {
 ${missingFields.map(field => {
-    if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications'].includes(field)) {
-      return `  "${field}": ["Critical point 1 (explanation)", "Critical point 2 (explanation)", "Common point 3", "Common point 4", "Safety warning 5"]`;
+    if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications', 'brandNames'].includes(field)) {
+      return `  "${field}": ["item1", "item2", "item3"]`;
     } else {
       return `  "${field}": "Comprehensive description with medical terms explained (like this) for clarity."`;
     }
@@ -617,6 +620,7 @@ function normalizeToDrugData(data: UnknownRecord, confidence: 'high' | 'medium' 
       activeIngredients: getStringArray(data, ['activeIngredients']),
       packSize: getString(data, ['packSize', 'pack_size']),
       manufacturerAddress: getString(data, ['manufacturerAddress', 'manufacturer_address']),
+      brandNames: getStringArray(data, ['brandNames', 'brand_names', 'popular_brands'])
     };
 }
 
@@ -648,7 +652,8 @@ function mergeData(base: DrugData, update: Partial<DrugData>): DrugData {
       'interactions',
       'indications',
       'contraindications',
-      'activeIngredients'
+      'activeIngredients',
+      'brandNames'
     ] as const;
 
     const stringKeys = [
@@ -746,6 +751,7 @@ function ensureDrugDataForUI(input: DrugData): DrugData {
   output.sourcesUsed = Array.isArray(input.sourcesUsed) ? input.sourcesUsed : [];
   output.imageChallenges = Array.isArray(input.imageChallenges) ? input.imageChallenges : [];
   output.alternatives = Array.isArray(input.alternatives) ? input.alternatives : [];
+  output.brandNames = Array.isArray(input.brandNames) ? input.brandNames : [];
 
   return output;
 }
