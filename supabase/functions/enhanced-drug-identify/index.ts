@@ -25,7 +25,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
 // Models
-const MODEL_VISION = 'google/gemini-2.5-flash';      // Primary Intelligence
+const MODEL_VISION = 'google/gemini-2.5-flash-lite';      // Primary Intelligence
 const MODEL_FAST = 'google/gemini-2.5-flash-lite';   // Speed & Polish
 
 // ============================================================================

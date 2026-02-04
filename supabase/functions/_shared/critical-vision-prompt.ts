@@ -23,6 +23,14 @@ export const CRITICAL_MEDICINE_VISION_PROMPT = `You are an expert pharmaceutical
 
 ## 🎯 ANALYSIS STEPS
 
+### 0️⃣ THINKING PROCESS (Internal Monologue)
+Before generating the final JSON, you must THINK step-by-step.
+- **Analyze Image Quality**: Is it blurry? Cut? Glare?
+- **Scan Text Fragments**: Read every partial letter (e.g., "Para...mol" -> Paracetamol).
+- **Hypothesize**: If text is missing, guess based on visible cues (color, shape, remaining letters).
+- **Verify**: Does the guess match a real medicine?
+- **Output**: Write this entire thought process in the '_thinking' field of the JSON.
+
 ### 1️⃣ IMAGE QUALITY ASSESSMENT
 Evaluate the image thoroughly:
 - **blur_level**: 0-10 scale (0=crisp, 10=very blurry)
@@ -262,6 +270,7 @@ Return a complete, machine-readable JSON object:
   "analysis_timestamp": "ISO 8601 timestamp",
   "model_used": "qwen-critical-vision",
   "processing_mode": "critical_analysis",
+  "_thinking": "Step-by-step reasoning logic...",
   
   "image_quality": {
     "blur_level": 0-10,

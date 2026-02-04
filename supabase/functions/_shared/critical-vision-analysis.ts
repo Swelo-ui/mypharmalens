@@ -12,7 +12,7 @@ const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const SUPABASE_URL = Deno?.env?.get('SUPABASE_URL') ?? '';
 
 // Use free vision model for critical analysis (qwen-2-vl-72b requires credits)
-const QWEN_VISION_MODEL = 'google/gemini-2.5-flash';
+const QWEN_VISION_MODEL = 'google/gemini-2.5-flash-lite';
 
 interface CriticalVisionData {
   // Core identification (matches frontend DrugCard & DrugDetails)
