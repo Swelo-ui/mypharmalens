@@ -3,7 +3,7 @@ import "xhr";
 // Shared Helpers
 import { checkDrugCache, saveDrugToCache } from './cache-integration.ts';
 import { aiCompareDrugNames } from './ai-validator.ts';
-import { cleanTextArray, generateNameAliases } from '../_shared/text-cleaner.ts';
+import { cleanText, cleanTextArray, generateNameAliases } from '../_shared/text-cleaner.ts';
 import { findJanaushadhiAlternative, JanaushadhiMatch } from '../_shared/janaushadhi-lookup.ts';
 import { isRateLimitError, createRateLimitResponse, logRateLimit } from '../_shared/rate-limit-handler.ts';
 import { performIntelligentWebSearch, shouldUseIntelligentWebSearch } from '../_shared/intelligent-web-search.ts';
@@ -27,6 +27,7 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 // Models
 const MODEL_VISION = 'google/gemini-2.5-flash-lite';      // Primary Intelligence
 const MODEL_FAST = 'google/gemini-2.5-flash-lite';   // Speed & Polish
+const MODEL_ENHANCEMENT = 'google/gemini-2.5-flash-lite'; // Knowledge Fill
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -67,6 +68,7 @@ interface DrugData {
   activeIngredients?: string[];
   packSize?: string;
   manufacturerAddress?: string;
+  partialReads?: Array<{ text: string; confidence: number; likely: string }>;
   alcoholWarning?: string;
   breastfeedingWarning?: string;
   drivingWarning?: string;
@@ -286,7 +288,15 @@ async function enrichData(
   }
 
   // 2. Intelligent Web Search (if needed)
-  const shouldSearch = shouldUseIntelligentWebSearch(visionResult, calculateCompleteness(currentData));
+  // Check completeness: trigger if < 70% or if specific key fields are missing
+  const completeness = calculateCompleteness(currentData);
+  let shouldSearch = shouldUseIntelligentWebSearch(visionResult, completeness);
+
+  // Force search if Name is known but vital info is missing (The user's specific case)
+  if (currentData.name !== 'Unknown Medication' && completeness < 80) {
+      console.log(`   ⚠️ Name known but data incomplete (${completeness}%) → Forcing Web Search`);
+      shouldSearch = true;
+  }
   
   if (shouldSearch && enrichmentSource !== 'cache' && enrichmentSource !== 'database') {
     console.log('   🌐 Triggering Intelligent Web Search...');
@@ -309,7 +319,13 @@ async function enrichData(
     }
   }
 
-  // 3. AI Hallucination Check & Final Polish
+  // 3. AI Knowledge Enhancement (New Step)
+  // If we still have missing fields, use AI knowledge to fill them
+  if (enrichmentSource !== 'database' && enrichmentSource !== 'cache') {
+    currentData = await enhanceWithAIKnowledge(currentData);
+  }
+
+  // 4. AI Hallucination Check & Final Polish
   if (enrichmentSource !== 'database' && enrichmentSource !== 'cache') {
     currentData = await polishWithAI(currentData);
   }
@@ -342,7 +358,146 @@ async function searchLocalDatabase(term: string): Promise<unknown> {
 }
 
 // ============================================================================
-// STAGE 3: SYNTHESIS & POLISH (The "Author")
+// STAGE 3: AI KNOWLEDGE ENHANCEMENT (The "Expert")
+// ============================================================================
+
+async function enhanceWithAIKnowledge(
+  currentData: DrugData
+): Promise<DrugData> {
+  const drugName = currentData.name;
+  const genericName = currentData.genericName;
+
+  // If name is still unknown, we can't enhance much
+  if (!drugName || drugName === 'Unknown Medication') {
+    return currentData;
+  }
+
+  console.log('\n🧪 === STAGE 2.5: AI KNOWLEDGE ENHANCEMENT ===');
+  const targetName = drugName;
+  console.log(`   Enhancing: "${targetName}"`);
+
+  // Check which fields are missing
+  const missingFields: string[] = [];
+  if (!currentData.description || currentData.description.length < 20) missingFields.push('description');
+  if (!currentData.mechanism || currentData.mechanism.length < 20) missingFields.push('mechanism');
+  if (!currentData.sideEffects?.length) missingFields.push('sideEffects');
+  if (!currentData.warnings?.length) missingFields.push('warnings');
+  if (!currentData.indications?.length) missingFields.push('indications');
+  if (!currentData.contraindications?.length) missingFields.push('contraindications');
+  if (!currentData.interactions?.length) missingFields.push('interactions');
+  if (!currentData.pregnancy) missingFields.push('pregnancy');
+  if (!currentData.dosageAndAdmin) missingFields.push('dosageAndAdmin');
+  if (!currentData.storage) missingFields.push('storage');
+
+  if (missingFields.length === 0) {
+    console.log('   All fields present - no enhancement needed');
+    return currentData;
+  }
+
+  console.log(`   Missing fields: ${missingFields.join(', ')}`);
+
+  const prompt = `You are a Senior Clinical Pharmacist and Patient Educator with 20+ years of experience.
+Your goal is to provide 99% ACCURATE, COMPREHENSIVE, and PATIENT-FRIENDLY information.
+
+DRUG: "${targetName}"${genericName ? ` (Generic: ${genericName})` : ''}
+
+TASK: Provide missing medical details for the following fields:
+${missingFields.map(f => `- ${f}`).join('\n')}
+
+CRITICAL STYLE GUIDELINES (S-TIER QUALITY):
+1. **LAYMAN TERMS**: You MUST explain complex medical jargon in brackets immediately after the term.
+   - Bad: "Antipyretic and analgesic."
+   - Good: "Antipyretic (fever reducer) and analgesic (pain reliever)."
+   - Bad: "Treats dyspepsia."
+   - Good: "Treats dyspepsia (indigestion/heartburn)."
+
+2. **COMPREHENSIVE LISTS**:
+   - For 'sideEffects', 'warnings', 'indications', 'contraindications': Provide 5-7 distinct, actionable points.
+   - Prioritize "Black Box" warnings and common severe reactions first.
+
+3. **CLEAR DESCRIPTIONS**:
+   - For 'description', 'mechanism', 'usage': Write clear, professional paragraphs (2-3 sentences).
+   - Use natural, empathetic but authoritative language.
+
+4. **SAFETY FIRST**:
+   - Highlight pregnancy/breastfeeding risks clearly.
+   - Mention critical drug interactions if asking for 'interactions'.
+
+RETURN ONLY VALID JSON (No Markdown):
+{
+${missingFields.map(field => {
+    if (['sideEffects', 'contraindications', 'interactions', 'warnings', 'indications'].includes(field)) {
+      return `  "${field}": ["Critical point 1 (explanation)", "Critical point 2 (explanation)", "Common point 3", "Common point 4", "Safety warning 5"]`;
+    } else {
+      return `  "${field}": "Comprehensive description with medical terms explained (like this) for clarity."`;
+    }
+  }).join(',\n')}
+}`;
+
+  try {
+    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': SUPABASE_URL,
+        'X-Title': 'PharmaLens Knowledge Enhancement'
+      },
+      body: JSON.stringify({
+        model: MODEL_ENHANCEMENT,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.1,
+        max_tokens: 2500,
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`❌ Enhancement API error: ${response.status}`);
+      return currentData;
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content;
+
+    if (content) {
+      try {
+        const enhancement = JSON.parse(content);
+        const newData = { ...currentData };
+
+        // Merge enhancement into data
+        let enhancedCount = 0;
+        missingFields.forEach(field => {
+          const value = enhancement[field];
+          if (value) {
+            if (Array.isArray(value) && value.length > 0) {
+              (newData as UnknownRecord)[field] = cleanTextArray(value);
+              enhancedCount++;
+              console.log(`   ✅ Enhanced ${field}: ${value.length} items`);
+            } else if (typeof value === 'string' && value.length > 10) {
+              (newData as UnknownRecord)[field] = cleanText(value);
+              enhancedCount++;
+              console.log(`   ✅ Enhanced ${field}`);
+            }
+          }
+        });
+
+        console.log(`🧪 Enhancement complete: ${enhancedCount}/${missingFields.length} fields filled`);
+        return newData;
+      } catch (e) {
+        console.error('❌ Failed to parse enhancement JSON:', e);
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Enhancement error:', error);
+  }
+
+  return currentData;
+}
+
+// ============================================================================
+// STAGE 4: SYNTHESIS & POLISH (The "Author")
 // ============================================================================
 
 async function polishWithAI(data: DrugData): Promise<DrugData> {
@@ -564,7 +719,9 @@ function calculateCompleteness(data: DrugData): number {
       !!data.description,
       Array.isArray(data.sideEffects) && data.sideEffects.length > 0,
       Array.isArray(data.warnings) && data.warnings.length > 0,
-      !!data.dosageAndAdmin
+      !!data.dosageAndAdmin,
+      !!data.storage,
+      Array.isArray(data.contraindications) && data.contraindications.length > 0
     ];
     const filled = checks.filter(Boolean).length;
     return (filled / checks.length) * 100;
