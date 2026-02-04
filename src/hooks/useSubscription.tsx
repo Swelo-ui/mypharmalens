@@ -578,6 +578,11 @@ export const useSubscription = () => {
       return guestUsage < GUEST_LIMITS.IDENTIFICATIONS;
     }
 
+    const isEmailConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
+    if (!isEmailConfirmed) {
+      return false;
+    }
+
     // Get current usage count
     const currentUsage = profileIdentificationsUsed || 0;
 
@@ -1072,5 +1077,4 @@ export const useSubscription = () => {
     incrementIdentificationUsage
   };
 };
-
 

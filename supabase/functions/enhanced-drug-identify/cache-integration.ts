@@ -2,7 +2,7 @@
 // Cache integration module for enhanced-drug-identify
 // Add this to enhanced-drug-identify/index.ts to enable caching
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from '@supabase/supabase-js';
 
 declare const Deno: { env: { get: (key: string) => string | undefined } };
 

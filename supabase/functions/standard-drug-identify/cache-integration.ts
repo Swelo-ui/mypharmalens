@@ -2,8 +2,7 @@
 // Cache integration module for enhanced-drug-identify
 // Add this to enhanced-drug-identify/index.ts to enable caching
 
-// @ts-ignore - Deno ESM import (works in Deno runtime, VS Code doesn't understand)
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from '@supabase/supabase-js';
 import { aiCompareDrugNames } from './ai-validator.ts';
 
 // OpenRouter config for advanced validation

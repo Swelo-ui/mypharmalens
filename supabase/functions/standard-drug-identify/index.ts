@@ -107,6 +107,39 @@ function createResponse(body: object, status = 200): Response {
   });
 }
 
+async function ensureConfirmedUser(req: Request): Promise<Response | null> {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) return null;
+
+  const token = authHeader.replace('Bearer ', '').trim();
+  if (!token) {
+    return createResponse({ error: 'Missing authorization token' }, 401);
+  }
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return createResponse({ error: 'Server misconfiguration' }, 500);
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      apikey: SUPABASE_ANON_KEY
+    }
+  });
+
+  if (!response.ok) {
+    return createResponse({ error: 'Unauthorized' }, 401);
+  }
+
+  const user = await response.json();
+  const isConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
+  if (!isConfirmed) {
+    return createResponse({ error: 'Email not confirmed' }, 403);
+  }
+
+  return null;
+}
+
 // ============================================================================
 // STAGE 1: VISION OCR - Extract from image
 // ============================================================================
@@ -534,6 +567,11 @@ Deno.serve(async (req: Request) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  const confirmationError = await ensureConfirmedUser(req);
+  if (confirmationError) {
+    return confirmationError;
   }
 
   const startTime = Date.now();

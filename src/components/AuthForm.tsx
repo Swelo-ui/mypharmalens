@@ -19,6 +19,26 @@ const AuthForm = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState('');
   const navigate = useNavigate();
+  const disposableEmailDomains = new Set([
+    '10minutemail.com',
+    '10minutemail.net',
+    'mailinator.com',
+    'yopmail.com',
+    'guerrillamail.com',
+    'guerrillamail.org',
+    'guerrillamail.net',
+    'tempmail.com',
+    'temp-mail.org',
+    'trashmail.com',
+    'mintemail.com',
+    'disposablemail.com'
+  ]);
+
+  const normalizeEmail = (value: string) => value.trim().toLowerCase();
+  const getEmailDomain = (value: string) => {
+    const atIndex = value.lastIndexOf('@');
+    return atIndex === -1 ? '' : value.slice(atIndex + 1);
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,11 +51,23 @@ const AuthForm = () => {
     }
     
     setTermsError('');
+    const normalizedEmail = normalizeEmail(email);
+    const domain = getEmailDomain(normalizedEmail);
+    if (!domain) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (disposableEmailDomains.has(domain)) {
+      toast.error("Disposable email addresses are not allowed.", {
+        description: "Please use a real email so we can verify your account."
+      });
+      return;
+    }
     setLoading(true);
 
     try {
       const { data, error } = await supabase.auth.signUp({ 
-        email, 
+        email: normalizedEmail, 
         password,
         options: {
           emailRedirectTo: window.location.origin
@@ -70,13 +102,23 @@ const AuthForm = () => {
     setLoading(true);
 
     try {
+      const normalizedEmail = normalizeEmail(email);
       const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
+        email: normalizedEmail, 
         password 
       });
 
       if (error) {
         throw error;
+      }
+
+      const isEmailConfirmed = !!data.user?.email_confirmed_at || !!data.user?.confirmed_at;
+      if (!isEmailConfirmed) {
+        await supabase.auth.signOut();
+        toast.error("Please confirm your email before signing in.", {
+          description: "Check your inbox for the verification link."
+        });
+        return;
       }
 
       toast.success("Signed in successfully");

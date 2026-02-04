@@ -669,6 +669,15 @@ const DrugIdentify = () => {
         console.log('✨ Special access granted - unlimited identifications');
         // Continue with processing
       } else {
+        const isEmailConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
+        if (isAuthenticated && user && !isEmailConfirmed) {
+          toast.error('Please verify your email to use AI identification.', {
+            description: 'Check your inbox and click the verification link.',
+            duration: 6000
+          });
+          return;
+        }
+
         // Check subscription limits before processing, guard loading first
         if (loading) {
           toast.info("Loading your subscription details... please wait a moment.");
