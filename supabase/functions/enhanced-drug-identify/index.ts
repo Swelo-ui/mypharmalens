@@ -23,6 +23,7 @@ const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY') ?? '';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const LEGACY_EMAIL_VERIFICATION_CUTOFF = '2026-02-04T00:00:00.000Z';
 
 // Models
 const MODEL_VISION = 'google/gemini-2.5-flash-lite';      // Primary Intelligence
@@ -197,6 +198,13 @@ function createResponse(body: object, status = 200): Response {
   });
 }
 
+function isLegacyUser(createdAt?: string | null): boolean {
+  if (!createdAt) return false;
+  const createdTime = new Date(createdAt).getTime();
+  const cutoffTime = new Date(LEGACY_EMAIL_VERIFICATION_CUTOFF).getTime();
+  return Number.isFinite(createdTime) && Number.isFinite(cutoffTime) && createdTime < cutoffTime;
+}
+
 async function ensureConfirmedUser(req: Request): Promise<Response | null> {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) return null;
@@ -223,7 +231,8 @@ async function ensureConfirmedUser(req: Request): Promise<Response | null> {
 
   const user = await response.json();
   const isConfirmed = !!user?.email_confirmed_at || !!user?.confirmed_at;
-  if (!isConfirmed) {
+  const isLegacy = isLegacyUser(user?.created_at);
+  if (!isConfirmed && !isLegacy) {
     return createResponse({ error: 'Email not confirmed' }, 403);
   }
 
