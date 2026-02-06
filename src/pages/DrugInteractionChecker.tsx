@@ -804,7 +804,7 @@ const DrugInteractionChecker = () => {
                                 </AccordionTrigger>
                                 <AccordionContent>
                                   <div className="px-4 pb-4 space-y-3 text-sm">
-                                    <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                                    <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                       <p className="font-semibold mb-1 text-xs uppercase tracking-wide">Analysis:</p>
                                       <p className="text-sm leading-relaxed break-words text-gray-700 dark:text-gray-300">
                                         {addLaymanBrackets(interaction.description)}
