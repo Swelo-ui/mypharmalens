@@ -718,29 +718,42 @@ const DrugInteractionChecker = () => {
 
                   {/* AI Interaction Results Section */}
                   {useSmartInteractions && isOnline && (
-                    <div className="mb-6 p-4 rounded-xl border border-pharma-100 bg-pharma-50/50 dark:bg-pharma-900/10 dark:border-pharma-800">
-                      <div className="flex items-center justify-between mb-3">
+                    <div className="mb-6 p-3 sm:p-4 rounded-xl border border-pharma-100 bg-pharma-50/50 dark:bg-pharma-900/10 dark:border-pharma-800">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div className="flex items-center gap-2">
-                          <Brain className="h-5 w-5 text-pharma-600 dark:text-pharma-400" />
+                          <Brain className="h-5 w-5 text-pharma-600 dark:text-pharma-400 flex-shrink-0" />
                           <h3 className="font-semibold text-pharma-900 dark:text-pharma-200">AI Safety Analysis</h3>
-                          <Badge variant="outline" className="bg-pharma-100 text-pharma-700 border-pharma-200 dark:bg-pharma-900/40 dark:text-pharma-300 dark:border-pharma-700 text-[10px] h-5">Verify with Doctor</Badge>
                         </div>
-                        {isAiAnalyzing ? (
-                          <div className="flex items-center gap-2 text-xs text-pharma-600 animate-pulse">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            Analyzing...
-                          </div>
-                        ) : aiInteractions ? (
-                          <Badge className="bg-green-600 hover:bg-green-700 text-white text-[10px] gap-1">
-                            <Check className="h-3 w-3" /> Updated
+                        
+                        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                          <Badge variant="outline" className="bg-pharma-100 text-pharma-700 border-pharma-200 dark:bg-pharma-900/40 dark:text-pharma-300 dark:border-pharma-700 text-[10px] h-6 whitespace-nowrap px-2">
+                            Verify with Doctor
                           </Badge>
-                        ) : null}
+
+                          {isAiAnalyzing ? (
+                            <div className="flex items-center gap-2 text-xs text-pharma-600 animate-pulse bg-white/50 dark:bg-black/20 px-2 py-1 rounded-full">
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <span className="font-medium">Analyzing...</span>
+                            </div>
+                          ) : aiInteractions ? (
+                            <Badge className="bg-green-600 hover:bg-green-700 text-white text-[10px] gap-1 h-6 px-2 shadow-sm">
+                              <Check className="h-3 w-3" /> Updated
+                            </Badge>
+                          ) : null}
+                        </div>
                       </div>
 
                       {isAiAnalyzing ? (
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-3/4 bg-pharma-200/50 dark:bg-pharma-800/30" />
-                          <Skeleton className="h-4 w-1/2 bg-pharma-200/50 dark:bg-pharma-800/30" />
+                        <div className="space-y-3">
+                          <div className="p-3 bg-white/40 dark:bg-gray-800/40 rounded-lg border border-pharma-100/50 dark:border-pharma-800/50 space-y-2">
+                            <Skeleton className="h-3 w-20 bg-pharma-200/50 dark:bg-pharma-800/30 mb-1" />
+                            <Skeleton className="h-4 w-full bg-pharma-200/50 dark:bg-pharma-800/30" />
+                            <Skeleton className="h-4 w-5/6 bg-pharma-200/50 dark:bg-pharma-800/30" />
+                          </div>
+                          <div className="space-y-2 pt-1">
+                            <Skeleton className="h-12 w-full rounded-lg bg-pharma-200/40 dark:bg-pharma-800/20" />
+                            <Skeleton className="h-12 w-full rounded-lg bg-pharma-200/40 dark:bg-pharma-800/20" />
+                          </div>
                         </div>
                       ) : aiError ? (
                         <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-2 rounded">
