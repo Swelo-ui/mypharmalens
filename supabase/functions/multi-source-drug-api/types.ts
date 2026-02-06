@@ -25,6 +25,8 @@ export interface ComprehensiveDrugInfo {
     fda?: string;
     rxlist?: string;
     dailymed?: string;
+    gemini?: string;
+    openrouter?: string;
   };
   completeness: number; // 0-100 score based on available information
 }

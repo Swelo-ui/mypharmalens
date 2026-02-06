@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertTriangle, X, Plus, Shield, Info, ArrowRight, ExternalLink, ChevronDown, Mic, Activity, Zap, Database, Check } from 'lucide-react';
+import { Search, AlertTriangle, X, Plus, Shield, Info, ArrowRight, ExternalLink, ChevronDown, Mic, Activity, Zap, Database, Check, Sparkles, Brain, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import Header from '@/components/Header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { loadAllDrugs } from '@/data/drugDataLoader';
 import { DrugData } from '@/components/DrugCard';
 import {
@@ -17,6 +20,7 @@ import {
   getSeverityBadgeColor,
   InteractionCheckResult
 } from '@/utils/drugInteractionChecker';
+import { medicalToLaymanTerms } from '@/utils/laymanTerms';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 // Removed popover/command UI to use inline, mobile-friendly list
@@ -49,6 +53,46 @@ function calculateLevenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
+interface AIInteraction {
+  severity: string;
+  title: string;
+  description: string;
+  recommendation: string;
+}
+
+const addLaymanBrackets = (text: string): string => {
+  if (!text) return text;
+  const entries = Object.entries(medicalToLaymanTerms).sort(
+    (a, b) => b[0].length - a[0].length
+  );
+  return entries.reduce((acc, [term, layman]) => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b(?!\\s*\\()`, 'gi');
+    return acc.replace(regex, (match) => `${match} (${layman})`);
+  }, text);
+};
+
+const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const getCache = (key: string) => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    const ts = typeof parsed.ts === 'number' ? parsed.ts : 0;
+    if (ts && Date.now() - ts > CACHE_TTL_MS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+const setCache = (key: string, value: { summary: string; interactions: AIInteraction[] }) => {
+  try {
+    const payload = { ...value, ts: Date.now() };
+    localStorage.setItem(key, JSON.stringify(payload));
+  } catch {}
+};
+
 const DrugInteractionChecker = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -58,6 +102,15 @@ const DrugInteractionChecker = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [interactionResult, setInteractionResult] = useState<InteractionCheckResult | null>(null);
+
+  // AI Smart Interactions State
+  const [useSmartInteractions, setUseSmartInteractions] = useState(true);
+  const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
+  const [aiInteractions, setAiInteractions] = useState<AIInteraction[] | null>(null);
+  const [aiSummary, setAiSummary] = useState<string>('');
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [showAllAi, setShowAllAi] = useState(false);
   // Inline list state
   const [showSummary, setShowSummary] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -128,12 +181,99 @@ const DrugInteractionChecker = () => {
     }
 
     if (selectedDrugs.length >= 2) {
+      // 1. Run Local Heuristic Check (Instant)
       const result = checkDrugInteractions(selectedDrugs, allDrugs);
       setInteractionResult(result);
+
+      // 2. Run AI Smart Check (Async) if enabled and online
+      if (useSmartInteractions && isOnline) {
+        const fetchSmart = async () => {
+          setIsAiAnalyzing(true);
+          setAiError(null);
+          try {
+            const drugNamesList = selectedDrugs.map(d => d.name);
+            const normalizedKey = drugNamesList
+              .map((name) => (name || '').trim())
+              .filter((name) => name.length > 0)
+              .sort((a, b) => a.localeCompare(b))
+              .join('|');
+            const cacheKey = `aiInteractions:${normalizedKey}`;
+            const cachedObj = getCache(cacheKey);
+            if (cachedObj && Array.isArray(cachedObj.interactions)) {
+              setAiInteractions(cachedObj.interactions);
+              setAiSummary(typeof cachedObj.summary === 'string' ? cachedObj.summary : '');
+              setShowAllAi(false);
+              setIsAiAnalyzing(false);
+              return;
+            }
+            console.log(`🧠 AI Checking interactions for: ${drugNamesList.join(', ')}`);
+
+            const { data, error } = await supabase.functions.invoke('analyze-interactions', {
+              body: {
+                drugs: drugNamesList
+              }
+            });
+
+            if (error) {
+               console.error("Supabase Function Error:", error);
+               throw new Error(error.message || "Failed to connect to AI service");
+            }
+
+            if (data?.error) {
+               throw new Error(data.error);
+            }
+
+            if (data?.interactions && Array.isArray(data.interactions)) {
+              setAiInteractions(data.interactions);
+            } else {
+              setAiInteractions([]); // Empty array means "checked but none found"
+            }
+            setAiSummary(typeof data?.summary === 'string' ? data.summary : '');
+            setCache(cacheKey, {
+              summary: typeof data?.summary === 'string' ? data.summary : '',
+              interactions: Array.isArray(data?.interactions) ? data.interactions : []
+            });
+            setShowAllAi(false);
+          } catch (err: any) {
+            console.error("❌ Smart check failed:", err);
+            setAiError(err.message || "AI analysis failed");
+            setAiInteractions(null);
+            setAiSummary('');
+            setShowAllAi(false);
+          } finally {
+            setIsAiAnalyzing(false);
+          }
+        };
+
+        // Debounce slightly to avoid rapid calls while adding multiple drugs
+        const timeoutId = setTimeout(fetchSmart, 1000);
+        return () => clearTimeout(timeoutId);
+      } else {
+        setAiInteractions(null);
+        setAiError(null);
+        setAiSummary('');
+        setShowAllAi(false);
+      }
+
     } else {
       setInteractionResult(null);
+      setAiInteractions(null);
+      setAiSummary('');
+      setShowAllAi(false);
     }
-  }, [selectedDrugs, allDrugs]);
+  }, [selectedDrugs, allDrugs, useSmartInteractions, isOnline]);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const handleAddDrug = (drug: DrugData) => {
     if (!selectedDrugs.find(d => d.id === drug.id)) {
@@ -277,6 +417,10 @@ const DrugInteractionChecker = () => {
       { mild: 0, moderate: 0, severe: 0, contraindicated: 0 }
     );
   }, [interactionResult]);
+
+  const visibleAiInteractions = aiInteractions
+    ? (showAllAi ? aiInteractions : aiInteractions.slice(0, 3))
+    : null;
 
   const getSeverityLabel = (severity: string) => {
     switch (severity) {
@@ -571,6 +715,129 @@ const DrugInteractionChecker = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+
+                  {/* AI Interaction Results Section */}
+                  {useSmartInteractions && isOnline && (
+                    <div className="mb-6 p-4 rounded-xl border border-pharma-100 bg-pharma-50/50 dark:bg-pharma-900/10 dark:border-pharma-800">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Brain className="h-5 w-5 text-pharma-600 dark:text-pharma-400" />
+                          <h3 className="font-semibold text-pharma-900 dark:text-pharma-200">AI Safety Analysis</h3>
+                          <Badge variant="outline" className="bg-pharma-100 text-pharma-700 border-pharma-200 dark:bg-pharma-900/40 dark:text-pharma-300 dark:border-pharma-700 text-[10px] h-5">Verify with Doctor</Badge>
+                        </div>
+                        {isAiAnalyzing ? (
+                          <div className="flex items-center gap-2 text-xs text-pharma-600 animate-pulse">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Analyzing...
+                          </div>
+                        ) : aiInteractions ? (
+                          <Badge className="bg-green-600 hover:bg-green-700 text-white text-[10px] gap-1">
+                            <Check className="h-3 w-3" /> Updated
+                          </Badge>
+                        ) : null}
+                      </div>
+
+                      {isAiAnalyzing ? (
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-3/4 bg-pharma-200/50 dark:bg-pharma-800/30" />
+                          <Skeleton className="h-4 w-1/2 bg-pharma-200/50 dark:bg-pharma-800/30" />
+                        </div>
+                      ) : aiError ? (
+                        <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-2 rounded">
+                           <AlertTriangle className="h-4 w-4" />
+                           <span>{aiError}</span>
+                        </div>
+                      ) : aiInteractions && aiInteractions.length > 0 ? (
+                        <div className="space-y-4">
+                          {aiSummary && (
+                            <div className="p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-pharma-100 dark:border-pharma-800">
+                              <p className="text-xs uppercase tracking-wide font-semibold text-pharma-700 dark:text-pharma-400 mb-1">AI Summary</p>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                {addLaymanBrackets(aiSummary)}
+                              </p>
+                            </div>
+                          )}
+
+                          <Accordion type="multiple" className="space-y-2">
+                            {visibleAiInteractions?.map((interaction, idx) => (
+                              <AccordionItem
+                                key={idx}
+                                value={`ai-${idx}`}
+                                className="rounded-lg border border-pharma-100 dark:border-pharma-800 bg-white/60 dark:bg-gray-900/40"
+                              >
+                                <AccordionTrigger className="px-4">
+                                  <div
+                                    className={`flex flex-col sm:flex-row sm:items-center gap-2 border-l-4 pl-4 ${
+                                      interaction.severity === 'Critical' || interaction.severity === 'Severe'
+                                        ? 'border-red-500'
+                                        : interaction.severity === 'Moderate'
+                                          ? 'border-yellow-500'
+                                          : 'border-blue-500'
+                                    }`}
+                                  >
+                                    <span className="font-semibold text-sm sm:text-base break-words leading-tight">
+                                      {interaction.title}
+                                    </span>
+                                    <Badge className={`${
+                                      interaction.severity === 'Critical' || interaction.severity === 'Severe'
+                                        ? 'bg-red-500 hover:bg-red-600'
+                                        : interaction.severity === 'Moderate'
+                                          ? 'bg-yellow-500 hover:bg-yellow-600'
+                                          : 'bg-blue-500 hover:bg-blue-600'
+                                    } text-xs w-fit flex-shrink-0 text-white border-0`}>
+                                      {interaction.severity.toUpperCase()}
+                                    </Badge>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <div className="px-4 pb-4 space-y-3 text-sm">
+                                    <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                                      <p className="font-semibold mb-1 text-xs uppercase tracking-wide">Analysis:</p>
+                                      <p className="text-sm leading-relaxed break-words text-gray-700 dark:text-gray-300">
+                                        {addLaymanBrackets(interaction.description)}
+                                      </p>
+                                    </div>
+                                    <div className="p-3 bg-pharma-50 dark:bg-pharma-900/20 rounded-lg border border-pharma-100 dark:border-pharma-800">
+                                      <p className="font-semibold mb-1 text-xs uppercase tracking-wide text-pharma-700 dark:text-pharma-400">Professional Advice:</p>
+                                      <p className="text-sm leading-relaxed break-words text-pharma-900 dark:text-pharma-200">
+                                        {addLaymanBrackets(interaction.recommendation)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            ))}
+                          </Accordion>
+                          <div className="flex flex-wrap items-center justify-center gap-2">
+                            {aiInteractions.length > 3 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowAllAi(v => !v)}
+                              >
+                                {showAllAi ? 'Show less' : `Show all (${aiInteractions.length})`}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {aiSummary && (
+                            <div className="p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-pharma-100 dark:border-pharma-800">
+                              <p className="text-xs uppercase tracking-wide font-semibold text-pharma-700 dark:text-pharma-400 mb-1">AI Summary</p>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                {addLaymanBrackets(aiSummary)}
+                              </p>
+                            </div>
+                          )}
+                          <div className="text-sm text-pharma-700/80 dark:text-pharma-400 italic">
+                            {addLaymanBrackets(aiSummary || 'No significant interactions. This combination is generally safe.')}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {!interactionResult.hasInteractions ? (
                     <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800">
                       <Shield className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -789,7 +1056,19 @@ const DrugInteractionChecker = () => {
 
                     {interactionResult.interactions.length > 0 && (
                       <div className="border-t pt-4 space-y-2">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Interaction severity</p>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Interaction severity</p>
+                          {/* Toggle for AI */}
+                          <div className="flex items-center gap-2" title="Toggle AI Smart Checker">
+                            <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">Smart AI</span>
+                            <Switch
+                              checked={useSmartInteractions}
+                              onCheckedChange={setUseSmartInteractions}
+                              className="scale-75 data-[state=checked]:bg-indigo-600"
+                              disabled={!isOnline}
+                            />
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div className="flex items-center justify-between">
                             <span className="text-gray-500 dark:text-gray-400">Mild</span>

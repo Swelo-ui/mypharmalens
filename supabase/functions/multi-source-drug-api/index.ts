@@ -1,7 +1,10 @@
 // Multi-Source Drug Information API with Caching
 import "@supabase/functions-js/edge-runtime.d.ts";
+// @ts-ignore
 import { getCachedDrug, saveDrugToCache } from './cache.ts';
+// @ts-ignore
 import { scrapeFDAOpenFDA, scrapeRxList, scrapeNIHDailyMed } from './scrapers.ts';
+// @ts-ignore
 import { cleanText as cleanTextContent, cleanDrugData, cleanMechanismText, cleanTextArray } from '../_shared/text-cleaner.ts';
 
 // Declare Deno for edge runtime
@@ -60,6 +63,7 @@ interface ComprehensiveDrugInfo {
     rxlist?: string;
     dailymed?: string;
     gemini?: string;
+    openrouter?: string;
   };
   completeness: number; // 0-100 score based on available information
 }
@@ -99,11 +103,11 @@ function createResponse(data: unknown, status: number = 200): Response {
 // Enhanced fetch with retry logic and exponential backoff
 async function fetchWithRetry(url: string, maxRetries: number = 3): Promise<Response> {
   let lastError: Error | null = null;
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🌐 Fetching ${url} (attempt ${attempt}/${maxRetries})`);
-      
+
       const response = await fetch(url, {
         headers: {
           'User-Agent': getRandomUserAgent(),
@@ -125,7 +129,7 @@ async function fetchWithRetry(url: string, maxRetries: number = 3): Promise<Resp
         console.log(`✅ Fetch successful (${response.status})`);
         return response;
       }
-      
+
       // Handle specific error codes
       if (response.status === 404) {
         console.warn(`⚠️ Resource not found (404) - drug may not exist in this source`);
@@ -142,7 +146,7 @@ async function fetchWithRetry(url: string, maxRetries: number = 3): Promise<Resp
     } catch (error) {
       lastError = error as Error;
       console.error(`❌ Attempt ${attempt} failed:`, (error as Error).message);
-      
+
       if (attempt < maxRetries) {
         // Exponential backoff: 1s, 2s, 4s
         const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
@@ -151,7 +155,7 @@ async function fetchWithRetry(url: string, maxRetries: number = 3): Promise<Resp
       }
     }
   }
-  
+
   console.error(`❌ All ${maxRetries} fetch attempts failed for ${url}`);
   throw lastError || new Error('All fetch attempts failed');
 }
@@ -166,13 +170,13 @@ function cleanText(text: string): string {
 
 function extractArrayFromText(text: string, maxItems: number = 15): string[] {
   if (!text) return [];
-  
+
   const items = text
     .split(/[•\n\r]/)
     .map(item => cleanText(item))
     .filter(item => item.length > 3 && item.length < 200)
     .slice(0, maxItems);
-    
+
   return Array.from(new Set(items));
 }
 
@@ -181,11 +185,11 @@ async function scrapeDrugsCom(drugName: string): Promise<Partial<ComprehensiveDr
   try {
     const searchUrl = `https://www.drugs.com/${encodeURIComponent(drugName.toLowerCase().replace(/\s+/g, '-'))}.html`;
     console.log(`Scraping Drugs.com: ${searchUrl}`);
-    
+
     const response = await fetchWithRetry(searchUrl);
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    
+
     if (!doc) {
       throw new Error('Failed to parse HTML');
     }
@@ -271,11 +275,11 @@ async function scrapeMedlinePlus(drugName: string): Promise<Partial<Comprehensiv
   try {
     const searchUrl = `https://medlineplus.gov/druginfo/meds/a${encodeURIComponent(drugName.toLowerCase().replace(/\s+/g, ''))}.html`;
     console.log(`Scraping MedlinePlus: ${searchUrl}`);
-    
+
     const response = await fetchWithRetry(searchUrl);
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    
+
     if (!doc) {
       throw new Error('Failed to parse HTML');
     }
@@ -346,7 +350,7 @@ function mergeMultiSourceData(
   medlinePlusData: Partial<ComprehensiveDrugInfo> | null,
   drugName: string
 ): ComprehensiveDrugInfo {
-  
+
   const merged: ComprehensiveDrugInfo = {
     name: drugName,
     genericName: "",
@@ -376,7 +380,7 @@ function mergeMultiSourceData(
   if (drugsComData) {
     sourcesUsed.push('Drugs.com');
     merged.sources.drugscom = drugsComData.sources?.drugscom;
-    
+
     // Prioritize Drugs.com for certain fields
     if (drugsComData.genericName) merged.genericName = drugsComData.genericName;
     if (drugsComData.manufacturer) merged.manufacturer = drugsComData.manufacturer;
@@ -389,12 +393,12 @@ function mergeMultiSourceData(
     if (drugsComData.indications?.length) merged.indications = drugsComData.indications;
     if (drugsComData.contraindications?.length) merged.contraindications = drugsComData.contraindications;
     if (drugsComData.interactions?.length) merged.interactions = drugsComData.interactions;
-    
+
     // Use Drugs.com description if available and substantial
     if (drugsComData.description && drugsComData.description.length > 50) {
       merged.description = drugsComData.description;
     }
-    
+
     // Use Drugs.com arrays if available
     if (drugsComData.sideEffects?.length) {
       merged.sideEffects = drugsComData.sideEffects.slice(0, 15);
@@ -414,7 +418,7 @@ function mergeMultiSourceData(
   if (medlinePlusData) {
     sourcesUsed.push('MedlinePlus');
     merged.sources.medlineplus = medlinePlusData.sources?.medlineplus;
-    
+
     // Fill in missing fields from MedlinePlus
     if (!merged.genericName && medlinePlusData.genericName) {
       merged.genericName = medlinePlusData.genericName;
@@ -428,7 +432,7 @@ function mergeMultiSourceData(
     if (!merged.storage && medlinePlusData.storage) {
       merged.storage = medlinePlusData.storage;
     }
-    
+
     // Merge arrays (combine unique items)
     if (medlinePlusData.sideEffects?.length) {
       const combinedSideEffects = [...merged.sideEffects, ...medlinePlusData.sideEffects];
@@ -442,9 +446,9 @@ function mergeMultiSourceData(
 
   // Calculate completeness score
   merged.completeness = calculateCompleteness(merged);
-  
+
   console.log(`Merged data from sources: ${sourcesUsed.join(', ')}, completeness: ${merged.completeness}%`);
-  
+
   return merged;
 }
 
@@ -456,9 +460,9 @@ function calculateCompleteness(merged: ComprehensiveDrugInfo): number {
   ];
 
   fields.forEach(field => {
-    if (merged[field as keyof ComprehensiveDrugInfo] && 
-        String(merged[field as keyof ComprehensiveDrugInfo]).trim() !== '' &&
-        String(merged[field as keyof ComprehensiveDrugInfo]) !== 'Unknown') {
+    if (merged[field as keyof ComprehensiveDrugInfo] &&
+      String(merged[field as keyof ComprehensiveDrugInfo]).trim() !== '' &&
+      String(merged[field as keyof ComprehensiveDrugInfo]) !== 'Unknown') {
       completenessScore += 8;
     }
   });
@@ -486,7 +490,7 @@ function mergeAllSourceData(
   dailyMedData: Partial<ComprehensiveDrugInfo> | null,
   drugName: string
 ): ComprehensiveDrugInfo {
-  
+
   const merged: ComprehensiveDrugInfo = {
     name: drugName,
     genericName: "",
@@ -512,7 +516,7 @@ function mergeAllSourceData(
 
   // Priority order: FDA > Drugs.com > MedlinePlus > RxList > DailyMed
   // FDA is most authoritative for regulatory/official info
-  
+
   const allSources = [
     { data: fdaData, name: 'FDA', key: 'fda' },
     { data: drugsComData, name: 'Drugs.com', key: 'drugscom' },
@@ -520,16 +524,16 @@ function mergeAllSourceData(
     { data: rxListData, name: 'RxList', key: 'rxlist' },
     { data: dailyMedData, name: 'DailyMed', key: 'dailymed' }
   ];
-  
+
   // Merge each source in priority order
   for (const source of allSources) {
     if (!source.data) continue;
-    
+
     // Track source
     if (source.data.sources) {
       merged.sources = { ...merged.sources, ...source.data.sources };
     }
-    
+
     // Fill in missing fields (first valid value wins due to priority order)
     if (!merged.genericName && source.data.genericName) merged.genericName = source.data.genericName;
     if (!merged.manufacturer && source.data.manufacturer) merged.manufacturer = source.data.manufacturer;
@@ -543,7 +547,7 @@ function mergeAllSourceData(
     if (merged.prescriptionStatus === 'Unknown' && source.data.prescriptionStatus) {
       merged.prescriptionStatus = source.data.prescriptionStatus;
     }
-    
+
     // Merge arrays (combine unique items from all sources)
     if (source.data.sideEffects?.length) {
       merged.sideEffects = [...new Set([...merged.sideEffects, ...source.data.sideEffects])].slice(0, 20);
@@ -564,16 +568,16 @@ function mergeAllSourceData(
       merged.brandNames = [...new Set([...merged.brandNames, ...source.data.brandNames])].slice(0, 10);
     }
   }
-  
+
   // Mark as verified if we have FDA data
   merged.verified = !!fdaData;
-  
+
   // Calculate completeness
   merged.completeness = calculateCompleteness(merged);
-  
+
   const sourceCount = allSources.filter(s => s.data !== null).length;
   console.log(`✅ Merged data from ${sourceCount}/5 sources, completeness: ${merged.completeness}%`);
-  
+
   return merged;
 }
 
@@ -584,7 +588,7 @@ async function collectDrugData(drugName: string): Promise<{
 }> {
   const searchAttempts: string[] = [];
   const sourcesUsed: string[] = [];
-  
+
   console.log(`\n🌐 === DATA COLLECTION START === for: ${drugName}`);
   console.log('🔍 Fetching from 5 data sources in parallel...');
   console.log(`   1. Drugs.com`);
@@ -592,7 +596,7 @@ async function collectDrugData(drugName: string): Promise<{
   console.log(`   3. FDA OpenFDA`);
   console.log(`   4. RxList`);
   console.log(`   5. NIH DailyMed`);
-  
+
   // 🆕 Try scraping from ALL 5 sources in parallel
   const [
     drugsComData,
@@ -607,14 +611,14 @@ async function collectDrugData(drugName: string): Promise<{
     scrapeRxList(drugName),
     scrapeNIHDailyMed(drugName)
   ]);
-  
+
   // Extract results
   const drugsComResult = drugsComData.status === 'fulfilled' ? drugsComData.value : null;
   const medlinePlusResult = medlinePlusData.status === 'fulfilled' ? medlinePlusData.value : null;
   const fdaResult = fdaData.status === 'fulfilled' ? fdaData.value : null;
   const rxListResult = rxListData.status === 'fulfilled' ? rxListData.value : null;
   const dailyMedResult = dailyMedData.status === 'fulfilled' ? dailyMedData.value : null;
-  
+
   // Track successful sources
   if (drugsComResult) {
     searchAttempts.push(`Drugs.com: ${drugName}`);
@@ -636,17 +640,17 @@ async function collectDrugData(drugName: string): Promise<{
     searchAttempts.push(`NIH DailyMed: ${drugName}`);
     sourcesUsed.push('NIH DailyMed');
   }
-  
+
   console.log(`\n📊 === SCRAPING RESULTS ===`);
   console.log(`   ✅ Successful: ${sourcesUsed.length}/5`);
   console.log(`   📝 Sources: ${sourcesUsed.join(', ')}`);
-  
+
   if (drugsComData.status === 'rejected') console.error(`   ❌ Drugs.com failed:`, drugsComData.reason);
   if (medlinePlusData.status === 'rejected') console.error(`   ❌ MedlinePlus failed:`, medlinePlusData.reason);
   if (fdaData.status === 'rejected') console.error(`   ❌ FDA OpenFDA failed:`, fdaData.reason);
   if (rxListData.status === 'rejected') console.error(`   ❌ RxList failed:`, rxListData.reason);
   if (dailyMedData.status === 'rejected') console.error(`   ❌ DailyMed failed:`, dailyMedData.reason);
-  
+
   // 🆕 Merge data from ALL sources
   console.log(`\n🔀 === MERGING DATA ===`);
   const drugInfo = mergeAllSourceData(
@@ -659,7 +663,7 @@ async function collectDrugData(drugName: string): Promise<{
   );
   console.log(`   Merged completeness: ${drugInfo.completeness}%`);
   console.log(`🌐 === DATA COLLECTION END ===\n`);
-  
+
   return {
     drugInfo,
     searchAttempts,
@@ -703,7 +707,7 @@ async function generateComprehensiveDataWithGemini(drugName: string): Promise<Co
 
   try {
     console.log(`🤖 Generating comprehensive data with Gemini for: ${drugName}`);
-    
+
     const prompt = `
     You are a pharmaceutical database expert. Generate complete, accurate, and medically reliable information for the medication: ${drugName}
     
@@ -769,7 +773,7 @@ async function generateComprehensiveDataWithGemini(drugName: string): Promise<Co
         const jsonMatch = geminiText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const generatedData = JSON.parse(jsonMatch[0]) as Partial<ComprehensiveDrugInfo>;
-          
+
           const comprehensiveInfo: ComprehensiveDrugInfo = {
             name: drugName,
             genericName: cleanTextContent(generatedData.genericName || ''),
@@ -802,6 +806,99 @@ async function generateComprehensiveDataWithGemini(drugName: string): Promise<Co
     }
   } catch (error) {
     console.error('Gemini data generation failed:', error);
+  }
+
+  return null;
+}
+
+// OpenRouter API integration for Smart Interactions
+const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY');
+const OPENROUTER_MODEL = 'openai/gpt-oss-120b'; // As requested by user
+
+interface SmartInteractionResponse {
+  interactions: string[];
+}
+
+async function generateSmartInteractions(drugName: string): Promise<string[] | null> {
+  if (!OPENROUTER_API_KEY) {
+    console.warn('OpenRouter API key not available, skipping smart interactions');
+    return null;
+  }
+
+  try {
+    console.log(`🧠 Generating SMART interactions for: ${drugName} using ${OPENROUTER_MODEL}`);
+
+    // Prompt designed for safety, conciseness, and user understanding
+    const prompt = `
+    Analyze the drug interactions for "${drugName}" deeply and properly.
+    
+    Context: The user input might be a single drug (e.g., "Aspirin") or multiple drugs/conditions (e.g., "Aspirin and Warfarin" or "Ibuprofen with high blood pressure").
+    
+    Goal: Provide a list of important drug interactions that a patient MUST know for safety.
+    Target Audience: Online users. Do not scare them with rare or theoretical interactions. Focus on what matters.
+    
+    Instructions:
+    1. If multiple drugs are meant, specifically analyze interactions BETWEEN them.
+    2. Identify only clinically significant interactions (drug-drug, drug-food, or drug-condition).
+    3. Explain WHY the interaction matters in simple, safe language (e.g., "May cause drowsiness" instead of "CNS depression").
+    4. Be concise. Limit to the top 5-7 most critical interactions.
+    5. Format the output as a JSON object with a single key "interactions" containing an array of strings. 
+    6. Each string should be a complete, readable sentence.
+    
+    Example Output Format:
+    {
+      "interactions": [
+        "Avoid alcohol as it may increase drowsiness.",
+        "Do not take with aspirin to prevent stomach bleeding risk."
+      ]
+    }
+    `;
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://mypharmalens.com', // Best practice for OpenRouter
+        'X-Title': 'PharmaLens',
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a smart, safe, and concise medical AI assistant.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.2, // Low temperature for factual consistency
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`OpenRouter API error (${response.status}): ${errText}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (content) {
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]) as SmartInteractionResponse;
+          if (Array.isArray(parsed.interactions) && parsed.interactions.length > 0) {
+            console.log(`✅ Smart interactions generated: ${parsed.interactions.length} items`);
+            return parsed.interactions;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse Smart Interaction JSON:', e);
+      }
+    }
+
+  } catch (error) {
+    console.error('Smart interaction generation failed:', error);
   }
 
   return null;
@@ -875,7 +972,7 @@ async function enhanceDrugInfoWithGemini(drugInfo: ComprehensiveDrugInfo): Promi
         const jsonMatch = enhancedText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const enhancedData = JSON.parse(jsonMatch[0]) as Partial<ComprehensiveDrugInfo>;
-          
+
           // Merge enhanced data with original, keeping source information
           const enhanced: ComprehensiveDrugInfo = {
             ...drugInfo,
@@ -911,32 +1008,55 @@ Deno.serve(async (req: Request) => {
 
   try {
     const startTime = performance.now();
-    const { drugName, skipCache } = await req.json() as { drugName?: string; skipCache?: boolean };
+    const { drugName, skipCache, useSmartInteractions } = await req.json() as {
+      drugName?: string;
+      skipCache?: boolean;
+      useSmartInteractions?: boolean;
+    };
 
     if (!drugName || typeof drugName !== 'string' || drugName.trim().length < 2) {
       return createResponse({ error: 'Invalid drug name' }, 400);
     }
 
     console.log(`\n========== Drug Lookup: ${drugName} ==========`);
-    
+
     // NEW: Check cache first (unless skipCache is true)
     if (!skipCache) {
       console.log(`\n🔍 === CACHE CHECK START === for: ${drugName}`);
       try {
         const cachedDrug = await getCachedDrug(drugName);
-        
+
         if (cachedDrug) {
           console.log(`📊 Cache found: completeness=${cachedDrug.completeness}%, sources=${Object.keys(cachedDrug.sources).length}`);
-          
+
           if (cachedDrug.completeness >= 60) {
             console.log(`✅ Cache HIT! Returning cached data`);
             console.log(`   Sources: ${Object.keys(cachedDrug.sources).join(', ')}`);
+
+            // If Smart Interaction is requested, we might need to overwrite the cached interactions
+            let finalData = cachedDrug;
+            let smartSourceUsed = false;
+
+            if (useSmartInteractions) {
+              console.log('⚡ Smart Interaction requested on CACHED data. Fetching AI update...');
+              const smartInteractions = await generateSmartInteractions(drugName);
+              if (smartInteractions) {
+                finalData = {
+                  ...cachedDrug,
+                  interactions: smartInteractions,
+                  sources: { ...cachedDrug.sources, openrouter: 'Smart AI (GPT-OSS-120B)' }
+                };
+                smartSourceUsed = true;
+                console.log('🔄 Replaced cached interactions with Smart AI data');
+              }
+            }
+
             const response: ApiResponse = {
               success: true,
-              data: cachedDrug,
-              searchAttempts: ['Cache lookup'],
+              data: finalData,
+              searchAttempts: ['Cache lookup', ...(smartSourceUsed ? ['Smart AI Update'] : [])],
               processingTime: Math.round(performance.now() - startTime),
-              sourcesUsed: Object.keys(cachedDrug.sources).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+              sourcesUsed: [...Object.keys(finalData.sources).map(s => s.charAt(0).toUpperCase() + s.slice(1))],
               fromCache: true
             };
             return createResponse(response, 200);
@@ -967,7 +1087,7 @@ Deno.serve(async (req: Request) => {
     // Only use Gemini fallback if scraping completely failed (< 15% completeness)
     // This gives priority to real scraped data from authoritative sources
     const hasMinimalData = drugInfo.completeness >= 15;
-    
+
     if (!hasMinimalData) {
       console.log(`❌ Scraping completely failed (${drugInfo.completeness}% < 15%), using Gemini as last resort...`);
       // Use Gemini to generate comprehensive data when scraping fails
@@ -982,7 +1102,7 @@ Deno.serve(async (req: Request) => {
           verified: false, // Mark as AI-generated
           completeness: Math.max(geminiGenerated.completeness, drugInfo.completeness)
         };
-        
+
         console.log(`💾 === AUTO-SAVE DISABLED (Gemini-backed) ===`);
         if (mergedInfo.completeness >= 30) {
           console.log(`   Completeness: ${mergedInfo.completeness}% (>= 30%, would qualify for caching)`);
@@ -990,7 +1110,7 @@ Deno.serve(async (req: Request) => {
           console.log(`   Drug name: ${drugName}`);
           console.log(`   Auto-save disabled - use manual save button to cache this result`);
         }
-        
+
         const response: ApiResponse = {
           success: true,
           data: mergedInfo,
@@ -1009,24 +1129,43 @@ Deno.serve(async (req: Request) => {
         return createResponse(response, 200);
       }
     }
-    
+
     // Enhance with Gemini (fill gaps in scraped data)
-    const enhancedInfo = await enhanceDrugInfoWithGemini(drugInfo);
+    let finalDrugInfo = await enhanceDrugInfoWithGemini(drugInfo);
+
+    // === SMART INTERACTION LOGIC (The "Online" User Path) ===
+    if (useSmartInteractions) {
+      console.log('⚡ Performing FINAL Smart Interaction Enhancement...');
+      const smartInteractions = await generateSmartInteractions(drugName);
+
+      if (smartInteractions) {
+        finalDrugInfo = {
+          ...finalDrugInfo,
+          interactions: smartInteractions,
+          sources: { ...finalDrugInfo.sources, openrouter: 'Smart AI (GPT-OSS-120B)' }
+        };
+        // Push "OpenRouter" to sourcesUsed logic if not there
+        if (!sourcesUsed.includes('OpenRouter')) sourcesUsed.push('OpenRouter');
+        console.log('✅ Applied Smart AI Interactions to final response');
+      } else {
+        console.log('⚠️ Smart Interaction failed (or API key missing), keeping original data');
+      }
+    }
 
     // Auto-save disabled - use manual save only
     console.log(`\n💾 === AUTO-SAVE DISABLED ===`);
-    if (enhancedInfo.completeness >= 30) {
-      console.log(`   Completeness: ${enhancedInfo.completeness}% (>= 30%, would qualify for caching)`);
+    if (finalDrugInfo.completeness >= 30) {
+      console.log(`   Completeness: ${finalDrugInfo.completeness}% (>= 30%, would qualify for caching)`);
       console.log(`   Sources used: ${sourcesUsed.join(', ')}`);
       console.log(`   Drug name: ${drugName}`);
       console.log(`   Auto-save disabled - use manual save button to cache this result`);
     } else {
-      console.log(`   ⚠️ Completeness too low (${enhancedInfo.completeness}% < 30%), would not qualify for caching anyway`);
+      console.log(`   ⚠️ Completeness too low (${finalDrugInfo.completeness}% < 30%), would not qualify for caching anyway`);
     }
 
     const response: ApiResponse = {
       success: true,
-      data: enhancedInfo,
+      data: finalDrugInfo,
       searchAttempts,
       processingTime: Math.round(performance.now() - startTime),
       sourcesUsed,
@@ -1035,7 +1174,7 @@ Deno.serve(async (req: Request) => {
 
     console.log(`\n🎉 === FINAL RESPONSE ===`);
     console.log(`   Sources: ${sourcesUsed.length}`);
-    console.log(`   Completeness: ${enhancedInfo.completeness}%`);
+    console.log(`   Completeness: ${finalDrugInfo.completeness}%`);
     console.log(`   From cache: ${false}`);
     console.log(`   Processing time: ${Math.round(performance.now() - startTime)}ms`);
     console.log(`🎉 === REQUEST COMPLETE ===\n`);
