@@ -13,7 +13,7 @@ import { TestimonialCard, pharmaLensTestimonials } from '@/components/ui/testimo
 const About = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const profileImageUrl = "https://res.cloudinary.com/dhf7udqhi/image/upload/v1759912527/1759912263678_ignyew.png";
+  const profileImageUrl = "https://res.cloudinary.com/dhf7udqhi/image/upload/v1770364370/WhatsApp_Image_2026-02-06_at_1.21.03_PM_loncdb.jpg";
 
   useEffect(() => {
     // Scroll to top when component mounts
