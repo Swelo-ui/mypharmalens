@@ -24,6 +24,7 @@ const AuthForm = () => {
   const [termsError, setTermsError] = useState('');
   const [fingerprint, setFingerprint] = useState<string>('');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [turnstileKey, setTurnstileKey] = useState<number>(0);
   const [honeypot, setHoneypot] = useState('');
   
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ const AuthForm = () => {
       setPassword('');
       setAcceptedTerms(false);
       setTurnstileToken('');
+      setTurnstileKey(prev => prev + 1);
       
     } catch (error) {
       console.error('Error signing up:', error);
@@ -115,6 +117,7 @@ const AuthForm = () => {
         description: message 
       });
       setTurnstileToken('');
+      setTurnstileKey(prev => prev + 1);
     } finally {
       setLoading(false);
     }
@@ -340,6 +343,7 @@ const AuthForm = () => {
 
               <div className="flex justify-center py-2">
                 <Turnstile
+                  key={turnstileKey}
                   sitekey={TURNSTILE_SITE_KEY}
                   onSuccess={(token) => setTurnstileToken(token)}
                   onError={() => {

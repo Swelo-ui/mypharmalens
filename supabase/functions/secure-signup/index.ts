@@ -277,7 +277,10 @@ serve(async (req) => {
     }
 
     if (!normalizedEmail || !passwordValue) {
-      throw new Error('Email and password are required');
+      return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const domain = normalizedEmail.split('@')[1] || '';
@@ -289,7 +292,10 @@ serve(async (req) => {
         eventType: 'signup_blocked',
         metadata: { reason: 'disposable_email' }
       });
-      throw new Error('Please use a permanent email address (e.g., Gmail, Yahoo).');
+      return new Response(JSON.stringify({ error: 'Please use a permanent email address (e.g., Gmail, Yahoo).' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY');
@@ -311,7 +317,10 @@ serve(async (req) => {
         eventType: 'signup_blocked',
         metadata: { reason: 'missing_turnstile' }
       });
-      throw new Error('Security check required.');
+      return new Response(JSON.stringify({ error: 'Security check required.' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const turnstileBody = new URLSearchParams({
@@ -328,7 +337,10 @@ serve(async (req) => {
     });
     if (!turnstileRes.ok) {
       console.error(`Turnstile HTTP error: ${turnstileRes.status}`);
-      throw new Error('Security check failed (Turnstile API error). Please try again.');
+      return new Response(JSON.stringify({ error: 'Security check failed (Turnstile API error). Please try again.' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     const turnstileData = await turnstileRes.json();
     if (!turnstileData.success) {
@@ -340,7 +352,10 @@ serve(async (req) => {
         eventType: 'signup_blocked',
         metadata: { reason: 'turnstile_failed' }
       });
-      throw new Error('Security check failed. Please try again.');
+      return new Response(JSON.stringify({ error: 'Security check failed. Please try again.' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const windowStart = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
@@ -367,7 +382,10 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'ip_rate_limit' }
         });
-        throw new Error('Too many accounts created from this network. Please try again in 10 days.');
+        return new Response(JSON.stringify({ error: 'Too many accounts created from this network. Please try again in 10 days.' }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
     }
 
@@ -391,7 +409,10 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'device_rate_limit' }
         });
-        throw new Error('Too many accounts created from this device. Please try again in 10 days.');
+        return new Response(JSON.stringify({ error: 'Too many accounts created from this device. Please try again in 10 days.' }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
         }
     }
 
@@ -402,7 +423,12 @@ serve(async (req) => {
       user_metadata: { device_fingerprint: deviceId }
     });
 
-    if (authError) throw authError;
+    if (authError) {
+      return new Response(JSON.stringify({ error: authError.message || 'Unable to create account' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     await logSecurityEvent(supabaseAdmin, {
       ip,
@@ -439,7 +465,7 @@ serve(async (req) => {
     console.error('Secure Signup Error:', error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: message }), {
-      status: 400,
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
