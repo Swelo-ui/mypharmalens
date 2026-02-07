@@ -374,7 +374,7 @@ serve(async (req) => {
       }
 
       ipCount = count ?? 0;
-      if (ipCount >= 2) {
+      if (ipCount >= 3) {
         await logSecurityEvent(supabaseAdmin, {
           ip,
           deviceFingerprint: deviceId,
@@ -382,7 +382,7 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'ip_rate_limit' }
         });
-        return new Response(JSON.stringify({ error: 'Too many accounts were created from this network. Please try again in 30 days, or log in with your existing account and enjoy.' }), {
+        return new Response(JSON.stringify({ error: 'Too many accounts were created from this network in the last 30 days. Please try again later, or log in with your existing account and enjoy.' }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -401,7 +401,7 @@ serve(async (req) => {
         if (deviceError) console.error('Device Check Error:', deviceError);
 
         deviceCountValue = deviceCount ?? 0;
-        if (deviceCountValue >= 2) {
+        if (deviceCountValue >= 1) {
         await logSecurityEvent(supabaseAdmin, {
           ip,
           deviceFingerprint: deviceId,
@@ -409,7 +409,7 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'device_rate_limit' }
         });
-        return new Response(JSON.stringify({ error: 'Too many accounts were created from this device. Please try again in 30 days, or log in with your existing account and enjoy.' }), {
+        return new Response(JSON.stringify({ error: 'Too many accounts were created from this device in the last 30 days. Please try again later, or log in with your existing account and enjoy.' }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
