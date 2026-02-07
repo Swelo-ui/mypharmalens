@@ -23,7 +23,6 @@ import {
 import { medicalToLaymanTerms } from '@/utils/laymanTerms';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
-// Removed popover/command UI to use inline, mobile-friendly list
 
 function calculateLevenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
@@ -72,13 +71,15 @@ const addLaymanBrackets = (text: string): string => {
   }, text);
 };
 
-const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 2;
+const AI_CACHE_VERSION = 'v2';
 const getCache = (key: string) => {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
+    if (parsed.version !== AI_CACHE_VERSION) return null;
     const ts = typeof parsed.ts === 'number' ? parsed.ts : 0;
     if (ts && Date.now() - ts > CACHE_TTL_MS) return null;
     return parsed;
@@ -88,10 +89,42 @@ const getCache = (key: string) => {
 };
 const setCache = (key: string, value: { summary: string; interactions: AIInteraction[] }) => {
   try {
-    const payload = { ...value, ts: Date.now() };
+    const payload = { ...value, ts: Date.now(), version: AI_CACHE_VERSION };
     localStorage.setItem(key, JSON.stringify(payload));
-  } catch {}
+  } catch {
+    return;
+  }
 };
+
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionLike = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: (() => void) | null;
+  onsoundstart?: (() => void) | null;
+  onsoundend?: (() => void) | null;
+  start: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+const getSpeechRecognition = () => {
+  if (typeof window === 'undefined') return null;
+  const win = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return win.SpeechRecognition || win.webkitSpeechRecognition || null;
+};
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
 
 const DrugInteractionChecker = () => {
   const navigate = useNavigate();
@@ -118,13 +151,13 @@ const DrugInteractionChecker = () => {
   const pageSize = 50;
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const aiRequestIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = getSpeechRecognition();
 
     if (!SpeechRecognition) {
       setIsSpeechSupported(false);
@@ -187,19 +220,23 @@ const DrugInteractionChecker = () => {
 
       // 2. Run AI Smart Check (Async) if enabled and online
       if (useSmartInteractions && isOnline) {
+        const requestId = ++aiRequestIdRef.current;
         const fetchSmart = async () => {
           setIsAiAnalyzing(true);
           setAiError(null);
           try {
             const drugNamesList = selectedDrugs.map(d => d.name);
-            const normalizedKey = drugNamesList
-              .map((name) => (name || '').trim())
-              .filter((name) => name.length > 0)
+            const normalizedKey = selectedDrugs
+              .map((drug) => `${drug.id}:${(drug.name || '').trim().toLowerCase()}`)
+              .filter((value) => value.length > 0)
               .sort((a, b) => a.localeCompare(b))
               .join('|');
             const cacheKey = `aiInteractions:${normalizedKey}`;
             const cachedObj = getCache(cacheKey);
-            if (cachedObj && Array.isArray(cachedObj.interactions)) {
+            const hasLocalInteractions = result.hasInteractions;
+            const cachedHasNoIssues = cachedObj && Array.isArray(cachedObj.interactions) && cachedObj.interactions.length === 0;
+            if (cachedObj && Array.isArray(cachedObj.interactions) && !(hasLocalInteractions && cachedHasNoIssues)) {
+              if (requestId !== aiRequestIdRef.current) return;
               setAiInteractions(cachedObj.interactions);
               setAiSummary(typeof cachedObj.summary === 'string' ? cachedObj.summary : '');
               setShowAllAi(false);
@@ -223,6 +260,7 @@ const DrugInteractionChecker = () => {
                throw new Error(data.error);
             }
 
+            if (requestId !== aiRequestIdRef.current) return;
             if (data?.interactions && Array.isArray(data.interactions)) {
               setAiInteractions(data.interactions);
             } else {
@@ -234,14 +272,18 @@ const DrugInteractionChecker = () => {
               interactions: Array.isArray(data?.interactions) ? data.interactions : []
             });
             setShowAllAi(false);
-          } catch (err: any) {
+          } catch (err) {
+            if (requestId !== aiRequestIdRef.current) return;
+            const message = getErrorMessage(err);
             console.error("❌ Smart check failed:", err);
-            setAiError(err.message || "AI analysis failed");
+            setAiError(message || "AI analysis failed");
             setAiInteractions(null);
             setAiSummary('');
             setShowAllAi(false);
           } finally {
-            setIsAiAnalyzing(false);
+            if (requestId === aiRequestIdRef.current) {
+              setIsAiAnalyzing(false);
+            }
           }
         };
 
@@ -295,8 +337,8 @@ const DrugInteractionChecker = () => {
     try {
       const recognition = recognitionRef.current;
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
+      recognition.onresult = (event) => {
+        const transcript = event.results?.[0]?.[0]?.transcript || '';
         const cleaned = transcript.trim();
         if (!cleaned) return;
 
@@ -335,10 +377,10 @@ const DrugInteractionChecker = () => {
       };
 
       // Animate waves only when sound is detected
-      (recognition as any).onsoundstart = () => {
+      recognition.onsoundstart = () => {
         setIsListening(true);
       };
-      (recognition as any).onsoundend = () => {
+      recognition.onsoundend = () => {
         setIsListening(false);
       };
       recognition.start();

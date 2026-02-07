@@ -101,7 +101,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
       const planName = currentSubscription?.plan?.name || 'Free Plan';
       
       switch (feature) {
-        case 'ai_identification':
+        case 'ai_identification': {
           const identificationsRemaining = usageStats?.identificationsRemaining ?? 0;
           const identificationsUsed = usageStats?.identificationsUsed ?? 0;
           const monthlyLimit = usageStats?.monthlyLimit ?? 5;
@@ -110,6 +110,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
             return `You've used all ${identificationsUsed} of ${monthlyLimit === -1 ? '∞' : monthlyLimit} AI identifications in your ${planName}. Upgrade to get more identifications!`;
           }
           return `AI Drug Identification is not available in your ${planName}.`;
+        }
         case 'database_search':
           return `You've reached the database search limit for your ${planName}.`;
         case 'history_feature':

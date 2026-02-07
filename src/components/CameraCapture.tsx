@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, X, RotateCw, Camera as CameraIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
   const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
 
-  const initializeCamera = async () => {
+  const initializeCamera = useCallback(async () => {
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         const facingMode = isFrontCamera ? 'user' : 'environment';
@@ -67,7 +67,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
       });
       setHasPermission(false);
     }
-  };
+  }, [isFrontCamera, toast]);
 
   const stopCamera = () => {
     if (streamRef.current) {
@@ -153,7 +153,7 @@ const CameraCapture = ({ onImageCapture, className }: CameraCaptureProps) => {
     if (cameraActive) {
       initializeCamera();
     }
-  }, [isFrontCamera]);
+  }, [isFrontCamera, cameraActive, initializeCamera]);
 
   return (
     <div className={cn("flex flex-col items-center", className)}>

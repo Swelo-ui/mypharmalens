@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { LogIn, UserPlus, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
@@ -10,6 +10,10 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import Turnstile from 'react-turnstile';
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
@@ -18,80 +22,99 @@ const AuthForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState('');
+  const [fingerprint, setFingerprint] = useState<string>('');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [honeypot, setHoneypot] = useState('');
+  
   const navigate = useNavigate();
-  const disposableEmailDomains = new Set([
-    '10minutemail.com',
-    '10minutemail.net',
-    'mailinator.com',
-    'yopmail.com',
-    'guerrillamail.com',
-    'guerrillamail.org',
-    'guerrillamail.net',
-    'tempmail.com',
-    'temp-mail.org',
-    'trashmail.com',
-    'mintemail.com',
-    'disposablemail.com'
-  ]);
+
+  useEffect(() => {
+    const setFp = async () => {
+      try {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        setFingerprint(result.visitorId);
+      } catch (e) {
+        console.error('Fingerprint failed', e);
+      }
+    };
+    setFp();
+  }, []);
 
   const normalizeEmail = (value: string) => value.trim().toLowerCase();
-  const getEmailDomain = (value: string) => {
-    const atIndex = value.lastIndexOf('@');
-    return atIndex === -1 ? '' : value.slice(atIndex + 1);
-  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate terms acceptance for sign-up
     if (!acceptedTerms) {
       setTermsError('You must accept the Terms and Conditions to create an account');
-      toast.error("Please accept the Terms and Conditions to proceed with account creation.");
+      toast.error("Please accept the Terms and Conditions to proceed.");
+      return;
+    }
+
+    if (!turnstileToken) {
+      toast.error("Please complete the security check (CAPTCHA).");
       return;
     }
     
     setTermsError('');
     const normalizedEmail = normalizeEmail(email);
-    const domain = getEmailDomain(normalizedEmail);
-    if (!domain) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-    if (disposableEmailDomains.has(domain)) {
-      toast.error("Disposable email addresses are not allowed.", {
-        description: "Please use a real email so we can verify your account."
-      });
-      return;
-    }
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email: normalizedEmail, 
-        password,
-        options: {
-          emailRedirectTo: window.location.origin
+      const { data, error } = await supabase.functions.invoke('secure-signup', {
+        body: {
+          email: normalizedEmail,
+          password,
+          turnstileToken,
+          deviceFingerprint: fingerprint,
+          honeypot
         }
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      toast.success("Account created successfully!", { 
-        description: "Please check your email to confirm your account."
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password
       });
+
+      if (signInError) throw signInError;
+
+      toast.success("Account created successfully!");
       
-      // Clear form after successful signup
       setEmail('');
       setPassword('');
       setAcceptedTerms(false);
+      setTurnstileToken('');
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing up:', error);
+      let message = 'An unexpected error occurred';
+      if (error && typeof error === 'object') {
+        const err = error as { message?: string; context?: { body?: unknown } };
+        const body = err.context?.body;
+        if (body) {
+          if (typeof body === 'string') {
+            try {
+              const parsed = JSON.parse(body) as { error?: unknown };
+              message = parsed?.error ? String(parsed.error) : body;
+            } catch {
+              message = body;
+            }
+          } else if (typeof body === 'object' && 'error' in body) {
+            message = String((body as { error?: unknown }).error ?? message);
+          }
+        }
+        if (message === 'An unexpected error occurred' && err.message) {
+          message = err.message;
+        }
+      }
       toast.error("Sign up failed", { 
-        description: error.message || "An unexpected error occurred" 
+        description: message 
       });
+      setTurnstileToken('');
     } finally {
       setLoading(false);
     }
@@ -115,10 +138,11 @@ const AuthForm = () => {
       toast.success("Signed in successfully");
       navigate('/identify');
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing in:', error);
+      const message = error instanceof Error ? error.message : 'An unexpected error occurred';
       toast.error("Sign in failed", { 
-        description: error.message || "An unexpected error occurred" 
+        description: message 
       });
     } finally {
       setLoading(false);
@@ -302,11 +326,34 @@ const AuthForm = () => {
                   By creating an account, you acknowledge that you have read and understood our terms regarding data collection, medical disclaimers, and age restrictions (13+).
                 </p>
               </div>
+
+              <div className="absolute opacity-0 -z-10 h-0 w-0 overflow-hidden">
+                <input 
+                  type="text" 
+                  name="website_url" 
+                  tabIndex={-1} 
+                  autoComplete="off" 
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-center py-2">
+                <Turnstile
+                  sitekey={TURNSTILE_SITE_KEY}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => {
+                    toast.error("Security check failed");
+                    setTurnstileToken('');
+                  }}
+                  onExpire={() => setTurnstileToken('')}
+                />
+              </div>
               
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={loading || !acceptedTerms}
+                disabled={loading || !acceptedTerms || !turnstileToken}
               >
                 {loading ? (
                   <>

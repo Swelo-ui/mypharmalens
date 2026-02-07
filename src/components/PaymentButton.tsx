@@ -6,6 +6,7 @@ import { Shield, CheckCircle, Clock, Loader2, AlertTriangle } from 'lucide-react
 import { toast } from 'sonner';
 import { SubscriptionPlan } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 import { SubscriptionService } from '@/services/subscriptionService';
 import { usePaymentStatus } from '@/hooks/usePaymentStatus';
 import ErrorHandler, { PaymentError } from '@/components/ErrorHandler';
@@ -22,6 +23,68 @@ interface PaymentButtonProps {
   onPaymentSuccess?: (planId: string) => void;
   onPaymentError?: (error: string) => void;
 }
+
+type RazorpayOrderResponse = {
+  key?: string;
+  keyId?: string;
+  order_id?: string;
+  orderId?: string;
+  callback_url?: string;
+  callbackUrl?: string;
+  transaction_id?: string;
+  transactionId?: string;
+  amount?: number;
+  currency?: string;
+  error?: string;
+  message?: string;
+  details?: string;
+};
+
+type RazorpaySuccessResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature?: string;
+};
+
+type RazorpayFailureResponse = {
+  error?: {
+    description?: string;
+    code?: string;
+  };
+};
+
+interface RazorpayOptions {
+  key: string;
+  amount?: number;
+  currency?: string;
+  name: string;
+  description: string;
+  order_id: string;
+  prefill: {
+    name: string;
+    email: string;
+  };
+  notes: {
+    planId: string;
+    billingCycle: 'monthly';
+  };
+  theme: {
+    color: string;
+  };
+  callback_url: string;
+  handler: (response: RazorpaySuccessResponse) => void;
+  modal: {
+    ondismiss: () => void;
+  };
+}
+
+interface RazorpayInstance {
+  open: () => void;
+  on: (event: 'payment.failed', handler: (response: RazorpayFailureResponse) => void) => void;
+  close?: () => void;
+}
+
+type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   plan,
@@ -128,7 +191,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     setIsProcessing(true);
     setPaymentError(null);
 
-    let currentUser: any = null;
+    let currentUser: User | null = null;
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
@@ -138,8 +201,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       currentUser = user;
 
       // Calculate amount - use discounted_price if available, otherwise use price
-      const planExtended = currentPlan as any;
-      const amount = planExtended.discounted_price || currentPlan.price || 0;
+      const amount = currentPlan.discounted_price || currentPlan.price || 0;
       
       // Log payment initiation
       transactionLogger.logPaymentInitiated(user.id, {
@@ -150,7 +212,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       });
 
       // All plans are now monthly only
-      const currentBillingCycle: 'monthly' = 'monthly';
+      const currentBillingCycle = 'monthly' as const;
 
       if (!amount || amount <= 0) {
         console.error('Invalid plan pricing computed:', { plan: currentPlan, currentBillingCycle, amount });
@@ -164,14 +226,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       });
 
       // Create Razorpay order via Supabase function with retry
-      const invokeWithRetry = async (attempts = 2) => {
-        let lastErr: any = null;
-        let lastData: any = null;
+      const invokeWithRetry = async (attempts = 2): Promise<RazorpayOrderResponse> => {
+        let lastErr: unknown = null;
+        let lastData: RazorpayOrderResponse | null = null;
         
         for (let i = 0; i <= attempts; i++) {
           console.log(`Attempt ${i + 1} to create Razorpay order...`);
           
-          const { data, error } = await supabase.functions.invoke('razorpay-order', {
+          const { data, error } = await supabase.functions.invoke<RazorpayOrderResponse>('razorpay-order', {
             body: {
               userId: user.id,
               planId: currentPlan.id,
@@ -204,12 +266,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         }
         
         // Build detailed error message
-        const errorMsg = lastData?.message || lastErr?.message || 'Failed to initiate payment';
-        const errorDetails = lastData?.details || lastErr?.details || '';
+        const errorMsg = lastData?.message || (lastErr instanceof Error ? lastErr.message : '') || 'Failed to initiate payment';
+        const errorDetails = lastData?.details || (typeof lastErr === 'object' && lastErr !== null && 'details' in lastErr ? String((lastErr as { details?: string }).details || '') : '');
         throw new Error(`${errorMsg}${errorDetails ? ` (${errorDetails})` : ''}`);
       };
 
-      let data = await invokeWithRetry(2);
+      const data = await invokeWithRetry(2);
       // Backward compatibility mapping for legacy fields
       if (!data?.key && data?.keyId) data.key = data.keyId;
       if (!data?.order_id && (data?.orderId || data?.order_id)) data.order_id = data.orderId || data.order_id;
@@ -225,14 +287,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
 
       const returnPath = window.location.pathname || '/subscription-manager';
-      let rzp: any;
-      const options: any = {
-        key: data?.key,
+      const rzpRef = { current: null as RazorpayInstance | null };
+      const options: RazorpayOptions = {
+        key: data?.key || '',
         amount: data?.amount,
         currency: data?.currency || 'INR',
         name: 'Pharmalens',
         description: `${currentPlan.name} - ${currentBillingCycle} subscription`,
-        order_id: data?.order_id,
+        order_id: data?.order_id || '',
         prefill: {
           name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
           email: user.email || '',
@@ -243,7 +305,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         },
         theme: { color: '#3399cc' },
         callback_url: `${data?.callback_url || ''}?return=${encodeURIComponent(returnPath)}`,
-        handler: function (response: any) {
+        handler: function (response: RazorpaySuccessResponse) {
           // Log payment success
           transactionLogger.logPaymentSuccess(user.id, {
             paymentId: response.razorpay_payment_id,
@@ -292,8 +354,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           
           onPaymentSuccess?.(currentPlan.id);
 
-          if (rzp && typeof rzp.close === 'function') {
-            rzp.close();
+          if (rzpRef.current && typeof rzpRef.current.close === 'function') {
+            rzpRef.current.close();
           }
           document.body.style.overflow = '';
         },
@@ -314,15 +376,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       };
 
       // Check if Razorpay SDK is loaded
-      if (!(window as any).Razorpay) {
+      const windowWithRazorpay = window as Window & { Razorpay?: RazorpayConstructor };
+      if (!windowWithRazorpay.Razorpay) {
         toast.error('Payment system is loading. Please try again in a moment.');
         setIsProcessing(false);
         return;
       }
 
-      rzp = new (window as any).Razorpay(options);
+      rzpRef.current = new windowWithRazorpay.Razorpay(options);
 
-      rzp.on('payment.failed', (response: any) => {
+      rzpRef.current.on('payment.failed', (response: RazorpayFailureResponse) => {
         const errorMsg = response?.error?.description || 'Payment failed. Please try again.';
         toast.error(errorMsg);
         transactionLogger.logPaymentFailed(user.id, {
@@ -336,22 +399,25 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         document.body.style.overflow = '';
       });
 
-      rzp.open();
+      rzpRef.current.open();
       
-    } catch (error: any) {
-      const errorMessage = error?.message || 'Payment failed';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
+      const errorCode = typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code?: string }).code || '')
+        : '';
       
       // Create structured error object
       const paymentError: PaymentError = {
-        type: error?.code === 'network_error' ? 'network_error' : 
-              error?.code === 'timeout' ? 'timeout' :
-              error?.code === 'validation_error' ? 'validation_error' :
+        type: errorCode === 'network_error' ? 'network_error' : 
+              errorCode === 'timeout' ? 'timeout' :
+              errorCode === 'validation_error' ? 'validation_error' :
               'payment_failed',
         message: errorMessage,
-        code: error?.code,
+        code: errorCode || undefined,
         details: error,
         timestamp: new Date(),
-        retryable: !['validation_error', 'authentication_error'].includes(error?.code)
+        retryable: !['validation_error', 'authentication_error'].includes(errorCode)
       };
 
       setPaymentError(paymentError);
@@ -363,8 +429,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         reason: errorMessage
       }, {
         message: errorMessage,
-        code: error?.code,
-        stack: error?.stack
+        code: errorCode || undefined,
+        stack: error instanceof Error ? error.stack : undefined
       });
 
       toast.error(errorMessage);
@@ -510,8 +576,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClose={() => setShowSummary(false)}
           onConfirm={handlePayment}
           planName={plan.name || 'Subscription Plan'}
-          planPrice={(plan as any).discounted_price || plan.price || 0}
-          originalPrice={(plan as any).original_price}
+          planPrice={plan.discounted_price || plan.price || 0}
+          originalPrice={plan.original_price}
           features={(() => {
             const planName = plan.name || '';
             if (planName === 'Free Plan' || planName === 'Free') {
@@ -548,8 +614,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             }
             return ['Basic features'];
           })()}
-          identificationsLimit={(plan as any).identifications_limit || 5}
-          searchLimit={(plan as any).advanced_search_limit}
+          identificationsLimit={plan.identifications_limit || 5}
+          searchLimit={plan.advanced_search_limit}
           billingCycle={billingCycle}
           isProcessing={isProcessing}
         />

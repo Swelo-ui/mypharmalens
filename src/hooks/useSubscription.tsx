@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from './useAuthStatus';
 import { toast } from 'sonner';
@@ -16,6 +17,12 @@ export type SubscriptionPlan = Tables<"subscription_plans">;
 export type UserSubscription = Tables<"user_subscriptions"> & {
   plan?: SubscriptionPlan;
 };
+
+const isProfileRow = (value: unknown): value is Tables<"profiles"> =>
+  typeof value === 'object' && value !== null && 'identifications_used' in value;
+
+const isUserSubscriptionRow = (value: unknown): value is Tables<"user_subscriptions"> =>
+  typeof value === 'object' && value !== null && 'status' in value && 'id' in value;
 
 export const useSubscription = () => {
   const { user, isAuthenticated } = useAuthStatus();
@@ -83,7 +90,7 @@ export const useSubscription = () => {
 
       const lastReset = data.last_reset_date ? new Date(data.last_reset_date) : null;
       const currentUsed = data.identifications_used ?? 0;
-      const currentExtra = (data as any).extra_identifications ?? 0;
+      const currentExtra = data.extra_identifications ?? 0;
       setExtraIdentifications(currentExtra);
 
       // Check if we need to reset based on billing cycle (30 days since last reset)
@@ -146,19 +153,22 @@ export const useSubscription = () => {
 
       if (error) throw error;
       setAvailablePlans((data || []) as SubscriptionPlan[]);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching subscription plans:', error);
 
-      // Don't show error toasts when offline - user already gets offline notification
+      const message = error instanceof Error ? error.message : String(error);
+      const errorCode = typeof error === 'object' && error !== null && 'code' in error
+        ? (error as { code?: string }).code
+        : undefined;
+
       const isOfflineError = !navigator.onLine ||
-        error?.message?.includes('fetch') ||
-        error?.message?.includes('Failed to fetch') ||
-        error?.code === 'PGRST301';
+        message.includes('fetch') ||
+        message.includes('Failed to fetch') ||
+        errorCode === 'PGRST301';
 
       if (!isOfflineError) {
-        const msg = error?.message || 'Unknown error';
         toast.error('Failed to load subscription plans', {
-          description: msg,
+          description: message || 'Unknown error',
           duration: 4000
         });
       } else {
@@ -352,10 +362,11 @@ export const useSubscription = () => {
         // No active subscription found - assign free plan
         await assignFreePlan();
       }
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error('Error fetching current subscription:', error);
       toast.error('Failed to fetch current subscription', {
-        description: error?.message || 'Unknown error'
+        description: message || 'Unknown error'
       });
       await assignFreePlan();
     }
@@ -391,10 +402,11 @@ export const useSubscription = () => {
 
       setCurrentSubscription(data as UserSubscription);
       await calculateUsageStats(data as UserSubscription, true);
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error('Error assigning free plan:', error);
       toast.error('Failed to assign free plan', {
-        description: error?.message || 'Unknown error'
+        description: message || 'Unknown error'
       });
     }
   };
@@ -427,7 +439,7 @@ export const useSubscription = () => {
       // Check if usage or bonus needs reconciliation
       if (monthlyLimit !== -1 && currentUsed >= monthlyLimit) {
         let needsUpdate = false;
-        let updates: any = {};
+        const updates: Partial<Tables<'profiles'>> = {};
 
         // CRITICAL: identifications_used should NEVER exceed monthlyLimit
         // If it does, cap it at monthlyLimit
@@ -699,12 +711,12 @@ export const useSubscription = () => {
       }
 
       const currentUsed = existing?.identifications_used ?? 0;
-      const currentExtra = (existing as any)?.extra_identifications ?? 0;
+      const currentExtra = existing?.extra_identifications ?? 0;
       const lastReset = existing?.last_reset_date ? new Date(existing.last_reset_date) : null;
 
       let newUsed = currentUsed + 1;
       let newExtra = currentExtra;
-      let payload: Partial<Tables<'profiles'>> & { id: string } = { id: user.id } as any;
+      let payload: Partial<Tables<'profiles'>> & { id: string } = { id: user.id };
 
       // Get monthly limit based on plan
       let monthlyLimit = IDENTIFICATION_LIMITS.FREE; // Default free tier
@@ -772,10 +784,10 @@ export const useSubscription = () => {
         console.log('📅 Monthly reset triggered - resetting usage count');
         newUsed = 1; // reset to 0 then add 1
         // Keep bonus identifications during monthly reset - they don't reset
-        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
+        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() };
       } else if (!lastReset) {
         // If missing, initialize last_reset_date without affecting count logic
-        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() } as any;
+        payload = { id: user.id, identifications_used: newUsed, last_reset_date: now.toISOString() };
       } else {
         // Normal usage increment
         // Check if we're at or beyond monthly limit
@@ -787,7 +799,7 @@ export const useSubscription = () => {
             newUsed = monthlyLimit; // Stay at monthly limit (39 for Lite, 101 for Pro)
             newExtra = Math.max(0, currentExtra - 1);
 
-            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra } as any;
+            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra };
             console.log('🎁 Using bonus identification:', {
               monthlyLimit,
               identifications_used: newUsed, // Stays at monthly limit
@@ -798,12 +810,12 @@ export const useSubscription = () => {
             // No bonus available - cannot proceed, keep at monthly limit
             newUsed = monthlyLimit;
             newExtra = 0;
-            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra } as any;
+            payload = { id: user.id, identifications_used: newUsed, extra_identifications: newExtra };
             console.log('⚠️ At limit with no bonus - cannot increment:', { monthlyLimit, newUsed });
           }
         } else {
           // Normal usage within monthly limit - increment identifications_used normally
-          payload = { id: user.id, identifications_used: newUsed } as any;
+          payload = { id: user.id, identifications_used: newUsed };
           console.log('📊 Normal usage within limit:', { monthlyLimit, newUsed, bonusAvailable: currentExtra });
         }
       }
@@ -967,8 +979,9 @@ export const useSubscription = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
-        async (payload) => {
-          const newUsed = (payload as any)?.new?.identifications_used;
+        async (payload: RealtimePostgresChangesPayload<Tables<'profiles'>>) => {
+          const newRow = payload.new;
+          const newUsed = isProfileRow(newRow) ? newRow.identifications_used : undefined;
           if (typeof newUsed === 'number') {
             setProfileIdentificationsUsed(newUsed);
             if (currentSubscription) {
@@ -1004,10 +1017,10 @@ export const useSubscription = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'user_subscriptions', filter: `user_id=eq.${user.id}` },
-        async (payload: any) => {
+        async (payload: RealtimePostgresChangesPayload<Tables<'user_subscriptions'>>) => {
           try {
             const newRow = payload?.new;
-            if (newRow && newRow.status === 'active') {
+            if (isUserSubscriptionRow(newRow) && newRow.status === 'active') {
               // Ensure plan details are present by fetching joined record
               const { data, error } = await supabase
                 .from('user_subscriptions')

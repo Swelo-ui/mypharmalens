@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { X, Download, Smartphone } from 'lucide-react';
@@ -20,61 +20,7 @@ export const PWAInstallPrompt = () => {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
-  useEffect(() => {
-    // Check if already installed
-    const standalone = window.matchMedia('(display-mode: standalone)').matches;
-    setIsStandalone(standalone);
-
-    // Detect iOS
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    setIsIOS(iOS);
-
-    // Check if already dismissed recently
-    const dismissed = localStorage.getItem('pwa-install-dismissed');
-    const dismissedTime = dismissed ? parseInt(dismissed) : 0;
-    const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-
-    // Show prompt if not standalone and hasn't been dismissed in last 7 days
-    if (!standalone && daysSinceDismissed > 7) {
-      // Handle beforeinstallprompt event (Chrome, Edge, etc.)
-      const handleBeforeInstall = (e: Event) => {
-        e.preventDefault();
-        const promptEvent = e as BeforeInstallPromptEvent;
-        setDeferredPrompt(promptEvent);
-        setShowInstallCard(true);
-        
-        // Show toast notification
-        toast.info('📱 Install PharmaLens', {
-          description: 'Get quick access from your home screen',
-          duration: 8000,
-          action: {
-            label: 'Install',
-            onClick: () => handleInstallClick()
-          },
-          cancel: {
-            label: 'Not now',
-            onClick: () => handleDismiss()
-          }
-        });
-      };
-
-      window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-      // For iOS and other browsers without beforeinstallprompt
-      if (iOS && !standalone) {
-        // Show after 10 seconds on iOS
-        setTimeout(() => {
-          setShowInstallCard(true);
-        }, 10000);
-      }
-
-      return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      };
-    }
-  }, []);
-
-  const handleInstallClick = async () => {
+  const handleInstallClick = useCallback(async () => {
     if (deferredPrompt) {
       try {
         await deferredPrompt.prompt();
@@ -102,13 +48,59 @@ export const PWAInstallPrompt = () => {
         duration: 10000
       });
     }
-  };
+  }, [deferredPrompt, isIOS]);
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setShowInstallCard(false);
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
     toast.dismiss();
-  };
+  }, []);
+
+  useEffect(() => {
+    const standalone = window.matchMedia('(display-mode: standalone)').matches;
+    setIsStandalone(standalone);
+
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    setIsIOS(iOS);
+
+    const dismissed = localStorage.getItem('pwa-install-dismissed');
+    const dismissedTime = dismissed ? parseInt(dismissed) : 0;
+    const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+
+    if (!standalone && daysSinceDismissed > 7) {
+      const handleBeforeInstall = (e: Event) => {
+        e.preventDefault();
+        const promptEvent = e as BeforeInstallPromptEvent;
+        setDeferredPrompt(promptEvent);
+        setShowInstallCard(true);
+        
+        toast.info('📱 Install PharmaLens', {
+          description: 'Get quick access from your home screen',
+          duration: 8000,
+          action: {
+            label: 'Install',
+            onClick: () => handleInstallClick()
+          },
+          cancel: {
+            label: 'Not now',
+            onClick: () => handleDismiss()
+          }
+        });
+      };
+
+      window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+
+      if (iOS && !standalone) {
+        setTimeout(() => {
+          setShowInstallCard(true);
+        }, 10000);
+      }
+
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      };
+    }
+  }, [handleDismiss, handleInstallClick]);
 
   // Don't show if already installed
   if (isStandalone || !showInstallCard) {

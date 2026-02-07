@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -18,35 +18,7 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
   const [loading, setLoading] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchSearchUsage();
-      
-      // Set up real-time subscription for search usage updates
-      const channel = supabase
-        .channel('search_usage_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'search_usage_tracking',
-            filter: `user_id=eq.${user.id}`
-          },
-          (payload) => {
-            console.log('Search usage updated:', payload);
-            fetchSearchUsage(); // Refresh when usage changes
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user]);
-
-  const fetchSearchUsage = async () => {
+  const fetchSearchUsage = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -116,7 +88,35 @@ const SearchLimitBar: React.FC<SearchLimitBarProps> = ({ onLimitReached }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, onLimitReached]);
+
+  useEffect(() => {
+    if (user) {
+      fetchSearchUsage();
+      
+      // Set up real-time subscription for search usage updates
+      const channel = supabase
+        .channel('search_usage_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'search_usage_tracking',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Search usage updated:', payload);
+            fetchSearchUsage(); // Refresh when usage changes
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, fetchSearchUsage]);
 
   const getPercentage = () => {
     return (searchesUsed / searchesLimit) * 100;

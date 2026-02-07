@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Clock, Search, AlertTriangle, Filter, Trash2, X } from 'lucide-react';
@@ -28,10 +28,38 @@ interface IdentificationRecord {
   created_at: string;
   drug_name: string;
   image_url?: string;
-  details: any;
+  details: IdentificationDetails | string | null;
   user_id?: string;
   image_features?: string;
 }
+
+type IdentificationDetails = {
+  id?: string;
+  genericName?: string;
+  generic_name?: string;
+  manufacturer?: string;
+  category?: string;
+  description?: string;
+  drugClass?: string;
+  drug_class?: string;
+  verified?: boolean;
+  image?: string;
+};
+
+const getDetailsObject = (details: IdentificationRecord['details']): IdentificationDetails | null => {
+  if (details && typeof details === 'object') {
+    return details as IdentificationDetails;
+  }
+  if (typeof details === 'string') {
+    try {
+      const parsed = JSON.parse(details);
+      return parsed && typeof parsed === 'object' ? (parsed as IdentificationDetails) : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
 
 const IdentificationHistory = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStatus();
@@ -58,29 +86,7 @@ const IdentificationHistory = () => {
     sessionStorage.setItem('historyWarningDismissed', 'true');
   };
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/auth');
-      return;
-    }
-
-    if (isAuthenticated && user) {
-      fetchIdentificationHistory();
-    }
-  }, [isAuthenticated, authLoading, user]);
-
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredHistory(history);
-    } else {
-      const filtered = history.filter(item => 
-        item.drug_name?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredHistory(filtered);
-    }
-  }, [searchTerm, history]);
-
-  const fetchIdentificationHistory = async () => {
+  const fetchIdentificationHistory = useCallback(async () => {
     try {
       setIsLoading(true);
       
@@ -116,7 +122,29 @@ const IdentificationHistory = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/auth');
+      return;
+    }
+
+    if (isAuthenticated && user) {
+      fetchIdentificationHistory();
+    }
+  }, [isAuthenticated, authLoading, user, navigate, fetchIdentificationHistory]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredHistory(history);
+    } else {
+      const filtered = history.filter(item => 
+        item.drug_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredHistory(filtered);
+    }
+  }, [searchTerm, history]);
 
   const handleDeleteRecord = async (id: string) => {
     setItemToDelete(id);
@@ -179,10 +207,11 @@ const IdentificationHistory = () => {
     }
   };
   
-  const extractDrugId = (details: any): string | null => {
+  const extractDrugId = (details: IdentificationRecord['details']): string | null => {
     if (!details) return null;
     
-    if (details.id) return details.id;
+    const detailsObject = getDetailsObject(details);
+    if (detailsObject?.id) return detailsObject.id;
     
     if (typeof details === 'string') {
       try {
@@ -265,7 +294,9 @@ const IdentificationHistory = () => {
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredHistory.map((item) => (
+            {filteredHistory.map((item) => {
+              const details = getDetailsObject(item.details);
+              return (
               <div key={item.id} className="relative group">
                 <div 
                   className="cursor-pointer transition-transform hover:scale-105"
@@ -279,13 +310,13 @@ const IdentificationHistory = () => {
                     drug={{
                       id: extractDrugId(item.details) || item.id,
                       name: item.drug_name || "Unknown Medication",
-                      genericName: item.details?.genericName || item.details?.generic_name || "",
-                      manufacturer: item.details?.manufacturer || "",
-                      category: item.details?.category || "",
-                      description: item.details?.description || "",
-                      drugClass: item.details?.drugClass || item.details?.drug_class || "",
-                      verified: item.details?.verified || false,
-                      image: item.image_url || item.details?.image || "",
+                      genericName: details?.genericName || details?.generic_name || "",
+                      manufacturer: details?.manufacturer || "",
+                      category: details?.category || "",
+                      description: details?.description || "",
+                      drugClass: details?.drugClass || details?.drug_class || "",
+                      verified: details?.verified || false,
+                      image: item.image_url || details?.image || "",
                     }}
                   />
                 </div>
@@ -301,7 +332,8 @@ const IdentificationHistory = () => {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            ))}
+            );
+            })}
           </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">

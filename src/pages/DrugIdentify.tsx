@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, AlertTriangle, ZoomIn, RotateCw, Zap, LogIn, BookmarkPlus, Stethoscope } from 'lucide-react';
@@ -75,6 +75,52 @@ const calculateSimilarity = (hash1: string, hash2: string): number => {
   return matchingBits / hash1.length;
 };
 
+type IdentificationHistoryItem = {
+  image_features?: string;
+  details?: DetailedDrugData | Record<string, unknown> | string | null;
+};
+
+type IdentificationResult = DetailedDrugData & {
+  confidence?: string;
+  fromHistory?: boolean;
+  matchSimilarity?: number;
+  processingTime?: number;
+  enhancedMode?: boolean;
+  blurryMode?: boolean;
+  blurryModeUsed?: boolean;
+  multiModelAnalysisUsed?: boolean;
+  directSearchUsed?: boolean;
+  processingStages?: string[];
+  fallbackUsed?: boolean;
+  enhancedProcessing?: boolean;
+  alternatives?: DetailedDrugData[];
+};
+
+type ProcessingMeta = {
+  confidence?: string;
+  fallbackUsed?: boolean;
+  processingStages?: string[];
+  enhancedProcessing?: boolean;
+};
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
+
+const getDetailsObject = (details: IdentificationHistoryItem['details']) => {
+  if (details && typeof details === 'object') {
+    return details as Record<string, unknown>;
+  }
+  if (typeof details === 'string') {
+    try {
+      const parsed = JSON.parse(details);
+      return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
@@ -91,7 +137,7 @@ const DrugIdentify = () => {
     const specialAccessEmails = ['imgamer.ms@gmail.com'];
     return user?.email && specialAccessEmails.includes(user.email.toLowerCase());
   };
-  const [identifiedDrug, setIdentifiedDrug] = useState<DetailedDrugData | null>(null);
+  const [identifiedDrug, setIdentifiedDrug] = useState<IdentificationResult | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [blurryMode, setBlurryMode] = useState(false);
@@ -101,11 +147,11 @@ const DrugIdentify = () => {
   const [processingPhase, setProcessingPhase] = useState("");
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number | null>(null);
   const [processingStartTime, setProcessingStartTime] = useState<number>(0);
-  const [previousIdentifications, setPreviousIdentifications] = useState<any[]>([]);
+  const [previousIdentifications, setPreviousIdentifications] = useState<IdentificationHistoryItem[]>([]);
   const [imageFeatures, setImageFeatures] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [processingMeta, setProcessingMeta] = useState<{ confidence?: string; fallbackUsed?: boolean; processingStages?: any[]; enhancedProcessing?: boolean } | null>(null);
+  const [processingMeta, setProcessingMeta] = useState<ProcessingMeta | null>(null);
   const navigate = useNavigate();
 
   // PharmaLens-branded progress messages - Professional & User-Friendly
@@ -245,14 +291,7 @@ const DrugIdentify = () => {
   }, [user, usageStats?.identificationsUsed]); // Refresh when usage changes
 
   // Fetch user's previous identifications when component loads
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      fetchPreviousIdentifications();
-    }
-  }, [isAuthenticated, user]);
-
-  // Function to fetch user's previous identifications
-  const fetchPreviousIdentifications = async () => {
+  const fetchPreviousIdentifications = useCallback(async () => {
     try {
       if (!user) return;
 
@@ -280,10 +319,16 @@ const DrugIdentify = () => {
     } catch (err) {
       console.error('Error fetching previous identifications:', err);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchPreviousIdentifications();
+    }
+  }, [isAuthenticated, user, fetchPreviousIdentifications]);
 
   // Function to check if the current image matches any previously identified medications
-  const findMatchInHistory = async (base64Image: string): Promise<any | null> => {
+  const findMatchInHistory = async (base64Image: string): Promise<IdentificationResult | null> => {
     if (!previousIdentifications.length) return null;
 
     try {
@@ -303,9 +348,11 @@ const DrugIdentify = () => {
 
         // If similarity is above threshold, we have a match
         if (similarity >= SIMILARITY_THRESHOLD) {
+          const detailsObject = getDetailsObject(prevIdentification.details);
+          if (!detailsObject) continue;
           console.log(`Found match in history with similarity: ${similarity}`, prevIdentification);
           return {
-            ...prevIdentification.details,
+            ...(detailsObject as unknown as IdentificationResult),
             confidence: 'high',
             fromHistory: true,
             matchSimilarity: similarity
@@ -393,7 +440,7 @@ const DrugIdentify = () => {
 
 
   // Enhanced function to identify drug using the new fault-tolerant system
-  const identifyDrugFromImage = async (base64Image: string): Promise<any> => {
+  const identifyDrugFromImage = async (base64Image: string): Promise<IdentificationResult> => {
     try {
       // Start tracking time
       const startTime = Date.now();
@@ -427,8 +474,7 @@ const DrugIdentify = () => {
       setEstimatedTimeRemaining(28);
 
       // Try enhanced drug identification first
-      let result = null;
-      let fallbackUsed = false;
+      let result: IdentificationResult | null = null;
       let progressSimulator: NodeJS.Timeout | null = null;
 
       try {
@@ -502,7 +548,7 @@ const DrugIdentify = () => {
           setCurrentProgress(100);
           setTargetProgress(100);
 
-          result = drugData.data;
+          result = drugData.data as IdentificationResult;
           result.enhancedProcessing = analysisMode === 'enhanced';
           result.processingStages = drugData.processingStages || [];
           result.confidence = drugData.confidence || 'medium';
@@ -547,7 +593,8 @@ const DrugIdentify = () => {
           clearInterval(progressSimulator);
         }
         console.error('Drug identification failed:', drugError);
-        throw new Error(`Identification failed: ${drugError.message || 'Please try again with a clearer image.'}`);
+        const message = getErrorMessage(drugError);
+        throw new Error(`Identification failed: ${message || 'Please try again with a clearer image.'}`);
       }
 
       // Final validation and processing
@@ -594,16 +641,17 @@ const DrugIdentify = () => {
       setEstimatedTimeRemaining(0);
 
       return result;
-    } catch (error: any) {
+    } catch (error) {
+      const message = getErrorMessage(error);
       console.error('Error in enhanced drug identification:', error);
 
       // Provide more specific error messages
-      if (error.message.includes('All identification systems failed')) {
+      if (message.includes('All identification systems failed')) {
         throw new Error('Unable to identify this medication. Please ensure the image is clear and try again.');
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      } else if (message.includes('network') || message.includes('fetch')) {
         throw new Error('Network error. Please check your connection and try again.');
       } else {
-        throw new Error(error.message || 'An unexpected error occurred during identification.');
+        throw new Error(message || 'An unexpected error occurred during identification.');
       }
     }
   };
@@ -963,7 +1011,8 @@ const DrugIdentify = () => {
                 duration: 5000
               });
             }
-          } catch (error: any) {
+          } catch (error) {
+            const message = getErrorMessage(error);
             console.error('Error processing image:', error);
 
             // Even on error, provide helpful information instead of blank screen
@@ -973,7 +1022,7 @@ const DrugIdentify = () => {
               genericName: "Error Occurred",
               manufacturer: "N/A",
               category: "Error",
-              description: `An error occurred during processing: ${error.message || "Unknown error"}`,
+              description: `An error occurred during processing: ${message || "Unknown error"}`,
               dosageAndAdmin: "",
               sideEffects: [],
               warnings: [
@@ -999,7 +1048,7 @@ const DrugIdentify = () => {
             };
 
             setIdentifiedDrug(errorData);
-            setErrorDetails(`Error: ${error.message || "Unknown error"}`);
+            setErrorDetails(`Error: ${message || "Unknown error"}`);
             toast.error("Failed to process the image", {
               description: "Please see recommendations and try again.",
               duration: 5000
@@ -1018,9 +1067,10 @@ const DrugIdentify = () => {
 
       reader.readAsDataURL(file);
 
-    } catch (error: any) {
+    } catch (error) {
+      const message = getErrorMessage(error);
       console.error("Error identifying medication:", error);
-      setErrorDetails(`Unexpected Error: ${error.message || "Unknown error"}`);
+      setErrorDetails(`Unexpected Error: ${message || "Unknown error"}`);
       toast.error("An unexpected error occurred. Please try again.");
       setIsIdentifying(false);
     }

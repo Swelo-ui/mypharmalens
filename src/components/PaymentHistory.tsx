@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -35,13 +35,7 @@ const PaymentHistory: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('payments');
 
-  useEffect(() => {
-    if (user) {
-      fetchPaymentHistory();
-    }
-  }, [user]);
-
-  const fetchPaymentHistory = async () => {
+  const fetchPaymentHistory = useCallback(async () => {
     if (!user) return;
 
     setIsLoading(true);
@@ -94,7 +88,13 @@ const PaymentHistory: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPaymentHistory();
+    }
+  }, [user, fetchPaymentHistory]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {

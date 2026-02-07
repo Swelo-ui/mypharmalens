@@ -6,6 +6,34 @@ import { searchDrugs } from '@/data/drugDataLoader';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DrugData } from '@/components/DrugCard';
 
+type SpeechRecognitionAlternative = {
+  transcript: string;
+  confidence: number;
+};
+
+type SpeechRecognitionResult = ArrayLike<SpeechRecognitionAlternative>;
+
+type SpeechRecognitionResultList = ArrayLike<SpeechRecognitionResult>;
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: ((event: Event) => void) | null;
+  onsoundstart?: ((event: Event) => void) | null;
+  onsoundend?: ((event: Event) => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognition;
+
 interface SearchBarProps {
   fullWidth?: boolean;
   placeholder?: string;
@@ -27,13 +55,16 @@ const SearchBar = ({
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const recognitionRef = useRef<any | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const windowSpeech = window as Window & {
+      SpeechRecognition?: SpeechRecognitionConstructor;
+      webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    };
+    const SpeechRecognition = windowSpeech.SpeechRecognition || windowSpeech.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setIsSpeechSupported(false);
@@ -119,7 +150,7 @@ const SearchBar = ({
     try {
       const recognition = recognitionRef.current;
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         const cleaned = transcript.trim();
 
@@ -149,10 +180,10 @@ const SearchBar = ({
       };
 
       // Animate waves only when sound is detected
-      (recognition as any).onsoundstart = () => {
+      recognition.onsoundstart = () => {
         setIsListening(true);
       };
-      (recognition as any).onsoundend = () => {
+      recognition.onsoundend = () => {
         setIsListening(false);
       };
       recognition.start();

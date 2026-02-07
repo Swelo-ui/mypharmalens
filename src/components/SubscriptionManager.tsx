@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,12 +32,15 @@ type UserSubscription = Tables<"user_subscriptions"> & { plan?: SubscriptionPlan
 
 // Extended type for plans with new fields
 interface ExtendedPlan extends SubscriptionPlan {
-  original_price: number;
-  discounted_price: number;
-  advanced_search_limit: number;
-  identifications_limit: number;
-  monthly_identifications?: number;
+  original_price: number | null;
+  discounted_price: number | null;
+  advanced_search_limit: number | null;
+  identifications_limit: number | null;
+  monthly_identifications?: number | null;
+  features: SubscriptionPlan['features'];
 }
+
+const isNotFoundError = (error: { code?: string } | null) => error?.code === 'PGRST116';
 
 const SubscriptionManager: React.FC = () => {
   const { user } = useAuthStatus();
@@ -49,34 +52,7 @@ const SubscriptionManager: React.FC = () => {
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsPlan, setCongratulationsPlan] = useState<string>('');
 
-  useEffect(() => {
-    if (user) {
-      fetchUserData();
-
-      const subscriptionService = SubscriptionService.getInstance();
-      const unsubscribe = subscriptionService.onSubscriptionUpdate((subscription) => {
-        if (subscription && subscription.status === 'active') {
-          setCurrentSubscription(subscription);
-          const planName = subscription.plan?.name || 'Premium Plan';
-
-          setCongratulationsPlan(planName);
-          setShowCongratulations(true);
-
-          setTimeout(() => fetchUserData(), 1000);
-        }
-      });
-
-      return () => unsubscribe();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (unifiedSubscription) {
-      setCurrentSubscription(unifiedSubscription);
-    }
-  }, [unifiedSubscription]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     setIsLoading(true);
     if (!user) {
       setIsLoading(false);
@@ -90,7 +66,7 @@ const SubscriptionManager: React.FC = () => {
         .eq('id', user.id)
         .single();
 
-      if (profileError && (profileError as any).code !== 'PGRST116') {
+      if (profileError && !isNotFoundError(profileError)) {
         throw profileError;
       }
 
@@ -111,7 +87,7 @@ const SubscriptionManager: React.FC = () => {
         .limit(1)
         .maybeSingle();
 
-      if (subscriptionError && (subscriptionError as any).code !== 'PGRST116') {
+      if (subscriptionError && !isNotFoundError(subscriptionError)) {
         throw subscriptionError;
       }
 
@@ -124,7 +100,34 @@ const SubscriptionManager: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserData();
+
+      const subscriptionService = SubscriptionService.getInstance();
+      const unsubscribe = subscriptionService.onSubscriptionUpdate((subscription) => {
+        if (subscription && subscription.status === 'active') {
+          setCurrentSubscription(subscription);
+          const planName = subscription.plan?.name || 'Premium Plan';
+
+          setCongratulationsPlan(planName);
+          setShowCongratulations(true);
+
+          setTimeout(() => fetchUserData(), 1000);
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user, fetchUserData]);
+
+  useEffect(() => {
+    if (unifiedSubscription) {
+      setCurrentSubscription(unifiedSubscription);
+    }
+  }, [unifiedSubscription]);
 
   const getSubscriptionStatus = () => {
     if (!currentSubscription) {
@@ -453,9 +456,8 @@ const SubscriptionManager: React.FC = () => {
                 const hasDiscount = originalPrice && originalPrice > displayPrice;
 
                 // Build features based on plan name with proper search limits
-                const planExtended = plan as any;
-                const identificationLimit = planExtended.identifications_limit || 5;
-                const searchLimit = planExtended.advanced_search_limit || (plan.name === 'Free Plan' || plan.id === 'free-plan' ? 100 : 50);
+                const identificationLimit = plan.identifications_limit || 5;
+                const searchLimit = plan.advanced_search_limit || (plan.name === 'Free Plan' || plan.id === 'free-plan' ? 100 : 50);
 
                 const displayFeatures: string[] = (() => {
                   if (plan.name === 'Free Plan' || plan.name === 'Free') {
@@ -492,8 +494,8 @@ const SubscriptionManager: React.FC = () => {
                   }
 
                   // Fallback to stored features or default
-                  return Array.isArray((plan as any).features)
-                    ? (plan as any).features
+                  return Array.isArray(plan.features)
+                    ? plan.features.map((feature) => String(feature))
                     : ['Basic features'];
                 })();
 

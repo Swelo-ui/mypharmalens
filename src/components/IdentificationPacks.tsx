@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,51 @@ interface IdentificationPack {
   is_active: boolean;
 }
 
+type RazorpayOrderResponse = {
+  order_id: string;
+  key: string;
+  amount: number;
+  currency?: string;
+};
+
+type RazorpaySuccessResponse = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature?: string;
+};
+
+type RazorpayFailureResponse = {
+  error?: {
+    description?: string;
+  };
+};
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpaySuccessResponse) => void;
+  prefill: {
+    email?: string;
+  };
+  theme: {
+    color: string;
+  };
+  modal: {
+    ondismiss: () => void;
+  };
+}
+
+interface RazorpayInstance {
+  open: () => void;
+  on: (event: 'payment.failed', handler: (response: RazorpayFailureResponse) => void) => void;
+}
+
+type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
+
 const IdentificationPacks: React.FC = () => {
   const { user } = useAuthStatus();
   const [packs, setPacks] = useState<IdentificationPack[]>([]);
@@ -26,14 +71,7 @@ const IdentificationPacks: React.FC = () => {
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratsPack, setCongratsPack] = useState<IdentificationPack | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchPacks();
-      fetchExtraIdentifications();
-    }
-  }, [user]);
-
-  const fetchPacks = async () => {
+  const fetchPacks = useCallback(async () => {
     try {
       // Try to fetch from database first, fallback to mock data
       try {
@@ -45,7 +83,7 @@ const IdentificationPacks: React.FC = () => {
 
         if (packsError) throw packsError;
 
-        setPacks((packsData as any[]) || []);
+        setPacks((packsData || []) as IdentificationPack[]);
       } catch (dbError) {
         console.log('Database table not ready, using mock data');
       }
@@ -85,9 +123,9 @@ const IdentificationPacks: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchExtraIdentifications = async () => {
+  const fetchExtraIdentifications = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -104,7 +142,14 @@ const IdentificationPacks: React.FC = () => {
       console.error('Error fetching extra identifications:', error);
       setExtraIdentifications(0);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPacks();
+      fetchExtraIdentifications();
+    }
+  }, [user, fetchPacks, fetchExtraIdentifications]);
 
   const handlePurchase = async (pack: IdentificationPack) => {
     if (!user) {
@@ -145,7 +190,7 @@ const IdentificationPacks: React.FC = () => {
       console.log('Top-up transaction created:', transactionId);
 
       // Create Razorpay order
-      const { data: orderData, error: orderError } = await supabase.functions.invoke('razorpay-order', {
+      const { data: orderData, error: orderError } = await supabase.functions.invoke<RazorpayOrderResponse>('razorpay-order', {
         body: {
           amount: pack.price_inr,
           currency: 'INR',
@@ -189,15 +234,14 @@ const IdentificationPacks: React.FC = () => {
       console.log('Transaction updated with order_id:', orderData.order_id);
 
       // Initialize Razorpay using server-provided fields
-      let razorpay: any;
-      const options = {
+      const options: RazorpayOptions = {
         key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency || 'INR',
         name: 'PharmaLens',
         description: pack.name,
         order_id: orderData.order_id,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpaySuccessResponse) {
           try {
             console.log('✅ Payment successful! Razorpay response:', {
               order_id: response.razorpay_order_id,
@@ -235,7 +279,7 @@ const IdentificationPacks: React.FC = () => {
               // INSTANT PROCESSING: Call verify-payment immediately
               console.log('⚡ Calling verify-payment for instant processing...');
 
-              const { data: verifyResult, error: verifyError } = await supabase.functions.invoke('verify-payment', {
+              const { data: verifyResult, error: verifyError } = await supabase.functions.invoke<{ success?: boolean; message?: string }>('verify-payment', {
                 body: {
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id
@@ -246,7 +290,7 @@ const IdentificationPacks: React.FC = () => {
 
               if (verifyError) {
                 console.error('❌ Verification error:', verifyError);
-                const message = (verifyError as any)?.message || 'Payment verification failed';
+                const message = verifyError instanceof Error ? verifyError.message : 'Payment verification failed';
                 // Gracefully handle non-captured payments (HTTP 400 from verify-payment)
                 if (message.toLowerCase().includes('payment not captured')) {
                   toast.error('Payment not captured — please retry.', {
@@ -352,15 +396,16 @@ const IdentificationPacks: React.FC = () => {
       };
 
       // Check if Razorpay SDK is loaded
-      if (!(window as any).Razorpay) {
+      const windowWithRazorpay = window as Window & { Razorpay?: RazorpayConstructor };
+      if (!windowWithRazorpay.Razorpay) {
         toast.error('Payment system is loading. Please try again in a moment.');
         setPurchasing(null);
         return;
       }
 
-      razorpay = new (window as any).Razorpay(options);
+      const razorpay = new windowWithRazorpay.Razorpay(options);
 
-      razorpay.on('payment.failed', (response: any) => {
+      razorpay.on('payment.failed', (response: RazorpayFailureResponse) => {
         console.error('Razorpay payment failed:', response);
         const errorMsg = response?.error?.description || 'Payment failed. Please try again.';
         toast.error(errorMsg);
@@ -369,9 +414,9 @@ const IdentificationPacks: React.FC = () => {
       });
 
       razorpay.open();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating order:', error);
-      const errorMessage = error?.message || 'Failed to create order. Please try again.';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create order. Please try again.';
       toast.error(errorMessage);
       setPurchasing(null);
     }

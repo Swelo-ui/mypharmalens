@@ -7,13 +7,14 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriptionService } from '@/services/subscriptionService';
 import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
+import { Tables } from '@/types/database.types';
 
 const PaymentResult: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isVerifying, setIsVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | 'pending' | null>(null);
-  const [transactionDetails, setTransactionDetails] = useState<any>(null);
+  const [transactionDetails, setTransactionDetails] = useState<Tables<'payment_transactions'> | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
 
   useEffect(() => {
@@ -141,7 +142,9 @@ const PaymentResult: React.FC = () => {
                 clearInterval(interval);
                 toast.info('Still processing. You will see updates in Subscription Manager.');
               }
-            } catch { }
+            } catch (error) {
+              console.warn('Polling error:', error);
+            }
           }, 2000);
         }
 

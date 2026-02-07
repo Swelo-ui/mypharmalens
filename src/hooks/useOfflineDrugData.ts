@@ -79,15 +79,6 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
     const [hasUpdates, setHasUpdates] = useState(false);
     const [estimatedSize, setEstimatedSize] = useState('');
 
-    // Load initial status
-    useEffect(() => {
-        refreshStatus();
-
-        // Calculate estimated size
-        const size = estimateDrugDataSize();
-        setEstimatedSize(formatStorageSize(size));
-    }, []);
-
     // Refresh offline status
     const refreshStatus = useCallback(async () => {
         try {
@@ -135,6 +126,14 @@ export function useOfflineDrugData(): UseOfflineDrugDataReturn {
             setOfflineStatus(prev => ({ ...prev, isLoading: false }));
         }
     }, []);
+
+    // Load initial status
+    useEffect(() => {
+        refreshStatus();
+
+        const size = estimateDrugDataSize();
+        setEstimatedSize(formatStorageSize(size));
+    }, [refreshStatus]);
 
     // Download all drugs for offline use with visible staged progress
     const downloadOfflineData = useCallback(async () => {

@@ -391,8 +391,21 @@ export const createLaymanExplanation = {
   }
 };
 
+type LaymanDrugInput = {
+  description?: string;
+  mechanism?: string;
+  indications?: string[];
+  contraindications?: string[];
+  sideEffects?: string[];
+  interactions?: string[];
+  dosageAndAdmin?: string;
+  warnings?: string[];
+  pregnancy?: string;
+  storage?: string;
+};
+
 // Helper function to generate complete layman explanations for a drug
-export const generateLaymanExplanations = (drug: any) => {
+export const generateLaymanExplanations = (drug: LaymanDrugInput) => {
   return {
     description: drug.description ? 
       `This medicine is used to ${drug.description.toLowerCase().replace(/^medication used to |^drug used to /, '')}` : 

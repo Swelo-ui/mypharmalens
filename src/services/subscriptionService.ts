@@ -96,11 +96,12 @@ export class SubscriptionService {
         success: true,
         transactionId: transaction.transaction_id
       };
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error('Payment verification error:', error);
       return {
         success: false,
-        error: error.message || 'Unknown payment verification error'
+        error: message || 'Unknown payment verification error'
       };
     }
   }
@@ -209,11 +210,12 @@ export class SubscriptionService {
         success: true,
         subscription: updatedSubscription
       };
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error('Subscription update error:', error);
       return {
         success: false,
-        error: error.message || 'Unknown subscription update error'
+        error: message || 'Unknown subscription update error'
       };
     }
   }

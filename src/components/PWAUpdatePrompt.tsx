@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 /**
@@ -9,6 +9,40 @@ import { toast } from 'sonner';
 export const PWAUpdatePrompt = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+
+  const handleUpdate = useCallback(async () => {
+    console.log('🔄 Updating to new version...');
+    toast.loading('Updating app...', { id: 'app-update' });
+    
+    try {
+      if (registration && registration.waiting) {
+        // Tell the waiting service worker to skip waiting and become active
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        
+        // Show success message
+        toast.success('✅ Updated!', {
+          id: 'app-update',
+          description: 'Reloading app with latest version...',
+          duration: 2000
+        });
+        
+        // Reload after short delay to show success message
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        // Fallback: just reload
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('❌ Update error:', error);
+      toast.error('Update failed', {
+        id: 'app-update',
+        description: 'Please refresh manually',
+        duration: 4000
+      });
+    }
+  }, [registration]);
 
   useEffect(() => {
     // Register service worker and handle updates
@@ -91,41 +125,7 @@ export const PWAUpdatePrompt = () => {
         }
       });
     }
-  }, []);
-
-  const handleUpdate = async () => {
-    console.log('🔄 Updating to new version...');
-    toast.loading('Updating app...', { id: 'app-update' });
-    
-    try {
-      if (registration && registration.waiting) {
-        // Tell the waiting service worker to skip waiting and become active
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        
-        // Show success message
-        toast.success('✅ Updated!', {
-          id: 'app-update',
-          description: 'Reloading app with latest version...',
-          duration: 2000
-        });
-        
-        // Reload after short delay to show success message
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        // Fallback: just reload
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('❌ Update error:', error);
-      toast.error('Update failed', {
-        id: 'app-update',
-        description: 'Please refresh manually',
-        duration: 4000
-      });
-    }
-  };
+  }, [handleUpdate]);
 
   // Auto-update in 30 seconds if user doesn't respond
   useEffect(() => {
@@ -138,7 +138,7 @@ export const PWAUpdatePrompt = () => {
 
       return () => clearTimeout(autoUpdateTimer);
     }
-  }, [updateAvailable]);
+  }, [updateAvailable, handleUpdate]);
 
   return null; // This component doesn't render anything visually
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { SubscriptionService } from '@/services/subscriptionService';
+import { SubscriptionService, UserSubscription } from '@/services/subscriptionService';
 import { PaymentError } from '@/components/ErrorHandler';
 
 interface PaymentStatusState {
@@ -14,7 +14,7 @@ interface UsePaymentStatusOptions {
   pollInterval?: number;
   maxRetries?: number;
   timeoutDuration?: number;
-  onSuccess?: (subscription: any) => void;
+  onSuccess?: (subscription: UserSubscription) => void;
   onError?: (error: PaymentError) => void;
 }
 
@@ -108,10 +108,11 @@ export const usePaymentStatus = (options: UsePaymentStatusOptions = {}) => {
       );
       handleError(error);
       return false;
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       const paymentError = createError(
         'server_error',
-        error.message || 'Failed to verify payment',
+        message || 'Failed to verify payment',
         'VERIFICATION_ERROR'
       );
       handleError(paymentError);
@@ -133,7 +134,7 @@ export const usePaymentStatus = (options: UsePaymentStatusOptions = {}) => {
       }
       
       return false;
-    } catch (error: any) {
+    } catch (error) {
       console.warn('Polling error:', error);
       return false;
     }

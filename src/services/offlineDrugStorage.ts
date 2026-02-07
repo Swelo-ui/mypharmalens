@@ -337,7 +337,7 @@ export async function getActualStorageSize(): Promise<{
             const estimate = await navigator.storage.estimate();
 
             // usageDetails.indexedDB is only available in some browsers
-            const usageDetails = (estimate as any).usageDetails;
+            const usageDetails = (estimate as { usageDetails?: { indexedDB?: number } }).usageDetails;
             const indexedDBSize = usageDetails?.indexedDB || 0;
 
             return {

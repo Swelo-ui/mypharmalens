@@ -72,10 +72,11 @@ const Profile = () => {
             return;
           }
 
-          if (data) {
-            setDisplayName((data as { display_name: string | null }).display_name || '');
-            setExtraIdentifications((data as any).extra_identifications || 0);
-          }
+        if (data) {
+          const profileData = data as { display_name: string | null; extra_identifications: number | null };
+          setDisplayName(profileData.display_name || '');
+          setExtraIdentifications(profileData.extra_identifications || 0);
+        }
 
           // Set email from auth user
           setEmail(user.email || '');

@@ -19,7 +19,7 @@ export interface PaymentError {
   type: 'payment_failed' | 'network_error' | 'server_error' | 'timeout' | 'validation_error' | 'unknown';
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   retryable: boolean;
 }

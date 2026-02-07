@@ -4,7 +4,7 @@ export interface TransactionLog {
   id?: string;
   user_id: string;
   event_type: 'payment_initiated' | 'payment_success' | 'payment_failed' | 'subscription_updated' | 'verification_started' | 'verification_completed' | 'error_occurred';
-  event_data: Record<string, any>;
+  event_data: Record<string, unknown>;
   timestamp: Date;
   session_id?: string;
   ip_address?: string;
@@ -20,8 +20,35 @@ export interface LogContext {
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
+
+type TransactionLogsInsert = {
+  user_id: string;
+  event_type: TransactionLog['event_type'];
+  event_data: Record<string, unknown>;
+  timestamp: string;
+  session_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  error_details?: TransactionLog['error_details'];
+};
+
+type TransactionLogsQueryResult = {
+  data: TransactionLog[] | null;
+  error: { message?: string } | null;
+};
+
+type TransactionLogsTable = {
+  insert: (values: TransactionLogsInsert) => Promise<{ error: { message?: string } | null }>;
+  select: (columns: string) => TransactionLogsFilter;
+};
+
+type TransactionLogsFilter = {
+  eq: (column: string, value: string) => TransactionLogsFilter;
+  order: (column: string, options: { ascending: boolean }) => TransactionLogsFilter;
+  limit: (limit: number) => Promise<TransactionLogsQueryResult>;
+};
 
 class TransactionLogger {
   private static instance: TransactionLogger;
@@ -60,18 +87,17 @@ class TransactionLogger {
   private async saveToDatabase(log: TransactionLog): Promise<void> {
     try {
       // Cast to any to bypass TypeScript checking for transaction_logs table
-      const { error } = await (supabase as any)
-        .from('transaction_logs')
-        .insert({
-          user_id: log.user_id,
-          event_type: log.event_type,
-          event_data: log.event_data,
-          timestamp: log.timestamp.toISOString(),
-          session_id: log.session_id,
-          ip_address: log.ip_address,
-          user_agent: log.user_agent,
-          error_details: log.error_details
-        });
+      const transactionLogsTable = supabase.from('transaction_logs' as never) as unknown as TransactionLogsTable;
+      const { error } = await transactionLogsTable.insert({
+        user_id: log.user_id,
+        event_type: log.event_type,
+        event_data: log.event_data,
+        timestamp: log.timestamp.toISOString(),
+        session_id: log.session_id,
+        ip_address: log.ip_address,
+        user_agent: log.user_agent,
+        error_details: log.error_details
+      });
 
       if (error) {
         console.error('Failed to save transaction log:', error);
@@ -115,7 +141,7 @@ class TransactionLogger {
   public async log(
     userId: string,
     eventType: TransactionLog['event_type'],
-    eventData: Record<string, any>,
+    eventData: Record<string, unknown>,
     errorDetails?: TransactionLog['error_details']
   ): Promise<void> {
     const log: TransactionLog = {
@@ -277,19 +303,17 @@ class TransactionLogger {
     eventType?: TransactionLog['event_type']
   ): Promise<TransactionLog[]> {
     try {
-      // Cast to any to bypass TypeScript checking
-      let query = (supabase as any)
-        .from('transaction_logs')
+      const transactionLogsTable = supabase.from('transaction_logs' as never) as unknown as TransactionLogsTable;
+      let query = transactionLogsTable
         .select('*')
         .eq('user_id', userId)
-        .order('timestamp', { ascending: false })
-        .limit(limit);
+        .order('timestamp', { ascending: false });
 
       if (eventType) {
         query = query.eq('event_type', eventType);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.limit(limit);
 
       if (error) {
         console.error('Failed to fetch transaction logs:', error);
@@ -305,12 +329,12 @@ class TransactionLogger {
 
   public async getLogsForSession(sessionId: string): Promise<TransactionLog[]> {
     try {
-      // Cast to any to bypass TypeScript checking
-      const { data, error } = await (supabase as any)
-        .from('transaction_logs')
+      const transactionLogsTable = supabase.from('transaction_logs' as never) as unknown as TransactionLogsTable;
+      const { data, error } = await transactionLogsTable
         .select('*')
         .eq('session_id', sessionId)
-        .order('timestamp', { ascending: true });
+        .order('timestamp', { ascending: true })
+        .limit(1000);
 
       if (error) {
         console.error('Failed to fetch session logs:', error);

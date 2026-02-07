@@ -16,6 +16,33 @@ import { DrugData } from '@/components/DrugCard';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionLike = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: (() => void) | null;
+  onsoundstart?: (() => void) | null;
+  onsoundend?: (() => void) | null;
+  start: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+const getSpeechRecognition = () => {
+  if (typeof window === 'undefined') return null;
+  const win = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return win.SpeechRecognition || win.webkitSpeechRecognition || null;
+};
+
 function calculateLevenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
 
@@ -57,13 +84,12 @@ const SymptomChecker = () => {
   const [symptomDrugs, setSymptomDrugs] = useState<DrugData[]>([]);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = getSpeechRecognition();
 
     if (!SpeechRecognition) {
       setIsSpeechSupported(false);
@@ -668,8 +694,8 @@ const SymptomChecker = () => {
     try {
       const recognition = recognitionRef.current;
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
+      recognition.onresult = (event) => {
+        const transcript = event.results?.[0]?.[0]?.transcript || '';
         const cleaned = transcript.trim();
         if (!cleaned) return;
 
@@ -702,11 +728,10 @@ const SymptomChecker = () => {
         setIsListening(false);
       };
 
-      // Animate waves only when sound is detected
-      (recognition as any).onsoundstart = () => {
+      recognition.onsoundstart = () => {
         setIsListening(true);
       };
-      (recognition as any).onsoundend = () => {
+      recognition.onsoundend = () => {
         setIsListening(false);
       };
 

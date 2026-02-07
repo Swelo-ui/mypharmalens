@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 
 interface SchemaMarkupProps {
   type: 'WebApplication' | 'FAQPage' | 'Article' | 'Organization';
-  data: any;
+  data: Record<string, unknown>;
 }
 
 const SchemaMarkup = ({ type, data }: SchemaMarkupProps) => {
