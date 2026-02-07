@@ -358,7 +358,7 @@ serve(async (req) => {
       });
     }
 
-    const windowStart = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    const windowStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     
     let ipCount: number | null | undefined = 0;
     if (ip !== 'unknown') {
@@ -382,7 +382,7 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'ip_rate_limit' }
         });
-        return new Response(JSON.stringify({ error: 'Too many accounts created from this network. Please try again in 10 days.' }), {
+        return new Response(JSON.stringify({ error: 'Too many accounts were created from this network. Please try again in 30 days, or log in with your existing account and enjoy.' }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -409,7 +409,7 @@ serve(async (req) => {
           eventType: 'signup_blocked',
           metadata: { reason: 'device_rate_limit' }
         });
-        return new Response(JSON.stringify({ error: 'Too many accounts created from this device. Please try again in 10 days.' }), {
+        return new Response(JSON.stringify({ error: 'Too many accounts were created from this device. Please try again in 30 days, or log in with your existing account and enjoy.' }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
