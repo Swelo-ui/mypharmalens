@@ -820,6 +820,10 @@ export const useSubscription = () => {
         }
       }
 
+
+      // Add timestamp for last identification
+      payload.last_identification_at = now.toISOString();
+
       const { error } = await supabase
         .from('profiles')
         .upsert(payload, { onConflict: 'id' });

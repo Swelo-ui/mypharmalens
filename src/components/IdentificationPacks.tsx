@@ -222,7 +222,8 @@ const IdentificationPacks: React.FC = () => {
         .from('topup_transactions')
         .update({
           razorpay_order_id: orderData.order_id,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          transaction_id: transactionId
         })
         .eq('transaction_id', transactionId);
 
@@ -257,7 +258,8 @@ const IdentificationPacks: React.FC = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 status: 'processing',
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                transaction_id: transactionId
               })
               .eq('razorpay_order_id', response.razorpay_order_id)
               .select()
