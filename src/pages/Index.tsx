@@ -176,6 +176,76 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Privacy First Section */}
+        <section className="py-20 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 relative overflow-hidden">
+          {/* Abstract background shapes */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 rounded-full bg-pharma-500/10 dark:bg-pharma-500/20 blur-[100px] shadow-2xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 rounded-full bg-blue-500/10 dark:bg-blue-500/20 blur-[100px] shadow-2xl pointer-events-none"></div>
+
+          <div className="container mx-auto px-4 max-w-6xl relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              <div className="animate-on-scroll order-2 lg:order-1">
+                <div className="relative rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-8 backdrop-blur-xl shadow-xl transition-transform hover:scale-[1.02] duration-300">
+                  <div className="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-10 pointer-events-none transform translate-x-4 -translate-y-4">
+                    <ShieldCheck className="w-32 h-32 text-pharma-900 dark:text-white" />
+                  </div>
+                  <div className="flex items-center space-x-4 mb-6 relative z-10">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-100 to-green-200 dark:from-green-400/20 dark:to-emerald-600/20 flex items-center justify-center border border-green-300 dark:border-green-500/30 shadow-inner flex-shrink-0">
+                      <ShieldCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">The PharmaLens Pitch</h3>
+                  </div>
+                  <div className="space-y-5 relative z-10">
+                    <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed font-light italic">
+                      "When you upload your medications to general AI models, your images might be stored to train future models, <span className="text-red-600 dark:text-red-300 font-medium not-italic">exposing your private health conditions.</span>"
+                    </p>
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-300 dark:via-white/20 to-transparent"></div>
+                    <p className="text-base leading-relaxed text-gray-900 dark:text-white font-medium italic">
+                      "PharmaLens processes the image and immediately discards it, keeping your healthcare data <span className="text-green-600 dark:text-green-400 font-bold not-italic">100% private.</span>"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="animate-on-scroll delay-150 order-1 lg:order-2">
+                <div className="inline-block mb-3">
+                  <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-500/10 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-500/20 shadow-[0_0_15px_rgba(74,222,128,0.05)]">
+                    <ShieldCheck className="w-3 h-3 mr-1.5" /> Enterprise Security
+                  </span>
+                </div>
+                <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white tracking-tight">
+                  Privacy First. <br className="hidden md:block" />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-pharma-600 via-pharma-500 to-pharma-700 dark:from-pharma-300 dark:via-pharma-100 dark:to-white">Zero Compromises.</span>
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
+                  We built PharmaLens with a fundamentally different approach to your medical data. We believe your health is your business, nobody else's.
+                </p>
+
+                <div className="space-y-5">
+                  <div className="flex items-start group">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center mr-4 mt-0.5 transition-colors group-hover:bg-green-50 dark:group-hover:bg-green-500/20 group-hover:border-green-300 dark:group-hover:border-green-500/30">
+                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-gray-900 dark:text-white font-semibold">No Image Retention</h4>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Photos of your medicine are processed in isolated memory and immediately permanently deleted. They never hit our storage servers.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start group">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center mr-4 mt-0.5 transition-colors group-hover:bg-green-50 dark:group-hover:bg-green-500/20 group-hover:border-green-300 dark:group-hover:border-green-500/30">
+                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-gray-900 dark:text-white font-semibold">No AI Model Training</h4>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Unlike generic AI chatbots, we strictly prohibit the use of your sensitive identification data to train future AI models.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Advanced Features Section */}
         <section className="py-20 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
           <div className="container mx-auto px-4 max-w-6xl">
