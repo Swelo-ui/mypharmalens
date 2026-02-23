@@ -68,6 +68,11 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/drugs" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
+                    A-Z Drug Directory
+                  </Link>
+                </li>
+                <li>
                   <Link to="/identify" className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-pharma-600 transition-colors">
                     Visual Identification
                   </Link>

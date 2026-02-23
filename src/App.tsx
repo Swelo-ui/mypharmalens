@@ -34,6 +34,7 @@ const PaymentResult = lazy(() => import("./components/PaymentResult"));
 // Replace direct component import with page wrappers
 const PaymentHistoryPage = lazy(() => import("./pages/PaymentHistoryPage"));
 const SubscriptionManagerPage = lazy(() => import("./pages/SubscriptionManagerPage"));
+const DrugDirectory = lazy(() => import("./pages/DrugDirectory"));
 
 const queryClient = new QueryClient();
 
@@ -60,7 +61,7 @@ const App = () => {
           {/* PWA Update & Install Prompts */}
           <PWAUpdatePrompt />
           <PWAInstallPrompt />
-          
+
           <div className="flex flex-col min-h-screen">
             <div className="flex-1">
               <Suspense fallback={<LoadingSpinner />}>
@@ -78,6 +79,7 @@ const App = () => {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/disclaimer" element={<Disclaimer />} />
                   <Route path="/drug/:id" element={<DrugPage />} />
+                  <Route path="/drugs" element={<DrugDirectory />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/symptom-checker" element={<SymptomChecker />} />
                   <Route path="/drug-interactions" element={<DrugInteractionChecker />} />
