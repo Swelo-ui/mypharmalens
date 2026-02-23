@@ -16,56 +16,45 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
     {
         id: "post_1",
-        title: "How to Identify Unknown Pills and Tablets Instantly",
-        slug: "identify-unknown-pills",
-        excerpt: "Found a loose pill and don't know what it is? Learn the safe and accurate way to identify unmarked tablets, capsules, and caplets using imprint codes.",
+        title: "How to Accurately Identify Medication Using Strips and Boxes",
+        slug: "identify-medication-strips-boxes",
+        excerpt: "Found a loose medication strip? Learn why reading the blister pack or box is the most accurate way to identify drugs and ensure medication safety.",
         author: "PharmaLens Research Team",
         date: "2026-02-10",
         readTime: "5 min read",
         category: "Guides",
-        tags: ["Pill Identifier", "Medication Safety", "Imprint Codes", "FDA"],
-        keywords: "pill identifier, identify pill by number, white round pill 512, unmarked pill identification",
-        imageUrl: "/images/how-to-identify-unknown-pills.png",
+        tags: ["Medication Safety", "Blister Packs", "Drug Identification", "PharmaLens"],
+        keywords: "identify medication strip, read blister pack, scan medicine box, pharmalens drug identifier",
+        imageUrl: "/images/medication-strip-identification.png",
         content: `
-Have you ever found a stray pill at the bottom of your purse or dropped on the bathroom floor, completely unsure of what it is or whose it might be? 
+When trying to figure out what a medication is, looking at a bare, loose pill is actually the hardest—and riskiest—way to do it.
 
-Guessing is incredibly dangerous. Every year, thousands of people end up in the ER because they took a medication they thought was an over-the-counter painkiller, but was actually a potent prescription drug.
+While imprint codes on pills exist, the absolute gold standard for accurate medication identification is the original packaging: **The Medication Strip (Blister Pack) or the Box**.
 
-Here is exactly what you need to do to safely identify an unknown pill without guessing.
+Here is why you should always rely on the strip or box, and how modern tools like PharmaLens make extracting this data instant and flawless.
 
-### 1. The "Imprint Code" is Your Best Friend
+### Why Strips and Boxes Provide "Full Info"
 
-By law (specifically FDA regulations in the US), all prescription and over-the-counter solid oral dosage forms (pills, tablets, capsules) **must** have a unique imprint code.
+A loose pill might tell you it's "Ibuprofen 200mg" if you look up the code. But the strip or box tells you the complete story necessary for safe consumption:
 
-This code, combined with the pill's color and shape, acts like a license plate.
+1. **Brand and Generic Name:** Clearly printed, avoiding any confusion between similar-looking pills.
+2. **Exact Dosage Strength:** Immediately visible (e.g., 500mg vs 250mg).
+3. **Expiry Date & Batch Number:** Critical safety information that is absolutely impossible to know from looking at a loose pill. If there is a pharmaceutical recall, the batch number is what you need.
+4. **Manufacturer Details:** Assures authenticity and origin.
 
-> **Pro Tip:** Imprints can be incredibly tiny and hard to read. Use the flashlight and macro camera features on your smartphone to take a close-up photo. You can then zoom in on the picture to clearly read faded or microscopic numbers.
+### Scanning with PharmaLens
 
-### 2. Reliable vs. Unreliable Sources
+Manually typing out long, complex chemical names from a crumpled blister pack can lead to typos and incorrect web searches. 
 
-Once you have the code, shape, and color, where do you look it up? Not all Google results are equal.
+This is where **PharmaLens** shines. Instead of taking a picture of a loose pill, point your PharmaLens scanner directly at the medication strip or the box.
 
-| Source Type | Reliability | Why use it? |
-| :--- | :--- | :--- |
-| **PharmaLens AI Identifier** | 🟢 Very High | Uses computer vision to instantly cross-reference massive verified databases without manual typing. |
-| **National Library of Medicine (Pillbox)** | 🟢 High | Official government database. Requires manual input of shape, color, and scoring. |
-| **Random Google Images** | 🔴 Low | Image results can be easily mislabeled by bloggers or incorrect forum posts. |
-| **Asking on Social Media** | 🔴 Very Low | Crowd-sourcing medical identification is dangerous and often leads to incorrect, life-threatening advice. |
+- **High-Accuracy Text Recognition (OCR):** PharmaLens instantly reads the text on the foil backing or the cardboard box.
+- **Contextual Understanding:** It doesn't just read words; it understands which word is the brand name, which is the chemical composition, and which is the dosage.
+- **Instant Full Profile:** Within seconds, you are presented with the complete, verified drug profile, including side effects, uses, and interaction warnings, all fetched accurately based on the packaging text.
 
-### What if the pill has NO markings?
+> **Pro Tip:** When scanning a blister pack, try to flatten it out as much as possible and ensure the text is well-lit and in focus. The clearer the text, the faster and more accurate the PharmaLens identification will be.
 
-If a pill has absolutely zero imprints, it is exponentially harder to identify safely. An unmarked pill is likely one of the following:
-
-1. **A Vitamin or Supplement:** The FDA does not require dietary supplements or herbal remedies to carry an imprint.
-2. **A Foreign Medication:** Drugs manufactured outside the US/UK may follow different laws.
-3. **An Illicit or Counterfeit Drug:** Illegal street drugs or counterfeit pills bought online often lack professional imprints or contain fake markings.
-4. **Candy or Mints:** It sounds silly, but many small mints look exactly like actual pills.
-
-> **Warning:** If a pill has no imprint code and you do not unequivocally know its source, **throw it away immediately**. Never consume an unidentified, unmarked pill.
-
-### Safe Disposal
-
-If you can't identify it, dispose of it safely. Do not flush it down the toilet unless explicitly instructed to do so. The best method is to use a local pharmacy's medication take-back program. If that's not possible, mix the pill with something unappealing (like used coffee grounds), seal it in a bag, and toss it in the household trash.`
+Never throw away the box or the strip until the medication is completely finished. They are your primary source of truth for medication safety.`
     },
     {
         id: "post_2",
@@ -201,5 +190,54 @@ Create a secure digital note (or a printed card kept in your wallet) that contai
 4. **The Prescribing Doctor** (e.g., Dr. Smith, Cardiology).
 
 Hand this list to the receptionist at *every* medical appointment. It prevents prescribing errors and gives your doctors a holistic view of your health.`
+    },
+    {
+        id: "post_5",
+        title: "The B.Pharm Survival Guide: When Neighbors Ask 'Beta, Ye Dawa Kis Liye Hai?'",
+        slug: "bpharm-student-survival-guide-pharmalens",
+        excerpt: "Every pharmacy student faces the ultimate test: a neighbor hands you a random strip of medicine and asks what it does. Here is how to answer like a pro in seconds.",
+        author: "PharmaLens Education Team",
+        date: "2026-02-23",
+        readTime: "6 min read",
+        category: "Guides",
+        tags: ["Pharmacy Students", "BPharm", "Career Advice", "Health Tech"],
+        keywords: "bpharm pharmacy student, medicine scanner app for students, pharmalens app, check medicine side effects instantly",
+        imageUrl: "/images/bpharm-student-scanner.png",
+        content: `
+If you are pursuing your B.Pharm or D.Pharm, you already know the universal truth: The moment your relatives, neighbors, or family friends find out you are studying pharmacy, you instantly become their personal, on-call doctor.
+
+The scenario always plays out exactly the same way: You are sitting peacefully, and suddenly "Sharma Uncle" walks over, pulls out a crumpled strip of medicine, and asks the dreaded question:
+
+*"Beta, you're studying pharmacy right? Ye dawa kis liye use hoti hai?" (Child, what is this medicine used for?)*
+
+### The Google Trap
+
+As a student, you haven't memorized all 20,000+ FDA and CDSCO approved drugs yet. So, you pull out your phone and Google the brand name. 
+
+**Here is why that is a terrible idea during a rapid-fire interrogation:**
+1. **Information Overlaod:** Google gives you 10,000 results. 
+2. **Unverified Sources:** You click on a random blog that might have outdated or completely incorrect contraindications.
+3. **The Embarrassment Factor:** You are scrolling frantically through a 10-page WebMD article while Sharma Uncle stares at you, waiting for an answer. You end up mumbling something vague about "pain relief" and feeling like a fraud.
+
+### The Professional Shortcut: Scan, Don't Search
+
+This is exactly why thousands of pharmacy students consider **PharmaLens** their secret weapon. It transforms you from a stressed student frantically Googling into an instant medication expert.
+
+Instead of typing, you simply open the PharmaLens app and **scan the medication strip or box.**
+
+| Feature | What It Gives You | Why It Impresses |
+| :--- | :--- | :--- |
+| **Instant Indications** | Tells you exactly what the drug treats (e.g., "Hypertension" instead of just "Blood Pressure"). | Shows immediate competence. |
+| **Clear Contraindications** | "Do not take if allergic to Sulfa drugs." | Makes you look like a safety expert. |
+| **Pregnancy Warnings** | Categorizes the drug safety for expecting mothers. | Critical advice that typical Google searches bury. |
+| **Common Side Effects** | Highlights what the patient should actually watch out for. | Allows you to give practical, real-world advice. |
+
+> **Pro Tip:** When a neighbor hands you a medicine, don't just tell them what it does. Scan it with PharmaLens, and proactively tell them: *"Uncle, this is for your blood pressure, but make sure you don't take it with grapefruit juice, and if you feel dizzy when standing up, that's a common side effect."*
+
+### Why PharmaLens is Essential for B.Pharm Students
+
+You are a student, not a walking encyclopedia. Mastering pharmacology takes years of clinical practice. PharmaLens bridges the gap between your theoretical textbook knowledge and real-world practical application. 
+
+It organizes complex chemical data into a clean, highly readable interface in a matter of seconds. Next time someone hands you a medicine strip, don't panic. Just scan it.`
     }
 ];

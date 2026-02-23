@@ -122,6 +122,12 @@ const Header = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
+                      <Link to="/blog" className="flex items-center w-full cursor-pointer">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        <span>Blog</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link to="/symptom-checker" className="flex items-center w-full cursor-pointer">
                         <Activity className="mr-2 h-4 w-4" />
                         <span>Symptom Checker</span>
@@ -281,6 +287,12 @@ const Header = () => {
                           <Link to="/profile" className="flex items-center w-full cursor-pointer">
                             <UserCircle className="mr-2 h-4 w-4" />
                             <span>Profile</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blog" className="flex items-center w-full cursor-pointer">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            <span>Blog</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
