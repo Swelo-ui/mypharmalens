@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical, Download } from 'lucide-react';
+import { Menu, X, Search, LogIn, UserCircle, LogOut, Activity, Home, Pill, HelpCircle, Info, Mail, Coffee, Shield, FileText, AlertTriangle, Scale, Phone, MessageCircle, CreditCard, Settings, FlaskConical, Download, BookOpen } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -65,6 +65,7 @@ const Header = () => {
   const mainLinks = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Identify', path: '/identify', icon: Pill },
+    { name: 'Blog', path: '/blog', icon: BookOpen },
     { name: 'About', path: '/about', icon: Info },
     { name: 'FAQ', path: '/faq', icon: HelpCircle },
     { name: 'Help', path: '/help', icon: HelpCircle },

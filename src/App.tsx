@@ -35,6 +35,8 @@ const PaymentResult = lazy(() => import("./components/PaymentResult"));
 const PaymentHistoryPage = lazy(() => import("./pages/PaymentHistoryPage"));
 const SubscriptionManagerPage = lazy(() => import("./pages/SubscriptionManagerPage"));
 const DrugDirectory = lazy(() => import("./pages/DrugDirectory"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const queryClient = new QueryClient();
 
@@ -89,6 +91,8 @@ const App = () => {
                   <Route path="/payment-history" element={<PaymentHistoryPage />} />
                   <Route path="/subscription" element={<SubscriptionManagerPage />} />
                   <Route path="/subscription-manager" element={<SubscriptionManagerPage />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
