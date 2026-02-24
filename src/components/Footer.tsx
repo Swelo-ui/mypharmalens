@@ -136,7 +136,7 @@ const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} PharmaLens. All rights reserved.
+            © {new Date().getFullYear()} PharmaLens™. All rights reserved.
           </p>
 
           <div className="mt-4 md:mt-0 flex items-center">
