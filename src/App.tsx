@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { useEffect, lazy, Suspense } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
 import { playAppAccessSound } from '@/utils/audioService';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -40,10 +41,27 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const queryClient = new QueryClient();
 
-// Loading component for lazy-loaded routes
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+// Premium shimmer loading component for lazy-loaded routes
+const PageLoadingSkeleton = () => (
+  <div className="min-h-screen bg-background">
+    {/* Top navigation skeleton */}
+    <div className="h-16 border-b border-border/40 px-4 flex items-center gap-4">
+      <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+      <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+      <div className="ml-auto h-8 w-8 rounded-full bg-muted animate-pulse" />
+    </div>
+    {/* Content skeleton */}
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <div className="h-8 w-3/4 rounded-lg bg-muted animate-pulse" />
+      <div className="h-4 w-1/2 rounded bg-muted animate-pulse" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+        <div className="h-40 rounded-xl bg-muted animate-pulse" />
+        <div className="h-40 rounded-xl bg-muted animate-pulse" />
+      </div>
+      <div className="h-4 w-full rounded bg-muted animate-pulse" />
+      <div className="h-4 w-5/6 rounded bg-muted animate-pulse" />
+      <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
+    </div>
   </div>
 );
 
@@ -66,37 +84,39 @@ const App = () => {
 
           <div className="flex flex-col min-h-screen">
             <div className="flex-1">
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/identify" element={<DrugIdentify />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/help" element={<HelpCenter />} />
-                  <Route path="/help/:categoryId" element={<HelpCategory />} />
-                  <Route path="/help/article/:articleId" element={<HelpArticlePage />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/disclaimer" element={<Disclaimer />} />
-                  <Route path="/drug/:id" element={<DrugPage />} />
-                  <Route path="/drugs" element={<DrugDirectory />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/symptom-checker" element={<SymptomChecker />} />
-                  <Route path="/drug-interactions" element={<DrugInteractionChecker />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/account-subscription" element={<AccountSubscriptionPage />} />
-                  <Route path="/payment-result" element={<PaymentResult />} />
-                  <Route path="/payment-history" element={<PaymentHistoryPage />} />
-                  <Route path="/subscription" element={<SubscriptionManagerPage />} />
-                  <Route path="/subscription-manager" element={<SubscriptionManagerPage />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:slug" element={<BlogPost />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<PageLoadingSkeleton />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/search" element={<SearchResults />} />
+                    <Route path="/identify" element={<DrugIdentify />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/help" element={<HelpCenter />} />
+                    <Route path="/help/:categoryId" element={<HelpCategory />} />
+                    <Route path="/help/article/:articleId" element={<HelpArticlePage />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/disclaimer" element={<Disclaimer />} />
+                    <Route path="/drug/:id" element={<DrugPage />} />
+                    <Route path="/drugs" element={<DrugDirectory />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/symptom-checker" element={<SymptomChecker />} />
+                    <Route path="/drug-interactions" element={<DrugInteractionChecker />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/account-subscription" element={<AccountSubscriptionPage />} />
+                    <Route path="/payment-result" element={<PaymentResult />} />
+                    <Route path="/payment-history" element={<PaymentHistoryPage />} />
+                    <Route path="/subscription" element={<SubscriptionManagerPage />} />
+                    <Route path="/subscription-manager" element={<SubscriptionManagerPage />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
             </div>
             <BottomNavigation />
           </div>
