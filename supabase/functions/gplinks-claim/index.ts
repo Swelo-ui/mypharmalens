@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const DAILY_CLAIM_LIMIT = 5;
-const TOKEN_EXPIRY_MINUTES = 10;
+const TOKEN_EXPIRY_MINUTES = 30; // Increased from 10 to 30 minutes — GPLinks ad flow can take time
 
 Deno.serve(async (req: Request) => {
     // Handle CORS preflight

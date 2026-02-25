@@ -111,7 +111,9 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
             });
 
             window.open(shortUrl, '_blank', 'noopener');
-            setDailyClaims(prev => prev + 1);
+            // NOTE: Do NOT optimistically increment dailyClaims here.
+            // The real count is updated by fetchClaimStatus() after the
+            // localStorage 'claim_success' event fires from ClaimCallback.
 
         } catch (error) {
             console.error('Free claim error:', error);
