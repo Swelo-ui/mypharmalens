@@ -88,12 +88,19 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                 body: { action: 'generate' }
             });
 
-            if (response.error) {
-                throw new Error(response.error.message || 'Failed to generate claim link');
+            // supabase.functions.invoke sets response.error on non-2xx status,
+            // but the actual JSON body is still in response.data
+            const data = response.data;
+
+            // Check for daily limit in either the data or error
+            if (data?.error?.includes?.('Daily limit') || data?.error === 'Daily limit reached') {
+                setDailyClaims(dailyLimit);
+                toast.info('Daily limit reached. Come back tomorrow for more free claims.');
+                return;
             }
 
-            if (!response.data?.success) {
-                const errorMsg = response.data?.error || 'Failed to generate claim';
+            if (response.error && !data?.success) {
+                const errorMsg = data?.error || data?.detail || response.error.message || 'Failed to generate claim link';
                 if (errorMsg.includes('Daily limit')) {
                     setDailyClaims(dailyLimit);
                     toast.info('Daily limit reached. Come back tomorrow.');
@@ -103,7 +110,13 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                 return;
             }
 
-            const { shortUrl } = response.data;
+            if (!data?.success) {
+                const errorMsg = data?.error || 'Failed to generate claim';
+                toast.error(errorMsg);
+                return;
+            }
+
+            const { shortUrl } = data;
 
             toast.info('Opening ad link...', {
                 description: 'Complete the page to earn your free identification. This tab will update automatically.',
@@ -118,7 +131,12 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
         } catch (error) {
             console.error('Free claim error:', error);
             const message = error instanceof Error ? error.message : 'Something went wrong';
-            toast.error('Failed to create claim', { description: message });
+            if (message.includes('Daily limit')) {
+                setDailyClaims(dailyLimit);
+                toast.info('Daily limit reached. Come back tomorrow.');
+            } else {
+                toast.error('Failed to create claim', { description: message });
+            }
         } finally {
             setLoading(false);
         }
