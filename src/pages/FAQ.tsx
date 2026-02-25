@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 
 const FAQ = () => {
   const structuredData = {
@@ -55,7 +56,7 @@ const FAQ = () => {
         "name": "What subscription plans are available?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "PharmaLens offers three plans: Free (₹0/month, 5 AI identifications), Lite (₹49/month, 39 AI identifications), and Pro (₹99/month, 101 AI identifications) with varying features including advanced search, database access, and premium tools."
+          "text": `PharmaLens offers three plans: Free (₹0/month, ${IDENTIFICATION_LIMITS.FREE} AI identifications + 5 daily via ads), Lite (₹49/month, ${IDENTIFICATION_LIMITS.LITE} AI identifications), and Pro (₹99/month, ${IDENTIFICATION_LIMITS.PRO} AI identifications) with varying features including advanced search, database access, and premium tools.`
         }
       },
       {
@@ -175,7 +176,7 @@ const FAQ = () => {
             <AccordionItem value="item-10">
               <AccordionTrigger>What subscription plans are available?</AccordionTrigger>
               <AccordionContent>
-                PharmaLens offers three plans: Free (₹0/month) with 100 drugs database search and 5 AI identifications; Lite (₹49/month, save ₹30) with 39 AI identifications and 1200+ medicines database with advanced search (249 results); Pro (₹99/month, save ₹100) with 101 AI identifications, 1200+ medicines database, advanced search (500 results), layman explanations, history feature, and advanced search filters. All plans include mobile web app access, PWA offline access, and basic drug information.
+                PharmaLens offers three plans: Free (₹0/month) with 100 drugs database search, {IDENTIFICATION_LIMITS.FREE} AI identification{IDENTIFICATION_LIMITS.FREE > 1 ? 's' : ''}, and the ability to claim up to 5 free identifications daily by watching short ads; Lite (₹49/month, save ₹30) with {IDENTIFICATION_LIMITS.LITE} AI identifications and 1200+ medicines database with advanced search (249 results); Pro (₹99/month, save ₹100) with {IDENTIFICATION_LIMITS.PRO} AI identifications, 1200+ medicines database, advanced search (500 results), layman explanations, history feature, and advanced search filters. All plans include mobile web app access, PWA offline access, and basic drug information.
               </AccordionContent>
             </AccordionItem>
 

@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import SponsorCarousel from '@/components/SponsorCarousel';
 import BottomNavigation from '@/components/BottomNavigation';
 import SEOHead from '@/components/SEOHead';
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { Pill, Camera, Check, ChevronRight, ShieldCheck, Database, Brain, Clock, Crown, ArrowRight, Stethoscope, AlertTriangle, Users, TrendingUp, Activity, Zap } from 'lucide-react';
@@ -438,8 +439,12 @@ const Index = () => {
                     <span className="text-sm">100 drugs database search</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="h-4 w-4 text-green-600 mr-3" />
-                    <span className="text-sm">5 AI identifications per month</span>
+                    <Check className="h-4 w-4 text-green-600 mr-3 shrink-0" />
+                    <span className="text-sm">{IDENTIFICATION_LIMITS.FREE} AI identification{IDENTIFICATION_LIMITS.FREE > 1 ? 's' : ''} per month</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Check className="h-4 w-4 text-green-600 mr-3 mt-1 shrink-0" />
+                    <span className="text-sm">Can claim up to 5 free identifications daily by watching short ads</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="h-4 w-4 text-green-600 mr-3" />
@@ -468,7 +473,7 @@ const Index = () => {
                     <div className="text-3xl font-bold text-pharma-600">₹49<span className="text-lg font-normal text-gray-500">/month</span></div>
                   </div>
                   <p className="text-sm text-green-600 font-semibold">Save ₹30/month</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">39 AI identifications/month</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{IDENTIFICATION_LIMITS.LITE} AI identifications/month</p>
                 </div>
 
                 <ul className="space-y-3 mb-8">
@@ -516,7 +521,7 @@ const Index = () => {
                     <div className="text-3xl font-bold text-pharma-600">₹99<span className="text-lg font-normal text-gray-500">/month</span></div>
                   </div>
                   <p className="text-sm text-green-600 font-semibold">Save ₹100/month</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">101 AI identifications/month</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{IDENTIFICATION_LIMITS.PRO} AI identifications/month</p>
                 </div>
 
                 <ul className="space-y-3 mb-8">

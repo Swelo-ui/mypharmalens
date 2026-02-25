@@ -38,6 +38,7 @@ const SubscriptionManagerPage = lazy(() => import("./pages/SubscriptionManagerPa
 const DrugDirectory = lazy(() => import("./pages/DrugDirectory"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const ClaimCallback = lazy(() => import("./pages/ClaimCallback"));
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,7 @@ const App = () => {
                     <Route path="/subscription-manager" element={<SubscriptionManagerPage />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<BlogPost />} />
+                    <Route path="/claim-callback" element={<ClaimCallback />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

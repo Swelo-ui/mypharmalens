@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
+import FreeClaimButton from '@/components/FreeClaimButton';
 
 interface IdentificationPack {
   id: string;
@@ -439,6 +440,9 @@ const IdentificationPacks: React.FC = () => {
       />
 
       <div className="space-y-4">
+        {/* Free Claim Option */}
+        <FreeClaimButton onClaimSuccess={fetchExtraIdentifications} />
+
         {/* Identification Packs */}
         <Card>
           <CardHeader>

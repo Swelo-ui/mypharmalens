@@ -1,16 +1,17 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   Pill,
-  Zap, 
-  History, 
-  Shield, 
-  Activity, 
-  FlaskConical, 
+  Zap,
+  History,
+  Shield,
+  Activity,
+  FlaskConical,
   Database,
   CheckCircle2
 } from 'lucide-react';
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 
 interface Benefit {
   icon: React.ReactNode;
@@ -74,7 +75,7 @@ const AccountBenefits: React.FC = () => {
         {/* Benefits Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {benefits.map((benefit, index) => (
-            <Card 
+            <Card
               key={index}
               className="group hover:shadow-lg transition-all duration-300 hover:border-pharma-200 dark:hover:border-pharma-800"
             >
@@ -104,7 +105,11 @@ const AccountBenefits: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                      <span className="text-sm">5 AI identifications/month</span>
+                      <span className="text-sm">{IDENTIFICATION_LIMITS.FREE} AI identification{IDENTIFICATION_LIMITS.FREE > 1 ? 's' : ''}/month</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm">Up to 5 free identifications daily via short ads</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />

@@ -14,8 +14,10 @@ import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { useSubscription } from '@/hooks/useSubscription';
+import { IDENTIFICATION_LIMITS, GUEST_LIMITS } from '@/config/subscription.config';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
+import FreeClaimButton from '@/components/FreeClaimButton';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -740,14 +742,14 @@ const DrugIdentify = () => {
 
         // Free plan and paid plans can use bonus identifications
         if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-          // Free plan: 5 monthly + bonus allowed
-          totalLimit = 5 + currentBonus;
+          // Free plan: config-based monthly + bonus allowed
+          totalLimit = IDENTIFICATION_LIMITS.FREE + currentBonus;
         } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-          // Lite plan: 39 monthly + bonus allowed
-          totalLimit = 39 + currentBonus;
+          // Lite plan: config-based monthly + bonus allowed
+          totalLimit = IDENTIFICATION_LIMITS.LITE + currentBonus;
         } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-          // Pro plan: 101 monthly + bonus allowed
-          totalLimit = 101 + currentBonus;
+          // Pro plan: config-based monthly + bonus allowed
+          totalLimit = IDENTIFICATION_LIMITS.PRO + currentBonus;
         } else {
           // Default: use monthly limit + bonus
           totalLimit = monthlyLimit + currentBonus;
@@ -788,9 +790,9 @@ const DrugIdentify = () => {
         }
 
         // THIRD CHECK: Verify user is authenticated for paid features
-        if (!isAuthenticated && used >= 3) {
+        if (!isAuthenticated && used >= GUEST_LIMITS.IDENTIFICATIONS) {
           toast.error('Guest limit reached. Please sign in to continue.', {
-            description: 'Sign in to get 5 free identifications per month',
+            description: `Sign in to get ${IDENTIFICATION_LIMITS.FREE} free identification${IDENTIFICATION_LIMITS.FREE > 1 ? 's' : ''} per month`,
             duration: 6000
           });
           return;
@@ -1210,13 +1212,13 @@ const DrugIdentify = () => {
                         <span className="font-medium">
                           {usageStats?.identificationsUsed} / {usageStats?.monthlyLimit === -1 ? '∞' : (() => {
                             const planName = usageStats?.planName || 'Free';
-                            let monthlyLimit = 5;
+                            let monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                             if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-                              monthlyLimit = 5;
+                              monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                             } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-                              monthlyLimit = 39;
+                              monthlyLimit = IDENTIFICATION_LIMITS.LITE;
                             } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-                              monthlyLimit = 101;
+                              monthlyLimit = IDENTIFICATION_LIMITS.PRO;
                             }
                             const totalForDisplay = monthlyLimit + extraIdentifications;
                             console.log('📊 Display calculation:', {
@@ -1262,13 +1264,13 @@ const DrugIdentify = () => {
                         <Progress
                           value={(() => {
                             const planName = usageStats?.planName || 'Free';
-                            let monthlyLimit = 5;
+                            let monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                             if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-                              monthlyLimit = 5;
+                              monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                             } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-                              monthlyLimit = 39;
+                              monthlyLimit = IDENTIFICATION_LIMITS.LITE;
                             } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-                              monthlyLimit = 101;
+                              monthlyLimit = IDENTIFICATION_LIMITS.PRO;
                             }
                             const totalLimit = monthlyLimit + extraIdentifications;
                             return ((usageStats?.identificationsUsed || 0) / totalLimit) * 100;
@@ -1284,6 +1286,13 @@ const DrugIdentify = () => {
                     </div>
                   </div>
                 )
+              )}
+
+              {/* Free Claim Button — shows for authenticated users */}
+              {isAuthenticated && !loading && (
+                <div className="mb-6 max-w-4xl mx-auto">
+                  <FreeClaimButton />
+                </div>
               )}
 
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6 text-base sm:text-lg">

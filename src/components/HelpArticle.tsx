@@ -2,6 +2,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 
 // Define the structure of our help articles
 export interface HelpArticle {
@@ -337,7 +338,8 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>100 drugs database search:</strong> Access basic information for common medications</li>
-        <li><strong>5 AI identifications per month:</strong> Use camera feature for pill identification</li>
+        <li><strong>${IDENTIFICATION_LIMITS.FREE} AI identification${IDENTIFICATION_LIMITS.FREE > 1 ? 's' : ''} per month:</strong> Use camera feature for pill identification</li>
+        <li><strong>Free Ad Claims:</strong> Claim up to 5 additional free identifications daily by watching short ads</li>
         <li><strong>Basic drug information:</strong> Essential details about medications</li>
         <li><strong>Mobile web app access:</strong> Use on any device with internet</li>
       </ul>
@@ -346,7 +348,7 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>All Free Plan features</strong></li>
-        <li><strong>39 AI identifications per month:</strong> More frequent use of camera identification</li>
+        <li><strong>${IDENTIFICATION_LIMITS.LITE} AI identifications per month:</strong> More frequent use of camera identification</li>
         <li><strong>1200+ medicines database:</strong> Expanded medication coverage with advanced search (249 results)</li>
         <li><strong>Priority support:</strong> Faster response to queries and issues</li>
         <li><strong>No ads:</strong> Uninterrupted, clean user experience</li>
@@ -357,7 +359,7 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>All Lite Plan features</strong></li>
-        <li><strong>101 AI identifications per month:</strong> Extensive camera use capabilities</li>
+        <li><strong>${IDENTIFICATION_LIMITS.PRO} AI identifications per month:</strong> Extensive camera use capabilities</li>
         <li><strong>1200+ database drugs:</strong> Comprehensive medication coverage with advanced search (500 results)</li>
         <li><strong>Layman explanations:</strong> Simplified medical terminology</li>
         <li><strong>History feature:</strong> Track all your searches and identifications</li>
@@ -370,7 +372,7 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>Use the history feature</strong> (Pro) to track medications for family members</li>
-        <li><strong>Take advantage of extensive identifications</strong> (Pro - 101/month) for medicine cabinet audits</li>
+        <li><strong>Take advantage of extensive identifications</strong> (Pro - ${IDENTIFICATION_LIMITS.PRO}/month) for medicine cabinet audits</li>
         <li><strong>Utilize advanced search filters</strong> (Pro) to find specific formulations</li>
         <li><strong>Enable layman explanations</strong> (Pro) for better understanding</li>
         <li><strong>Use priority support</strong> (Lite/Pro) for quick assistance</li>
@@ -389,7 +391,7 @@ export const helpArticles: HelpArticle[] = [
       
       <ul>
         <li><strong>Free Plan:</strong> Occasional users, basic medication lookups</li>
-        <li><strong>Lite Plan:</strong> Regular users, need up to 39 identifications monthly</li>
+        <li><strong>Lite Plan:</strong> Regular users, need up to ${IDENTIFICATION_LIMITS.LITE} identifications monthly</li>
         <li><strong>Pro Plan:</strong> Power users, families, healthcare professionals, comprehensive needs</li>
       </ul>
       

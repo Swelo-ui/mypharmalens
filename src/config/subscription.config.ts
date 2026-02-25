@@ -21,7 +21,7 @@ export const PLAN_IDS = {
 // ============================================================================
 
 export const IDENTIFICATION_LIMITS = {
-    FREE: 5 as number,
+    FREE: 1 as number,
     LITE: 39 as number,
     PRO: 101 as number,
     UNLIMITED: -1 as number, // Used for special access and unlimited plans
@@ -32,7 +32,16 @@ export const IDENTIFICATION_LIMITS = {
 // ============================================================================
 
 export const GUEST_LIMITS = {
-    IDENTIFICATIONS: 3 as number, // Number of free identifications for unauthenticated users
+    IDENTIFICATIONS: 1 as number, // Number of free identifications for unauthenticated users
+};
+
+// ============================================================================
+// FREE CLAIM (GPLinks Ad-Based) LIMITS
+// ============================================================================
+
+export const FREE_CLAIM_LIMITS = {
+    DAILY_CLAIMS: 5 as number, // Max free claims via ad links per day
+    TOKEN_EXPIRY_MINUTES: 10 as number, // How long a claim token stays valid
 };
 
 // ============================================================================

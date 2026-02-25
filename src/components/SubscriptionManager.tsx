@@ -23,6 +23,7 @@ import { Tables } from '@/types/database.types';
 import { useSubscription } from '@/hooks/useSubscription';
 import PurchaseSuccessConfetti from '@/components/PurchaseSuccessConfetti';
 import { SubscriptionService } from '@/services/subscriptionService';
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 import IdentificationPacks from './IdentificationPacks';
 import { ShineBorder } from '@/components/ui/shine-border';
 
@@ -168,13 +169,13 @@ const SubscriptionManager: React.FC = () => {
 
     // Calculate correct monthly limit based on plan name
     const planName = usageStats.planName || 'Free';
-    let monthlyLimit = 5;
+    let monthlyLimit = IDENTIFICATION_LIMITS.FREE;
     if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-      monthlyLimit = 5;
+      monthlyLimit = IDENTIFICATION_LIMITS.FREE;
     } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-      monthlyLimit = 39;
+      monthlyLimit = IDENTIFICATION_LIMITS.LITE;
     } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-      monthlyLimit = 101;
+      monthlyLimit = IDENTIFICATION_LIMITS.PRO;
     }
 
     // Include bonus identifications in the total limit
@@ -301,13 +302,13 @@ const SubscriptionManager: React.FC = () => {
                     <span className="font-semibold">
                       {usageStats.identificationsUsed} / {usageStats.monthlyLimit === -1 ? '∞' : (() => {
                         const planName = usageStats.planName || 'Free';
-                        let monthlyLimit = 5;
+                        let monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                         if (planName === 'Free' || planName.toLowerCase().includes('free')) {
-                          monthlyLimit = 5;
+                          monthlyLimit = IDENTIFICATION_LIMITS.FREE;
                         } else if (planName === 'Lite' || planName.toLowerCase().includes('lite')) {
-                          monthlyLimit = 39;
+                          monthlyLimit = IDENTIFICATION_LIMITS.LITE;
                         } else if (planName === 'Pro' || planName.toLowerCase().includes('pro')) {
-                          monthlyLimit = 101;
+                          monthlyLimit = IDENTIFICATION_LIMITS.PRO;
                         }
                         return monthlyLimit + (profile?.extra_identifications || 0);
                       })()}
@@ -427,7 +428,7 @@ const SubscriptionManager: React.FC = () => {
                   <Zap className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-blue-700 dark:text-blue-200">
                     <p className="font-semibold">Unlock More with Premium Plans</p>
-                    <p className="mt-1">Upgrade to Lite (39/month) or Pro (101/month) for more identifications, advanced search, and priority support.</p>
+                    <p className="mt-1">Upgrade to Lite ({IDENTIFICATION_LIMITS.LITE}/month) or Pro ({IDENTIFICATION_LIMITS.PRO}/month) for more identifications, advanced search, and priority support. You can also claim up to 5 free identifications daily by watching short ads!</p>
                   </div>
                 </div>
               )}
@@ -456,7 +457,7 @@ const SubscriptionManager: React.FC = () => {
                 const hasDiscount = originalPrice && originalPrice > displayPrice;
 
                 // Build features based on plan name with proper search limits
-                const identificationLimit = plan.identifications_limit || 5;
+                const identificationLimit = plan.name?.toLowerCase().includes('pro') ? IDENTIFICATION_LIMITS.PRO : plan.name?.toLowerCase().includes('lite') ? IDENTIFICATION_LIMITS.LITE : IDENTIFICATION_LIMITS.FREE;
                 const searchLimit = plan.advanced_search_limit || (plan.name === 'Free Plan' || plan.id === 'free-plan' ? 100 : 50);
 
                 const displayFeatures: string[] = (() => {
@@ -466,7 +467,8 @@ const SubscriptionManager: React.FC = () => {
                       '100 drugs database access',
                       'Basic drug information',
                       'Drug interaction checker',
-                      'Symptom checker'
+                      'Symptom checker',
+                      'Up to 5 free identifications daily via short ads'
                     ];
                   } else if (plan.name === 'Lite') {
                     return [
@@ -524,7 +526,7 @@ const SubscriptionManager: React.FC = () => {
                     <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-6">
                       <div className="text-center">
                         <p className="text-base sm:text-lg font-semibold">
-                          {identificationLimit} identifications/month
+                          {identificationLimit === -1 ? 'Unlimited' : identificationLimit} identification{identificationLimit === 1 ? '' : 's'}/month
                         </p>
                         {searchLimit && (
                           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">

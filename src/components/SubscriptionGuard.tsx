@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Crown, Zap, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStatus } from '../hooks/useAuthStatus'; // Corrected import path and hook name
+import { useAuthStatus } from '../hooks/useAuthStatus';
+import FreeClaimButton from './FreeClaimButton';
 
 interface SubscriptionGuardProps {
   feature: 'ai_identification' | 'database_search' | 'history_feature' | 'layman_explanations' | 'advanced_filters';
@@ -99,13 +100,13 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   const getUpgradeMessage = (): string => {
     try {
       const planName = currentSubscription?.plan?.name || 'Free Plan';
-      
+
       switch (feature) {
         case 'ai_identification': {
           const identificationsRemaining = usageStats?.identificationsRemaining ?? 0;
           const identificationsUsed = usageStats?.identificationsUsed ?? 0;
           const monthlyLimit = usageStats?.monthlyLimit ?? 5;
-          
+
           if (identificationsRemaining === 0) {
             return `You've used all ${identificationsUsed} of ${monthlyLimit === -1 ? '∞' : monthlyLimit} AI identifications in your ${planName}. Upgrade to get more identifications!`;
           }
@@ -130,18 +131,18 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
 
   const getRecommendedPlan = (): string => {
     const currentPlanId = currentSubscription?.plan?.id;
-    
+
     if (currentPlanId === 'free-plan') {
       if (feature === 'ai_identification') {
         return 'Lite Plan'; // For more identifications
       }
       return 'Monthly Premium Plan'; // For premium features
     }
-    
+
     if (currentPlanId === 'lite-plan') {
       return 'Monthly Premium Plan'; // For premium features
     }
-    
+
     return 'Monthly Premium Plan';
   };
 
@@ -156,55 +157,62 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   }; // Added missing closing curly brace for handleUpgradeClick
 
   return (
-    <Card className="border-2 border-dashed border-pharma-200 bg-pharma-50/50">
-      <CardHeader className="text-center pb-4">
-        <div className="mx-auto w-12 h-12 bg-pharma-100 rounded-full flex items-center justify-center mb-3">
-          <Lock className="w-6 h-6 text-pharma-600" />
-        </div>
-        <CardTitle className="text-lg flex items-center justify-center gap-2">
-          <Crown className="w-5 h-5 text-pharma-600" />
-          {getFeatureDisplayName()} Locked
-        </CardTitle>
-        <CardDescription className="text-sm">
-          {getUpgradeMessage()}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-2">
-          <Badge variant="outline" className="bg-pharma-100 text-pharma-700 border-pharma-300">
-            Current: {currentSubscription?.plan?.name || 'Free Plan'}
-          </Badge>
-          <ArrowRight className="w-4 h-4 text-gray-400" />
-          <Badge className="bg-pharma-600 text-white">
-            Recommended: {getRecommendedPlan()}
-          </Badge>
-        </div>
+    <div className="space-y-4">
+      {/* Free Claim option — show when identification limit is reached */}
+      {feature === 'ai_identification' && (usageStats?.identificationsRemaining ?? 0) === 0 && (
+        <FreeClaimButton />
+      )}
 
-        {feature === 'ai_identification' && (usageStats?.identificationsRemaining ?? 0) === 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-            <div className="flex items-center justify-center gap-2 text-orange-700">
-              <Zap className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {usageStats?.identificationsUsed ?? 0}/{(usageStats?.monthlyLimit ?? 5) === -1 ? '∞' : (usageStats?.monthlyLimit ?? 5)} identifications used this month
-              </span>
-            </div>
+      <Card className="border-2 border-dashed border-pharma-200 bg-pharma-50/50">
+        <CardHeader className="text-center pb-4">
+          <div className="mx-auto w-12 h-12 bg-pharma-100 rounded-full flex items-center justify-center mb-3">
+            <Lock className="w-6 h-6 text-pharma-600" />
           </div>
-        )}
+          <CardTitle className="text-lg flex items-center justify-center gap-2">
+            <Crown className="w-5 h-5 text-pharma-600" />
+            {getFeatureDisplayName()} Locked
+          </CardTitle>
+          <CardDescription className="text-sm">
+            {getUpgradeMessage()}
+          </CardDescription>
+        </CardHeader>
 
-        <Button 
-          onClick={handleUpgradeClick}
-          className="w-full bg-pharma-600 hover:bg-pharma-700"
-        >
-          <Crown className="w-4 h-4 mr-2" />
-          Upgrade to {getRecommendedPlan()}
-        </Button>
-        
-        <p className="text-xs text-gray-500">
-          Unlock this feature and many more with a premium subscription
-        </p>
-      </CardContent>
-    </Card>
+        <CardContent className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="outline" className="bg-pharma-100 text-pharma-700 border-pharma-300">
+              Current: {currentSubscription?.plan?.name || 'Free Plan'}
+            </Badge>
+            <ArrowRight className="w-4 h-4 text-gray-400" />
+            <Badge className="bg-pharma-600 text-white">
+              Recommended: {getRecommendedPlan()}
+            </Badge>
+          </div>
+
+          {feature === 'ai_identification' && (usageStats?.identificationsRemaining ?? 0) === 0 && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <div className="flex items-center justify-center gap-2 text-orange-700">
+                <Zap className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {usageStats?.identificationsUsed ?? 0}/{(usageStats?.monthlyLimit ?? 5) === -1 ? '∞' : (usageStats?.monthlyLimit ?? 5)} identifications used this month
+                </span>
+              </div>
+            </div>
+          )}
+
+          <Button
+            onClick={handleUpgradeClick}
+            className="w-full bg-pharma-600 hover:bg-pharma-700"
+          >
+            <Crown className="w-4 h-4 mr-2" />
+            Upgrade to {getRecommendedPlan()}
+          </Button>
+
+          <p className="text-xs text-gray-500">
+            Unlock this feature and many more with a premium subscription
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

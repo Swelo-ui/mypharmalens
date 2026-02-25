@@ -31,10 +31,10 @@ export const useSubscription = () => {
   const [loading, setLoading] = useState(true);
   const [usageStats, setUsageStats] = useState({
     identificationsUsed: 0,
-    identificationsRemaining: 5,
+    identificationsRemaining: IDENTIFICATION_LIMITS.FREE,
     databaseSearchesUsed: 0,
     databaseSearchesRemaining: 10,
-    monthlyLimit: 5,
+    monthlyLimit: IDENTIFICATION_LIMITS.FREE,
     planName: 'Free'
   });
 
@@ -57,7 +57,7 @@ export const useSubscription = () => {
             id: user.id,
             identifications_used: 0,
             last_reset_date: now.toISOString(),
-            monthly_identifications: 5
+            monthly_identifications: IDENTIFICATION_LIMITS.FREE
           },
           {
             onConflict: 'id',
@@ -131,8 +131,8 @@ export const useSubscription = () => {
           setUsageStats(prev => ({
             ...prev,
             identificationsUsed: currentUsed,
-            identificationsRemaining: Math.max(5 - currentUsed, 0),
-            monthlyLimit: 5,
+            identificationsRemaining: Math.max(IDENTIFICATION_LIMITS.FREE - currentUsed, 0),
+            monthlyLimit: IDENTIFICATION_LIMITS.FREE,
             planName: 'Free'
           }));
         }
@@ -230,7 +230,7 @@ export const useSubscription = () => {
         .update({
           identifications_used: 0,
           last_reset_date: now.toISOString(),
-          monthly_identifications: 5
+          monthly_identifications: IDENTIFICATION_LIMITS.FREE
         })
         .eq('id', user.id);
 
@@ -690,7 +690,7 @@ export const useSubscription = () => {
             id: user.id,
             identifications_used: 0,
             last_reset_date: now.toISOString(),
-            monthly_identifications: 5
+            monthly_identifications: IDENTIFICATION_LIMITS.FREE
           },
           {
             onConflict: 'id',
@@ -1066,10 +1066,10 @@ export const useSubscription = () => {
       setProfileIdentificationsUsed(0);
       setUsageStats({
         identificationsUsed: 0,
-        identificationsRemaining: 5,
+        identificationsRemaining: IDENTIFICATION_LIMITS.FREE,
         databaseSearchesUsed: 0,
         databaseSearchesRemaining: 10,
-        monthlyLimit: 5,
+        monthlyLimit: IDENTIFICATION_LIMITS.FREE,
         planName: 'Free',
       });
     }
