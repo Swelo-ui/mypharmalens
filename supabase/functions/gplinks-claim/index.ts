@@ -91,23 +91,26 @@ Deno.serve(async (req: Request) => {
             const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").substring(0, 8);
             const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
-            // Build the callback URL — use PATH-based token, NOT query params
-            // GPLinks strips/ignores query parameters, causing all claims to share one short URL
+            // Build the callback URL with token in path
             const appUrl = Deno.env.get("APP_URL") || "https://pharmalens.tech";
             const callbackUrl = `${appUrl}/claim-callback/${token}`;
 
-            // Call GPLinks API to create short link
+            // CRITICAL: Use unique alias to prevent GPLinks URL deduplication
+            // Without alias, GPLinks caches by destination URL and returns the SAME short link
+            const uniqueAlias = `pl${token.substring(0, 10)}`;
             const encodedUrl = encodeURIComponent(callbackUrl);
-            const gplinksUrl = `https://api.gplinks.com/api?api=${gplinksApiToken}&url=${encodedUrl}`;
+            const gplinksUrl = `https://api.gplinks.com/api?api=${gplinksApiToken}&url=${encodedUrl}&alias=${uniqueAlias}`;
 
-            console.log("📎 Calling GPLinks API...");
+            console.log(`📎 GPLinks API call | Alias: ${uniqueAlias} | Callback: ${callbackUrl}`);
             const gplinksResponse = await fetch(gplinksUrl);
             const gplinksData = await gplinksResponse.json();
+
+            console.log(`📎 GPLinks response:`, JSON.stringify(gplinksData));
 
             if (gplinksData.status === "error") {
                 console.error("GPLinks API error:", gplinksData);
                 return new Response(
-                    JSON.stringify({ success: false, error: "Failed to create short link" }),
+                    JSON.stringify({ success: false, error: "Failed to create short link", detail: gplinksData.message || "Unknown GPLinks error" }),
                     { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
             }
