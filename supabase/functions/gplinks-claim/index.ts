@@ -91,9 +91,10 @@ Deno.serve(async (req: Request) => {
             const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").substring(0, 8);
             const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
-            // Build the callback URL (goes to frontend page)
+            // Build the callback URL — use PATH-based token, NOT query params
+            // GPLinks strips/ignores query parameters, causing all claims to share one short URL
             const appUrl = Deno.env.get("APP_URL") || "https://pharmalens.tech";
-            const callbackUrl = `${appUrl}/claim-callback?token=${token}`;
+            const callbackUrl = `${appUrl}/claim-callback/${token}`;
 
             // Call GPLinks API to create short link
             const encodedUrl = encodeURIComponent(callbackUrl);

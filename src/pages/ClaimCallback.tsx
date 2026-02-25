@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Loader2, Sparkles } from 'lucide-react';
 
 type ClaimStatus = 'verifying' | 'success' | 'error';
 
 const ClaimCallback: React.FC = () => {
-    const [searchParams] = useSearchParams();
+    const { token } = useParams<{ token: string }>();
     const navigate = useNavigate();
     const [status, setStatus] = useState<ClaimStatus>('verifying');
     const [message, setMessage] = useState('Verifying your claim...');
 
     useEffect(() => {
         const verifyClaim = async () => {
-            const token = searchParams.get('token');
 
             if (!token) {
                 setStatus('error');
@@ -49,7 +48,7 @@ const ClaimCallback: React.FC = () => {
         };
 
         verifyClaim();
-    }, [searchParams, navigate]);
+    }, [token, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pharma-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-pharma-950 p-4">
