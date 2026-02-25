@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, Clock, ExternalLink, Zap } from 'lucide-react';
+import { Loader2, Clock, ExternalLink, Zap, PlaySquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -149,7 +149,7 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                     {loading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                        <Sparkles className="w-4 h-4" />
+                        <PlaySquare className="w-4 h-4" />
                     )}
                     {isLimitReached ? 'Come back tomorrow' : 'Claim Free ID'}
                     {!isLimitReached && !statusLoading && (
@@ -173,38 +173,38 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                     onComplete={() => setShowConfetti(false)}
                 />
             )}
-            <div className="p-4 bg-gradient-to-r from-pharma-50 to-blue-50 dark:from-pharma-900/20 dark:to-blue-900/20 rounded-lg border border-pharma-200/60 dark:border-pharma-800/40">
-                <div className="flex items-center justify-between gap-4">
+            <div className="p-4 sm:p-5 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     {/* Left — icon + text */}
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-pharma-100 dark:bg-pharma-800/40 flex items-center justify-center">
-                            <Sparkles className="w-4 h-4 text-pharma-600 dark:text-pharma-400" />
+                    <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
+                        <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100 dark:border-blue-800/30">
+                            <PlaySquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <div className="min-w-0">
-                            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                Claim Free Identification
+                        <div className="min-w-0 flex-1">
+                            <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                Watch Ad for Free ID
                             </h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                Watch a short ad to earn +1 free ID
+                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-snug mt-0.5 line-clamp-2 sm:line-clamp-1">
+                                Earn +1 identification by watching a short sponsor video
                             </p>
                         </div>
                     </div>
 
                     {/* Right — progress + button */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                        {/* Daily progress dots (desktop) */}
+                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-5 w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-800">
+                        {/* Daily progress dots (desktop & organized mobile) */}
                         {!statusLoading && (
-                            <div className="hidden sm:flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
                                 {Array.from({ length: dailyLimit }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${i < dailyClaims
-                                                ? 'bg-pharma-500 dark:bg-pharma-400'
-                                                : 'bg-gray-200 dark:bg-gray-700'
+                                        className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors duration-300 ${i < dailyClaims
+                                            ? 'bg-blue-500 dark:bg-blue-400'
+                                            : 'bg-gray-200 dark:bg-gray-700'
                                             }`}
                                     />
                                 ))}
-                                <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 tabular-nums">
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 ml-1.5 tabular-nums">
                                     {dailyClaims}/{dailyLimit}
                                 </span>
                             </div>
@@ -214,53 +214,32 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                             onClick={handleClaim}
                             disabled={loading || isLimitReached || statusLoading}
                             size="sm"
-                            className={`gap-1.5 transition-all duration-200 ${isLimitReached
-                                    ? 'bg-gray-400 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-600 cursor-not-allowed'
-                                    : 'bg-pharma-600 hover:bg-pharma-700 dark:bg-pharma-500 dark:hover:bg-pharma-600 shadow-sm hover:shadow-md'
+                            className={`flex-shrink-0 gap-1.5 font-medium transition-all duration-200 ${isLimitReached
+                                ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-not-allowed border border-gray-200 dark:border-gray-700'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
                                 }`}
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span className="hidden sm:inline">Processing...</span>
+                                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                                    <span>Processing...</span>
                                 </>
                             ) : statusLoading ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                             ) : isLimitReached ? (
                                 <>
-                                    <Clock className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Tomorrow</span>
+                                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    <span>Limit Reached</span>
                                 </>
                             ) : (
                                 <>
-                                    <ExternalLink className="w-4 h-4" />
-                                    Claim Free
+                                    <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    <span>Claim Now</span>
                                 </>
                             )}
                         </Button>
                     </div>
                 </div>
-
-                {/* Bottom — progress bar + remaining count */}
-                {!statusLoading && (
-                    <div className="mt-3 pt-2 border-t border-pharma-200/50 dark:border-pharma-800/30">
-                        <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                <Zap className="w-3 h-3" />
-                                {claimsRemaining} free claim{claimsRemaining !== 1 ? 's' : ''} remaining today
-                            </span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 sm:hidden tabular-nums">
-                                {dailyClaims}/{dailyLimit} used
-                            </span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-pharma-500 dark:bg-pharma-400 rounded-full transition-all duration-500 ease-out"
-                                style={{ width: `${progressPercent}%` }}
-                            />
-                        </div>
-                    </div>
-                )}
             </div>
         </>
     );
