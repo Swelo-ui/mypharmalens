@@ -1,12 +1,78 @@
-import "@supabase/functions-js/edge-runtime";
-import { createClient } from "@supabase/supabase-js";
-import { corsHeaders } from "../_shared/cors.ts";
+// @ts-nocheck
+// This file runs in Supabase Deno Edge Runtime, local TS will not have Deno types
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
+};
 
 const DAILY_CLAIM_LIMIT = 5;
-const TOKEN_EXPIRY_MINUTES = 30; // Increased from 10 to 30 minutes — GPLinks ad flow can take time
+const TOKEN_EXPIRY_MINUTES = 30;
+
+// ============================================================================
+// Round-Robin URL Shortener Provider Configuration
+// Claim 1     → GPLinks   (unique IP view on GPLinks)
+// Claim 2, 3  → Exe.io    (unique IP view on Exe.io)
+// Claim 4, 5  → ShrinkMe  (unique IP view on ShrinkMe)
+// This maximizes revenue by ensuring each service sees unique IP views.
+// ============================================================================
+interface ShortenerProvider {
+    name: string;
+    getUrl: (apiToken: string, encodedUrl: string, alias: string) => string;
+    parseResponse: (data: any) => { success: boolean; shortUrl?: string; error?: string };
+}
+
+const PROVIDERS: Record<string, ShortenerProvider> = {
+    gplinks: {
+        name: 'GPLinks',
+        getUrl: (apiToken, encodedUrl, alias) =>
+            `https://api.gplinks.com/api?api=${apiToken}&url=${encodedUrl}&alias=${alias}`,
+        parseResponse: (data) => {
+            if (data.status === 'error') {
+                return { success: false, error: data.message || 'GPLinks API error' };
+            }
+            return { success: true, shortUrl: data.shortenedUrl };
+        }
+    },
+    exeio: {
+        name: 'Exe.io',
+        getUrl: (apiToken, encodedUrl, alias) =>
+            `https://exe.io/api?api=${apiToken}&url=${encodedUrl}&alias=${alias}`,
+        parseResponse: (data) => {
+            if (data.status === 'error') {
+                return { success: false, error: data.message || 'Exe.io API error' };
+            }
+            return { success: true, shortUrl: data.shortenedUrl };
+        }
+    },
+    shrinkme: {
+        name: 'ShrinkMe',
+        getUrl: (apiToken, encodedUrl, alias) =>
+            `https://shrinkme.io/api?api=${apiToken}&url=${encodedUrl}&alias=${alias}`,
+        parseResponse: (data) => {
+            if (data.status === 'error') {
+                return { success: false, error: data.message || 'ShrinkMe API error' };
+            }
+            return { success: true, shortUrl: data.shortenedUrl };
+        }
+    }
+};
+
+// Determine which provider to use based on claim number (1-indexed)
+function getProviderForClaim(claimNumber: number): { providerKey: string; envKey: string } {
+    if (claimNumber <= 1) {
+        return { providerKey: 'gplinks', envKey: 'GPLINKS_API_TOKEN' };
+    } else if (claimNumber <= 3) {
+        return { providerKey: 'exeio', envKey: 'EXE_IO_API_TOKEN' };
+    } else {
+        return { providerKey: 'shrinkme', envKey: 'SHRINKME_API_TOKEN' };
+    }
+}
 
 Deno.serve(async (req: Request) => {
-    // Handle CORS preflight
     if (req.method === "OPTIONS") {
         return new Response("ok", { headers: corsHeaders });
     }
@@ -14,26 +80,16 @@ Deno.serve(async (req: Request) => {
     try {
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
         const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const gplinksApiToken = Deno.env.get("GPLINKS_API_TOKEN");
-
-        if (!gplinksApiToken) {
-            return new Response(
-                JSON.stringify({ success: false, error: "GPLinks API not configured" }),
-                { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
 
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-        // Parse request body
         const body = await req.json().catch(() => ({}));
         const action = body.action || "generate";
 
         // =======================================================================
-        // ACTION: GENERATE — Create a new claim link
+        // ACTION: GENERATE
         // =======================================================================
         if (action === "generate") {
-            // Authenticate user
             const authHeader = req.headers.get("Authorization");
             if (!authHeader) {
                 return new Response(
@@ -54,7 +110,7 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Check daily claim count
+            // Get rolling 24h claim count
             const { data: countData, error: countError } = await supabaseAdmin
                 .rpc("get_daily_claim_count", { p_user_id: user.id });
 
@@ -79,7 +135,7 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Cleanup any expired pending tokens for this user
+            // Expire old pending tokens
             await supabaseAdmin
                 .from("free_claim_tokens")
                 .update({ status: "expired" })
@@ -91,31 +147,54 @@ Deno.serve(async (req: Request) => {
             const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").substring(0, 8);
             const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
-            // Build the callback URL with token in path
+            // Build callback URL (path-based for uniqueness)
             const appUrl = Deno.env.get("APP_URL") || "https://pharmalens.tech";
             const callbackUrl = `${appUrl}/claim-callback/${token}`;
 
-            // CRITICAL: Use unique alias to prevent GPLinks URL deduplication
-            // Without alias, GPLinks caches by destination URL and returns the SAME short link
+            // ================================================================
+            // ROUND-ROBIN: Pick the right provider based on claim number
+            // Claim 1 → GPLinks, Claim 2-3 → Exe.io, Claim 4-5 → ShrinkMe
+            // ================================================================
+            const nextClaimNumber = dailyCount + 1;
+            const { providerKey, envKey } = getProviderForClaim(nextClaimNumber);
+            const provider = PROVIDERS[providerKey];
+            const apiToken = Deno.env.get(envKey);
+
+            if (!apiToken) {
+                console.error(`Missing API token for ${provider.name} (env: ${envKey})`);
+                return new Response(
+                    JSON.stringify({ success: false, error: `${provider.name} API not configured` }),
+                    { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+            }
+
+            // Create unique alias to prevent any caching/deduplication
             const uniqueAlias = `pl${token.substring(0, 10)}`;
             const encodedUrl = encodeURIComponent(callbackUrl);
-            const gplinksUrl = `https://api.gplinks.com/api?api=${gplinksApiToken}&url=${encodedUrl}&alias=${uniqueAlias}`;
+            const shortenerApiUrl = provider.getUrl(apiToken, encodedUrl, uniqueAlias);
 
-            console.log(`📎 GPLinks API call | Alias: ${uniqueAlias} | Callback: ${callbackUrl}`);
-            const gplinksResponse = await fetch(gplinksUrl);
-            const gplinksData = await gplinksResponse.json();
+            console.log(`📎 [Claim ${nextClaimNumber}/5] Using ${provider.name} | Alias: ${uniqueAlias} | Callback: ${callbackUrl}`);
 
-            console.log(`📎 GPLinks response:`, JSON.stringify(gplinksData));
+            const shortenerResponse = await fetch(shortenerApiUrl);
+            const shortenerData = await shortenerResponse.json();
 
-            if (gplinksData.status === "error") {
-                console.error("GPLinks API error:", gplinksData);
+            console.log(`📎 ${provider.name} response:`, JSON.stringify(shortenerData));
+
+            const parsed = provider.parseResponse(shortenerData);
+
+            if (!parsed.success || !parsed.shortUrl) {
+                console.error(`${provider.name} API error:`, shortenerData);
                 return new Response(
-                    JSON.stringify({ success: false, error: "Failed to create short link", detail: gplinksData.message || "Unknown GPLinks error" }),
+                    JSON.stringify({
+                        success: false,
+                        error: "Failed to create short link",
+                        detail: parsed.error || "Unknown error"
+                    }),
                     { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
             }
 
-            const shortUrl = gplinksData.shortenedUrl;
+            const shortUrl = parsed.shortUrl;
 
             // Save claim token to database
             const { error: insertError } = await supabaseAdmin
@@ -137,14 +216,15 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            console.log(`✅ Claim token created for user ${user.id} | Token: ${token.substring(0, 8)}... | Daily: ${dailyCount + 1}/${DAILY_CLAIM_LIMIT}`);
+            console.log(`✅ Claim #${nextClaimNumber} via ${provider.name} for user ${user.id} | Token: ${token.substring(0, 8)}...`);
 
             return new Response(
                 JSON.stringify({
                     success: true,
                     shortUrl: shortUrl,
                     claimId: token.substring(0, 8),
-                    dailyClaimsUsed: dailyCount + 1,
+                    provider: provider.name,
+                    dailyClaimsUsed: nextClaimNumber,
                     dailyClaimsLimit: DAILY_CLAIM_LIMIT,
                     expiresInMinutes: TOKEN_EXPIRY_MINUTES
                 }),
@@ -153,7 +233,7 @@ Deno.serve(async (req: Request) => {
         }
 
         // =======================================================================
-        // ACTION: VERIFY — User returned from GPLinks, verify and credit
+        // ACTION: VERIFY
         // =======================================================================
         if (action === "verify") {
             const claimToken = body.token;
@@ -164,7 +244,6 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Look up the token
             const { data: tokenData, error: tokenError } = await supabaseAdmin
                 .from("free_claim_tokens")
                 .select("*")
@@ -179,7 +258,6 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Check if already claimed
             if (tokenData.status === "claimed") {
                 return new Response(
                     JSON.stringify({ success: false, error: "This reward has already been claimed" }),
@@ -187,9 +265,7 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Check if expired
             if (tokenData.status === "expired" || new Date(tokenData.expires_at) < new Date()) {
-                // Mark as expired if not already
                 await supabaseAdmin
                     .from("free_claim_tokens")
                     .update({ status: "expired" })
@@ -201,7 +277,6 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Credit the user with +1 extra identification
             const { error: incrementError } = await supabaseAdmin
                 .rpc("increment_extra_identifications", {
                     p_user_id: tokenData.user_id,
@@ -216,7 +291,6 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Mark token as claimed
             const { error: updateError } = await supabaseAdmin
                 .from("free_claim_tokens")
                 .update({
@@ -228,10 +302,8 @@ Deno.serve(async (req: Request) => {
 
             if (updateError) {
                 console.error("Error updating claim status:", updateError);
-                // Don't fail — the credit was already given
             }
 
-            // Get updated daily count
             const { data: newCount } = await supabaseAdmin
                 .rpc("get_daily_claim_count", { p_user_id: tokenData.user_id });
 
@@ -249,7 +321,7 @@ Deno.serve(async (req: Request) => {
         }
 
         // =======================================================================
-        // ACTION: STATUS — Get current daily claim status for user
+        // ACTION: STATUS
         // =======================================================================
         if (action === "status") {
             const authHeader = req.headers.get("Authorization");
@@ -291,7 +363,7 @@ Deno.serve(async (req: Request) => {
         );
 
     } catch (error) {
-        console.error("GPLinks claim error:", error);
+        console.error("Claim error:", error);
         const errMsg = error instanceof Error ? error.message : "Internal server error";
         return new Response(
             JSON.stringify({ success: false, error: errMsg }),
