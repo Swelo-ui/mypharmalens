@@ -17,7 +17,6 @@ const TOKEN_EXPIRY_MINUTES = 30;
 // Claim 1     → GPLinks   (unique IP view on GPLinks)
 // Claim 2, 3  → Exe.io    (unique IP view on Exe.io)
 // Claim 4, 5  → ShrinkMe  (unique IP view on ShrinkMe)
-// This maximizes revenue by ensuring each service sees unique IP views.
 // ============================================================================
 interface ShortenerProvider {
     name: string;
@@ -61,7 +60,6 @@ const PROVIDERS: Record<string, ShortenerProvider> = {
     }
 };
 
-// Determine which provider to use based on claim number (1-indexed)
 function getProviderForClaim(claimNumber: number): { providerKey: string; envKey: string } {
     if (claimNumber <= 1) {
         return { providerKey: 'gplinks', envKey: 'GPLINKS_API_TOKEN' };
@@ -70,6 +68,14 @@ function getProviderForClaim(claimNumber: number): { providerKey: string; envKey
     } else {
         return { providerKey: 'shrinkme', envKey: 'SHRINKME_API_TOKEN' };
     }
+}
+
+// Extract real client IP from request headers
+function getClientIP(req: Request): string {
+    return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+        || req.headers.get("cf-connecting-ip")
+        || req.headers.get("x-real-ip")
+        || "unknown";
 }
 
 Deno.serve(async (req: Request) => {
@@ -110,30 +116,47 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Get rolling 24h claim count
-            const { data: countData, error: countError } = await supabaseAdmin
-                .rpc("get_daily_claim_count", { p_user_id: user.id });
+            // Get client IP and device ID
+            const clientIP = getClientIP(req);
+            const deviceId = body.deviceId || "";
 
-            if (countError) {
-                console.error("Error checking daily claims:", countError);
+            // ================================================================
+            // TRIPLE-LAYER ABUSE PREVENTION
+            // Check user_id + ip_address + device_id limits (all 5/24h)
+            // ================================================================
+            const { data: eligibility, error: eligibilityError } = await supabaseAdmin
+                .rpc("check_claim_eligibility", {
+                    p_user_id: user.id,
+                    p_ip_address: clientIP,
+                    p_device_id: deviceId,
+                    p_limit: DAILY_CLAIM_LIMIT
+                });
+
+            if (eligibilityError) {
+                console.error("Error checking eligibility:", eligibilityError);
                 return new Response(
                     JSON.stringify({ success: false, error: "Failed to check claim limit" }),
                     { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
             }
 
-            const dailyCount = countData ?? 0;
-            if (dailyCount >= DAILY_CLAIM_LIMIT) {
+            if (!eligibility.eligible) {
+                console.log(`🚫 Claim blocked | Reason: ${eligibility.reason} | User: ${user.id} | IP: ${clientIP} | Device: ${deviceId?.substring(0, 8)}... | Counts: user=${eligibility.user_count} ip=${eligibility.ip_count} device=${eligibility.device_count}`);
                 return new Response(
                     JSON.stringify({
                         success: false,
                         error: "Daily limit reached",
-                        dailyClaimsUsed: dailyCount,
+                        message: eligibility.message,
+                        reason: eligibility.reason,
+                        dailyClaimsUsed: Math.max(eligibility.user_count, eligibility.ip_count, eligibility.device_count),
                         dailyClaimsLimit: DAILY_CLAIM_LIMIT
                     }),
                     { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
             }
+
+            // Use the highest count among all 3 dimensions for determining provider
+            const effectiveCount = Math.max(eligibility.user_count, eligibility.ip_count, eligibility.device_count);
 
             // Expire old pending tokens
             await supabaseAdmin
@@ -147,15 +170,14 @@ Deno.serve(async (req: Request) => {
             const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").substring(0, 8);
             const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
-            // Build callback URL (path-based for uniqueness)
+            // Build callback URL
             const appUrl = Deno.env.get("APP_URL") || "https://pharmalens.tech";
             const callbackUrl = `${appUrl}/claim-callback/${token}`;
 
             // ================================================================
-            // ROUND-ROBIN: Pick the right provider based on claim number
-            // Claim 1 → GPLinks, Claim 2-3 → Exe.io, Claim 4-5 → ShrinkMe
+            // ROUND-ROBIN: Pick provider based on effective claim number
             // ================================================================
-            const nextClaimNumber = dailyCount + 1;
+            const nextClaimNumber = effectiveCount + 1;
             const { providerKey, envKey } = getProviderForClaim(nextClaimNumber);
             const provider = PROVIDERS[providerKey];
             const apiToken = Deno.env.get(envKey);
@@ -168,12 +190,11 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            // Create unique alias to prevent any caching/deduplication
             const uniqueAlias = `pl${token.substring(0, 10)}`;
             const encodedUrl = encodeURIComponent(callbackUrl);
             const shortenerApiUrl = provider.getUrl(apiToken, encodedUrl, uniqueAlias);
 
-            console.log(`📎 [Claim ${nextClaimNumber}/5] Using ${provider.name} | Alias: ${uniqueAlias} | Callback: ${callbackUrl}`);
+            console.log(`📎 [Claim ${nextClaimNumber}/5] Using ${provider.name} | User: ${user.id} | IP: ${clientIP} | Device: ${deviceId?.substring(0, 8)}...`);
 
             const shortenerResponse = await fetch(shortenerApiUrl);
             const shortenerData = await shortenerResponse.json();
@@ -194,18 +215,17 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            const shortUrl = parsed.shortUrl;
-
-            // Save claim token to database
+            // Save claim token with IP and device_id
             const { error: insertError } = await supabaseAdmin
                 .from("free_claim_tokens")
                 .insert({
                     user_id: user.id,
                     token: token,
                     status: "pending",
-                    short_url: shortUrl,
+                    short_url: parsed.shortUrl,
                     expires_at: expiresAt.toISOString(),
-                    ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown"
+                    ip_address: clientIP,
+                    device_id: deviceId || null
                 });
 
             if (insertError) {
@@ -216,12 +236,12 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
-            console.log(`✅ Claim #${nextClaimNumber} via ${provider.name} for user ${user.id} | Token: ${token.substring(0, 8)}...`);
+            console.log(`✅ Claim #${nextClaimNumber} via ${provider.name} | User: ${user.id} | IP: ${clientIP}`);
 
             return new Response(
                 JSON.stringify({
                     success: true,
-                    shortUrl: shortUrl,
+                    shortUrl: parsed.shortUrl,
                     claimId: token.substring(0, 8),
                     provider: provider.name,
                     dailyClaimsUsed: nextClaimNumber,
@@ -291,12 +311,14 @@ Deno.serve(async (req: Request) => {
                 );
             }
 
+            const clientIP = getClientIP(req);
+
             const { error: updateError } = await supabaseAdmin
                 .from("free_claim_tokens")
                 .update({
                     status: "claimed",
                     claimed_at: new Date().toISOString(),
-                    ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || tokenData.ip_address
+                    ip_address: clientIP
                 })
                 .eq("id", tokenData.id);
 
@@ -307,7 +329,7 @@ Deno.serve(async (req: Request) => {
             const { data: newCount } = await supabaseAdmin
                 .rpc("get_daily_claim_count", { p_user_id: tokenData.user_id });
 
-            console.log(`🎉 Free identification claimed! User: ${tokenData.user_id} | Daily: ${newCount}/${DAILY_CLAIM_LIMIT}`);
+            console.log(`🎉 Claim verified! User: ${tokenData.user_id} | Daily: ${newCount}/${DAILY_CLAIM_LIMIT}`);
 
             return new Response(
                 JSON.stringify({

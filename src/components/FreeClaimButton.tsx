@@ -13,6 +13,19 @@ interface FreeClaimButtonProps {
     compact?: boolean;
 }
 
+// Generate a persistent device fingerprint stored in localStorage.
+// Uses a non-obvious key to reduce chance of manual deletion.
+function getDeviceId(): string {
+    const STORAGE_KEY = '_pl_sid';
+    let deviceId = localStorage.getItem(STORAGE_KEY);
+    if (!deviceId) {
+        // Generate a unique device ID using crypto API
+        deviceId = crypto.randomUUID().replace(/-/g, '') + Date.now().toString(36);
+        localStorage.setItem(STORAGE_KEY, deviceId);
+    }
+    return deviceId;
+}
+
 const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compact = false }) => {
     const { user } = useAuthStatus();
     const [loading, setLoading] = useState(false);
@@ -85,17 +98,18 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
         setLoading(true);
         try {
             const response = await supabase.functions.invoke('gplinks-claim', {
-                body: { action: 'generate' }
+                body: { action: 'generate', deviceId: getDeviceId() }
             });
 
             // supabase.functions.invoke sets response.error on non-2xx status,
             // but the actual JSON body is still in response.data
             const data = response.data;
 
-            // Check for daily limit in either the data or error
+            // Check for daily limit (account, IP, or device limit)
             if (data?.error?.includes?.('Daily limit') || data?.error === 'Daily limit reached') {
                 setDailyClaims(dailyLimit);
-                toast.info('Daily limit reached. Come back tomorrow for more free claims.');
+                const msg = data?.message || 'Daily limit reached. Come back tomorrow for more free claims.';
+                toast.info(msg);
                 return;
             }
 
