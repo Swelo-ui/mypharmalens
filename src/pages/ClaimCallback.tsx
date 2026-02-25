@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Loader2, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
 
 type ClaimStatus = 'verifying' | 'success' | 'error';
 

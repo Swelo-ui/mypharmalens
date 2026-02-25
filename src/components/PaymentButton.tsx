@@ -12,6 +12,7 @@ import { usePaymentStatus } from '@/hooks/usePaymentStatus';
 import ErrorHandler, { PaymentError } from '@/components/ErrorHandler';
 import { transactionLogger } from '@/utils/transactionLogger';
 import PaymentSummary from '@/components/PaymentSummary';
+import { IDENTIFICATION_LIMITS } from '@/config/subscription.config';
 
 interface PaymentButtonProps {
   plan?: SubscriptionPlan;
@@ -100,14 +101,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [paymentError, setPaymentError] = useState<PaymentError | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [showSummary, setShowSummary] = useState(false);
-  
+
   const { startPolling, reset, isPolling, error: pollingError } = usePaymentStatus();
   const currentPlan = plan;
 
   useEffect(() => {
     // Generate session ID for transaction logging
     setSessionId(transactionLogger.getSessionId());
-    
+
     // Subscribe to subscription updates
     const subscriptionService = SubscriptionService.getInstance();
     const unsubscribe = subscriptionService.onSubscriptionUpdate((subscription) => {
@@ -119,7 +120,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           startDate: new Date(),
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
         });
-        
+
         toast.success('🎉 Subscription Activated!', {
           description: `Congratulations! Your ${subscription.plan_id.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} is now active.`,
           duration: 5000
@@ -176,7 +177,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
   const handlePayment = async () => {
     setShowSummary(false);
-    
+
     if (planId && !plan) {
       toast.error('Plan details not available. Please try again.');
       return;
@@ -194,7 +195,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     let currentUser: User | null = null;
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
+
       if (userError || !user) {
         throw new Error('Please log in to continue with payment');
       }
@@ -202,7 +203,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       // Calculate amount - use discounted_price if available, otherwise use price
       const amount = currentPlan.discounted_price || currentPlan.price || 0;
-      
+
       // Log payment initiation
       transactionLogger.logPaymentInitiated(user.id, {
         planId: currentPlan.id,
@@ -229,10 +230,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       const invokeWithRetry = async (attempts = 2): Promise<RazorpayOrderResponse> => {
         let lastErr: unknown = null;
         let lastData: RazorpayOrderResponse | null = null;
-        
+
         for (let i = 0; i <= attempts; i++) {
           console.log(`Attempt ${i + 1} to create Razorpay order...`);
-          
+
           const { data, error } = await supabase.functions.invoke<RazorpayOrderResponse>('razorpay-order', {
             body: {
               userId: user.id,
@@ -243,9 +244,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               billingCycle: currentBillingCycle
             }
           });
-          
+
           console.log('Edge Function response:', { data, error });
-          
+
           // Check if data contains an error (Edge Function returned error in response body)
           if (data?.error) {
             lastErr = { message: data.message || data.error, code: 'edge_function_error', details: data.details };
@@ -254,17 +255,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             await new Promise(r => setTimeout(r, 500 * (i + 1)));
             continue;
           }
-          
+
           if (!error && data) {
             console.log('Order created successfully:', data.orderId);
             return data;
           }
-          
+
           lastErr = error;
           console.error('Supabase invoke error:', error);
           await new Promise(r => setTimeout(r, 500 * (i + 1)));
         }
-        
+
         // Build detailed error message
         const errorMsg = lastData?.message || (lastErr instanceof Error ? lastErr.message : '') || 'Failed to initiate payment';
         const errorDetails = lastData?.details || (typeof lastErr === 'object' && lastErr !== null && 'details' in lastErr ? String((lastErr as { details?: string }).details || '') : '');
@@ -315,10 +316,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           });
 
           toast.success('Payment initiated. Finalizing...');
-          
+
           // Start polling for subscription status
           startPolling(user.id);
-          
+
           // Proactively activate subscription server-side and notify UI
           (async () => {
             try {
@@ -341,7 +342,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
                 currentPlan.id,
                 data?.transaction_id || data?.transactionId
               );
-              
+
               if (result.success) {
                 console.log('Subscription updated successfully:', result.subscription);
                 // Give realtime a moment to propagate
@@ -351,7 +352,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               console.error('Client-side subscription update error:', err);
             }
           })();
-          
+
           onPaymentSuccess?.(currentPlan.id);
 
           if (rzpRef.current && typeof rzpRef.current.close === 'function') {
@@ -360,7 +361,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           document.body.style.overflow = '';
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: function () {
             toast.info('Payment window closed');
             transactionLogger.logError(user.id, {
               context: 'payment_modal',
@@ -400,18 +401,18 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       });
 
       rzpRef.current.open();
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Payment failed';
       const errorCode = typeof error === 'object' && error !== null && 'code' in error
         ? String((error as { code?: string }).code || '')
         : '';
-      
+
       // Create structured error object
       const paymentError: PaymentError = {
-        type: errorCode === 'network_error' ? 'network_error' : 
-              errorCode === 'timeout' ? 'timeout' :
-              errorCode === 'validation_error' ? 'validation_error' :
+        type: errorCode === 'network_error' ? 'network_error' :
+          errorCode === 'timeout' ? 'timeout' :
+            errorCode === 'validation_error' ? 'validation_error' :
               'payment_failed',
         message: errorMessage,
         code: errorCode || undefined,
@@ -421,7 +422,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       };
 
       setPaymentError(paymentError);
-      
+
       // Log payment failure
       transactionLogger.logPaymentFailed(currentUser?.id || 'unknown', {
         planId: currentPlan?.id || 'unknown',
@@ -502,11 +503,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       <Button
         onClick={showPaymentSummary}
         disabled={isCurrentPlan || isProcessing || isPolling}
-        className={`w-full h-12 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500 inline-flex items-center justify-center gap-2 ${
-          plan?.id === 'monthly-premium-plan' && !isCurrentPlan
-            ? 'bg-pharma-600 hover:bg-pharma-700 text-white' 
+        className={`w-full h-12 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-pharma-500 inline-flex items-center justify-center gap-2 ${plan?.id === 'monthly-premium-plan' && !isCurrentPlan
+            ? 'bg-pharma-600 hover:bg-pharma-700 text-white'
             : ''
-        } ${isPolling ? 'animate-pulse-border' : ''} ${className}`}
+          } ${isPolling ? 'animate-pulse-border' : ''} ${className}`}
         variant={getButtonVariant()}
         size="lg"
       >
@@ -547,7 +547,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             <div className="text-xs text-pharma-700 dark:text-pharma-200">
               <p className="font-medium">Billing Information</p>
               <p className="mt-1">
-                • Instant activation after payment<br/>
+                • Instant activation after payment<br />
                 • Auto-renewal can be managed in settings
               </p>
             </div>
@@ -614,7 +614,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             }
             return ['Basic features'];
           })()}
-          identificationsLimit={plan.identifications_limit || 5}
+          identificationsLimit={plan.name?.toLowerCase().includes('pro') ? IDENTIFICATION_LIMITS.PRO : plan.name?.toLowerCase().includes('lite') ? IDENTIFICATION_LIMITS.LITE : IDENTIFICATION_LIMITS.FREE}
           searchLimit={plan.advanced_search_limit}
           billingCycle={billingCycle}
           isProcessing={isProcessing}

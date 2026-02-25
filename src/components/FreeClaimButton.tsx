@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Clock, ExternalLink, Zap, PlaySquare } from 'lucide-react';
+import { Loader2, Clock, ExternalLink, PlaySquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
@@ -125,7 +125,6 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
     if (!user?.id) return null;
 
     const isLimitReached = claimsRemaining <= 0;
-    const progressPercent = dailyLimit > 0 ? (dailyClaims / dailyLimit) * 100 : 0;
 
     // Compact mode
     if (compact) {
@@ -173,12 +172,12 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                     onComplete={() => setShowConfetti(false)}
                 />
             )}
-            <div className="p-4 sm:p-5 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-xl border border-pharma-200/60 dark:border-pharma-800/30 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     {/* Left — icon + text */}
                     <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
-                        <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100 dark:border-blue-800/30">
-                            <PlaySquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/30">
+                            <PlaySquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
@@ -192,14 +191,14 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
 
                     {/* Right — progress + button */}
                     <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-5 w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-800">
-                        {/* Daily progress dots (desktop & organized mobile) */}
+                        {/* Daily progress dots */}
                         {!statusLoading && (
                             <div className="flex items-center gap-1.5 flex-shrink-0">
                                 {Array.from({ length: dailyLimit }).map((_, i) => (
                                     <div
                                         key={i}
                                         className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors duration-300 ${i < dailyClaims
-                                            ? 'bg-blue-500 dark:bg-blue-400'
+                                            ? 'bg-emerald-500 dark:bg-emerald-400'
                                             : 'bg-gray-200 dark:bg-gray-700'
                                             }`}
                                     />
@@ -216,7 +215,7 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                             size="sm"
                             className={`flex-shrink-0 gap-1.5 font-medium transition-all duration-200 ${isLimitReached
                                 ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-not-allowed border border-gray-200 dark:border-gray-700'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+                                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow-md'
                                 }`}
                         >
                             {loading ? (
@@ -240,6 +239,7 @@ const FreeClaimButton: React.FC<FreeClaimButtonProps> = ({ onClaimSuccess, compa
                         </Button>
                     </div>
                 </div>
+
             </div>
         </>
     );
