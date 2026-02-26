@@ -11,7 +11,7 @@ const Blog = () => {
             <SEOHead
                 title="Healthcare Knowledge Base & articles | PharmaLens"
                 description="Expert articles and guides on medication safety, drug combinations, pill identification, and general health advice."
-                canonicalUrl="https://pharmalens.tech/blog"
+                canonicalUrl="/blog"
             />
 
             <Header />

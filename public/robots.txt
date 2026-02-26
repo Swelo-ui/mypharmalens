@@ -20,5 +20,3 @@ Allow: /blog
 # Sitemap location
 Sitemap: https://pharmalens.tech/sitemap.xml
 
-# Crawl delay for better server performance
-Crawl-delay: 1

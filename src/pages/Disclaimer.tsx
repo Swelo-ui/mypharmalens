@@ -9,25 +9,26 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 const Disclaimer = () => {
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title="Medical Disclaimer - PharmaLens"
         description="Important medical disclaimers and legal information for PharmaLens AI medication identification app. Not a substitute for professional medical advice."
         keywords="medical disclaimer, medication identification, AI limitations, healthcare advice, pharmaceutical information"
+        canonicalUrl="/disclaimer"
       />
       <div className="min-h-screen flex flex-col">
         <Header />
-        
+
         <main className="flex-1 pt-24 pb-16">
           <div className="container mx-auto px-4 max-w-4xl">
             <h1 className="text-3xl font-bold mb-8">Medical Disclaimer</h1>
-            
+
             <Alert variant="destructive" className="mb-8 bg-red-500 text-white font-bold dark:bg-red-700 dark:text-white">
               <AlertTitle>⚠️ Critical Medical Notice</AlertTitle>
               <AlertDescription>
                 PharmaLens is an AI-powered informational tool only and is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult healthcare professionals for medical decisions.
               </AlertDescription>
             </Alert>
-            
+
             <div className="prose prose-lg dark:prose-invert max-w-none">
               <h2>1. Developer Information</h2>
               <p>
@@ -266,14 +267,14 @@ const Disclaimer = () => {
                   PharmaLens is a technology tool, NOT a medical professional. NEVER make medical decisions based solely on app information. ALWAYS verify medication identifications and consult healthcare professionals for all medical needs.
                 </p>
               </div>
-              
+
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-8">
                 Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
           </div>
         </main>
-        
+
         <Footer />
       </div>
     </>

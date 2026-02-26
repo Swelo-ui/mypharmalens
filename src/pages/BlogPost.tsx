@@ -52,7 +52,7 @@ const BlogPost = () => {
             <SEOHead
                 title={`${post.title} | PharmaLens Health`}
                 description={post.excerpt}
-                canonicalUrl={`https://pharmalens.tech/blog/${post.slug}`}
+                canonicalUrl={`/blog/${post.slug}`}
                 structuredData={schemaData}
             />
 

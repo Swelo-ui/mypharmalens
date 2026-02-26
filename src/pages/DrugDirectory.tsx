@@ -63,7 +63,7 @@ const DrugDirectory = () => {
             <SEOHead
                 title="A-Z Drug Directory - Complete Medication List | PharmaLens"
                 description="Browse our comprehensive A-Z directory of over 1000+ prescription and over-the-counter medications. Find clinical information, uses, and side effects."
-                canonicalUrl="https://pharmalens.tech/drugs"
+                canonicalUrl="/drugs"
             />
 
             <Header />
