@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Pill, ArrowLeft
@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DrugDetails, { DetailedDrugData } from '@/components/DrugDetails';
 import { toast } from '@/components/ui/use-toast';
+import SEOHead from '@/components/SEOHead';
 
 const DrugPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,20 +18,15 @@ const DrugPage = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    console.log("DrugPage loaded with ID:", id);
     if (id) {
-      // Add a small delay to ensure data is loaded properly
       const timer = setTimeout(async () => {
         try {
           const drugData = await getDrugById(id);
           
-          console.log("Drug data retrieved:", drugData?.name);
-          console.log("Drug data laymanExplanations:", drugData?.laymanExplanations ? "EXISTS" : "MISSING");
           if (drugData) {
-            // Convert DrugData to DetailedDrugData by ensuring required fields
             const detailedDrugData: DetailedDrugData = {
               ...drugData,
-              genericName: drugData.genericName || drugData.name, // Use name as fallback if genericName is missing
+              genericName: drugData.genericName || drugData.name,
               manufacturer: drugData.manufacturer || 'Unknown',
               category: drugData.category || 'Uncategorized',
               description: drugData.description || '',
@@ -61,9 +57,67 @@ const DrugPage = () => {
     }
   }, [id]);
 
+  // Build structured data for Drug schema markup
+  const drugStructuredData = useMemo(() => {
+    if (!drug) return undefined;
+    return {
+      "@context": "https://schema.org",
+      "@type": "Drug",
+      "name": drug.name,
+      "alternateName": drug.genericName !== drug.name ? drug.genericName : undefined,
+      "description": drug.description,
+      "url": `https://pharmalens.tech/drug/${id}`,
+      "medicineSystem": "WesternConventional",
+      "nonProprietaryName": drug.genericName,
+      "manufacturer": {
+        "@type": "Organization",
+        "name": drug.manufacturer
+      },
+      "drugClass": drug.drugClass || drug.category,
+      "prescriptionStatus": drug.prescriptionStatus === 'OTC' ? 'OTC' : 'PrescriptionOnly',
+      "warning": drug.warnings?.length ? drug.warnings.join('. ') : undefined,
+      "administrationRoute": drug.dosageAndAdmin || undefined,
+      "isAvailableGenerically": true,
+      "mechanismOfAction": drug.mechanism || undefined,
+      "pregnancyWarning": drug.pregnancy || undefined,
+    };
+  }, [drug, id]);
+
+  // Generate SEO description from drug data
+  const seoDescription = useMemo(() => {
+    if (!drug) return '';
+    const desc = drug.description || '';
+    const truncated = desc.length > 155 ? desc.substring(0, 152) + '...' : desc;
+    return `${drug.name} (${drug.genericName}) - ${truncated} Learn about dosage, side effects, interactions, and warnings on PharmaLens.`;
+  }, [drug]);
+
+  // Generate SEO keywords
+  const seoKeywords = useMemo(() => {
+    if (!drug) return '';
+    const keywords = [
+      drug.name,
+      drug.genericName,
+      drug.category,
+      drug.manufacturer,
+      `${drug.name} side effects`,
+      `${drug.name} dosage`,
+      `${drug.name} uses`,
+      `${drug.genericName} information`,
+      'medication information',
+      'drug details',
+      'PharmaLens'
+    ];
+    return keywords.filter(Boolean).join(', ');
+  }, [drug]);
+
   if (loading) {
     return (
       <>
+        <SEOHead
+          title="Loading Medication Information"
+          description="Loading detailed medication information on PharmaLens - your AI-powered medication identification platform."
+          canonicalUrl={`/drug/${id}`}
+        />
         <Header />
         <div className="container max-w-4xl mx-auto px-4 pt-24 pb-8 min-h-[70vh] flex items-center justify-center">
           <div className="animate-pulse flex flex-col items-center">
@@ -79,6 +133,12 @@ const DrugPage = () => {
   if (!drug) {
     return (
       <>
+        <SEOHead
+          title="Medication Not Found"
+          description="The medication you're looking for could not be found on PharmaLens."
+          canonicalUrl={`/drug/${id}`}
+          noIndex={true}
+        />
         <Header />
         <div className="container max-w-4xl mx-auto px-4 pt-24 pb-8 min-h-[70vh] flex flex-col items-center justify-center">
           <Pill className="h-16 w-16 text-gray-400 mb-4" />
@@ -96,6 +156,14 @@ const DrugPage = () => {
 
   return (
     <>
+      <SEOHead
+        title={`${drug.name} (${drug.genericName}) - Drug Information`}
+        description={seoDescription}
+        keywords={seoKeywords}
+        canonicalUrl={`/drug/${id}`}
+        ogType="article"
+        structuredData={drugStructuredData}
+      />
       <Header />
       <div className="container max-w-4xl mx-auto px-4 pt-20 pb-28 sm:pb-12">
         <Button 

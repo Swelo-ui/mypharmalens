@@ -13,6 +13,9 @@ Allow: /symptom-checker
 Allow: /terms
 Allow: /privacy
 Allow: /disclaimer
+Allow: /drugs
+Allow: /drug/
+Allow: /blog
 
 # Sitemap location
 Sitemap: https://pharmalens.tech/sitemap.xml
