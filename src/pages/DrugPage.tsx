@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Pill, ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,13 @@ const DrugPage = () => {
   const navigate = useNavigate();
   const [drug, setDrug] = useState<DetailedDrugData | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     if (id) {
       const timer = setTimeout(async () => {
         try {
           const drugData = await getDrugById(id);
-          
+
           if (drugData) {
             const detailedDrugData: DetailedDrugData = {
               ...drugData,
@@ -52,7 +52,7 @@ const DrugPage = () => {
         }
         setLoading(false);
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [id]);
@@ -62,24 +62,43 @@ const DrugPage = () => {
     if (!drug) return undefined;
     return {
       "@context": "https://schema.org",
-      "@type": "Drug",
-      "name": drug.name,
-      "alternateName": drug.genericName !== drug.name ? drug.genericName : undefined,
+      "@type": "MedicalWebPage",
+      "name": `${drug.name} - Drug Information`,
       "description": drug.description,
       "url": `https://pharmalens.tech/drug/${id}`,
-      "medicineSystem": "WesternConventional",
-      "nonProprietaryName": drug.genericName,
-      "manufacturer": {
-        "@type": "Organization",
-        "name": drug.manufacturer
+      "lastReviewed": "2026-02-26",
+      "medicalAudience": {
+        "@type": "MedicalAudience",
+        "audienceType": "Patient"
       },
-      "drugClass": drug.drugClass || drug.category,
-      "prescriptionStatus": drug.prescriptionStatus === 'OTC' ? 'OTC' : 'PrescriptionOnly',
-      "warning": drug.warnings?.length ? drug.warnings.join('. ') : undefined,
-      "administrationRoute": drug.dosageAndAdmin || undefined,
-      "isAvailableGenerically": true,
-      "mechanismOfAction": drug.mechanism || undefined,
-      "pregnancyWarning": drug.pregnancy || undefined,
+      "publisher": {
+        "@type": "Organization",
+        "name": "PharmaLens",
+        "url": "https://pharmalens.tech"
+      },
+      "about": {
+        "@type": "Drug",
+        "name": drug.name,
+        "alternateName": drug.genericName !== drug.name ? drug.genericName : undefined,
+        "description": drug.description,
+        "nonProprietaryName": drug.genericName,
+        "manufacturer": {
+          "@type": "Organization",
+          "name": drug.manufacturer
+        },
+        "drugClass": {
+          "@type": "DrugClass",
+          "name": drug.drugClass || drug.category
+        },
+        "prescriptionStatus": drug.prescriptionStatus === 'OTC'
+          ? "https://schema.org/OTC"
+          : "https://schema.org/PrescriptionOnly",
+        "warning": drug.warnings?.length ? drug.warnings.join('. ') : undefined,
+        "administrationRoute": drug.dosageAndAdmin || undefined,
+        "isAvailableGenerically": true,
+        "mechanismOfAction": drug.mechanism || undefined,
+        "pregnancyWarning": drug.pregnancy || undefined
+      }
     };
   }, [drug, id]);
 
@@ -166,9 +185,9 @@ const DrugPage = () => {
       />
       <Header />
       <div className="container max-w-4xl mx-auto px-4 pt-20 pb-28 sm:pb-12">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)} 
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
