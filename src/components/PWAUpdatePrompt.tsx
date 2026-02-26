@@ -13,19 +13,19 @@ export const PWAUpdatePrompt = () => {
   const handleUpdate = useCallback(async () => {
     console.log('🔄 Updating to new version...');
     toast.loading('Updating app...', { id: 'app-update' });
-    
+
     try {
       if (registration && registration.waiting) {
         // Tell the waiting service worker to skip waiting and become active
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        
+
         // Show success message
         toast.success('✅ Updated!', {
           id: 'app-update',
           description: 'Reloading app with latest version...',
           duration: 2000
         });
-        
+
         // Reload after short delay to show success message
         setTimeout(() => {
           window.location.reload();
@@ -51,13 +51,13 @@ export const PWAUpdatePrompt = () => {
         .then((reg) => {
           console.log('✅ Service Worker registered:', reg);
           setRegistration(reg);
-          
+
           // Check for updates every 60 seconds
           setInterval(() => {
             console.log('🔍 Checking for app updates...');
             reg.update();
           }, 60000); // Check every 1 minute
-          
+
           // Listen for updates
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -66,7 +66,7 @@ export const PWAUpdatePrompt = () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   console.log('🆕 New version available!');
                   setUpdateAvailable(true);
-                  
+
                   // Show persistent toast notification
                   toast.info('🎉 Update Available!', {
                     description: 'A new version of PharmaLens is ready',
@@ -127,14 +127,14 @@ export const PWAUpdatePrompt = () => {
     }
   }, [handleUpdate]);
 
-  // Auto-update in 30 seconds if user doesn't respond
+  // Auto-update in 5 seconds if user doesn't respond
   useEffect(() => {
     if (updateAvailable) {
       const autoUpdateTimer = setTimeout(() => {
-        console.log('⏰ Auto-updating after 30 seconds...');
+        console.log('⏰ Auto-updating after 5 seconds...');
         toast.info('Auto-updating...', { duration: 2000 });
         handleUpdate();
-      }, 30000); // 30 seconds
+      }, 5000); // 5 seconds
 
       return () => clearTimeout(autoUpdateTimer);
     }
