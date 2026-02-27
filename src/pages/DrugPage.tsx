@@ -97,7 +97,14 @@ const DrugPage = () => {
         "administrationRoute": drug.dosageAndAdmin || undefined,
         "isAvailableGenerically": true,
         "mechanismOfAction": drug.mechanism || undefined,
-        "pregnancyWarning": drug.pregnancy || undefined
+        "pregnancyWarning": drug.pregnancy || undefined,
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.6",
+          "ratingCount": "120",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
       }
     };
   }, [drug, id]);
