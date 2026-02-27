@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, ExternalLink, Mail, Linkedin, Youtube } from 'lucide-react';
+import { Pill, ExternalLink, Mail, Linkedin, Youtube, MapPin } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import { LikeButton } from '@/components/ui/like-button';
 
@@ -28,6 +28,16 @@ const Footer = () => {
             </p>
 
             <div className="flex items-center space-x-3 sm:space-x-4">
+              <a
+                href="https://share.google/8JXgREohI4JBFRCq4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-pharma-600 transition-colors"
+                aria-label="Google Business Profile"
+              >
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
+
               <a
                 href="https://www.linkedin.com/in/himanshu-sharma-374421326"
                 target="_blank"

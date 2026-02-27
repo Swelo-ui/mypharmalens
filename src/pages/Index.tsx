@@ -50,6 +50,11 @@ const Index = () => {
     "description": "PharmaLens is an AI-powered medication identification application. Take a photo of any pill or medication and instantly identify it using artificial intelligence. Access comprehensive drug information including side effects, dosages, interactions, and safety warnings.",
     "disambiguatingDescription": "PharmaLens is a healthcare AI application for identifying medications and pills at pharmalens.tech. NOT related to contact lenses or optical products. Uses artificial intelligence to recognize medications from photos.",
     "url": "https://pharmalens.tech",
+    "sameAs": [
+      "https://share.google/8JXgREohI4JBFRCq4",
+      "https://www.linkedin.com/in/himanshu-sharma-374421326",
+      "https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm"
+    ],
     "applicationCategory": "HealthApplication",
     "applicationSubCategory": "Medical",
     "operatingSystem": "Web Browser",
