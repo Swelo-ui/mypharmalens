@@ -1,32 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 /**
- * Hook to detect online/offline status and show appropriate notifications
+ * Hook to detect online/offline status and show appropriate notifications.
+ * Uses a ref for wasOffline tracking so the effect only runs once on mount,
+ * preventing duplicate event listeners and duplicate toast notifications.
  */
 export const useOfflineDetection = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [wasOffline, setWasOffline] = useState(false);
+  const wasOfflineRef = useRef(false);
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       
       // Only show "back online" toast if user was previously offline
-      if (wasOffline) {
+      if (wasOfflineRef.current) {
         toast.success('🌐 Back Online!', {
+          id: 'network-status',
           description: 'You can now use drug identification features',
           duration: 3000
         });
-        setWasOffline(false);
+        wasOfflineRef.current = false;
       }
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      setWasOffline(true);
+      wasOfflineRef.current = true;
       
       toast.warning('📴 You are offline', {
+        id: 'network-status',
         description: 'Drug identification requires internet. Other features work offline.',
         duration: 5000,
         action: {
@@ -42,15 +46,15 @@ export const useOfflineDetection = () => {
 
     // Initial check
     if (!navigator.onLine) {
-      setWasOffline(true);
+      wasOfflineRef.current = true;
     }
 
-    // Cleanup
+    // Cleanup — runs only on unmount since dependency array is empty
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [wasOffline]);
+  }, []); // Empty dependency array — register listeners only once
 
   /**
    * Check if online before attempting an action
@@ -60,6 +64,7 @@ export const useOfflineDetection = () => {
   const checkOnlineStatus = (action: string = 'This action'): boolean => {
     if (!isOnline) {
       toast.error(`📴 No Internet Connection`, {
+        id: 'network-check',
         description: `${action} requires an internet connection`,
         duration: 4000
       });
@@ -70,7 +75,7 @@ export const useOfflineDetection = () => {
 
   return {
     isOnline,
-    wasOffline,
+    wasOffline: wasOfflineRef.current,
     checkOnlineStatus
   };
 };
