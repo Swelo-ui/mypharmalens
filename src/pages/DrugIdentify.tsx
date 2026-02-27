@@ -126,7 +126,7 @@ const getDetailsObject = (details: IdentificationHistoryItem['details']) => {
 const DrugIdentify = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStatus();
   const { canPerformIdentification, incrementIdentificationUsage, usageStats, loading } = useSubscription();
-  const { checkOnlineStatus } = useOfflineDetection();
+  const { checkOnlineStatus } = useOfflineDetection({ showNotifications: false });
   const [identificationMode, setIdentificationMode] = useState<'upload' | 'camera'>('upload');
 
   const [analysisMode, setAnalysisMode] = useState<'standard' | 'enhanced'>('standard');

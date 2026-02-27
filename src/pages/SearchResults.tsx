@@ -61,7 +61,7 @@ const SearchResults = () => {
   const isMobile = useIsMobile();
   const { isAuthenticated, user } = useAuthStatus();
   const { usageStats, getDatabaseSearchLimit } = useSubscription();
-  const { isOnline } = useOfflineDetection();
+  const { isOnline } = useOfflineDetection({ showNotifications: false });
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('q') || '';
 
@@ -176,10 +176,7 @@ const SearchResults = () => {
             return;
           } else {
             console.log("No offline data available");
-            toast.warning('📴 You are offline', {
-              description: 'Download offline data from Profile to search without internet',
-              duration: 5000
-            });
+            // Offline toast removed because useOfflineDetection in App.tsx globally shows '📴 You are offline'
             setAllResults([]);
             setIsLoading(false);
             return;
