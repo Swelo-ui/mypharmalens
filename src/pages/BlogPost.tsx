@@ -36,15 +36,27 @@ const BlogPost = () => {
     // Creating JSON-LD schema for the Article
     const schemaData = {
         "@context": "https://schema.org",
-        "@type": "MedicalWebPage",
+        "@type": "BlogPosting",
         "headline": post.title,
         "description": post.excerpt,
         "author": {
             "@type": "Organization",
             "name": post.author
         },
+        "publisher": {
+            "@type": "Organization",
+            "name": "PharmaLens",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://pharmalens.tech/images/pharmalens-logo-ai-medication-app.jpg"
+            }
+        },
         "datePublished": post.date,
-        "image": post.imageUrl ? post.imageUrl : "https://pharmalens.tech/og-image.jpg"
+        "image": post.imageUrl ? post.imageUrl : "https://pharmalens.tech/images/pharmalens-logo-ai-medication-app.jpg",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://pharmalens.tech/blog/${post.slug}`
+        }
     };
 
     return (

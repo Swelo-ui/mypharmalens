@@ -400,7 +400,8 @@ const SearchResults = () => {
           : "Browse PharmaLens complete medication database. Search over 1000+ drugs with detailed information including dosages, side effects, drug interactions, and brand names."
         }
         keywords={`${searchQuery ? searchQuery + ', ' : ''}medication database, drug search, medicine lookup, pill finder, drug information, pharmaceutical database, medication list, drug side effects, dosage information`}
-        canonicalUrl={searchQuery ? `/search?q=${encodeURIComponent(searchQuery)}` : "/search"}
+        canonicalUrl="/search"
+        noIndex={Boolean(searchQuery)}
       />
       <Header />
 

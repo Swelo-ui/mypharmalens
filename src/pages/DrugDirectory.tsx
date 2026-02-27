@@ -4,14 +4,17 @@ import Header from '../components/Header';
 import SEOHead from '../components/SEOHead';
 import { loadAllDrugs } from '../data/drugDataLoader';
 import { Search } from 'lucide-react';
+import { DrugData } from '@/components/DrugCard';
+
+// Alphabet array for the A-Z navigation
+const alphabet = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 const DrugDirectory = () => {
-    const [drugs, setDrugs] = useState<any[]>([]);
+    const [drugs, setDrugs] = useState<DrugData[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeLetter, setActiveLetter] = useState<string>('A');
 
-    // Alphabet array for the A-Z navigation
-    const alphabet = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
 
     useEffect(() => {
         const fetchDrugs = async () => {

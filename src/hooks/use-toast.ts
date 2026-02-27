@@ -77,6 +77,6 @@ export const useToast = () => {
     }
   };
 
-  const toasts: any[] = [];
+  const toasts: unknown[] = [];
   return { toast: legacyToastWrapper, toasts };
 };

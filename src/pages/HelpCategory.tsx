@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { helpArticles } from '@/components/HelpArticle';
+import SEOHead from '@/components/SEOHead';
 
 const HelpCategory = () => {
   const { categoryId } = useParams();
@@ -36,6 +37,11 @@ const HelpCategory = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title={`${displayName} | PharmaLens Help`}
+        description={`Browse ${displayName.toLowerCase()} in the PharmaLens help center.`}
+        canonicalUrl={`/help/${categoryId}`}
+      />
       <Header />
       
       <main className="flex-1 pt-24 pb-16">

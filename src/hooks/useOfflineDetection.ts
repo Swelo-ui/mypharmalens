@@ -62,7 +62,7 @@ export const useOfflineDetection = (options: { showNotifications?: boolean } = {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []); // Empty dependency array — register listeners only once
+  }, [showNotifications]); // Register listeners when showNotifications changes
 
   /**
    * Check if online before attempting an action

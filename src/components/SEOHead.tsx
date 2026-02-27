@@ -17,7 +17,7 @@ const SEOHead = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "/og-image.png",
+  ogImage = "/images/pharmalens-logo-ai-medication-app.jpg",
   ogType = "website",
   noIndex = false,
   structuredData
