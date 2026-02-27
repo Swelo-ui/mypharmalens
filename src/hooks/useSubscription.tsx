@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from './useAuthStatus';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Tables } from '@/types/database.types';
 import {
   PLAN_IDS,

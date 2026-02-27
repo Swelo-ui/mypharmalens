@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Shield, CheckCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { SubscriptionPlan } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';

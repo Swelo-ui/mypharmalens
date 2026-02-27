@@ -27,7 +27,7 @@ import {
     estimateDrugDataSize,
     getTotalDrugCount
 } from '@/data/getAllDrugsForOffline';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 export interface OfflineStatus {
     available: boolean;

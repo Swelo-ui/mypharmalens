@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { X, Download, Smartphone } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;

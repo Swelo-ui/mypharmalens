@@ -21,7 +21,7 @@ import {
   InteractionCheckResult
 } from '@/utils/drugInteractionChecker';
 import { medicalToLaymanTerms } from '@/utils/laymanTerms';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import SEOHead from '@/components/SEOHead';
 
 function calculateLevenshteinDistance(a: string, b: string): number {

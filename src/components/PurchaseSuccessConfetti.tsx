@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Confetti, type ConfettiRef } from '@/registry/magicui/confetti';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 interface PurchaseSuccessConfettiProps {
     isOpen: boolean;

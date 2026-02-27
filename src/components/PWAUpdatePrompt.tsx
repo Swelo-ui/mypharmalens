@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * PWA Update Prompt Component

@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Loader2, Save, Key, User, Mail, Calendar, CreditCard, Info, LogOut } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate, useLocation } from 'react-router-dom';

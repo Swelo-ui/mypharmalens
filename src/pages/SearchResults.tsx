@@ -21,7 +21,7 @@ import SearchBar from '@/components/SearchBar';
 import DrugCard from '@/components/DrugCard';
 import SearchLimitBar from '@/components/SearchLimitBar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { hasReachedSearchLimit } from '@/utils/searchUsageTracker';
 import { searchOfflineDrugs, isOfflineDataAvailable, DrugOfflineData } from '@/services/offlineDrugStorage';
 import { Link } from 'react-router-dom';

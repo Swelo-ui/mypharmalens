@@ -14,7 +14,7 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import { Tables } from '@/types/database.types';

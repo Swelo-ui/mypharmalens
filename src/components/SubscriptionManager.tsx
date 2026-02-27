@@ -15,7 +15,7 @@ import {
   TrendingDown,
   Zap
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStatus } from '@/hooks/useAuthStatus';
 import PaymentButton from './PaymentButton';

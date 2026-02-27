@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { symptoms, symptomCategories, Symptom } from '@/utils/symptomMapping';
 import { loadAllDrugs } from '@/data/drugDataLoader';
 import { DrugData } from '@/components/DrugCard';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import SEOHead from '@/components/SEOHead';
 
 type SpeechRecognitionEventLike = {
