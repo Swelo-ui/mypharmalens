@@ -7,6 +7,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import * as Sentry from '@sentry/react'
 
+// Capture app start time BEFORE anything else (most accurate measurement)
+const appStartTime = performance.now();
+
 // Initialize Sentry crash reporting (only if DSN is configured)
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
 if (sentryDsn) {
@@ -28,6 +31,24 @@ if (sentryDsn) {
     replaysOnErrorSampleRate: 1.0,
     environment: import.meta.env.MODE,
   });
+
+  // ─── Sentry Custom Metrics ───────────────────────────────────────────────
+
+  // 1. COUNT: Track every new app session start
+  Sentry.metrics.count('pharmalens.app.session_start', 1);
+
+  // 2. GAUGE: Real page load time from browser Navigation Timing API (ms)
+  window.addEventListener('load', () => {
+    const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    if (navEntry) {
+      const pageLoadMs = Math.round(navEntry.loadEventEnd - navEntry.startTime);
+      Sentry.metrics.gauge('pharmalens.page.load_time_ms', pageLoadMs);
+    }
+  });
+
+  // 3. DISTRIBUTION: JS bundle parse + execute time (time to first render)
+  const bundleTime = Math.round(performance.now() - appStartTime);
+  Sentry.metrics.distribution('pharmalens.app.bundle_parse_ms', bundleTime);
 }
 
 const root = createRoot(document.getElementById("root")!);
@@ -44,3 +65,4 @@ root.render(
     </ThemeProvider>
   </BrowserRouter>
 );
+

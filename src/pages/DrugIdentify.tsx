@@ -22,6 +22,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import * as Sentry from '@sentry/react';
 
 import { playDrugIdentificationSound } from '@/utils/audioService';
 import SEOHead from '@/components/SEOHead';
@@ -582,12 +583,16 @@ const DrugIdentify = () => {
             throw new Error(
               "Safety Protocol: Identification process halted due to insufficient image clarity. To ensure medical accuracy, please retake the photo with better lighting and focus on the text."
             );
+          } else {
+            // Metric: Track error/failure
+            Sentry.metrics.count('pharmalens.identification.error', 1);
+            throw new Error(drugData.error || 'Unable to identify this medication. Please try again with a clearer image.');
           }
-
-          throw new Error(drugData.error || 'Unable to identify this medication. Please try again with a clearer image.');
         } else {
           // Unexpected response format
-          throw new Error(`${analysisMode} system returned invalid response`);
+          // Metric: Track error/failure
+          Sentry.metrics.count('pharmalens.identification.error', 1);
+          throw new Error("Could not process the image properly. Please try again.");
         }
       } catch (drugError) {
         // Clear the progress simulator on error
@@ -805,6 +810,9 @@ const DrugIdentify = () => {
       setProcessingPhase("Preparing image");
       toast.info("Processing your image...");
 
+      // Metric: Track attempt started
+      Sentry.metrics.count('pharmalens.identification.attempt', 1);
+
       // Check image quality
       await checkImageQuality(file);
 
@@ -889,6 +897,9 @@ const DrugIdentify = () => {
 
               // Play drug identification completion sound
               playDrugIdentificationSound();
+
+              // Metric: Track success
+              Sentry.metrics.count('pharmalens.identification.success', 1);
 
               // Enhanced messaging based on identification result
               if (isUnidentified) {
