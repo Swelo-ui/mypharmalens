@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText, Loader2, Star } from 'lucide-react';
+import { Pill, Brain, Camera, Database, Shield, CheckCircle2, Mail, Linkedin, Bookmark, FileText, Loader2, Star, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
@@ -308,9 +308,18 @@ const About = () => {
                 </span>
               </div>
               <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
-              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">
                 Trusted by healthcare professionals, pharmacy students, and caregivers across India
               </p>
+              <a 
+                href="https://pharmanotes.me/blog/pharmalens-app-review" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center justify-center px-4 py-2 mt-2 bg-pharma-50 text-pharma-700 hover:bg-pharma-100 dark:bg-pharma-900/30 dark:text-pharma-300 dark:hover:bg-pharma-900/50 rounded-full text-sm font-medium transition-colors"
+              >
+                Read what B.Pharm students have to say about us on Pharmanotes!
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
             </div>
           </div>
 
