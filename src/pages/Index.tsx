@@ -732,9 +732,9 @@ const Index = () => {
                 <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
                   <ShieldCheck className="h-8 w-8 text-green-600" />
                 </div>
-                <h4 className="font-semibold mb-2">HIPAA Compliant</h4>
+                <h4 className="font-semibold mb-2">Zero Data Retention</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Your privacy is protected with enterprise-grade security and HIPAA compliance standards.
+                  Your medication images are processed instantly and permanently deleted — never stored on our servers.
                 </p>
               </div>
 
@@ -752,9 +752,9 @@ const Index = () => {
                 <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-4">
                   <Database className="h-8 w-8 text-orange-600" />
                 </div>
-                <h4 className="font-semibold mb-2">Multi-Language Support</h4>
+                <h4 className="font-semibold mb-2">1400+ Medicines</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Available in multiple languages to serve healthcare professionals and patients globally.
+                  Comprehensive Indian drug database including Jan Aushadhi generics, branded drugs, and OTC medications.
                 </p>
               </div>
             </div>

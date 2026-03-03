@@ -87,6 +87,20 @@ const drugDataLoaders = {
   fertility: () => import("./fertilityDrugs").then(m => m.fertilityDrugs),
   painInflammationCombination: () => import("./painInflammationCombinationDrugs").then(m => m.painInflammationCombinationDrugs),
   dermatology: () => import("./dermatologyDrugs").then(m => m.dermatologyDrugs),
+  // Jan Aushadhi Missing Expansions
+  antiDiabeticExpansion: () => import("./antiDiabeticExpansionDrugs").then(m => m.antiDiabeticExpansionDrugs),
+  respiratoryExpansion: () => import("./respiratoryExpansionDrugs").then(m => m.respiratoryExpansionDrugs),
+  cvsExpansion: () => import("./cvsExpansionDrugs").then(m => m.cvsExpansionDrugs),
+  cnsExpansion: () => import("./cnsExpansionDrugs").then(m => m.cnsExpansionDrugs),
+  oncologyExpansion: () => import("./oncologyExpansionDrugs").then(m => m.oncologyExpansionDrugs),
+  supplementExpansion: () => import("./supplementExpansionDrugs").then(m => m.supplementExpansionDrugs),
+  antibioticExpansion: () => import("./antibioticExpansionDrugs").then(m => m.antibioticExpansionDrugs),
+  gastrointestinalExpansion2: () => import("./gastrointestinalExpansionDrugs").then(m => m.gastrointestinalExpansionDrugs), // Named 2 to avoid collision with gastrointestinalExpansion
+  painRheumatologyExpansion: () => import("./painRheumatologyExpansionDrugs").then(m => m.painRheumatologyExpansionDrugs),
+  neurologyPsychiatryExpansion: () => import("./neurologyPsychiatryExpansionDrugs").then(m => m.neurologyPsychiatryExpansionDrugs),
+  endocrineWomensHealthExpansion: () => import("./endocrineWomensHealthExpansionDrugs").then(m => m.endocrineWomensHealthExpansionDrugs),
+  batch3Expansion: () => import("./batch3ExpansionDrugs").then(m => m.batch3ExpansionDrugs),
+  batch4Expansion: () => import("./batch4ExpansionDrugs").then(m => m.batch4ExpansionDrugs),
 };
 
 // Cache for loaded drug data
