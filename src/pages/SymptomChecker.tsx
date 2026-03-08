@@ -750,13 +750,98 @@ const SymptomChecker = () => {
     )
   })).filter(category => category.symptoms.length > 0);
 
+  const symptomCheckerStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "MedicalWebPage",
+        "@id": "https://pharmalens.tech/symptom-checker#webpage",
+        "name": "AI Symptom Checker - Find Medications by Symptom | PharmaLens",
+        "description": "AI-powered symptom checker that maps 100+ symptoms across 15 categories to relevant medications from a database of 1,500+ drugs. Select symptoms to instantly see matched medicines with dosage, side effects, and safety information.",
+        "url": "https://pharmalens.tech/symptom-checker",
+        "datePublished": "2025-01-01",
+        "dateModified": "2026-02-26",
+        "isAccessibleForFree": true,
+        "inLanguage": "en-IN",
+        "specialty": "Pharmacy",
+        "medicalAudience": {
+          "@type": "MedicalAudience",
+          "audienceType": "Patient"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "PharmaLens",
+          "url": "https://pharmalens.tech"
+        },
+        "about": [
+          { "@type": "MedicalCondition", "name": "Headache" },
+          { "@type": "MedicalCondition", "name": "Fever" },
+          { "@type": "MedicalCondition", "name": "Cough" },
+          { "@type": "MedicalCondition", "name": "Nausea" },
+          { "@type": "MedicalCondition", "name": "Stomach Pain" },
+          { "@type": "MedicalCondition", "name": "Allergy" },
+          { "@type": "MedicalCondition", "name": "Anxiety" },
+          { "@type": "MedicalCondition", "name": "Joint Pain" },
+          { "@type": "MedicalCondition", "name": "Diabetes" },
+          { "@type": "MedicalCondition", "name": "Hypertension" },
+          { "@type": "MedicalCondition", "name": "Asthma" },
+          { "@type": "MedicalCondition", "name": "Insomnia" },
+          { "@type": "MedicalCondition", "name": "Menstrual Cramps" },
+          { "@type": "MedicalCondition", "name": "Acne" },
+          { "@type": "MedicalCondition", "name": "Diarrhea" }
+        ],
+        "potentialAction": {
+          "@type": "UseAction",
+          "name": "Check symptoms and find medications",
+          "target": "https://pharmalens.tech/symptom-checker"
+        },
+        "mainContentOfPage": {
+          "@type": "WebPageElement",
+          "cssSelector": ".container"
+        },
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": ["h1", "p.text-gray-600"]
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "PharmaLens Symptom Checker",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web Browser",
+        "url": "https://pharmalens.tech/symptom-checker",
+        "description": "Select from 100+ symptoms across categories like digestive, respiratory, neurological, and women's health to find matching medications from PharmaLens's database of 1,500+ drugs.",
+        "featureList": [
+          "100+ symptoms across 15 medical categories",
+          "AI-powered drug matching algorithm",
+          "Voice-based symptom search",
+          "1,500+ medications in database",
+          "Women's health, neurological, and chronic condition symptoms",
+          "Instant medication recommendations with safety information"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock"
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "PharmaLens",
+          "url": "https://pharmalens.tech"
+        }
+      }
+    ]
+  };
+
   return (
     <>
       <SEOHead
-        title="Free AI Symptom Checker - Identify Medications & Conditions | PharmaLens"
-        description="Use our free AI-powered Symptom Checker to find medications and understand potential conditions. Instant, accurate health analysis and drug recommendations based on your symptoms."
-        keywords="AI symptom checker, free symptom checker, medication finder by symptom, check symptoms online, drug symptom search, medicine finder, health symptom analysis, symptom based medicine, what medicine for headache, fever medicine finder, cold medicine checker, stomach pain remedy finder, symptom to drug search, OTC medicine by symptom, find drug by symptoms"
+        title="AI Symptom Checker - Find Medicines by Symptom | PharmaLens"
+        description="Instantly find medicines for your symptoms. Select from 100+ symptoms across headache, fever, cough, allergy, diabetes, women's health and more. Matches from a database of 1,500+ drugs with dosage, side effects, and safety info."
+        keywords="AI symptom checker, symptom to medicine, medication finder by symptom, check symptoms online, drug symptom search, medicine finder India, health symptom analysis, what medicine for headache, fever medicine finder, cold medicine checker, stomach pain remedy finder, OTC medicine by symptom, find drug by symptoms, symptom based drug search"
         canonicalUrl="/symptom-checker"
+        structuredData={symptomCheckerStructuredData}
       />
       <Header />
       <div className="container max-w-7xl mx-auto px-4 pt-24 pb-12">

@@ -77,7 +77,8 @@
   <meta name="medical-disclaimer"
     content="For informational purposes only. Not a substitute for professional medical advice." />
 
-  <!-- Canonical URL is set dynamically per-page via react-helmet-async SEOHead component -->
+  <!-- Static fallback canonical for the SPA shell (pre-JS crawl). React Helmet overrides this per-page once JS executes. -->
+  <link rel="canonical" href="https://pharmalens.tech/" />
 
   <!-- Preconnect for Performance - establishes early connections -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>

@@ -74,6 +74,19 @@
     Content-Type = "application/xml; charset=utf-8"
     Cache-Control = "public, max-age=3600"
 
+# Canonical HTTP headers for drug pages — Google reads these before HTML/JS parsing.
+# Fixes "Duplicate without user-selected canonical" Search Console issue.
+[[headers]]
+  for = "/drug/:id"
+  [headers.values]
+    Link = "<https://pharmalens.tech/drug/:id>; rel=\"canonical\""
+
+# Canonical HTTP header for symptom-checker — helps Google confirm this is the canonical URL.
+[[headers]]
+  for = "/symptom-checker"
+  [headers.values]
+    Link = "<https://pharmalens.tech/symptom-checker>; rel=\"canonical\""
+
 # Cache fonts
 [[headers]]
   for = "/*.woff2"

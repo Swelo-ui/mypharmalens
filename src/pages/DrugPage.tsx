@@ -66,6 +66,9 @@ const DrugPage = () => {
       "name": `${drug.name} - Drug Information`,
       "description": drug.description,
       "url": `https://pharmalens.tech/drug/${id}`,
+      "datePublished": "2025-01-01",
+      "dateModified": "2026-02-26",
+      "inLanguage": "en-IN",
       "lastReviewed": "2026-02-26",
       "medicalAudience": {
         "@type": "MedicalAudience",
