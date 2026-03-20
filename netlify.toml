@@ -2,6 +2,12 @@
   publish = "dist"
   command = "npm run build"
 
+# Edge Function: injects correct canonical Link HTTP header for all drug pages
+# Runs at CDN edge before JS — fixes Googlebot seeing wrong canonical on SPA shell
+[[edge_functions]]
+  function = "seo-canonical"
+  path = "/drug/*"
+
 [build.environment]
   NODE_VERSION = "20.19.2"
 
@@ -16,6 +22,32 @@
 [[redirects]]
   from = "https://www.pharmalens.tech/*"
   to = "https://pharmalens.tech/:splat"
+  status = 301
+  force = true
+
+# Trailing slash redirects — prevents duplicate content from /drug/X and /drug/X/
+# (must be BEFORE the SPA catch-all below)
+[[redirects]]
+  from = "/drug/*/"
+  to = "/drug/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/drugs/"
+  to = "/drugs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/search/"
+  to = "/search"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/symptom-checker/"
+  to = "/symptom-checker"
   status = 301
   force = true
 
@@ -74,18 +106,15 @@
     Content-Type = "application/xml; charset=utf-8"
     Cache-Control = "public, max-age=3600"
 
-# Canonical HTTP headers for drug pages — Google reads these before HTML/JS parsing.
-# Fixes "Duplicate without user-selected canonical" Search Console issue.
-[[headers]]
-  for = "/drug/:id"
-  [headers.values]
-    Link = "<https://pharmalens.tech/drug/:id>; rel=\"canonical\""
-
-# Canonical HTTP header for symptom-checker — helps Google confirm this is the canonical URL.
+# NOTE: Netlify [[headers]] does NOT support dynamic :id path params (only [[redirects]] do).
+# Drug page canonicals are handled by react-helmet-async (SEOHead component) + Edge Function.
+# The /symptom-checker canonical header below is safe (no dynamic param).
 [[headers]]
   for = "/symptom-checker"
   [headers.values]
     Link = "<https://pharmalens.tech/symptom-checker>; rel=\"canonical\""
+
+
 
 # Cache fonts
 [[headers]]

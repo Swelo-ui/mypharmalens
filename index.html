@@ -77,8 +77,9 @@
   <meta name="medical-disclaimer"
     content="For informational purposes only. Not a substitute for professional medical advice." />
 
-  <!-- Static fallback canonical for the SPA shell (pre-JS crawl). React Helmet overrides this per-page once JS executes. -->
-  <link rel="canonical" href="https://pharmalens.tech/" />
+  <!-- NOTE: Canonical is set dynamically per-page by SEOHead component (react-helmet-async).
+       No static fallback canonical here — a hardcoded "/" canonical on every SPA route
+       would signal to Googlebot that all pages canonicalize to the homepage. -->
 
   <!-- Preconnect for Performance - establishes early connections -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
