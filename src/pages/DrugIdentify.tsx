@@ -1513,7 +1513,7 @@ const DrugIdentify = () => {
                 </div>
               </Alert>
             )}
-            <DrugDetails drug={identifiedDrug} />
+            <DrugDetails drug={identifiedDrug} analysisMode={analysisMode} />
           </div>
         )}
       </div>

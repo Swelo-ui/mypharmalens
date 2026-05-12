@@ -18,7 +18,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'neutropenia': 'low infection-fighting white blood cells',
   'agranulocytosis': 'dangerously low white blood cell count',
   'pancytopenia': 'low counts of all blood cells',
-  
+
   // Cardiovascular terms
   'arrhythmias': 'irregular heartbeat',
   'bradycardia': 'slow heart rate',
@@ -27,7 +27,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'hypotension': 'low blood pressure',
   'cardiomyopathy': 'heart muscle disease',
   'qt prolongation': 'changes in heart rhythm that can be dangerous',
-  
+
   // Gastrointestinal terms
   'nausea': 'feeling sick to your stomach',
   'emesis': 'vomiting',
@@ -36,7 +36,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'dyspepsia': 'indigestion or stomach upset',
   'gastritis': 'stomach lining inflammation',
   'hepatitis': 'liver inflammation',
-  
+
   // Neurological terms
   'seizures': 'fits or convulsions',
   'tremor': 'shaking',
@@ -47,27 +47,27 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'insomnia': 'trouble sleeping',
   'confusion': 'difficulty thinking clearly',
   'hallucinations': 'seeing or hearing things that aren\'t there',
-  
+
   // Respiratory terms
   'dyspnea': 'shortness of breath',
   'bronchospasm': 'tightening of airways',
   'cough': 'persistent coughing',
   'rhinitis': 'runny or stuffy nose',
-  
+
   // Skin terms
   'rash': 'skin irritation or red patches',
   'urticaria': 'hives or itchy bumps',
   'pruritus': 'itching',
   'photosensitivity': 'increased sensitivity to sunlight',
   'alopecia': 'hair loss',
-  
+
   // Pregnancy categories
   'category a': 'Studies show no risk to the baby',
   'category b': 'Generally considered safe during pregnancy',
   'category c': 'Use only if benefits outweigh potential risks',
   'category d': 'May harm the baby - avoid during pregnancy',
   'category x': 'Dangerous to unborn babies - never use during pregnancy',
-  
+
   // Drug interactions
   'cyp1a2': 'a liver enzyme that breaks down caffeine and other medicines',
   'cyp2c9': 'a liver enzyme that breaks down medicines',
@@ -90,7 +90,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'cyp3a4 inducers': 'medicines that can decrease this drug\'s effects',
   'anticoagulants': 'blood thinning medicines',
   'antacids': 'stomach acid reducers',
-  
+
   // Administration terms
   'oral': 'by mouth',
   'intravenous': 'through a vein (IV)',
@@ -100,7 +100,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'sublingual': 'under the tongue',
   'loading dose': 'first higher dose to get medicine working quickly',
   'maintenance dose': 'regular dose to keep medicine working',
-  
+
   // Storage terms
   'room temperature': 'normal indoor temperature (68-77°F)',
   'refrigerate': 'keep in the refrigerator (36-46°F)',
@@ -155,7 +155,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'ribosomal subunit': 'part of cell machinery that makes proteins',
   'mitochondrial function': 'cellular energy production',
   'reactive oxygen species': 'harmful substances that damage cells',
-  
+
   // Antimalarial-specific terms
   'plasmodium': 'malaria parasite',
   'p. falciparum': 'the most dangerous type of malaria parasite',
@@ -195,7 +195,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'mitochondrial electron transport': 'energy-making process in parasite cells',
   'heme detoxification': 'how malaria parasites process iron from blood',
   'free radicals': 'harmful substances that damage parasite proteins',
-  
+
   // Antiviral-specific terms
   'neuraminidase': 'protein that flu viruses use to escape from infected cells',
   'neuraminidase inhibitor': 'medicine that blocks the protein flu viruses need to spread',
@@ -270,7 +270,7 @@ export const medicalToLaymanTerms: Record<string, string> = {
   'h2 blockers': 'stomach acid reducing medicines (like Pepcid)',
   'rifamycins': 'type of antibiotic (like rifampin)',
   'anticonvulsants': 'seizure medicines',
-  
+
   // Additional terms from recent drug explanations
   'antimalarial': 'medicine that prevents or treats malaria',
   'antimalarial prophylaxis': 'taking medicine to prevent malaria',
@@ -327,16 +327,80 @@ export const simplifyMedicalTerm = (term: string): string => {
   return medicalToLaymanTerms[lowerTerm] || term;
 };
 
+/**
+ * Adds inline layman bracket annotations to medical text.
+ * e.g. "tachycardia" → "tachycardia (fast heart rate)"
+ * Longer/more specific terms are matched first to avoid partial overlaps.
+ */
+export const addLaymanBrackets = (text: string): string => {
+  if (!text) return text;
+
+  // Sort keys longest-first so multi-word terms match before single words
+  const sortedKeys = Object.keys(medicalToLaymanTerms).sort((a, b) => b.length - a.length);
+
+  let result = text;
+  const alreadyAnnotated = new Set<string>();
+
+  for (const term of sortedKeys) {
+    if (alreadyAnnotated.has(term)) continue;
+
+    const laymanTerm = medicalToLaymanTerms[term];
+    // Skip if the layman term is essentially the same as the original
+    if (laymanTerm.toLowerCase() === term.toLowerCase()) continue;
+
+    // Build a case-insensitive whole-word regex
+    // Escape special regex chars in the term
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b(${escaped})\\b(?!\\s*\\()`, 'gi');
+
+    if (regex.test(result)) {
+      result = result.replace(regex, `$1 (${laymanTerm})`);
+      alreadyAnnotated.add(term);
+    }
+  }
+
+  return result;
+};
+
+/**
+ * Derives a short "used for" summary from indications array.
+ * Returns a plain-English one-liner like "ulcer, fever, headache"
+ */
+export const getUsedForSummary = (indications: string[]): string => {
+  if (!indications || indications.length === 0) return '';
+
+  const simplified = indications
+    .slice(0, 4) // max 4 items to keep it short
+    .map(ind => {
+      // Strip common prefixes like "Treatment of", "Prevention of", "Management of"
+      let clean = ind
+        .replace(/^(treatment|prevention|management|relief|control)\s+of\s+/i, '')
+        .replace(/^(used\s+for|indicated\s+for)\s+/i, '')
+        .trim();
+
+      // Simplify any known medical terms in the indication
+      const lowerClean = clean.toLowerCase();
+      if (medicalToLaymanTerms[lowerClean]) {
+        clean = medicalToLaymanTerms[lowerClean];
+      }
+
+      // Lowercase first char for list style
+      return clean.charAt(0).toLowerCase() + clean.slice(1);
+    });
+
+  return simplified.join(', ');
+};
+
 export const createLaymanExplanation = {
   mechanism: (professionalText: string): string => {
     return `This medicine works by ${professionalText.toLowerCase().replace(/^[A-Z]/, match => match.toLowerCase())}`;
   },
-  
+
   sideEffect: (effect: string): string => {
     const simplified = simplifyMedicalTerm(effect);
     return simplified.charAt(0).toUpperCase() + simplified.slice(1);
   },
-  
+
   contraindication: (condition: string): string => {
     const simplified = simplifyMedicalTerm(condition);
     if (simplified.startsWith('hypersensitivity')) {
@@ -344,16 +408,16 @@ export const createLaymanExplanation = {
     }
     return `You have ${simplified}`;
   },
-  
+
   indication: (condition: string): string => {
     return condition.toLowerCase().replace(/^treatment of |^prevention of /, '');
   },
-  
+
   warning: (warningText: string): string => {
     const simplified = simplifyMedicalTerm(warningText);
     return `Be careful: ${simplified}`;
   },
-  
+
   dosage: (professionalDosage: string): string => {
     return professionalDosage
       .replace(/oral:/i, 'Take by mouth:')
@@ -365,7 +429,7 @@ export const createLaymanExplanation = {
       .replace(/qid/gi, 'four times daily')
       .replace(/qd/gi, 'once daily');
   },
-  
+
   pregnancy: (category: string): string => {
     const lowerCategory = category.toLowerCase();
     if (lowerCategory.includes('category a')) {
@@ -381,7 +445,7 @@ export const createLaymanExplanation = {
     }
     return category;
   },
-  
+
   storage: (storageInstructions: string): string => {
     return storageInstructions
       .replace(/store at room temperature/i, 'Keep at normal room temperature (68-77°F)')
@@ -407,44 +471,44 @@ type LaymanDrugInput = {
 // Helper function to generate complete layman explanations for a drug
 export const generateLaymanExplanations = (drug: LaymanDrugInput) => {
   return {
-    description: drug.description ? 
-      `This medicine is used to ${drug.description.toLowerCase().replace(/^medication used to |^drug used to /, '')}` : 
+    description: drug.description ?
+      `This medicine is used to ${drug.description.toLowerCase().replace(/^medication used to |^drug used to /, '')}` :
       undefined,
-    
-    mechanism: drug.mechanism ? 
-      createLaymanExplanation.mechanism(drug.mechanism) : 
+
+    mechanism: drug.mechanism ?
+      createLaymanExplanation.mechanism(drug.mechanism) :
       undefined,
-    
-    indications: drug.indications?.map((indication: string) => 
+
+    indications: drug.indications?.map((indication: string) =>
       createLaymanExplanation.indication(indication)
     ),
-    
-    contraindications: drug.contraindications?.map((contra: string) => 
+
+    contraindications: drug.contraindications?.map((contra: string) =>
       createLaymanExplanation.contraindication(contra)
     ),
-    
-    sideEffects: drug.sideEffects?.map((effect: string) => 
+
+    sideEffects: drug.sideEffects?.map((effect: string) =>
       createLaymanExplanation.sideEffect(effect)
     ),
-    
-    interactions: drug.interactions?.map((interaction: string) => 
+
+    interactions: drug.interactions?.map((interaction: string) =>
       `May interact with ${simplifyMedicalTerm(interaction)}`
     ),
-    
-    dosageAndAdmin: drug.dosageAndAdmin ? 
-      createLaymanExplanation.dosage(drug.dosageAndAdmin) : 
+
+    dosageAndAdmin: drug.dosageAndAdmin ?
+      createLaymanExplanation.dosage(drug.dosageAndAdmin) :
       undefined,
-    
-    warnings: drug.warnings?.map((warning: string) => 
+
+    warnings: drug.warnings?.map((warning: string) =>
       createLaymanExplanation.warning(warning)
     ),
-    
-    pregnancy: drug.pregnancy ? 
-      createLaymanExplanation.pregnancy(drug.pregnancy) : 
+
+    pregnancy: drug.pregnancy ?
+      createLaymanExplanation.pregnancy(drug.pregnancy) :
       undefined,
-    
-    storage: drug.storage ? 
-      createLaymanExplanation.storage(drug.storage) : 
+
+    storage: drug.storage ?
+      createLaymanExplanation.storage(drug.storage) :
       undefined
   };
 };

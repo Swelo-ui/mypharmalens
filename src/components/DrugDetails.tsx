@@ -8,6 +8,7 @@ import {
   ToggleRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { addLaymanBrackets, getUsedForSummary } from '@/utils/laymanTerms';
 
 export interface DetailedDrugData {
   id: string;
@@ -69,12 +70,30 @@ export interface DetailedDrugData {
 interface DrugDetailsProps {
   drug: DetailedDrugData;
   className?: string;
+  analysisMode?: 'standard' | 'enhanced';
 }
 
 
-const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
+const DrugDetails = ({ drug, className, analysisMode = 'enhanced' }: DrugDetailsProps) => {
   const [activeTab, setActiveTab] = useState<'general' | 'usage' | 'alternatives'>('general');
   const [showLaymanTerms, setShowLaymanTerms] = useState(false);
+
+  const isStandardMode = analysisMode === 'standard';
+
+  // Helper: in standard mode, annotate text with inline layman brackets
+  const annotate = (text: string): string => {
+    if (!isStandardMode || !text) return text;
+    return addLaymanBrackets(text);
+  };
+
+  // Helper: annotate an array of strings
+  const annotateList = (list: string[]): string[] => {
+    if (!isStandardMode || !list) return list;
+    return list.map(item => addLaymanBrackets(item));
+  };
+
+  // "Used for" summary shown only in standard mode
+  const usedForSummary = isStandardMode ? getUsedForSummary(drug.indications ?? []) : '';
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -86,7 +105,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {showLaymanTerms && drug.laymanExplanations?.description
                   ? drug.laymanExplanations.description
-                  : drug.description}
+                  : annotate(drug.description)}
               </p>
             </div>
 
@@ -95,7 +114,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {showLaymanTerms && drug.laymanExplanations?.dosageAndAdmin
                   ? drug.laymanExplanations.dosageAndAdmin
-                  : drug.dosageAndAdmin}
+                  : annotate(drug.dosageAndAdmin)}
               </p>
             </div>
 
@@ -104,7 +123,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 {showLaymanTerms && drug.laymanExplanations?.mechanism
                   ? drug.laymanExplanations.mechanism
-                  : drug.mechanism}
+                  : annotate(drug.mechanism)}
               </p>
             </div>
 
@@ -113,7 +132,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <ul className="space-y-2">
                 {((showLaymanTerms && drug.laymanExplanations?.sideEffects
                   ? drug.laymanExplanations.sideEffects
-                  : drug.sideEffects) ?? []).map((effect, i) => (
+                  : annotateList(drug.sideEffects ?? [])) ?? []).map((effect, i) => (
                     <li key={i} className="flex items-start">
                       <ThumbsDown className="h-4 w-4 text-amber-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{effect}</span>
@@ -127,7 +146,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <ul className="space-y-2">
                 {((showLaymanTerms && drug.laymanExplanations?.warnings
                   ? drug.laymanExplanations.warnings
-                  : drug.warnings) ?? []).map((warning, i) => (
+                  : annotateList(drug.warnings ?? [])) ?? []).map((warning, i) => (
                     <li key={i} className="flex items-start">
                       <AlertTriangle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{warning}</span>
@@ -141,7 +160,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <ul className="space-y-2">
                 {((showLaymanTerms && drug.laymanExplanations?.interactions
                   ? drug.laymanExplanations.interactions
-                  : drug.interactions) ?? []).map((interaction, i) => (
+                  : annotateList(drug.interactions ?? [])) ?? []).map((interaction, i) => (
                     <li key={i} className="flex items-start">
                       <AlertCircle className="h-4 w-4 text-pharma-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{interaction}</span>
@@ -160,7 +179,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <ul className="space-y-2">
                 {((showLaymanTerms && drug.laymanExplanations?.indications
                   ? drug.laymanExplanations.indications
-                  : drug.indications) ?? []).map((indication, i) => (
+                  : annotateList(drug.indications ?? [])) ?? []).map((indication, i) => (
                     <li key={i} className="flex items-start">
                       <ThumbsUp className="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{indication}</span>
@@ -174,7 +193,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <ul className="space-y-2">
                 {((showLaymanTerms && drug.laymanExplanations?.contraindications
                   ? drug.laymanExplanations.contraindications
-                  : drug.contraindications) ?? []).map((contraindication, i) => (
+                  : annotateList(drug.contraindications ?? [])) ?? []).map((contraindication, i) => (
                     <li key={i} className="flex items-start">
                       <AlertCircle className="h-4 w-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300 text-sm">{contraindication}</span>
@@ -188,7 +207,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               <p className="text-gray-700 dark:text-gray-300 text-sm">
                 {showLaymanTerms && drug.laymanExplanations?.pregnancy
                   ? drug.laymanExplanations.pregnancy
-                  : drug.pregnancy}
+                  : annotate(drug.pregnancy)}
               </p>
             </div>
 
@@ -199,7 +218,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                 <span className="text-gray-700 dark:text-gray-300 text-sm">
                   {showLaymanTerms && drug.laymanExplanations?.storage
                     ? drug.laymanExplanations.storage
-                    : drug.storage}
+                    : annotate(drug.storage)}
                 </span>
               </div>
             </div>
@@ -232,7 +251,7 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                           </span>
                         </div>
                       </div>
-                      
+
                       {drug.janaushadhiAlternative.drugCode && (
                         <div className="text-right bg-white/50 dark:bg-black/20 px-2.5 py-1 rounded-md border border-rose-100 dark:border-rose-900/30 flex-shrink-0">
                           <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold block">PMBJP Code</span>
@@ -251,16 +270,16 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                       </p>
                       {(drug.janaushadhiAlternative.strength || drug.janaushadhiAlternative.formulation) && (
                         <div className="flex flex-wrap gap-2 mt-2">
-                           {drug.janaushadhiAlternative.strength && (
-                             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white/70 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60">
-                               {drug.janaushadhiAlternative.strength}
-                             </span>
-                           )}
-                           {drug.janaushadhiAlternative.formulation && (
-                             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white/70 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60">
-                               {drug.janaushadhiAlternative.formulation}
-                             </span>
-                           )}
+                          {drug.janaushadhiAlternative.strength && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white/70 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60">
+                              {drug.janaushadhiAlternative.strength}
+                            </span>
+                          )}
+                          {drug.janaushadhiAlternative.formulation && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white/70 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60">
+                              {drug.janaushadhiAlternative.formulation}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -271,8 +290,8 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                         <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Estimated Price (MRP)</span>
                         <div className="flex items-baseline gap-2">
                           <span className="text-2xl font-bold text-rose-700 dark:text-rose-400 leading-none">
-                            {drug.janaushadhiAlternative.mrp && drug.janaushadhiAlternative.mrp > 0 
-                              ? `₹${Number(drug.janaushadhiAlternative.mrp).toFixed(2)}` 
+                            {drug.janaushadhiAlternative.mrp && drug.janaushadhiAlternative.mrp > 0
+                              ? `₹${Number(drug.janaushadhiAlternative.mrp).toFixed(2)}`
                               : 'Price varies'}
                           </span>
                           {drug.janaushadhiAlternative.savings && (
@@ -282,40 +301,40 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
                           )}
                         </div>
                       </div>
-                      
-                      <a 
-                        href="https://janaushadhi.gov.in/near-by-kendra" 
-                        target="_blank" 
+
+                      <a
+                        href="https://janaushadhi.gov.in/near-by-kendra"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex justify-center items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
                       >
                         Locate Store <Search className="h-4 w-4" />
                       </a>
                     </div>
-                    
+
                     {/* Advice / Footer */}
                     {drug.janaushadhiAlternative.advice && (
-                        <div className="mt-3 flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-300 bg-rose-100/50 dark:bg-rose-900/20 p-3 rounded-lg border border-rose-100 dark:border-rose-900/10">
-                            <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-rose-600" />
-                            <p className="leading-relaxed">{drug.janaushadhiAlternative.advice}</p>
-                        </div>
+                      <div className="mt-3 flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-300 bg-rose-100/50 dark:bg-rose-900/20 p-3 rounded-lg border border-rose-100 dark:border-rose-900/10">
+                        <Info className="h-4 w-4 flex-shrink-0 mt-0.5 text-rose-600" />
+                        <p className="leading-relaxed">{drug.janaushadhiAlternative.advice}</p>
+                      </div>
                     )}
                   </div>
                 ) : (
                   <div className="p-4 flex items-start gap-3">
-                     <div className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
-                        <Info className="h-5 w-5" />
-                     </div>
-                     <div>
-                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
-                          Janaushadhi Status
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          No direct match found in the Pradhan Mantri Bhartiya Janaushadhi Pariyojana database.
-                          <br />
-                          <span className="text-xs mt-1 block opacity-80">You can still ask for generic equivalents at your local pharmacy.</span>
-                        </p>
-                     </div>
+                    <div className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                      <Info className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                        Janaushadhi Status
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        No direct match found in the Pradhan Mantri Bhartiya Janaushadhi Pariyojana database.
+                        <br />
+                        <span className="text-xs mt-1 block opacity-80">You can still ask for generic equivalents at your local pharmacy.</span>
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -335,8 +354,8 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
               </div>
             ) : (
               <div className="glass-card p-6 text-center">
-                 <Search className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                 <p className="text-gray-600 dark:text-gray-400">No popular brand names found for this medication.</p>
+                <Search className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600 dark:text-gray-400">No popular brand names found for this medication.</p>
               </div>
             )}
           </div>
@@ -379,6 +398,17 @@ const DrugDetails = ({ drug, className }: DrugDetailsProps) => {
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
             <span className="font-medium">Generic Name:</span> {drug.genericName}
           </p>
+
+          {/* Standard mode: "Used for" quick summary for normal users */}
+          {isStandardMode && usedForSummary && (
+            <div className="flex items-start gap-2 mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
+              <Pill className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-blue-800 dark:text-blue-300">
+                <span className="font-semibold">Used for: </span>
+                <span>{usedForSummary}</span>
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
