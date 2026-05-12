@@ -399,16 +399,7 @@ const DrugDetails = ({ drug, className, analysisMode = 'enhanced' }: DrugDetails
             <span className="font-medium">Generic Name:</span> {drug.genericName}
           </p>
 
-          {/* Standard mode: "Used for" quick summary for normal users */}
-          {isStandardMode && usedForSummary && (
-            <div className="flex items-start gap-2 mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
-              <Pill className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                <span className="font-semibold">Used for: </span>
-                <span>{usedForSummary}</span>
-              </p>
-            </div>
-          )}
+
 
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
