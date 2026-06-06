@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>https://pharmalens.tech/sitemap-pages.xml</loc>
+    <loc>https://pharmalens.netlify.app/sitemap-pages.xml</loc>
     <lastmod>2026-06-06</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://pharmalens.tech/sitemap-drugs-1.xml</loc>
+    <loc>https://pharmalens.netlify.app/sitemap-drugs-1.xml</loc>
     <lastmod>2026-06-06</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://pharmalens.tech/sitemap-drugs-2.xml</loc>
+    <loc>https://pharmalens.netlify.app/sitemap-drugs-2.xml</loc>
     <lastmod>2026-06-06</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://pharmalens.tech/sitemap-drugs-3.xml</loc>
+    <loc>https://pharmalens.netlify.app/sitemap-drugs-3.xml</loc>
     <lastmod>2026-06-06</lastmod>
   </sitemap>
 </sitemapindex>

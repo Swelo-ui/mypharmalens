@@ -1,6 +1,6 @@
 {
   "packageId": "tech.pharmalens.twa",
-  "host": "pharmalens.tech",
+  "host": "pharmalens.netlify.app",
   "name": "PharmaLens",
   "launcherName": "PharmaLens",
   "display": "standalone",
@@ -13,9 +13,9 @@
   "backgroundColor": "#ffffff",
   "enableNotifications": false,
   "startUrl": "/",
-  "iconUrl": "https://pharmalens.tech/icon-512.png",
-  "maskableIconUrl": "https://pharmalens.tech/icon-512.png",
-  "monochromeIconUrl": "https://pharmalens.tech/icon-512.png",
+  "iconUrl": "https://pharmalens.netlify.app/icon-512.png",
+  "maskableIconUrl": "https://pharmalens.netlify.app/icon-512.png",
+  "monochromeIconUrl": "https://pharmalens.netlify.app/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
@@ -25,7 +25,7 @@
   "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://pharmalens.tech/manifest.json",
+  "webManifestUrl": "https://pharmalens.netlify.app/manifest.json",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {

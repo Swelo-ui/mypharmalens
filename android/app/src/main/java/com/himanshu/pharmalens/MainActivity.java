@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         configureWebView();
 
         // Load the PWA
-        webView.loadUrl("https://pharmalens.tech");
+        webView.loadUrl("https://pharmalens.netlify.app");
         
         // Check for updates after a short delay
         mainHandler.postDelayed(() -> updateChecker.checkForUpdates(), 3000);
@@ -219,7 +219,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
-                if (url.contains("pharmalens.tech")) {
+                if (url.contains("pharmalens.netlify.app")) {
                     return false; // Let WebView handle pharmalens.tech URLs
                 }
                 return super.shouldOverrideUrlLoading(view, request);

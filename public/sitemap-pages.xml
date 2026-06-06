@@ -1,127 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://pharmalens.tech/</loc>
+    <loc>https://pharmalens.netlify.app/</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/search</loc>
+    <loc>https://pharmalens.netlify.app/search</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/drugs</loc>
+    <loc>https://pharmalens.netlify.app/drugs</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/identify</loc>
+    <loc>https://pharmalens.netlify.app/identify</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/about</loc>
+    <loc>https://pharmalens.netlify.app/about</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/faq</loc>
+    <loc>https://pharmalens.netlify.app/faq</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/help</loc>
+    <loc>https://pharmalens.netlify.app/help</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/contact</loc>
+    <loc>https://pharmalens.netlify.app/contact</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/privacy</loc>
+    <loc>https://pharmalens.netlify.app/privacy</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/terms</loc>
+    <loc>https://pharmalens.netlify.app/terms</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/disclaimer</loc>
+    <loc>https://pharmalens.netlify.app/disclaimer</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/symptom-checker</loc>
+    <loc>https://pharmalens.netlify.app/symptom-checker</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/drug-interactions</loc>
+    <loc>https://pharmalens.netlify.app/drug-interactions</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog</loc>
+    <loc>https://pharmalens.netlify.app/blog</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/identify-medication-strips-boxes</loc>
+    <loc>https://pharmalens.netlify.app/blog/identify-medication-strips-boxes</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/checking-drug-interactions</loc>
+    <loc>https://pharmalens.netlify.app/blog/checking-drug-interactions</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/understanding-antibiotic-resistance</loc>
+    <loc>https://pharmalens.netlify.app/blog/understanding-antibiotic-resistance</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/safe-medication-management</loc>
+    <loc>https://pharmalens.netlify.app/blog/safe-medication-management</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/bpharm-student-survival-guide-pharmalens</loc>
+    <loc>https://pharmalens.netlify.app/blog/bpharm-student-survival-guide-pharmalens</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/elderly-polypharmacy-medication-management-guide</loc>
+    <loc>https://pharmalens.netlify.app/blog/elderly-polypharmacy-medication-management-guide</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pharmalens.tech/blog/how-to-identify-unknown-medication-strips-usa</loc>
+    <loc>https://pharmalens.netlify.app/blog/how-to-identify-unknown-medication-strips-usa</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
