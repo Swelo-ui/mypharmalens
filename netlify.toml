@@ -14,14 +14,14 @@
 # Redirect all traffic to HTTPS
 [[redirects]]
   from = "http://pharmalens.tech/*"
-  to = "https://pharmalens.tech/:splat"
+  to = "https://pharmalens.netlify.app/:splat"
   status = 301
   force = true
 
 # Redirect www to non-www
 [[redirects]]
   from = "https://www.pharmalens.tech/*"
-  to = "https://pharmalens.tech/:splat"
+  to = "https://pharmalens.netlify.app/:splat"
   status = 301
   force = true
 
@@ -112,7 +112,7 @@
 [[headers]]
   for = "/symptom-checker"
   [headers.values]
-    Link = "<https://pharmalens.tech/symptom-checker>; rel=\"canonical\""
+    Link = "<https://pharmalens.netlify.app/symptom-checker>; rel=\"canonical\""
 
 
 

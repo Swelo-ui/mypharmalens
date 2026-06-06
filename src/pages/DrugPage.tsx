@@ -65,7 +65,7 @@ const DrugPage = () => {
       "@type": "MedicalWebPage",
       "name": `${drug.name} - Drug Information`,
       "description": drug.description,
-      "url": `https://pharmalens.tech/drug/${id}`,
+      "url": `https://pharmalens.netlify.app/drug/${id}`,
       "datePublished": "2025-01-01",
       "dateModified": "2026-02-26",
       "inLanguage": "en-IN",
@@ -77,7 +77,7 @@ const DrugPage = () => {
       "publisher": {
         "@type": "Organization",
         "name": "PharmaLens",
-        "url": "https://pharmalens.tech"
+        "url": "https://pharmalens.netlify.app"
       },
       "about": {
         "@type": "Drug",

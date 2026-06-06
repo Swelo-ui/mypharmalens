@@ -23,7 +23,7 @@ const SEOHead = ({
   structuredData
 }: SEOHeadProps) => {
   const fullTitle = title.includes('PharmaLens') ? title : `${title} | PharmaLens`;
-  const baseUrl = "https://pharmalens.tech";
+  const baseUrl = "https://pharmalens.netlify.app";
   const fullCanonicalUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 

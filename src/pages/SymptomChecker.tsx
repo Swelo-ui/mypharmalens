@@ -755,10 +755,10 @@ const SymptomChecker = () => {
     "@graph": [
       {
         "@type": "MedicalWebPage",
-        "@id": "https://pharmalens.tech/symptom-checker#webpage",
+        "@id": "https://pharmalens.netlify.app/symptom-checker#webpage",
         "name": "AI Symptom Checker - Find Medications by Symptom | PharmaLens",
         "description": "AI-powered symptom checker that maps 100+ symptoms across 15 categories to relevant medications from a database of 1,500+ drugs. Select symptoms to instantly see matched medicines with dosage, side effects, and safety information.",
-        "url": "https://pharmalens.tech/symptom-checker",
+        "url": "https://pharmalens.netlify.app/symptom-checker",
         "datePublished": "2025-01-01",
         "dateModified": "2026-02-26",
         "isAccessibleForFree": true,
@@ -771,7 +771,7 @@ const SymptomChecker = () => {
         "publisher": {
           "@type": "Organization",
           "name": "PharmaLens",
-          "url": "https://pharmalens.tech"
+          "url": "https://pharmalens.netlify.app"
         },
         "about": [
           { "@type": "MedicalCondition", "name": "Headache" },
@@ -793,7 +793,7 @@ const SymptomChecker = () => {
         "potentialAction": {
           "@type": "UseAction",
           "name": "Check symptoms and find medications",
-          "target": "https://pharmalens.tech/symptom-checker"
+          "target": "https://pharmalens.netlify.app/symptom-checker"
         },
         "mainContentOfPage": {
           "@type": "WebPageElement",
@@ -809,7 +809,7 @@ const SymptomChecker = () => {
         "name": "PharmaLens Symptom Checker",
         "applicationCategory": "HealthApplication",
         "operatingSystem": "Web Browser",
-        "url": "https://pharmalens.tech/symptom-checker",
+        "url": "https://pharmalens.netlify.app/symptom-checker",
         "description": "Select from 100+ symptoms across categories like digestive, respiratory, neurological, and women's health to find matching medications from PharmaLens's database of 1,500+ drugs.",
         "featureList": [
           "100+ symptoms across 15 medical categories",
@@ -828,7 +828,7 @@ const SymptomChecker = () => {
         "provider": {
           "@type": "Organization",
           "name": "PharmaLens",
-          "url": "https://pharmalens.tech"
+          "url": "https://pharmalens.netlify.app"
         }
       }
     ]

@@ -48,14 +48,14 @@ const BlogPost = () => {
             "name": "PharmaLens",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://pharmalens.tech/images/pharmalens-logo-ai-medication-app.jpg"
+                "url": "https://pharmalens.netlify.app/images/pharmalens-logo-ai-medication-app.jpg"
             }
         },
         "datePublished": post.date,
-        "image": post.imageUrl ? post.imageUrl : "https://pharmalens.tech/images/pharmalens-logo-ai-medication-app.jpg",
+        "image": post.imageUrl ? post.imageUrl : "https://pharmalens.netlify.app/images/pharmalens-logo-ai-medication-app.jpg",
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://pharmalens.tech/blog/${post.slug}`
+            "@id": `https://pharmalens.netlify.app/blog/${post.slug}`
         }
     };
 

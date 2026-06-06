@@ -17,7 +17,7 @@ const contactStructuredData = {
   "@type": "LocalBusiness",
   "name": "PharmaLens",
   "description": "PharmaLens - AI-Powered Medication Identification and Drug Information Platform. Contact us for support, feedback, or inquiries about our pill identifier and drug interaction checker.",
-  "url": "https://pharmalens.tech",
+  "url": "https://pharmalens.netlify.app",
   "telephone": "",
   "email": "himanshusharma.shriram@gmail.com",
   "address": {
