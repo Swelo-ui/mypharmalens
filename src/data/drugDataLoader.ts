@@ -232,8 +232,104 @@ export const searchDrugs = async (query: string): Promise<DrugData[]> => {
   return scored;
 };
 
-// Get drug by ID with lazy loading
+// Helper to map drug ID prefixes to their respective category loader keys
+const getCategoryById = (id: string): keyof typeof drugDataLoaders | null => {
+  if (id.startsWith('ATD')) return 'addictionTreatment';
+  if (id.startsWith('ADD')) return 'additional';
+  if (id.startsWith('AMISC')) return 'additionalMiscellaneous';
+  if (id.startsWith('ANE')) return 'anesthetic';
+  if (id.startsWith('ABD')) return 'antibiotic';
+  if (id.startsWith('JAD_ABX') || id.startsWith('JAD_TB')) return 'antibioticExpansion';
+  if (id.startsWith('AAC')) return 'antibioticsAntimicrobialCombinations';
+  if (id.startsWith('ADC')) return 'antidiabeticCombination';
+  if (id.startsWith('JAD_AD')) return 'antiDiabeticExpansion';
+  if (id.startsWith('AMD')) return 'antimalarial';
+  if (id.startsWith('APD')) return 'antiparasitic';
+  if (id.startsWith('AVD')) return 'antiviral';
+  if (id.startsWith('JAD_MISSING_')) {
+    const num = parseInt(id.replace('JAD_MISSING_', ''), 10);
+    if (num <= 5) return 'batch3Expansion';
+    if (num <= 10) return 'batch4Expansion';
+  }
+  if (id.startsWith('CVC')) return 'cardiovascularCombination';
+  if (id.startsWith('CVD')) return 'cardiovascular';
+  if (id.startsWith('CNS')) return 'centralNervous';
+  if (id.startsWith('JAD_CNS')) return 'cnsExpansion';
+  if (id.startsWith('COGN')) return 'cognitiveNootropic';
+  if (id.startsWith('CAD')) return 'contrastAgents';
+  if (id.startsWith('JAD_CVS')) return 'cvsExpansion';
+  if (id.startsWith('DERM')) return 'dermatology';
+  if (id.startsWith('DER')) return 'dermatological';
+  if (id.startsWith('DEXP')) return 'dermatologyExpansion';
+  if (id.startsWith('EMG')) return 'emergency';
+  if (id.startsWith('EDD')) return 'enzymeDigestive';
+  if (id.startsWith('ED')) return 'endocrine';
+  if (id.startsWith('JAD_EWH')) return 'endocrineWomensHealthExpansion';
+  if (id.startsWith('EWD')) return 'extraWHO';
+  if (id.startsWith('FRD')) return 'fertility';
+  if (id.startsWith('FEXP')) return 'finalExpansion';
+  if (id.startsWith('GDH')) return 'gastroenterologyDigestiveHealth';
+  if (id.startsWith('GASTRO')) return 'gastroenterology';
+  if (id.startsWith('GID')) return 'gastrointestinal';
+  if (id.startsWith('JAD_GAS')) return 'gastrointestinalExpansion';
+  if (id.startsWith('GYN')) return 'gynecology';
+  if (id.startsWith('HEMA')) return 'hematology';
+  if (id.startsWith('IMM')) return 'immunology';
+  if (id.startsWith('INFECT')) return 'infectiousDiseases';
+  if (id.startsWith('MISCD')) return 'miscellaneous';
+  if (id.startsWith('MEXP')) return 'miscellaneousExpansion';
+  if (id.startsWith('MRL')) return 'muscleRelaxant';
+  if (id.startsWith('NEURO')) return 'neurology';
+  if (id.startsWith('JAD_NEU')) return 'neurologyPsychiatryExpansion';
+  if (id.startsWith('OBS')) return 'obstetrics';
+  if (id.startsWith('ONC')) return 'oncology';
+  if (id.startsWith('JAD_ONC')) return 'oncologyExpansion';
+  if (id.startsWith('OPHT')) return 'ophthalmology';
+  if (id.startsWith('OTD')) return 'other';
+  if (id.startsWith('PIC')) return 'painInflammationCombination';
+  if (id.startsWith('PIM')) return 'painInflammationMusculoskeletal';
+  if (id.startsWith('PMD')) return 'painManagement';
+  if (id.startsWith('JAD_PR')) return 'painRheumatologyExpansion';
+  if (id.startsWith('PERM')) return 'permethrinScabies';
+  if (id.startsWith('RCOMB')) return 'respiratoryCombination';
+  if (id.startsWith('RD')) return 'respiratory';
+  if (id.startsWith('JAD_RES')) return 'respiratoryExpansion';
+  if (id.startsWith('SHD')) return 'steroidHormone';
+  if (id.startsWith('SUP')) return 'supplement';
+  if (id.startsWith('JAD_SUP')) return 'supplementExpansion';
+  if (id.startsWith('SEXP')) return 'supplementsExpansion';
+  if (id.startsWith('URO')) return 'urology';
+  if (id.startsWith('VAC')) return 'vaccine';
+  if (id.startsWith('VNS')) return 'vitaminsNutritionalSupplements';
+
+  return null;
+};
+
+// Get drug by ID with lazy loading (highly optimized for quick search engine indexing)
 export const getDrugById = async (id: string): Promise<DrugData | null> => {
+  // 1. Check if the drug is already cached in memory
+  for (const drugs of drugDataCache.values()) {
+    const found = drugs.find(d => d.id === id);
+    if (found) return found;
+  }
+  if (allDrugsCache) {
+    const found = allDrugsCache.find(d => d.id === id);
+    if (found) return found;
+  }
+
+  // 2. Try to load only the specific category matching the ID prefix
+  const category = getCategoryById(id);
+  if (category) {
+    try {
+      const drugs = await loadDrugCategory(category);
+      const found = drugs.find(d => d.id === id);
+      if (found) return found;
+    } catch (e) {
+      console.warn(`Failed to lazy load category ${category} for ID ${id}:`, e);
+    }
+  }
+
+  // 3. Fallback to loading all drugs if the mapping fails or not found
   const allDrugs = await loadAllDrugs();
   return allDrugs.find(drug => drug.id === id) || null;
 };

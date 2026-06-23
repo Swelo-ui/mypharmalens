@@ -19,9 +19,11 @@ const DrugPage = () => {
 
   useEffect(() => {
     if (id) {
-      const timer = setTimeout(async () => {
+      let isMounted = true;
+      const loadDrug = async () => {
         try {
           const drugData = await getDrugById(id);
+          if (!isMounted) return;
 
           if (drugData) {
             const detailedDrugData: DetailedDrugData = {
@@ -49,11 +51,15 @@ const DrugPage = () => {
         } catch (error) {
           console.error("Error loading drug data:", error);
           toast("Failed to load medication data.");
+        } finally {
+          if (isMounted) setLoading(false);
         }
-        setLoading(false);
-      }, 100);
+      };
 
-      return () => clearTimeout(timer);
+      loadDrug();
+      return () => {
+        isMounted = false;
+      };
     }
   }, [id]);
 
