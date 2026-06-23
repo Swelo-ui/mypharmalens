@@ -21,8 +21,7 @@ const Hero = () => {
             </span>
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-            Identify & Learn About
-            <span className="text-pharma-600"> Any Medication</span>
+            Identify & Learn About Any Medication with <span className="text-pharma-600">PharmaLens</span>
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-6">
             PharmaLens combines AI technology with comprehensive drug databases to help you identify medications and access reliable information instantly.

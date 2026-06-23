@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet-async';
 
 interface SEOHeadProps {
@@ -23,7 +22,10 @@ const SEOHead = ({
   structuredData
 }: SEOHeadProps) => {
   const fullTitle = title.includes('PharmaLens') ? title : `${title} | PharmaLens`;
-  const baseUrl = "https://pharmalens.netlify.app";
+  
+  // Dynamically determine base URL depending on whether the site is running on Netlify or Vercel
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens.netlify.app";
+  
   const fullCanonicalUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 

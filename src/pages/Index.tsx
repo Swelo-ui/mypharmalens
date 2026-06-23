@@ -42,42 +42,57 @@ const Index = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens.netlify.app";
+
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "PharmaLens - AI Medication Identification App",
-    "alternateName": ["PharmaLens", "PharmaLens AI", "PharmaLens Tech"],
-    "description": "PharmaLens is an AI-powered medication identification application. Take a photo of any pill or medication and instantly identify it using artificial intelligence. Access comprehensive drug information including side effects, dosages, interactions, and safety warnings.",
-    "disambiguatingDescription": "PharmaLens is a healthcare AI application for identifying medications and pills at pharmalens.netlify.app. NOT related to contact lenses or optical products. Uses artificial intelligence to recognize medications from photos.",
-    "url": "https://pharmalens.netlify.app",
-    "sameAs": [
-      "https://share.google/8JXgREohI4JBFRCq4",
-      "https://www.linkedin.com/in/himanshu-sharma-374421326",
-      "https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm"
-    ],
-    "applicationCategory": "HealthApplication",
-    "applicationSubCategory": "Medical",
-    "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "INR"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "150",
-      "bestRating": "5"
-    },
-    "featureList": [
-      "AI-powered medication identification from photos",
-      "Comprehensive drug database with 1000+ medications",
-      "Drug interaction checker",
-      "Symptom-based medicine recommendations",
-      "Side effects and dosage information",
-      "Visual pill identification"
-    ],
-    "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner, free pill finder, camera medication identifier, what pill is this, identify medicine by photo, drug lookup app, medicine database, AI pharmacist, drug interaction checker, symptom checker"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${currentOrigin}/#website`,
+        "name": "PharmaLens",
+        "alternateName": ["PharmaLens AI", "PharmaLens Tech", "PharmaLens App"],
+        "url": currentOrigin,
+        "description": "PharmaLens - AI-Powered Medication Identification and Drug Information Platform"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${currentOrigin}/#app`,
+        "name": "PharmaLens - AI Medication Identification App",
+        "alternateName": ["PharmaLens", "PharmaLens AI", "PharmaLens Tech"],
+        "description": "PharmaLens is an AI-powered medication identification application. Take a photo of any pill or medication and instantly identify it using artificial intelligence. Access comprehensive drug information including side effects, dosages, interactions, and safety warnings.",
+        "disambiguatingDescription": "PharmaLens is a healthcare AI application for identifying medications and pills. NOT related to contact lenses or optical products. Uses artificial intelligence to recognize medications from photos.",
+        "url": currentOrigin,
+        "sameAs": [
+          "https://share.google/8JXgREohI4JBFRCq4",
+          "https://www.linkedin.com/in/himanshu-sharma-374421326",
+          "https://youtube.com/@my-pharmalens?si=EmFuIPaN6in9HUXm"
+        ],
+        "applicationCategory": "HealthApplication",
+        "applicationSubCategory": "Medical",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "150",
+          "bestRating": "5"
+        },
+        "featureList": [
+          "AI-powered medication identification from photos",
+          "Comprehensive drug database with 1000+ medications",
+          "Drug interaction checker",
+          "Symptom-based medicine recommendations",
+          "Side effects and dosage information",
+          "Visual pill identification"
+        ],
+        "keywords": "medication identifier, pill identifier, drug identification, AI medicine app, pharmacy app, drug information, pill scanner, free pill finder, camera medication identifier, what pill is this, identify medicine by photo, drug lookup app, medicine database, AI pharmacist, drug interaction checker, symptom checker"
+      }
+    ]
   };
 
   return (
