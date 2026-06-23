@@ -1,6 +1,4 @@
-
 {
-  "buildCommand": "npm install && ls -la node_modules/.bin && npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
@@ -23,7 +21,5 @@
         }
       ]
     }
-  ],
-  "installCommand": "npm install",
-  "nodeVersion": "20.19.2"
+  ]
 }
