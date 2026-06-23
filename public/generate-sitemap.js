@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const baseUrl = 'https://pharmalens.netlify.app';
+const baseUrl = 'https://pharmalens-drug-identify.vercel.app';
 const currentDate = new Date().toISOString().split('T')[0];
 
 const pages = [

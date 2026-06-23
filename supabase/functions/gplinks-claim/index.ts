@@ -171,7 +171,7 @@ Deno.serve(async (req: Request) => {
             const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
             // Build callback URL
-            const appUrl = Deno.env.get("APP_URL") || "https://pharmalens.netlify.app";
+            const appUrl = Deno.env.get("APP_URL") || "https://pharmalens-drug-identify.vercel.app";
             const callbackUrl = `${appUrl}/claim-callback/${token}`;
 
             // ================================================================

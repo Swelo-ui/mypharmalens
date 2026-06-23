@@ -18,5 +18,5 @@ Allow: /drug/
 Allow: /blog
 
 # Sitemap location
-Sitemap: https://pharmalens.netlify.app/sitemap.xml
+Sitemap: https://pharmalens-drug-identify.vercel.app/sitemap.xml
 

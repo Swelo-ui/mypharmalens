@@ -32,12 +32,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
-                      android:host="pharmalens.netlify.app" />
+                      android:host="pharmalens-drug-identify.vercel.app" />
             </intent-filter>
 
             <!-- TWA Configuration -->
             <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
-            <meta-data android:name="DEFAULT_URL" android:value="https://pharmalens.netlify.app" />
+            <meta-data android:name="DEFAULT_URL" android:value="https://pharmalens-drug-identify.vercel.app" />
             
             <!-- Fullscreen Configuration -->
             <meta-data android:name="android.support.customtabs.trusted.DISPLAY_MODE" android:value="fullscreen" />
