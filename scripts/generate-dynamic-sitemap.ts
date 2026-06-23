@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const baseUrl = 'https://pharmalens.netlify.app';
+const baseUrl = 'https://pharmalens-drug-identify.vercel.app';
 const currentDate = new Date().toISOString().split('T')[0];
 const DRUGS_PER_SITEMAP = 500;
 

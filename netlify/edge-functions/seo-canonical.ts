@@ -10,7 +10,7 @@
  */
 import type { Context } from "@netlify/edge-functions";
 
-const BASE_URL = "https://pharmalens.netlify.app";
+const BASE_URL = "https://pharmalens-drug-identify.vercel.app";
 
 export default async function handler(req: Request, context: Context) {
   const url = new URL(req.url);

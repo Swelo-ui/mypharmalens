@@ -42,7 +42,7 @@ const Index = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens.netlify.app";
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens-drug-identify.vercel.app";
 
   const structuredData = {
     "@context": "https://schema.org",

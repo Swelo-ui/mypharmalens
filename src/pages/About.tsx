@@ -70,8 +70,8 @@ const About = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "PharmaLens",
-    "url": "https://pharmalens.netlify.app",
-    "logo": "https://pharmalens.netlify.app/logo.png",
+    "url": "https://pharmalens-drug-identify.vercel.app",
+    "logo": "https://pharmalens-drug-identify.vercel.app/logo.png",
     "sameAs": [
       "https://twitter.com/pharmalens",
       "https://linkedin.com/company/pharmalens"

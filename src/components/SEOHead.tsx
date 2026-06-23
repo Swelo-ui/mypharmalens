@@ -24,7 +24,7 @@ const SEOHead = ({
   const fullTitle = title.includes('PharmaLens') ? title : `${title} | PharmaLens`;
   
   // Dynamically determine base URL depending on whether the site is running on Netlify or Vercel
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens.netlify.app";
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : "https://pharmalens-drug-identify.vercel.app";
   
   const fullCanonicalUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
